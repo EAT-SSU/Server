@@ -8,13 +8,12 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @Entity
-@Table(name="user")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @NotNull
@@ -30,4 +29,12 @@ public class User extends BaseTimeEntity {
     @NotNull
     private String nickname;
 
+    public static User join(@NotNull String email, @NotNull String pwd, @NotNull String nickname) {
+        User user = new User();
+        user.email = email;
+        user.pwd = pwd;
+        user.nickname = nickname;
+        user.role = Role.USER;
+        return user;
+    }
 }
