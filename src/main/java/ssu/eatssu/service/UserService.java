@@ -58,4 +58,12 @@ public class UserService {
         // 3. 인증 정보를 바탕으로 JWT 토큰 생성
         return jwtTokenProvider.generateTokens(authentication);
     }
+
+    public void changePassword(Long userId, String pwd) {
+        User user = userRepository.findById(userId)
+              .orElseThrow(()-> new RuntimeException("User not found"));
+        String encodedPwd = passwordEncoder.encode(pwd);
+        user.changePassword(encodedPwd);
+        userRepository.save(user);
+    }
 }

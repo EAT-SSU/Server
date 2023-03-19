@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.UserRepository;
 import ssu.eatssu.service.UserService;
 import ssu.eatssu.utils.SecurityUtil;
-import ssu.eatssu.web.user.dto.Join;
-import ssu.eatssu.web.user.dto.Login;
-import ssu.eatssu.web.user.dto.NicknameEdit;
-import ssu.eatssu.web.user.dto.Tokens;
+import ssu.eatssu.web.user.dto.*;
 
 import static ssu.eatssu.utils.SecurityUtil.*;
 
@@ -64,9 +61,20 @@ public class UserController {
      */
     @Operation(summary = "닉네임 수정", description = "닉네임 수정")
     @PatchMapping("/nickname")
-    public ResponseEntity updateNickname(@Valid @RequestBody NicknameEdit nicknameEdit){
+    public ResponseEntity nicknameUpdate(@Valid @RequestBody NicknameEdit nicknameEdit){
         Long userId = getLoginUserId();
         userService.updateNickname(userId, nicknameEdit.getNickname());
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    /**
+     * 닉네임 수정
+     */
+    @Operation(summary = "비밀번호 변경", description = "비밀번호 변경")
+    @PatchMapping("/password")
+    public ResponseEntity passwordChange(@Valid @RequestBody PasswordChange passwordChange){
+        Long userId = getLoginUserId();
+        userService.changePassword(userId, passwordChange.getPwd());
         return new ResponseEntity(HttpStatus.OK);
     }
 
