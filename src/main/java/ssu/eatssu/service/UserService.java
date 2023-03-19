@@ -1,5 +1,6 @@
 package ssu.eatssu.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -9,7 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.UserRepository;
-import ssu.eatssu.web.user.dto.Join;
+import ssu.eatssu.jwt.JwtTokenProvider;
+import ssu.eatssu.web.user.dto.Tokens;
 
 @Service
 @RequiredArgsConstructor
@@ -18,20 +20,34 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public void join(Join join){
-        join.setPwd(passwordEncoder.encode(join.getPwd()));
-        User user = User.join(join.getEmail(), join.getPwd(), join.getNickname());
+    public Tokens join(String email, String pwd, String nickname) throws JsonProcessingException{
+        String encodedPwd = passwordEncoder.encode(pwd);
+        User user = User.join(email, encodedPwd, nickname);
         userRepository.save(user);
+
+        return generateJwtTokens(email, pwd);
     }
 
 
-    public void login(String email, String pwd) {
+    public Tokens login(String email, String pwd) throws JsonProcessingException {
         //유저 존재 여부 체크
         userRepository.findByEmail(email)
                 .orElseThrow(()-> new RuntimeException("User not found"));
 
-        // 1. ID/pwd 를 기반으로 Authentication 객체 생성
+        return generateJwtTokens(email, pwd);
+    }
+
+    public void updateNickname(Long userId, String nickname) {
+        User user = userRepository.findById(userId)
+              .orElseThrow(()-> new RuntimeException("User not found"));
+        user.updateNickname(nickname);
+        userRepository.save(user);
+    }
+
+    public Tokens generateJwtTokens(String email, String pwd) throws JsonProcessingException {
+        // 1. email/pwd 를 기반으로 Authentication 객체 생성
         //    이때 authentication은 인증 여부를 확인하는 authenticated 값이 false
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, pwd);
 
@@ -40,8 +56,6 @@ public class UserService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         // 3. 인증 정보를 바탕으로 JWT 토큰 생성
-            /*TokenDto jwt = tokenProvider.createToken(authentication);
-            return jwt;*/
-
+        return jwtTokenProvider.generateTokens(authentication);
     }
 }

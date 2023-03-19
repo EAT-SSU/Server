@@ -1,26 +1,30 @@
 package ssu.eatssu.security;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ssu.eatssu.domain.Role;
 import ssu.eatssu.domain.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
+@RequiredArgsConstructor
+@Getter
 public class CustomUserDetails implements UserDetails {
-    //private final Long userId;
+    private final Long Id;
     private final String email;
     private final String pwd;
-    private final Role role;
+    private final GrantedAuthority role;
 
     public CustomUserDetails(User user){
-        //this.userId = user.getId();
+        this.Id = user.getId();
         this.email = user.getEmail();
         this.pwd = user.getPwd();
         this.role = user.getRole();
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -58,4 +62,5 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
