@@ -41,4 +41,8 @@ public class User extends BaseTimeEntity {
     public void updateNickname(@NotNull String nickname) {
         this.nickname = nickname;
     }
+
+    public void changePassword(String newPwd) {
+        this.pwd = newPwd;
+    }
 }
