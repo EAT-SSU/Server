@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -14,7 +16,15 @@ public class Restaurant {
     @Column(name = "restaurant_id")
     private Long id;
 
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private RestaurantName restaurantName;
 
-    private String Time;
+    private String time;
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    private List<Menu> menus;
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    private List<TodayMenu> todayMenus;
+
 }
