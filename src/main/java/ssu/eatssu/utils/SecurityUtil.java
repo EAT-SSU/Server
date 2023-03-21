@@ -1,6 +1,7 @@
 package ssu.eatssu.utils;
 
 import org.springframework.security.access.AuthorizationServiceException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -10,7 +11,7 @@ import ssu.eatssu.security.UserPrincipalDto;
 @Component
 public class SecurityUtil {
 
-    public static UserPrincipalDto getLoginUser() {
+    public static UserPrincipalDto getLoginUserPrincipal() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
             return toDto(principal);
@@ -19,8 +20,12 @@ public class SecurityUtil {
         }
     }
 
+    public static Authentication getLoginUser(){
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
     public static Long getLoginUserId() {
-        UserPrincipalDto loginUser = getLoginUser();
+        UserPrincipalDto loginUser = getLoginUserPrincipal();
         return loginUser != null ? loginUser.getId() : null;
     }
 

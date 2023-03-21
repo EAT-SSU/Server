@@ -78,7 +78,14 @@ public class UserController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-
-
+    /**
+     * accessToken, refreshToken 재발급
+     */
+    @Operation(summary = "accessToken, refreshToken 재발급", description = "accessToken, refreshToken 재발급")
+    @PostMapping("/token/reissue")
+    public ResponseEntity<Tokens> refreshAccessToken() throws JsonProcessingException{
+        Tokens tokens = userService.refreshAccessToken(getLoginUser());
+        return ResponseEntity.ok(tokens);
+    }
 
 }
