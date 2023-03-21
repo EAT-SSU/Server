@@ -30,7 +30,6 @@ public class UserService {
         return generateJwtTokens(email, pwd);
     }
 
-
     public Tokens login(String email, String pwd) throws JsonProcessingException {
         //유저 존재 여부 체크
         userRepository.findByEmail(email)
@@ -65,5 +64,10 @@ public class UserService {
         String encodedPwd = passwordEncoder.encode(pwd);
         user.changePassword(encodedPwd);
         userRepository.save(user);
+    }
+
+    public Tokens refreshAccessToken(Authentication authentication) throws JsonProcessingException{
+
+        return jwtTokenProvider.generateTokens(authentication);
     }
 }
