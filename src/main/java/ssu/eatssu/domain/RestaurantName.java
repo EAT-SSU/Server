@@ -1,15 +1,18 @@
 package ssu.eatssu.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.Getter;
 
 import java.util.Locale;
 
+@Getter
 public enum RestaurantName {
     DODAM("도담 식당"),
     DOMITORY("기숙사 식당"),
     FOOD_COURT("푸드 코트"),
     SNACK_CORNER("스낵 코너"),
-    HAKSIK("학생 식당");
+    HAKSIK("학생 식당"),
+    THE_KITCHEN("더 키친");
 
     private String krName;
 
@@ -22,7 +25,4 @@ public enum RestaurantName {
         this.krName = krName;
     }
 
-    public String getKrName() {
-        return this.krName;
-    }
 }

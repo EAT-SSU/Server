@@ -1,5 +1,6 @@
 package ssu.eatssu.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class TodayMenu {
     @Temporal(TemporalType.DATE)
     private Date date;
 
+    @Enumerated(EnumType.STRING)
     private TimePart timePart;
 
     @ManyToOne(fetch=FetchType.LAZY)

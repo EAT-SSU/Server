@@ -19,7 +19,6 @@ public class Restaurant {
     @Enumerated(EnumType.STRING)
     private RestaurantName restaurantName;
 
-    private String time;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private List<Menu> menus;
@@ -27,4 +26,6 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private List<TodayMenu> todayMenus;
 
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    private List<OpenHour> openHours;
 }
