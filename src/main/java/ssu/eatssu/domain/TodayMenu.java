@@ -1,11 +1,11 @@
 package ssu.eatssu.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import ssu.eatssu.domain.enums.TimePart;
 
 import java.util.Date;
 

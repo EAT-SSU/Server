@@ -1,12 +1,12 @@
-package ssu.eatssu.domain;
+package ssu.eatssu.domain.enums;
 
 import lombok.Getter;
 
 @Getter
 public enum DayType {
 
-    WEEKDAY("평일"),
-    HOLIDAY("주말");
+    WEEKDAY("주중"),
+    HOLIDAY("주말, 공휴일");
 
     private String krName;
 

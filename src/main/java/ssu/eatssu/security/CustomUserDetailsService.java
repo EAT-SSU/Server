@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import ssu.eatssu.domain.User;
-import ssu.eatssu.domain.UserRepository;
+import ssu.eatssu.domain.repository.UserRepository;
 
 @Slf4j
 @Component
