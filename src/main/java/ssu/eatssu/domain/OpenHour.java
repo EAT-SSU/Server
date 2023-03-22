@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ssu.eatssu.domain.enums.DayType;
+import ssu.eatssu.domain.enums.TimePart;
 
 @Entity
 @Getter

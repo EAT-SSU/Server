@@ -1,4 +1,4 @@
-package ssu.eatssu.domain;
+package ssu.eatssu.domain.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
@@ -16,9 +16,9 @@ public enum TimePart {
         return TimePart.valueOf(s.toUpperCase(Locale.ROOT));
     }
 
-    private String name;
+    private String krName;
 
-    TimePart(String name){
-        this.name = name;
+    TimePart(String krName){
+        this.krName = krName;
     }
 }

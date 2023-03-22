@@ -1,4 +1,4 @@
-package ssu.eatssu.domain;
+package ssu.eatssu.domain.enums;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

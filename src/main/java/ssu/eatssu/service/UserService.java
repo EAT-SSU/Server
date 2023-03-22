@@ -9,7 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.User;
-import ssu.eatssu.domain.UserRepository;
+import ssu.eatssu.domain.repository.UserRepository;
 import ssu.eatssu.jwt.JwtTokenProvider;
 import ssu.eatssu.web.user.dto.Tokens;
 
