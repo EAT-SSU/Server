@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ssu.eatssu.domain.OpenHour;
 import ssu.eatssu.domain.Restaurant;
-import ssu.eatssu.domain.enums.DayType;
-import ssu.eatssu.domain.enums.TimePart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +18,7 @@ public class RestaurantInfo {
     private String location;
 
     @Schema(description = "식당 운영시간 리스트", example = "")
-    private List<OpenHourInfo> openHours = new ArrayList<>();
+    private List<OpenHourInfo> openHours;
 
     @AllArgsConstructor
     @Getter

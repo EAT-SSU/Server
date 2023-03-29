@@ -1,9 +1,7 @@
 package ssu.eatssu.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import ssu.eatssu.domain.enums.TimePart;
 
@@ -12,6 +10,8 @@ import java.util.Date;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 public class TodayMenu {
 
     @Id
@@ -34,6 +34,4 @@ public class TodayMenu {
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "menu_id")
     private Menu menu;
-
-    private int price;
 }
