@@ -34,4 +34,6 @@ public class TodayMenu {
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "menu_id")
     private Menu menu;
+
+    private Integer flag;
 }

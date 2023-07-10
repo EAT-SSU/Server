@@ -69,4 +69,17 @@ public class MenuService {
     }
 
 
+    public List<Menu> findMenuByTimePartAndFlag(TimePart timePart, String date, RestaurantName restaurantName, int flag)
+            throws ParseException {
+        Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
+                .orElseThrow(() -> new IllegalArgumentException("Restaurant not found"));
+        //date format 맞추기
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        Date formatDate = simpleDateFormat.parse(date);
+
+        List<TodayMenu> todayMenus = todayMenuRepository.findAllByDateAndTimePartAndRestaurantAndFlag(formatDate,
+                timePart,
+                restaurant, flag);
+        return todayMenus.stream().map(TodayMenu::getMenu).toList();
+    }
 }

@@ -11,8 +11,10 @@ import java.util.List;
 @Schema(title = "식단 조회")
 @Getter
 @AllArgsConstructor
-public class TodayMenu {
+public class TodayMenu2 {
     private List<MenuInfo> menuInfoList;
+
+    private Integer flag;
 
     @AllArgsConstructor
     @Getter
@@ -29,12 +31,12 @@ public class TodayMenu {
         @Schema(description = "메뉴 평점(평점이 없으면 null)", example = "4.4")
         private Double grade;
     }
-    public static TodayMenu from(List<Menu> menus){
+    public static TodayMenu2 from(List<Menu> menus, Integer flag){
         List<MenuInfo> menuInfoList = new ArrayList<>();
         for (Menu menu : menus) {
             MenuInfo menuInfo = new MenuInfo(menu.getId(), menu.getName(), menu.getPrice(), menu.getGrade());
             menuInfoList.add(menuInfo);
         }
-        return new TodayMenu(menuInfoList);
+        return new TodayMenu2(menuInfoList, flag);
     }
 }
