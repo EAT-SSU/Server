@@ -18,16 +18,25 @@ public class Menu {
 
     private String name;
 
+
+
+    private Integer price;
+
+    private Double grade = 0.0;
+
+    private Integer totalGrade = 0;
+
+    private Integer reviewCnt = 0 ;
+
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
+    private List<TodayMenu> todayMenus = new ArrayList<>();
+
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    private Integer price;
-
-    private Double grade;
-
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
-    private List<TodayMenu> todayMenus = new ArrayList<>();
+    private List<Review> reviews = new ArrayList<>();
 
     private Menu(String name, Restaurant restaurant, Integer price) {
         this.name = name;
@@ -44,4 +53,13 @@ public class Menu {
         return new Menu(name, restaurant, price);
     }
 
+    public void addReview(Integer grade) {
+            this.reviewCnt++;
+            this.totalGrade += grade;
+            this.grade = calculateGrade();
+    }
+
+    private Double calculateGrade(){ // 평정 계산 로직
+        return this.totalGrade.doubleValue()/this.reviewCnt.doubleValue();
+    }
 }

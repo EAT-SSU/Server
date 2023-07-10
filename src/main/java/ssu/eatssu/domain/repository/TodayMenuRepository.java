@@ -10,4 +10,7 @@ import java.util.List;
 
 public interface TodayMenuRepository extends JpaRepository<TodayMenu, Long> {
     List<TodayMenu> findAllByDateAndTimePartAndRestaurant(Date date, TimePart timePart, Restaurant restaurant);
+
+    List<TodayMenu> findAllByDateAndTimePartAndRestaurantAndFlag(Date formatDate, TimePart timePart,
+                                                                 Restaurant restaurant, Integer flag);
 }

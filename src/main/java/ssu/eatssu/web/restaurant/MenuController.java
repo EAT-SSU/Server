@@ -14,6 +14,7 @@ import ssu.eatssu.domain.enums.TimePart;
 import ssu.eatssu.service.MenuService;
 import ssu.eatssu.web.restaurant.dto.AddTodayMenuList;
 import ssu.eatssu.web.restaurant.dto.TodayMenu;
+import ssu.eatssu.web.restaurant.dto.TodayMenu2;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -74,6 +75,31 @@ public class MenuController {
         }
         TodayMenu todayMenu = TodayMenu.from(menus);
         return ResponseEntity.ok(todayMenu);
+    }
+
+    /**
+     * 특정 식당의 점심메뉴 조회
+     */
+    @Operation(summary = "도담 혹은 학생식당의 점심메뉴 리스트 조회", description = "도담 혹은 학생식당의 점심메뉴 리스트 조회")
+    @GetMapping("/{date}/lunch2")
+    public ResponseEntity<List<TodayMenu2>> lunchMenuListSet(@Parameter(description = "날짜(yyyyMMdd)") @PathVariable(
+            "date") String date,
+                                                             @Parameter(description = "식당이름")@RequestParam("restaurant")
+                                                           RestaurantName restaurantName) throws ParseException {
+        List<TodayMenu2> result = new ArrayList<>();
+        List<Menu> menus1 = new ArrayList<>();
+        List<Menu> menus2 = new ArrayList<>();
+
+        menus1 = menuService.findMenuByTimePartAndFlag(TimePart.LUNCH, date, restaurantName, 1);
+        menus2 = menuService.findMenuByTimePartAndFlag(TimePart.LUNCH, date, restaurantName, 2);
+
+        TodayMenu2 todayMenu1 = TodayMenu2.from(menus1, 1);
+        TodayMenu2 todayMenu2 = TodayMenu2.from(menus2, 2);
+
+        result.add(todayMenu1);
+        result.add(todayMenu2);
+
+        return ResponseEntity.ok(result);
     }
 
     /**
