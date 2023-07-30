@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ssu.eatssu.domain.enums.RestaurantName;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class Restaurant {
     @Enumerated(EnumType.STRING)
     private RestaurantName restaurantName;
 
-    private String time;
+    private String location;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private List<Menu> menus;
@@ -27,4 +28,6 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private List<TodayMenu> todayMenus;
 
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    private List<OpenHour> openHours;
 }

@@ -1,6 +1,7 @@
-package ssu.eatssu.domain;
+package ssu.eatssu.domain.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import ssu.eatssu.domain.User;
 
 import java.util.Optional;
 

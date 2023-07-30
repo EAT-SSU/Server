@@ -6,12 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import ssu.eatssu.domain.User;
-import ssu.eatssu.domain.UserRepository;
+import ssu.eatssu.domain.repository.UserRepository;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 class UserServiceTest {
