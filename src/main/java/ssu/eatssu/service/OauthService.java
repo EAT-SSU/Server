@@ -1,47 +1,44 @@
 package ssu.eatssu.service;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.User;
+import ssu.eatssu.domain.enums.OauthProvider;
 import ssu.eatssu.domain.repository.UserRepository;
 import ssu.eatssu.jwt.JwtTokenProvider;
 import ssu.eatssu.web.user.dto.Tokens;
 
-@Service
+import java.util.Optional;
+
 @RequiredArgsConstructor
+@Service
 @Transactional
-public class UserService {
+public class OauthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public Tokens join(String email, String pwd, String nickname) throws JsonProcessingException{
+
+    public Tokens loginByKakao(String email, String providerId) throws JsonProcessingException {
+        Optional<User> user = userRepository.findByEmail(email);
+        String pwd = makePassword(OauthProvider.KAKAO, providerId);
+        if (user.isEmpty()) {
+            join(email, providerId, OauthProvider.KAKAO);
+        }
+        return generateJwtTokens(email, pwd);
+    }
+    private void join(String email, String providerId, OauthProvider provider) throws JsonProcessingException {
+        String pwd = makePassword(provider, providerId);
         String encodedPwd = passwordEncoder.encode(pwd);
-        User user = User.join(email, encodedPwd, nickname);
-        userRepository.save(user);
-
-        return generateJwtTokens(email, pwd);
-    }
-
-    public Tokens login(String email, String pwd) throws JsonProcessingException {
-        //유저 존재 여부 체크
-        userRepository.findByEmail(email)
-                .orElseThrow(()-> new RuntimeException("User not found"));
-
-        return generateJwtTokens(email, pwd);
-    }
-
-    public void updateNickname(Long userId, String nickname) {
-        User user = userRepository.findById(userId)
-              .orElseThrow(()-> new RuntimeException("User not found"));
-        user.updateNickname(nickname);
+        User user = User.Oauthjoin(email, encodedPwd, provider.toString()+"유저", provider, providerId);
         userRepository.save(user);
     }
 
@@ -58,16 +55,8 @@ public class UserService {
         return jwtTokenProvider.generateTokens(authentication);
     }
 
-    public void changePassword(Long userId, String pwd) {
-        User user = userRepository.findById(userId)
-              .orElseThrow(()-> new RuntimeException("User not found"));
-        String encodedPwd = passwordEncoder.encode(pwd);
-        user.changePassword(encodedPwd);
-        userRepository.save(user);
+    private String makePassword(OauthProvider provider, String providerId){
+        return provider.toString()+providerId;
     }
 
-    public Tokens refreshAccessToken(Authentication authentication) throws JsonProcessingException{
-
-        return jwtTokenProvider.generateTokens(authentication);
-    }
 }
