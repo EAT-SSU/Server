@@ -17,16 +17,16 @@ public class RestaurantInfo {
     @Schema(description = "식당위치", example = "기숙사 1층")
     private String location;
 
-    @Schema(description = "식당 운영시간 리스트", example = "")
+    @Schema(description = "식당 운영시간 리스트")
     private List<OpenHourInfo> openHours;
 
     @AllArgsConstructor
     @Getter
     private static class OpenHourInfo {
-        @Schema(description = "평일/주말", example = "주중 / 주말, 공휴일")
+        @Schema(description = "평일/주말", example = "주중")
         private String dayType;
 
-        @Schema(description = "아침/점심/저녁", example = "아침/점심/저녁")
+        @Schema(description = "아침/점심/저녁", example = "점심")
         private String timepart;
 
         @Schema(description = "운영 시간", example = "11:00 - 14:00")

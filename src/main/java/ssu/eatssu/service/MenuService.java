@@ -3,20 +3,26 @@ package ssu.eatssu.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ssu.eatssu.domain.Meal;
+import ssu.eatssu.domain.MealMenu;
 import ssu.eatssu.domain.Menu;
 import ssu.eatssu.domain.Restaurant;
-import ssu.eatssu.domain.TodayMenu;
 import ssu.eatssu.domain.enums.RestaurantName;
 import ssu.eatssu.domain.enums.TimePart;
+import ssu.eatssu.domain.repository.MealMenuRepository;
+import ssu.eatssu.domain.repository.MealRepository;
 import ssu.eatssu.domain.repository.MenuRepository;
 import ssu.eatssu.domain.repository.RestaurantRepository;
-import ssu.eatssu.domain.repository.TodayMenuRepository;
-import ssu.eatssu.web.restaurant.dto.AddTodayMenuList;
+import ssu.eatssu.response.BaseException;
+import ssu.eatssu.web.restaurant.dto.MenuReqDto;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import static ssu.eatssu.response.BaseResponseStatus.NOT_FOUND_MENU;
+import static ssu.eatssu.response.BaseResponseStatus.NOT_FOUND_RESTAURANT;
 
 @Service
 @RequiredArgsConstructor
@@ -24,62 +30,50 @@ import java.util.List;
 public class MenuService {
 
     private final MenuRepository menuRepository;
-    private final TodayMenuRepository todayMenuRepository;
+    private final MealRepository mealRepository;
+    private final MealMenuRepository mealMenuRepository;
     private final RestaurantRepository restaurantRepository;
 
     public List<Menu> findFixMenuByRestaurant(RestaurantName restaurantName) {
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
-                .orElseThrow(() -> new IllegalArgumentException("Restaurant not found"));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_RESTAURANT));
         return menuRepository.findAllByRestaurant(restaurant);
     }
 
-    public List<Menu> findMenuByTimePart(TimePart timePart, String date, RestaurantName restaurantName) throws ParseException {
+    public List<Meal> findTodayMeals(TimePart timePart, String date,
+                                     RestaurantName restaurantName) throws ParseException {
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
-                .orElseThrow(() -> new IllegalArgumentException("Restaurant not found"));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_RESTAURANT));
         //date format 맞추기
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Date formatDate = simpleDateFormat.parse(date);
-
-        List<TodayMenu> todayMenus = todayMenuRepository.findAllByDateAndTimePartAndRestaurant(formatDate, timePart,
-                restaurant);
-        return todayMenus.stream().map(TodayMenu::getMenu).toList();
+        return mealRepository.findAllByDateAndTimePartAndRestaurant(formatDate, timePart, restaurant);
     }
 
-    public void addTodayMenuByTimePart(TimePart timePart, String date, RestaurantName restaurantName,
-                                       AddTodayMenuList addTodayMenuList) throws ParseException {
+
+    public void addMeal(TimePart timePart, String date, RestaurantName restaurantName,
+                        MenuReqDto.AddTodayMenuList addTodayMenuList) throws ParseException {
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
-                .orElseThrow(() -> new IllegalArgumentException("Restaurant not found"));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_RESTAURANT));
         //date format 맞추기
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Date formatDate = simpleDateFormat.parse(date);
-
-        for (AddTodayMenuList.AddTodayMenu addTodayMenu : addTodayMenuList.getAddTodayMenuList()) {
+        Meal newMeal = Meal.builder().date(formatDate).restaurant(restaurant).timePart(timePart).build();
+        mealRepository.save(newMeal);
+        for (String addMenuName : addTodayMenuList.getTodayMenuList()) {
             //메뉴 체크 (기존에 없던 새로운 메뉴 라면)
-            if(!menuRepository.existsByNameAndRestaurant(addTodayMenu.getName(), restaurant)) {
+            if (!menuRepository.existsByNameAndRestaurant(addMenuName, restaurant)) {
                 //메뉴 추가
-                menuRepository.save(Menu.addFixPrice(addTodayMenu.getName(), restaurant));
+                menuRepository.save(Menu.addFixPrice(addMenuName, restaurant));
             }
             //메뉴 찾아서
-            Menu menu = menuRepository.findByNameAndRestaurant(addTodayMenu.getName(), restaurant)
-                    .orElseThrow(() -> new IllegalArgumentException("Menu not found"));
-            //오늘의 메뉴 추가
-            todayMenuRepository.save(TodayMenu.builder().date(formatDate).timePart(timePart).restaurant(restaurant)
-                    .menu(menu).build());
+            Menu menu = menuRepository.findByNameAndRestaurant(addMenuName, restaurant)
+                    .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+            //식단에 메뉴 추가
+            MealMenu mealMenu = MealMenu.builder().menu(menu).meal(newMeal).build();
+            mealMenuRepository.save(mealMenu);
         }
+        newMeal.caculateGrade();
     }
 
-
-    public List<Menu> findMenuByTimePartAndFlag(TimePart timePart, String date, RestaurantName restaurantName, int flag)
-            throws ParseException {
-        Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
-                .orElseThrow(() -> new IllegalArgumentException("Restaurant not found"));
-        //date format 맞추기
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-        Date formatDate = simpleDateFormat.parse(date);
-
-        List<TodayMenu> todayMenus = todayMenuRepository.findAllByDateAndTimePartAndRestaurantAndFlag(formatDate,
-                timePart,
-                restaurant, flag);
-        return todayMenus.stream().map(TodayMenu::getMenu).toList();
-    }
 }

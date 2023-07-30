@@ -1,10 +1,12 @@
 package ssu.eatssu.domain.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import static ssu.eatssu.domain.enums.RestaurantName.*;
 
@@ -13,6 +15,8 @@ import static ssu.eatssu.domain.enums.RestaurantName.*;
 public enum MenuTypeGroup {
     FIX("고정 메뉴", Arrays.asList(FOOD_COURT, SNACK_CORNER, THE_KITCHEN)),
     CHANGE("변동 메뉴", Arrays.asList(DODAM, DOMITORY, HAKSIK));
+
+
 
     private String krName;
     private List<RestaurantName> restaurantList;
@@ -27,5 +31,10 @@ public enum MenuTypeGroup {
     }
     public static boolean isChange(RestaurantName restaurant){
         return CHANGE.getRestaurantList().contains(restaurant);
+    }
+
+    @JsonCreator
+    public static MenuTypeGroup from(String s){
+        return MenuTypeGroup.valueOf(s.toUpperCase(Locale.ROOT));
     }
 }

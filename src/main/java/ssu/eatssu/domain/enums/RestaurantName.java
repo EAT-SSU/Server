@@ -7,7 +7,7 @@ import java.util.Locale;
 
 @Getter
 public enum RestaurantName {
-    DODAM("도담 식당", 5000),
+    DODAM("도담 식당", 6000),
     DOMITORY("기숙사 식당", 5000),
     FOOD_COURT("푸드 코트", 0),
     SNACK_CORNER("스낵 코너", 0),

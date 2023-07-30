@@ -25,6 +25,7 @@ public class User extends BaseTimeEntity {
     private Role role;
 
     @NotNull
+    @Column(unique = true)
     private String email;
 
     @NotNull
@@ -51,7 +52,7 @@ public class User extends BaseTimeEntity {
         user.provider = OauthProvider.EATSSU;
         return user;
     }
-    public static User Oauthjoin(@NotNull String email, @NotNull String pwd, @NotNull String nickname,
+    public static User oAuthJoin(@NotNull String email, @NotNull String pwd, @NotNull String nickname,
                             @NotNull OauthProvider provider, String providerId) {
         User user = new User();
         user.email = email;
