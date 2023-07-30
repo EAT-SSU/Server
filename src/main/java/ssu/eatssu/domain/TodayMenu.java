@@ -1,16 +1,17 @@
 package ssu.eatssu.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import ssu.eatssu.domain.enums.TimePart;
 
 import java.util.Date;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 public class TodayMenu {
 
     @Id
@@ -23,6 +24,7 @@ public class TodayMenu {
     @Temporal(TemporalType.DATE)
     private Date date;
 
+    @Enumerated(EnumType.STRING)
     private TimePart timePart;
 
     @ManyToOne(fetch=FetchType.LAZY)
@@ -33,5 +35,5 @@ public class TodayMenu {
     @JoinColumn(name = "menu_id")
     private Menu menu;
 
-    private int price;
+    private Integer flag;
 }

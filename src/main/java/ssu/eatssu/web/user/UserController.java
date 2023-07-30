@@ -9,12 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ssu.eatssu.domain.UserRepository;
+import ssu.eatssu.domain.repository.UserRepository;
 import ssu.eatssu.service.UserService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.user.dto.*;
 
-import static ssu.eatssu.utils.SecurityUtil.*;
+import static ssu.eatssu.utils.SecurityUtil.getLoginUser;
+import static ssu.eatssu.utils.SecurityUtil.getLoginUserId;
 
 @RestController
 @RequestMapping("/user")
@@ -35,7 +36,6 @@ public class UserController {
         Tokens tokens = userService.join(join.getEmail(), join.getPwd(), join.getNickname());
         return ResponseEntity.ok(tokens);
     }
-
     /**
      * 이메일 중복체크. 중복이면 true
      */
@@ -68,7 +68,7 @@ public class UserController {
     }
 
     /**
-     * 닉네임 수정
+     * 비밀번호 변경
      */
     @Operation(summary = "비밀번호 변경", description = "비밀번호 변경")
     @PatchMapping("/password")

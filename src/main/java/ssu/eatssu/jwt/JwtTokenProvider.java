@@ -13,16 +13,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
-import ssu.eatssu.domain.Role;
 import ssu.eatssu.security.CustomUserDetails;
 import ssu.eatssu.security.UserPrincipalDto;
 import ssu.eatssu.web.user.dto.Tokens;
 
 import java.security.Key;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
