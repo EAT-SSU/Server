@@ -10,38 +10,67 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 import ssu.eatssu.domain.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
+public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     private final QReview review = QReview.review;
-    private final QMenu menu = QMenu.menu;
-    private final QUser user = QUser.user;
 
     @Override
-    public Slice<Review> findByMenuOrderByIdDesc(Menu menu, Long lastReviewId, Pageable pageable) {
+    public Slice<Review> findAllByMenuOrderByIdDesc(Menu menu, Long lastReviewId, Pageable pageable) {
         List<Review> reviewList = queryFactory.selectFrom(review)
                 .where(
                         nextFromLastReviewId(lastReviewId),
                         review.menu.eq(menu)
                 )
                 .orderBy(review.id.desc())
-                .limit(pageable.getPageSize()+1)
+                .limit(pageable.getPageSize() + 1L)
                 .fetch();
         return checkLastPage(pageable, reviewList);
     }
 
     @Override
-    public Slice<Review> findByMenuOrderByIdAsc(Menu menu, Long lastReviewId, Pageable pageable) {
+    public Slice<Review> findAllByMenuOrderByIdAsc(Menu menu, Long lastReviewId, Pageable pageable) {
         List<Review> reviewList = queryFactory.selectFrom(review)
                 .where(
                         beforeFromLastReviewId(lastReviewId),
                         review.menu.eq(menu)
                 )
+                .orderBy(review.id.asc())
+                .limit(pageable.getPageSize() + 1L)
+                .fetch();
+        return checkLastPage(pageable, reviewList);
+    }
+
+    @Override
+    public Slice<Review> findAllByMealOrderByIdDesc(Meal meal, Long lastReviewId, Pageable pageable) {
+        List<Menu> menuList = new ArrayList<>();
+        meal.getMealMenus().forEach(mealMenu -> menuList.add(mealMenu.getMenu()));
+        List<Review> reviewList = queryFactory.selectFrom(review)
+                .where(
+                        nextFromLastReviewId(lastReviewId),
+                        review.menu.in(menuList)
+                )
                 .orderBy(review.id.desc())
-                .limit(pageable.getPageSize()+1)
+                .limit(pageable.getPageSize() + 1L)
+                .fetch();
+        return checkLastPage(pageable, reviewList);
+    }
+
+    @Override
+    public Slice<Review> findAllByMealOrderByIdAsc(Meal meal, Long lastReviewId, Pageable pageable) {
+        List<Menu> menuList = new ArrayList<>();
+        meal.getMealMenus().forEach(mealMenu -> menuList.add(mealMenu.getMenu()));
+        List<Review> reviewList = queryFactory.selectFrom(review)
+                .where(
+                        beforeFromLastReviewId(lastReviewId),
+                        review.menu.in(menuList)
+                )
+                .orderBy(review.id.asc())
+                .limit(pageable.getPageSize() + 1L)
                 .fetch();
         return checkLastPage(pageable, reviewList);
     }
@@ -54,7 +83,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                         review.user.eq(user)
                 )
                 .orderBy(review.id.desc())
-                .limit(pageable.getPageSize()+1)
+                .limit(pageable.getPageSize() + 1L)
                 .fetch();
         return checkLastPage(pageable, reviewList);
     }
@@ -86,8 +115,6 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
 
         return new SliceImpl<>(results, pageable, hasNext);
     }
-
-
 
 
 }

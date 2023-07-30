@@ -4,167 +4,105 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ssu.eatssu.domain.Meal;
 import ssu.eatssu.domain.Menu;
 import ssu.eatssu.domain.enums.MenuTypeGroup;
 import ssu.eatssu.domain.enums.RestaurantName;
 import ssu.eatssu.domain.enums.TimePart;
+import ssu.eatssu.response.BaseException;
+import ssu.eatssu.response.BaseResponse;
 import ssu.eatssu.service.MenuService;
-import ssu.eatssu.web.restaurant.dto.AddTodayMenuList;
-import ssu.eatssu.web.restaurant.dto.TodayMenu;
-import ssu.eatssu.web.restaurant.dto.TodayMenu2;
+import ssu.eatssu.web.restaurant.dto.MenuReqDto.AddTodayMenuList;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ssu.eatssu.response.BaseResponseStatus.*;
+import static ssu.eatssu.web.restaurant.dto.MenuResDto.*;
+
+@Slf4j
 @RestController
 @RequestMapping("/menu")
 @RequiredArgsConstructor
-@Tag(name="Menu",description = "메뉴 API")
+@Tag(name = "Menu", description = "메뉴 API")
 public class MenuController {
 
     private final MenuService menuService;
 
     /**
-     * 고정메뉴 파는거 조회
+     * 특정 식당의 식단 조회
      */
-    @Operation(summary = "고정메뉴 파는거 조회", description = "고정메뉴 파는거 조회")
-    @GetMapping("")
-    public ResponseEntity<TodayMenu> morningMenuList(@Parameter(description = "식당이름")@RequestParam("restaurant")
-                                                             RestaurantName restaurantName){
-        if(!MenuTypeGroup.isFix(restaurantName))
-            throw new IllegalArgumentException("no fix menu restaurant!");
-        List<Menu> menus = menuService.findFixMenuByRestaurant(restaurantName);
-        TodayMenu todayMenu = TodayMenu.from(menus);
-        return ResponseEntity.ok(todayMenu);
-    }
-
-    /**
-     * 특정 식당의 아침메뉴 조회
-     */
-    @Operation(summary = "특정 식당의 아침메뉴 조회", description = "특정 식당의 아침메뉴 조회")
-    @GetMapping("/{date}/morning")
-    public ResponseEntity<TodayMenu> morningMenuList(@Parameter(description = "날짜(yyyyMMdd)") @PathVariable("date") String date,
-                                                    @Parameter(description = "식당이름")@RequestParam("restaurant")
-                                                   RestaurantName restaurantName) throws ParseException {
-        if(!MenuTypeGroup.isChange(restaurantName))
-            throw new IllegalArgumentException("no change menu restaurant!");
-        List<Menu> menus = menuService.findMenuByTimePart(TimePart.MORNING, date, restaurantName);
-        TodayMenu todayMenu = TodayMenu.from(menus);
-        return ResponseEntity.ok(todayMenu);
-    }
-
-    /**
-     * 특정 식당의 점심메뉴 조회
-     */
-    @Operation(summary = "특정 식당의 점심메뉴 조회", description = "특정 식당의 점심메뉴 조회")
-    @GetMapping("/{date}/lunch")
-    public ResponseEntity<TodayMenu> lunchMenuList(@Parameter(description = "날짜(yyyyMMdd)") @PathVariable("date") String date,
-                                                     @Parameter(description = "식당이름")@RequestParam("restaurant")
-                                                             RestaurantName restaurantName) throws ParseException {
-        List<Menu> menus = new ArrayList<>();
-        if(MenuTypeGroup.isChange(restaurantName)){
-            menus = menuService.findMenuByTimePart(TimePart.LUNCH, date, restaurantName);
-        }else if(MenuTypeGroup.isFix(restaurantName)){
-            menus = menuService.findFixMenuByRestaurant(restaurantName);
-        }else{
-            throw new IllegalArgumentException("not fount restaurant!");
+    @Operation(summary = "변동메뉴 식단 리스트 조회 By 식당", description = "변동메뉴 식단 리스트 조회(학생식당, 도담, 기숙사 식당)")
+    @GetMapping("/today-meal")
+    public ResponseEntity<List<TodayMeal>> todayMealList(@Parameter(description = "날짜(yyyyMMdd)") @RequestParam(
+            "date")
+                                                                 String date,
+                                                         @Parameter(description = "식당이름") @RequestParam("restaurant")
+                                                                 RestaurantName restaurantName,
+                                                         @Parameter(description = "시간대") @RequestParam("time")
+                                                                 TimePart timePart) throws ParseException {
+        if (MenuTypeGroup.isChange(restaurantName)) {
+            List<Meal> mealList = menuService.findTodayMeals(timePart, date, restaurantName);
+            List<TodayMeal> todayMealList = new ArrayList<>();
+            for (Meal meal : mealList) {
+                TodayMeal todayMeal = TodayMeal.from(meal);
+                todayMealList.add(todayMeal);
+            }
+            return ResponseEntity.ok(todayMealList);
+        } else {
+            throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
-        TodayMenu todayMenu = TodayMenu.from(menus);
-        return ResponseEntity.ok(todayMenu);
-    }
-
-    /**
-     * 특정 식당의 점심메뉴 조회
-     */
-    @Operation(summary = "도담 혹은 학생식당의 점심메뉴 리스트 조회", description = "도담 혹은 학생식당의 점심메뉴 리스트 조회")
-    @GetMapping("/{date}/lunch2")
-    public ResponseEntity<List<TodayMenu2>> lunchMenuListSet(@Parameter(description = "날짜(yyyyMMdd)") @PathVariable(
-            "date") String date,
-                                                             @Parameter(description = "식당이름")@RequestParam("restaurant")
-                                                           RestaurantName restaurantName) throws ParseException {
-        List<TodayMenu2> result = new ArrayList<>();
-        List<Menu> menus1 = new ArrayList<>();
-        List<Menu> menus2 = new ArrayList<>();
-
-        menus1 = menuService.findMenuByTimePartAndFlag(TimePart.LUNCH, date, restaurantName, 1);
-        menus2 = menuService.findMenuByTimePartAndFlag(TimePart.LUNCH, date, restaurantName, 2);
-
-        TodayMenu2 todayMenu1 = TodayMenu2.from(menus1, 1);
-        TodayMenu2 todayMenu2 = TodayMenu2.from(menus2, 2);
-
-        result.add(todayMenu1);
-        result.add(todayMenu2);
-
-        return ResponseEntity.ok(result);
-    }
-
-    /**
-     * 특정 식당의 저녁메뉴 조회
-     */
-    @Operation(summary = "특정 식당의 저녁메뉴 조회", description = "특정 식당의 저녁메뉴 조회")
-    @GetMapping("/{date}/dinner")
-    public ResponseEntity<TodayMenu> dinnerMenuList(@Parameter(description = "날짜(yyyyMMdd)") @PathVariable("date") String date,
-                                                     @Parameter(description = "식당이름")@RequestParam("restaurant")
-                                                             RestaurantName restaurantName) throws ParseException {
-
-        if(!MenuTypeGroup.isChange(restaurantName))
-            throw new IllegalArgumentException("no change menu restaurant!");
-        List<Menu> menus = menuService.findMenuByTimePart(TimePart.DINNER, date, restaurantName);
-        TodayMenu todayMenu = TodayMenu.from(menus);
-        return ResponseEntity.ok(todayMenu);
     }
 
 
     /**
-     * 특정 식당의 특정 날짜 아침메뉴 추가하기
+     * 고정메뉴 조회
      */
-    @Operation(summary = "특정 식당의 아침메뉴 추가", description = "특정 식당의 아침메뉴 추가")
-    @PostMapping("/{date}/morning")
-    public ResponseEntity morningMenuAdd(@Parameter(description = "날짜(yyyyMMdd)") @PathVariable("date") String date,
-                                                    @Parameter(description = "식당이름")@RequestParam("restaurant")
-                                                            RestaurantName restaurantName,
-                                                    @RequestBody AddTodayMenuList addTodayMenuList) throws ParseException {
-
-        if(!MenuTypeGroup.isChange(restaurantName))
-            throw new IllegalArgumentException("no change menu restaurant!");
-        menuService.addTodayMenuByTimePart(TimePart.MORNING, date, restaurantName, addTodayMenuList);
-        return new ResponseEntity(HttpStatus.OK);
+    @Operation(summary = "고정 메뉴 리스트 조회", description = "고정 메뉴 리스트 조회(푸드코트, 스낵코너, 더 키친)")
+    @GetMapping("/fix-menu")
+    public ResponseEntity<FixMenuList> fixMenuList(@Parameter(description = "식당이름") @RequestParam("restaurant")
+                                                           RestaurantName restaurantName) {
+        if (MenuTypeGroup.isFix(restaurantName)) {
+            List<Menu> menuList = menuService.findFixMenuByRestaurant(restaurantName);
+            FixMenuList fixMenuList = FixMenuList.from(menuList);
+            return ResponseEntity.ok(fixMenuList);
+        } else {
+            throw new BaseException(NOT_SUPPORT_RESTAURANT);
+        }
     }
 
+
     /**
-     * 특정 식당의 특정 날짜 점심메뉴 추가하기
+     * 특정 식당의 특정 날짜 식단 추가하기
      */
-    @Operation(summary = "특정 식당의 점심메뉴 추가", description = "특정 식당의 점심메뉴 추가")
-    @PostMapping("/{date}/lunch")
-    public ResponseEntity lunchMenuAdd(@Parameter(description = "날짜(yyyyMMdd)") @PathVariable("date") String date,
-                                         @Parameter(description = "식당이름")@RequestParam("restaurant")
+    @Operation(summary = "특정 식당 식단 추가", description = "특정 식당의 식단 추가")
+    @PostMapping("/")
+    public ResponseEntity todayMenuAdd(@Parameter(description = "날짜(yyyyMMdd)") @RequestParam(
+            "date")
+                                                 String date,
+                                         @Parameter(description = "식당이름") @RequestParam("restaurant")
                                                  RestaurantName restaurantName,
+                                         @Parameter(description = "시간대") @RequestParam("time")
+                                                 TimePart timePart,
                                          @RequestBody AddTodayMenuList addTodayMenuList) throws ParseException {
 
-        if(!MenuTypeGroup.isChange(restaurantName))
-            throw new IllegalArgumentException("no change menu restaurant!");
-        menuService.addTodayMenuByTimePart(TimePart.LUNCH, date, restaurantName, addTodayMenuList);
-        return new ResponseEntity(HttpStatus.OK);
+        if (MenuTypeGroup.isChange(restaurantName)) {
+            menuService.addMeal(timePart, date, restaurantName, addTodayMenuList);
+            return ResponseEntity.ok(HttpStatus.OK);
+        } else {
+            throw new BaseException(NOT_SUPPORT_RESTAURANT);
+        }
     }
 
-    /**
-     * 특정 식당의 특정 날짜 저녁메뉴 추가하기
-     */
-    @Operation(summary = "특정 식당의 저녁메뉴 추가", description = "특정 식당의 저녁메뉴 추가")
-    @PostMapping("/{date}/dinner")
-    public ResponseEntity dinnerMenuAdd(@Parameter(description = "날짜(yyyyMMdd)") @PathVariable("date") String date,
-                                         @Parameter(description = "식당이름")@RequestParam("restaurant")
-                                                 RestaurantName restaurantName,
-                                         @RequestBody AddTodayMenuList addTodayMenuList) throws ParseException {
-
-        if(!MenuTypeGroup.isChange(restaurantName))
-            throw new IllegalArgumentException("no change menu restaurant!");
-        menuService.addTodayMenuByTimePart(TimePart.DINNER, date, restaurantName, addTodayMenuList);
-        return new ResponseEntity(HttpStatus.OK);
+    @ExceptionHandler(BaseException.class)
+    public BaseResponse<String> handleBaseException(BaseException e) {
+        log.info(e.getStatus().toString());
+        return new BaseResponse<>(e.getStatus());
     }
 
 }

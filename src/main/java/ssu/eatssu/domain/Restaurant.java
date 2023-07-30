@@ -26,7 +26,7 @@ public class Restaurant {
     private List<Menu> menus;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
-    private List<TodayMenu> todayMenus;
+    private List<Meal> meals;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private List<OpenHour> openHours;
