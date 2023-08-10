@@ -26,6 +26,9 @@ public enum BaseResponseStatus {
     PERMISSION_DENIED(false, 2007, "권한이 없습니다."),
 
     MISSING_QUERY_PARAM(false, 2008, "쿼리 파라미터가 누락되었습니다."),
+    INVALID_TOKEN(false, 2009, "유효하지 않은 토큰 값입니다." ),
+    FAIL_MAKE_TOKEN(false, 2010, "토큰 생성에 실패했습니다."),
+
 
     /**
      * 3000 : Response 오류
