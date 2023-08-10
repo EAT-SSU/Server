@@ -18,6 +18,7 @@ import ssu.eatssu.service.MyPageService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.SliceDto;
 import ssu.eatssu.web.mypage.dto.MyReviewDetail;
+import ssu.eatssu.web.mypage.dto.MypageInfo;
 
 @Slf4j
 @RestController
@@ -40,6 +41,17 @@ public class MyPageController {
         Long userId = SecurityUtil.getLoginUserId();
         SliceDto<MyReviewDetail> myReviewList = myPageService.findMyReviewList(userId, pageable, lastReviewId);
         return ResponseEntity.ok(myReviewList);
+    }
+
+    /**
+     * 마이페이지 정보
+     */
+    @Operation(summary = "마이페이지 정보", description = "마이페이지 정보")
+    @PostMapping("/info")
+    public ResponseEntity<MypageInfo> mypageInfo() {
+        Long userId = SecurityUtil.getLoginUserId();
+        MypageInfo mypageInfo = myPageService.mypageInfo(userId);
+        return ResponseEntity.ok(mypageInfo);
     }
 
     @ExceptionHandler(BaseException.class)
