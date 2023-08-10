@@ -13,6 +13,7 @@ import ssu.eatssu.domain.repository.UserRepository;
 import ssu.eatssu.response.BaseException;
 import ssu.eatssu.web.SliceDto;
 import ssu.eatssu.web.mypage.dto.MyReviewDetail;
+import ssu.eatssu.web.mypage.dto.MypageInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,7 @@ public class MyPageService {
     private final UserRepository userRepository;
 
     public SliceDto<MyReviewDetail> findMyReviewList(Long userId, Pageable pageable, Long lastReviewId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         //pageable에서 sort값 가져옴
         String sortBy = pageable.getSort().get().findFirst().orElseThrow().getProperty();
@@ -59,5 +59,10 @@ public class MyPageService {
         }
         return new SliceDto<>(sliceReviewList.getNumberOfElements(),
                 sliceReviewList.hasNext(), myReviewDetailList);
+    }
+
+    public MypageInfo mypageInfo(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        return new MypageInfo(user.getNickname(), user.getProvider());
     }
 }

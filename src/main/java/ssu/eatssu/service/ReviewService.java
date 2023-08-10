@@ -46,8 +46,10 @@ public class ReviewService {
         menu.addReview(reviewCreate.getMainGrade(),reviewCreate.getTasteGrade(), reviewCreate.getAmountGrade());
         menuRepository.save(menu);
 
-        for(MultipartFile img : imgList){
-            addReviewImg(review, img);
+        if(imgList!=null&&!imgList.isEmpty()){
+            for(MultipartFile img : imgList){
+                addReviewImg(review, img);
+            }
         }
     }
     public void addReviewImg(Review review, MultipartFile image) {
@@ -113,7 +115,7 @@ public class ReviewService {
                 menuList.stream().map(this::findMenuReviewGradeCnt).toList();
         Map<Integer, Long> totalGradeCntMap = gradeCntMapList.stream().flatMap(m -> m.entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Long::sum));
-
+        meal.caculateGrade();
         return MenuReviewInfo.builder()
                 .menuName(reviewMenuList).mainGrade(meal.getMainGrade()).tasteGrade(meal.getTasteGrade())
                 .amountGrade(meal.getAmountGrade()).totalReviewCount(menuList.stream().mapToInt(Menu::getReviewCnt).sum())
