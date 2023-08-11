@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.enums.ReportStatus;
 import ssu.eatssu.domain.enums.ReviewReportType;
 
+@Builder
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,10 +34,4 @@ public class ReviewReport extends BaseTimeEntity{
 
     @Enumerated(EnumType.STRING)
     private ReportStatus status;
-
-    @Builder
-    public ReviewReport(User user, Review review) {
-        this.user = user;
-        this.review = review;
-    }
 }
