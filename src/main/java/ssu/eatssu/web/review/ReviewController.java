@@ -62,9 +62,8 @@ public class ReviewController {
      * 리뷰 수정(글 수정)
      */
     @Operation(summary = "리뷰 수정(글 수정)", description = "리뷰 수정(글 수정)")
-    @PatchMapping("/{menuId}/{reviewId}")
-    public ResponseEntity reviewUpdate(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
-                                       @Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId,
+    @PatchMapping("/{reviewId}")
+    public ResponseEntity reviewUpdate(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId,
                                        @RequestBody ReviewUpdate reviewUpdate) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.updateReview(userId, reviewId, reviewUpdate);
@@ -75,9 +74,8 @@ public class ReviewController {
      * 리뷰 삭제
      */
     @Operation(summary = "리뷰 삭제", description = "리뷰 삭제")
-    @DeleteMapping("/{menuId}/detail/{reviewId}")
-    public ResponseEntity reviewDelete(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
-                                       @Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity reviewDelete(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.deleteReview(userId, reviewId);
         return new ResponseEntity(HttpStatus.OK);
