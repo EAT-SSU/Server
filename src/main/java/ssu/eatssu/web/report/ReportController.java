@@ -12,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ssu.eatssu.domain.Review;
+import ssu.eatssu.domain.enums.ReviewReportType;
 import ssu.eatssu.response.BaseException;
 import ssu.eatssu.response.BaseResponse;
 import ssu.eatssu.service.MyPageService;
@@ -21,6 +23,11 @@ import ssu.eatssu.web.SliceDto;
 import ssu.eatssu.web.mypage.dto.MyReviewDetail;
 import ssu.eatssu.web.mypage.dto.MypageInfo;
 import ssu.eatssu.web.report.dto.ReviewReportCreate;
+import ssu.eatssu.web.report.dto.ReviewReportTypeInfo;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -29,6 +36,18 @@ import ssu.eatssu.web.report.dto.ReviewReportCreate;
 @Tag(name = "Report", description = "신고 API")
 public class ReportController {
     private final ReportService reportService;
+
+    /**
+     * 리뷰 신고 사유 받아오기
+     */
+    @Operation(summary = "리뷰 신고 사유 받아오기", description = "리뷰 신고 사유 받아오기")
+    @GetMapping("/type")
+    public ResponseEntity<List<ReviewReportTypeInfo>> reportReviewType() {
+        List<ReviewReportTypeInfo> reportInfo = new ArrayList<>();
+        Arrays.stream(ReviewReportType.values())
+                .forEach(reportType -> reportInfo.add(new ReviewReportTypeInfo(reportType)));
+        return ResponseEntity.ok(reportInfo);
+    }
 
     /**
      * 리뷰 신고하기
