@@ -1,16 +1,15 @@
 package ssu.eatssu.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ssu.eatssu.domain.enums.ReportStatus;
 import ssu.eatssu.domain.enums.ReviewReportType;
 
+@Builder
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class ReviewReport extends BaseTimeEntity{
 
     @Id
@@ -33,10 +32,4 @@ public class ReviewReport extends BaseTimeEntity{
 
     @Enumerated(EnumType.STRING)
     private ReportStatus status;
-
-    @Builder
-    public ReviewReport(User user, Review review) {
-        this.user = user;
-        this.review = review;
-    }
 }
