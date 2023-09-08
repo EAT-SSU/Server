@@ -32,7 +32,7 @@ public class MyPageController {
      * 내가 쓴 리뷰 리스트
      */
     @Operation(summary = "내가 쓴 리뷰 모아보기", description = "내가 쓴 리뷰 리스트")
-    @PostMapping("/myreview")
+    @GetMapping("/myreview")
     public ResponseEntity<SliceDto<MyReviewDetail>> myReviewList(
             @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)",
                     in = ParameterIn.QUERY) @RequestParam(required = false) Long lastReviewId,
@@ -47,7 +47,7 @@ public class MyPageController {
      * 마이페이지 정보
      */
     @Operation(summary = "마이페이지 정보", description = "마이페이지 정보")
-    @PostMapping("/info")
+    @GetMapping("/info")
     public ResponseEntity<MypageInfo> mypageInfo() {
         Long userId = SecurityUtil.getLoginUserId();
         MypageInfo mypageInfo = myPageService.mypageInfo(userId);
