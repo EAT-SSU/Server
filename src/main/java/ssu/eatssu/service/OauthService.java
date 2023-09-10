@@ -59,7 +59,7 @@ public class OauthService {
     private void join(String email, String providerId, OauthProvider provider) {
         String pwd = makePassword(provider, providerId);
         String encodedPwd = passwordEncoder.encode(pwd);
-        User user = User.oAuthJoin(email, encodedPwd, provider + "유저", provider, providerId);
+        User user = User.oAuthJoin(email, encodedPwd, provider, providerId);
         userRepository.save(user);
     }
 
