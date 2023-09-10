@@ -33,7 +33,7 @@ public class UserController {
     @Operation(summary = "회원가입", description = "회원가입.")
     @PostMapping("/join")
     public ResponseEntity<Tokens> join(@Valid @RequestBody Join join) throws JsonProcessingException {
-        Tokens tokens = userService.join(join.getEmail(), join.getPwd(), join.getNickname());
+        Tokens tokens = userService.join(join.getEmail(), join.getPwd());
         return ResponseEntity.ok(tokens);
     }
     /**

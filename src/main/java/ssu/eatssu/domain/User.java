@@ -20,20 +20,16 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @Column(unique = true)
     private String email;
 
-    @NotNull
     private String pwd;
 
-    @NotNull
     private String nickname;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     private OauthProvider provider;
 
@@ -42,21 +38,19 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Review> reviews;
 
-    public static User join(@NotNull String email, @NotNull String pwd, @NotNull String nickname) {
+    public static User join(@NotNull String email, @NotNull String pwd) {
         User user = new User();
         user.email = email;
         user.pwd = pwd;
-        user.nickname = nickname;
         user.role = Role.USER;
         user.provider = OauthProvider.EATSSU;
         return user;
     }
-    public static User oAuthJoin(@NotNull String email, @NotNull String pwd, @NotNull String nickname,
-                            @NotNull OauthProvider provider, String providerId) {
+    public static User oAuthJoin(@NotNull String email, @NotNull String pwd, @NotNull OauthProvider provider,
+                                 String providerId) {
         User user = new User();
         user.email = email;
         user.pwd = pwd;
-        user.nickname = nickname;
         user.role = Role.USER;
         user.provider = provider;
         user.providerId = providerId;

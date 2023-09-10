@@ -25,7 +25,7 @@ class UserServiceTest {
     @DisplayName("회원 가입 테스트")
     void join() {
         //given
-        User user = User.join("email1", "pwd1", "nickname1");
+        User user = User.join("email1", "pwd1");
 
         //when
         userRepository.save(user);
