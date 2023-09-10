@@ -11,7 +11,12 @@ import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.repository.UserRepository;
 import ssu.eatssu.jwt.JwtTokenProvider;
+import ssu.eatssu.response.BaseException;
 import ssu.eatssu.web.user.dto.Tokens;
+
+import java.util.Optional;
+
+import static ssu.eatssu.response.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -22,9 +27,9 @@ public class UserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public Tokens join(String email, String pwd, String nickname) throws JsonProcessingException{
+    public Tokens join(String email, String pwd) throws JsonProcessingException{
         String encodedPwd = passwordEncoder.encode(pwd);
-        User user = User.join(email, encodedPwd, nickname);
+        User user = User.join(email, encodedPwd);
         userRepository.save(user);
 
         return generateJwtTokens(email, pwd);
@@ -32,9 +37,10 @@ public class UserService {
 
     public Tokens login(String email, String pwd) throws JsonProcessingException {
         //유저 존재 여부 체크
-        userRepository.findByEmail(email)
-                .orElseThrow(()-> new RuntimeException("User not found"));
-
+        Optional<User> user = userRepository.findByEmail(email);
+        if(user.isEmpty()){
+            throw new BaseException(NOT_FOUND_USER);
+        }
         return generateJwtTokens(email, pwd);
     }
 
