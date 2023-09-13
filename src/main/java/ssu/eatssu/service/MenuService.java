@@ -21,8 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static ssu.eatssu.response.BaseResponseStatus.NOT_FOUND_MENU;
-import static ssu.eatssu.response.BaseResponseStatus.NOT_FOUND_RESTAURANT;
+import static ssu.eatssu.response.BaseResponseStatus.*;
+import static ssu.eatssu.web.restaurant.dto.MenuResDto.*;
 
 @Service
 @RequiredArgsConstructor
@@ -76,4 +76,8 @@ public class MenuService {
         newMeal.caculateGrade();
     }
 
+    public MenuList findAllMenu(Long mealId) {
+        Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
+        return MenuList.from(meal);
+    }
 }
