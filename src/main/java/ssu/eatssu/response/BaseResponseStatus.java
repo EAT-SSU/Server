@@ -29,6 +29,9 @@ public enum BaseResponseStatus {
     INVALID_TOKEN(false, 2009, "유효하지 않은 토큰 값입니다." ),
     FAIL_MAKE_TOKEN(false, 2010, "토큰 생성에 실패했습니다."),
 
+    DUPLICATE_EMAIL(false, 2011, "중복된 이메일입니다."),
+    DUPLICATE_NICKNAME(false, 2012, "중복된 닉네임입니다."),
+
 
     /**
      * 3000 : Response 오류
