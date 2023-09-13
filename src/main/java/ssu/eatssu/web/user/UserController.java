@@ -68,6 +68,16 @@ public class UserController {
     }
 
     /**
+     * 닉네임 중복 체크. 중복이면 true
+     */
+    @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복")
+    @GetMapping("/check-nickname")
+    public ResponseEntity checkNicknameDuplicate(@Parameter(description = "닉네임")@RequestParam String nickname){
+        boolean result = userRepository.existsByNickname(nickname);
+        return ResponseEntity.ok(result);
+    }
+
+    /**
      * 비밀번호 변경
      */
     @Operation(summary = "비밀번호 변경", description = "비밀번호 변경")
