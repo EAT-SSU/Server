@@ -95,4 +95,36 @@ public class MenuResDto {
         }
     }
 
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MenuList {
+        private List<MenuInfo> menuInfoList;
+
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        private static class MenuInfo{
+            @Schema(description = "메뉴 식별자", example = "2")
+            private Long menuId;
+
+            @Schema(description = "메뉴 이름", example = "돈까스")
+            private String name;
+        }
+
+        public static MenuList from (Meal meal){
+            if(!meal.getMealMenus().isEmpty()){
+                List<MenuInfo> menuInfoList = new ArrayList<>();
+                for(MealMenu mealMenu : meal.getMealMenus()){
+                    Menu menu = mealMenu.getMenu();
+                    MenuInfo menuInfo = new MenuInfo(menu.getId(), menu.getName());
+                    menuInfoList.add(menuInfo);
+                }
+                return new MenuList(menuInfoList);
+            }else{
+                return null;
+            }
+        }
+    }
+
 }

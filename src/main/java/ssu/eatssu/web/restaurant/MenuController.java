@@ -99,6 +99,16 @@ public class MenuController {
         }
     }
 
+    /**
+     * mealId로 menuId, name 리스트 조회
+     */
+    @Operation(summary = "메뉴 정보 조회 By mealId", description = "메뉴 정보(Id, name) 조회 By mealId")
+    @GetMapping("/menus")
+    public ResponseEntity menuList(@Parameter(description = "mealId") @RequestParam("mealId") Long mealId) {
+        MenuList menuList = menuService.findAllMenu(mealId);
+        return ResponseEntity.ok(menuList);
+    }
+
     @ExceptionHandler(BaseException.class)
     public BaseResponse<String> handleBaseException(BaseException e) {
         log.info(e.getStatus().toString());

@@ -44,7 +44,7 @@ public class UserController {
     /**
      * 이메일 중복체크. 중복이면 true
      */
-    @Operation(summary = "이메일 중복 체크", description = "이미 존재하는 이메일이면 true 반환")
+    @Operation(summary = "이메일 중복 체크", description = "존재하는 이메일이면 errorCode 2011")
     @PostMapping("/user-emails/{email}/exist")
     public BaseResponse<Boolean> checkEmailDuplicate(@Parameter(description = "이메일")@PathVariable String email){
         boolean result = userRepository.existsByEmail(email);
@@ -79,7 +79,7 @@ public class UserController {
     /**
      * 닉네임 중복 체크. 중복이면 true
      */
-    @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복")
+    @Operation(summary = "닉네임 중복 체크", description = "존재하는 닉네임이면 errorCode 2012")
     @GetMapping("/check-nickname")
     public BaseResponse<Boolean> checkNicknameDuplicate(@Parameter(description = "닉네임")@RequestParam(value =
             "nickname") String nickname){
@@ -111,6 +111,12 @@ public class UserController {
         Tokens tokens = userService.refreshAccessToken(getLoginUser());
         return ResponseEntity.ok(tokens);
     }
+    @ExceptionHandler(BaseException.class)
+    public BaseResponse<String> handleBaseException(BaseException e) {
+        log.info(e.getStatus().toString());
+        return new BaseResponse<>(e.getStatus());
+    }
+
     @ExceptionHandler(BaseException.class)
     public BaseResponse<String> handleBaseException(BaseException e) {
         log.info(e.getStatus().toString());
