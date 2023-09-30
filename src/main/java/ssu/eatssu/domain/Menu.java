@@ -74,9 +74,27 @@ public class Menu {
             calculateGrade();
     }
 
+    public void refreshReview(){
+        int totalMain = 0;
+        int totalTaste =0;
+        int totalAmount = 0;
+        for(Review review : this.reviews){
+            totalMain+=review.getMainGrade();
+            totalTaste = review.getTasteGrade();
+            totalAmount+=review.getAmountGrade();
+        }
+        this.totalMainGrade = totalMain;
+        this.totalTasteGrade = totalTaste;
+        this.totalAmountGrade = totalAmount;
+        this.reviewCnt = (int)reviews.stream().count();
+        calculateGrade();
+    }
+
     private void calculateGrade(){ // 평점 계산 후 적용
-        this.mainGrade = this.totalMainGrade.doubleValue()/this.reviewCnt.doubleValue();
-        this.tasteGrade = this.totalTasteGrade.doubleValue()/this.reviewCnt.doubleValue();
-        this.amountGrade = this.totalAmountGrade.doubleValue()/this.reviewCnt.doubleValue();
+        if(this.reviewCnt!=0){
+            this.mainGrade = this.totalMainGrade.doubleValue()/this.reviewCnt.doubleValue();
+            this.tasteGrade = this.totalTasteGrade.doubleValue()/this.reviewCnt.doubleValue();
+            this.amountGrade = this.totalAmountGrade.doubleValue()/this.reviewCnt.doubleValue();
+        }
     }
 }
