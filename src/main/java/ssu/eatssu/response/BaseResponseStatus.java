@@ -28,6 +28,9 @@ public enum BaseResponseStatus {
     MISSING_QUERY_PARAM(false, 2008, "쿼리 파라미터가 누락되었습니다."),
     INVALID_TOKEN(false, 2009, "유효하지 않은 토큰 값입니다." ),
     FAIL_MAKE_TOKEN(false, 2010, "토큰 생성에 실패했습니다."),
+    NICKNAME_DUPLICATE(false, 2011, "이미 존재하는 닉네임입니다."),
+    EMAIL_DUPLICATE(false, 2012, "이미 존재하는 이메일입니다."),
+
 
 
     /**
