@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.repository.UserRepository;
+import ssu.eatssu.response.BaseResponse;
 import ssu.eatssu.service.UserService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.user.dto.*;
@@ -72,9 +73,10 @@ public class UserController {
      */
     @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복")
     @GetMapping("/check-nickname")
-    public ResponseEntity checkNicknameDuplicate(@Parameter(description = "닉네임")@RequestParam String nickname){
+    public BaseResponse<Boolean> checkNicknameDuplicate(@Parameter(description = "닉네임")@RequestParam(value =
+            "nickname") String nickname){
         boolean result = userRepository.existsByNickname(nickname);
-        return ResponseEntity.ok(result);
+        return new BaseResponse(result);
     }
 
     /**
