@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ssu.eatssu.domain.enums.MenuTypeGroup;
 import ssu.eatssu.response.BaseException;
 import ssu.eatssu.response.BaseResponse;
+import ssu.eatssu.service.RefreshingService;
 import ssu.eatssu.service.ReviewService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.SliceDto;
@@ -27,6 +28,7 @@ import ssu.eatssu.web.review.dto.ReviewDetail;
 import ssu.eatssu.web.review.dto.ReviewUpdate;
 
 import javax.net.ssl.SSLEngineResult;
+import java.awt.*;
 import java.util.List;
 
 import static ssu.eatssu.domain.enums.MenuTypeGroup.CHANGE;
@@ -41,6 +43,7 @@ import static ssu.eatssu.response.BaseResponseStatus.MISSING_QUERY_PARAM;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final RefreshingService refreshingService;
 
     /**
      * 리뷰 작성
@@ -147,6 +150,14 @@ public class ReviewController {
             throw new BaseException(MISSING_QUERY_PARAM);
         }
         return ResponseEntity.ok(reviewList);
+    }
+    /*
+    review 갯수, 별점 refresh
+     */
+    @GetMapping("/refresh")
+    public BaseResponse refreshReviewInfo(){
+        refreshingService.refreshAllReviews();
+        return new BaseResponse<>("");
     }
 
     @ExceptionHandler(BaseException.class)
