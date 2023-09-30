@@ -6,18 +6,22 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.repository.UserRepository;
+import ssu.eatssu.response.BaseException;
 import ssu.eatssu.response.BaseResponse;
 import ssu.eatssu.service.UserService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.user.dto.*;
 
+import static ssu.eatssu.response.BaseResponseStatus.*;
 import static ssu.eatssu.utils.SecurityUtil.getLoginUser;
 import static ssu.eatssu.utils.SecurityUtil.getLoginUserId;
 
+@Slf4j
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -42,9 +46,13 @@ public class UserController {
      */
     @Operation(summary = "이메일 중복 체크", description = "이미 존재하는 이메일이면 true 반환")
     @PostMapping("/user-emails/{email}/exist")
-    public ResponseEntity<Boolean> checkEmailDuplicate(@Parameter(description = "이메일")@PathVariable String email){
+    public BaseResponse<Boolean> checkEmailDuplicate(@Parameter(description = "이메일")@PathVariable String email){
         boolean result = userRepository.existsByEmail(email);
-        return ResponseEntity.ok(result);
+        if(result){
+            return new BaseResponse<>(result);
+        }else{
+            throw new BaseException(EMAIL_DUPLICATE);
+        }
     }
 
     /**
@@ -76,7 +84,11 @@ public class UserController {
     public BaseResponse<Boolean> checkNicknameDuplicate(@Parameter(description = "닉네임")@RequestParam(value =
             "nickname") String nickname){
         boolean result = userRepository.existsByNickname(nickname);
-        return new BaseResponse(result);
+        if(result){
+            return new BaseResponse(result);
+        }else{
+            throw new BaseException(NICKNAME_DUPLICATE);
+        }
     }
 
     /**
@@ -98,6 +110,11 @@ public class UserController {
     public ResponseEntity<Tokens> refreshAccessToken() throws JsonProcessingException{
         Tokens tokens = userService.refreshAccessToken(getLoginUser());
         return ResponseEntity.ok(tokens);
+    }
+    @ExceptionHandler(BaseException.class)
+    public BaseResponse<String> handleBaseException(BaseException e) {
+        log.info(e.getStatus().toString());
+        return new BaseResponse<>(e.getStatus());
     }
 
 }
