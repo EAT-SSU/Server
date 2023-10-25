@@ -111,10 +111,20 @@ public class UserController {
         Tokens tokens = userService.refreshAccessToken(getLoginUser());
         return ResponseEntity.ok(tokens);
     }
+    /**
+     * 유저 탈퇴
+     */
+    @Operation(summary = "유저 탈퇴", description = "유저 탈퇴")
+    @DeleteMapping("/signout")
+    public ResponseEntity<> signout(){
+        userService.signout(getLoginUserId());
+        return ResponseEntity.ok("");
+    }
     @ExceptionHandler(BaseException.class)
     public BaseResponse<String> handleBaseException(BaseException e) {
         log.info(e.getStatus().toString());
         return new BaseResponse<>(e.getStatus());
     }
+
 
 }
