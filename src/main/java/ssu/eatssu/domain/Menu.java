@@ -74,7 +74,15 @@ public class Menu {
             calculateGrade();
     }
 
-    public void refreshReview(){
+    public void deleteReview(){
+        refreshReview();
+    }
+
+    public void updateReview() {
+        refreshReview();
+    }
+
+    private void refreshReview(){
         int totalMain = 0;
         int totalTaste =0;
         int totalAmount = 0;
