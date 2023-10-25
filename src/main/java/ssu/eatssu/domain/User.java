@@ -39,7 +39,8 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.DETACH,CascadeType.MERGE
+            ,CascadeType.REFRESH})
     private List<Review> reviews;
 
     public static User join(@NotNull String email, @NotNull String pwd) {
@@ -73,7 +74,4 @@ public class User extends BaseTimeEntity {
 
     public void updateEmail(String email) { this.email = email; }
 
-    public void signout(){
-        this.status = UserStatus.INACTIVE;
-    }
 }

@@ -41,6 +41,7 @@ public class UserController {
         Tokens tokens = userService.join(join.getEmail(), join.getPwd());
         return ResponseEntity.ok(tokens);
     }
+
     /**
      * 이메일 중복체크. 중복이면 true
      */

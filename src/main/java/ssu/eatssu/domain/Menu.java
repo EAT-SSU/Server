@@ -82,7 +82,7 @@ public class Menu {
         refreshReview();
     }
 
-    private void refreshReview(){
+    public void refreshReview(){
         int totalMain = 0;
         int totalTaste =0;
         int totalAmount = 0;
