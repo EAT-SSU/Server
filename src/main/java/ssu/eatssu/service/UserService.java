@@ -76,4 +76,9 @@ public class UserService {
 
         return jwtTokenProvider.generateTokens(authentication);
     }
+
+    public void signout (Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(()-> new BaseException(NOT_FOUND_USER));
+        user.signout();
+    }
 }
