@@ -46,10 +46,10 @@ public class UserController {
      */
     @Operation(summary = "이메일 중복 체크", description = "존재하는 이메일이면 errorCode 2011")
     @PostMapping("/user-emails/{email}/exist")
-    public BaseResponse<Boolean> checkEmailDuplicate(@Parameter(description = "이메일")@PathVariable String email){
-        boolean result = userRepository.existsByEmail(email);
-        if(result){
-            return new BaseResponse<>(result);
+    public BaseResponse checkEmailDuplicate(@Parameter(description = "이메일")@PathVariable String email){
+        boolean duplicated = userRepository.existsByEmail(email);
+        if(!duplicated){
+            return new BaseResponse("");
         }else{
             throw new BaseException(EMAIL_DUPLICATE);
         }
@@ -77,15 +77,15 @@ public class UserController {
     }
 
     /**
-     * 닉네임 중복 체크. 중복이면 true
+     * 닉네임 중복 체크
      */
     @Operation(summary = "닉네임 중복 체크", description = "존재하는 닉네임이면 errorCode 2012")
     @GetMapping("/check-nickname")
-    public BaseResponse<Boolean> checkNicknameDuplicate(@Parameter(description = "닉네임")@RequestParam(value =
+    public BaseResponse checkNicknameDuplicate(@Parameter(description = "닉네임")@RequestParam(value =
             "nickname") String nickname){
-        boolean result = userRepository.existsByNickname(nickname);
-        if(result){
-            return new BaseResponse(result);
+        boolean duplicated = userRepository.existsByNickname(nickname);
+        if(!duplicated){
+            return new BaseResponse("");
         }else{
             throw new BaseException(NICKNAME_DUPLICATE);
         }
