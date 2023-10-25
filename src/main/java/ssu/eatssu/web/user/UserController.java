@@ -116,10 +116,11 @@ public class UserController {
      */
     @Operation(summary = "유저 탈퇴", description = "유저 탈퇴")
     @DeleteMapping("/signout")
-    public ResponseEntity<> signout(){
+    public BaseResponse signout(){
         userService.signout(getLoginUserId());
-        return ResponseEntity.ok("");
+        return new BaseResponse("");
     }
+
     @ExceptionHandler(BaseException.class)
     public BaseResponse<String> handleBaseException(BaseException e) {
         log.info(e.getStatus().toString());
