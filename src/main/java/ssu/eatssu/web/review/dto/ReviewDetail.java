@@ -54,19 +54,19 @@ public class ReviewDetail {
 
         List<String> imgUrlList = new ArrayList<>();
         review.getReviewImgs().forEach(i -> imgUrlList.add(i.getImageUrl()));
-        boolean isWriter = review.getUser().getId().equals(userId);
-        if(review.getUser().getStatus()== UserStatus.ACTIVE){
-            return ReviewDetail.builder()
-                    .reviewId(review.getId())
-                    .writerId(review.getUser().getId()).writerNickname(review.getUser().getNickname())
-                    .mainGrade(review.getMainGrade()).amountGrade(review.getAmountGrade()).tasteGrade(review.getTasteGrade())
-                    .writeDate(review.getCreatedDate().toLocalDate()).content(review.getContent())
-                    .isWriter(isWriter).imgUrlList(imgUrlList).menu(review.getMenu().getName())
-                    .build();
-        }else{
+        if(review.getUser()== null){//탈퇴한 유저의 리뷰인 경우
             return ReviewDetail.builder()
                     .reviewId(review.getId())
                     .writerId(null).writerNickname("알 수 없음")
+                    .mainGrade(review.getMainGrade()).amountGrade(review.getAmountGrade()).tasteGrade(review.getTasteGrade())
+                    .writeDate(review.getCreatedDate().toLocalDate()).content(review.getContent())
+                    .isWriter(false).imgUrlList(imgUrlList).menu(review.getMenu().getName())
+                    .build();
+        }else{
+            boolean isWriter = review.getUser().getId().equals(userId);
+            return ReviewDetail.builder()
+                    .reviewId(review.getId())
+                    .writerId(review.getUser().getId()).writerNickname(review.getUser().getNickname())
                     .mainGrade(review.getMainGrade()).amountGrade(review.getAmountGrade()).tasteGrade(review.getTasteGrade())
                     .writeDate(review.getCreatedDate().toLocalDate()).content(review.getContent())
                     .isWriter(isWriter).imgUrlList(imgUrlList).menu(review.getMenu().getName())

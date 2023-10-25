@@ -44,4 +44,8 @@ public class Review extends BaseTimeEntity{
         this.tasteGrade = tasteGrade;
     }
 
+    public void signoutUser(){
+        this.user = null;
+    }
+
 }
