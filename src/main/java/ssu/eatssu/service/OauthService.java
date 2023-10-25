@@ -11,9 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -56,11 +53,11 @@ public class OauthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RestTemplate restTemplate;
 
-    private void join(String email, String providerId, OauthProvider provider) {
+    private User join(String email, String providerId, OauthProvider provider) {
         String pwd = makePassword(provider, providerId);
         String encodedPwd = passwordEncoder.encode(pwd);
         User user = User.oAuthJoin(email, encodedPwd, provider, providerId);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     public Tokens generateJwtTokens(String email, String pwd){
@@ -95,12 +92,19 @@ public class OauthService {
 
     public Tokens loginByApple(String identityToken) throws NoSuchAlgorithmException, InvalidKeySpecException {
         OauthInfo oauthInfo = userInfoFromApple(identityToken);
-        Optional<User> user = userRepository.findByProviderId(oauthInfo.getProviderId());
-        if (user.isEmpty()) {
-            join(oauthInfo.getEmail(), oauthInfo.getProviderId(), OauthProvider.APPLE);
+        Optional<User> userOptional = userRepository.findByProviderId(oauthInfo.getProviderId());
+        User user;
+        if (userOptional.isEmpty()) {//최초로그인시 회원가입
+            user = join(oauthInfo.getEmail(), oauthInfo.getProviderId(), OauthProvider.APPLE);
+        }else{
+            user = userOptional.get();
+            if(isHideEmail(userOptional.get().getEmail())&&!isHideEmail(oauthInfo.getEmail())){
+                user.updateEmail(oauthInfo.getEmail());
+                userRepository.save(user);
+            }
         }
         String pwd = makePassword(OauthProvider.APPLE, oauthInfo.getProviderId());
-        return generateJwtTokens(oauthInfo.getEmail(), pwd);
+        return generateJwtTokens(user.getEmail(), pwd);
     }
 
     private OauthInfo userInfoFromApple(String identityToken) throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -148,6 +152,14 @@ public class OauthService {
         }catch (ExpiredJwtException exception){
             log.info(exception.getMessage());
             throw new BaseException(INVALID_TOKEN);
+        }
+    }
+
+    private boolean isHideEmail(String email){
+        if(email.length()>25){
+            return email.substring(email.length() - 25, email.length()).equals("@privaterelay.appleid.com");
+        }else{
+            return false;
         }
     }
 

@@ -73,6 +73,7 @@ public class ReviewService {
         if(isWriterOrAdmin(review, user)){
             review.update(reviewUpdate.getContent(), reviewUpdate.getMainGrade(), reviewUpdate.getAmountGrade()
                     , reviewUpdate.getTasteGrade());
+            review.getMenu().updateReview();
         }else{
             throw new BaseException(PERMISSION_DENIED);
         }
@@ -85,6 +86,7 @@ public class ReviewService {
                 .orElseThrow(()-> new BaseException(NOT_FOUND_REVIEW));
         if(isWriterOrAdmin(review, user)){
             reviewRepository.delete(review);
+            review.getMenu().deleteReview();
         }else{
             throw new BaseException(PERMISSION_DENIED);
         }
