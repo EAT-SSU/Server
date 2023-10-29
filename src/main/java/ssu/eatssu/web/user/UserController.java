@@ -41,6 +41,7 @@ public class UserController {
         Tokens tokens = userService.join(join.getEmail(), join.getPwd());
         return ResponseEntity.ok(tokens);
     }
+
     /**
      * 이메일 중복체크. 중복이면 true
      */
@@ -111,10 +112,21 @@ public class UserController {
         Tokens tokens = userService.refreshAccessToken(getLoginUser());
         return ResponseEntity.ok(tokens);
     }
+    /**
+     * 유저 탈퇴
+     */
+    @Operation(summary = "유저 탈퇴", description = "유저 탈퇴")
+    @DeleteMapping("/signout")
+    public BaseResponse signout(){
+        userService.signout(getLoginUserId());
+        return new BaseResponse("");
+    }
+
     @ExceptionHandler(BaseException.class)
     public BaseResponse<String> handleBaseException(BaseException e) {
         log.info(e.getStatus().toString());
         return new BaseResponse<>(e.getStatus());
     }
+
 
 }
