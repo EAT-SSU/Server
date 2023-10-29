@@ -3,7 +3,6 @@ package ssu.eatssu.domain.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -14,7 +13,7 @@ import static ssu.eatssu.domain.enums.RestaurantName.*;
 @Getter
 public enum MenuTypeGroup {
     FIX("고정 메뉴", Arrays.asList(FOOD_COURT, SNACK_CORNER, THE_KITCHEN)),
-    CHANGE("변동 메뉴", Arrays.asList(DODAM, DOMITORY, HAKSIK));
+    CHANGE("변동 메뉴", Arrays.asList(DODAM, DORMITORY, HAKSIK));
 
 
 
