@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ssu.eatssu.domain.Review;
 import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.repository.UserRepository;
 import ssu.eatssu.jwt.JwtTokenProvider;
@@ -75,5 +76,13 @@ public class UserService {
     public Tokens refreshAccessToken(Authentication authentication) throws JsonProcessingException{
 
         return jwtTokenProvider.generateTokens(authentication);
+    }
+
+    public void signout (Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(()-> new BaseException(NOT_FOUND_USER));
+        for(Review review: user.getReviews()) {
+            review.signoutUser();
+        }
+        userRepository.delete(user);
     }
 }
