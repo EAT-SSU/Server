@@ -107,7 +107,7 @@ public class ReviewService {
                 .reviewGradeCnt(MenuReviewInfo.ReviewGradeCnt.fromMap(findMenuReviewGradeCnt(menu)))
                 .build();
     }
-    public MenuReviewInfo findReviewByMealId(Long mealId) {
+    public MenuReviewInfo findReviewInfoByMealId(Long mealId) {
         Meal meal = mealRepository.findById(mealId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
         List<Menu> menuList = new ArrayList<>();

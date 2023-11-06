@@ -3,6 +3,7 @@ package ssu.eatssu.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ssu.eatssu.domain.Meal;
 import ssu.eatssu.domain.Menu;
 import ssu.eatssu.domain.repository.*;
 
@@ -22,6 +23,10 @@ public class RefreshingService {
         List<Menu> menuList = menuRepository.findAll();
         for(Menu menu : menuList){
             menu.refreshReview();
+        }
+        List<Meal> mealList = mealRepository.findAll();
+        for(Meal meal : mealList){
+            meal.caculateGrade();
         }
     }
 }

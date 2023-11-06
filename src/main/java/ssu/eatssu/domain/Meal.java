@@ -50,19 +50,27 @@ public class Meal {
 
     public void caculateGrade(){
         if(!mealMenus.isEmpty()){
-            int m = mealMenus.size();
+            int totalReviewCnt = 0;
             Double mainGradeSum = 0.0;
             Double amountGradeSum = 0.0;
             Double tasteGradeSum = 0.0;
             for(MealMenu mealMenu : mealMenus){
                 Menu menu = mealMenu.getMenu();
-                mainGradeSum += menu.getMainGrade();
-                amountGradeSum += menu.getAmountGrade();
-                tasteGradeSum += menu.getTasteGrade();
+                totalReviewCnt += menu.getReviewCnt();
+                mainGradeSum += menu.getTotalMainGrade();
+                amountGradeSum += menu.getTotalAmountGrade();
+                tasteGradeSum += menu.getTotalTasteGrade();
             }
-            this.mainGrade = mainGradeSum/m;
-            this.amountGrade = amountGradeSum/m;
-            this.tasteGrade = tasteGradeSum/m;
+            if(totalReviewCnt!=0){
+                this.mainGrade = mainGradeSum/totalReviewCnt;
+                this.amountGrade = amountGradeSum/totalReviewCnt;
+                this.tasteGrade = tasteGradeSum/totalReviewCnt;
+            }else{
+                this.mainGrade = 0.0;
+                this.amountGrade = 0.0;
+                this.tasteGrade = 0.0;
+            }
+
         }
     }
 
