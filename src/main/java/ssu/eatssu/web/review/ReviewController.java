@@ -92,8 +92,10 @@ public class ReviewController {
     public ResponseEntity<MenuReviewInfo> menuReviewInfo(
             @Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType")
                     MenuTypeGroup menuTypeGroup,
-            @Parameter(description = "menuId") @RequestParam(value = "menuId", required = false)
-                    Long menuId
+            @Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false)
+                    Long menuId,
+            @Parameter(description = "mealId(고정메뉴)") @RequestParam(value = "mealId", required = false)
+                    Long mealId
     ) {
         MenuReviewInfo menuReviewInfo;
         if (menuTypeGroup == FIX) {
@@ -103,10 +105,10 @@ public class ReviewController {
                 menuReviewInfo = reviewService.findReviewInfoByMenuId(menuId);
             }
         } else if (menuTypeGroup == CHANGE) {
-            if (menuId == null) {
+            if (mealId == null) {
                 throw new BaseException(MISSING_QUERY_PARAM);
             } else {
-                menuReviewInfo = reviewService.findReviewInfoByMenuId(menuId);
+                menuReviewInfo = reviewService.findReviewInfoByMealId(mealId);
             }
         } else {
             throw new BaseException(MISSING_QUERY_PARAM);
@@ -121,8 +123,10 @@ public class ReviewController {
     @GetMapping("/list")
     public ResponseEntity<SliceDto<ReviewDetail>> menuReviewInfo(@Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType")
                                                                          MenuTypeGroup menuTypeGroup,
-                                                                 @Parameter(description = "menuId") @RequestParam(value = "menuId", required = false)
+                                                                 @Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false)
                                                                          Long menuId,
+                                                                 @Parameter(description = "mealId(변동메뉴)") @RequestParam(value = "mealId", required = false)
+                                                                             Long mealId,
                                                                  @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 " +
                                                                          "값 필요 없음)",
                                                                          in = ParameterIn.QUERY) @RequestParam(value
@@ -137,10 +141,10 @@ public class ReviewController {
                 reviewList = reviewService.findReviewListByMenuId(menuId, pageable, lastReviewId);
             }
         } else if (menuTypeGroup == CHANGE) {
-            if (menuId == null) {
+            if (mealId == null) {
                 throw new BaseException(MISSING_QUERY_PARAM);
             } else {
-                reviewList = reviewService.findReviewListByMenuId(menuId, pageable, lastReviewId);
+                reviewList = reviewService.findReviewListByMealId(mealId, pageable, lastReviewId);
             }
         } else {
             throw new BaseException(MISSING_QUERY_PARAM);
