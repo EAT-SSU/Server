@@ -86,6 +86,7 @@ public class ReviewService {
                 .orElseThrow(()-> new BaseException(NOT_FOUND_REVIEW));
         if(isWriterOrAdmin(review, user)){
             reviewRepository.delete(review);
+            reviewRepository.flush();
             review.getMenu().deleteReview();
         }else{
             throw new BaseException(PERMISSION_DENIED);
@@ -94,7 +95,7 @@ public class ReviewService {
     public boolean isWriterOrAdmin(Review review, User user){
         return review.getUser() == user;
     }
-    public MenuReviewInfo findFixMenuReviewInfo(Long menuId) {
+    public MenuReviewInfo findReviewInfoByMenuId(Long menuId) {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
         List<String> reviewMenuList = new ArrayList<>();
@@ -106,7 +107,7 @@ public class ReviewService {
                 .reviewGradeCnt(MenuReviewInfo.ReviewGradeCnt.fromMap(findMenuReviewGradeCnt(menu)))
                 .build();
     }
-    public MenuReviewInfo findChangeMenuReviewInfo(Long mealId) {
+    public MenuReviewInfo findReviewByMealId(Long mealId) {
         Meal meal = mealRepository.findById(mealId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
         List<Menu> menuList = new ArrayList<>();
@@ -149,7 +150,7 @@ public class ReviewService {
         return new SliceDto<>(sliceReviewList.getNumberOfElements(),
                 sliceReviewList.hasNext(), reviewDetailList);
     }
-    public SliceDto<ReviewDetail> findFixMenuReviewList(Long menuId, Pageable pageable, Long lastReviewId) {
+    public SliceDto<ReviewDetail> findReviewListByMenuId(Long menuId, Pageable pageable, Long lastReviewId) {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(()->new BaseException(NOT_FOUND_MENU));
         //pageable에서 sort값 가져옴
@@ -168,7 +169,7 @@ public class ReviewService {
         }
         return sliceReviewToSliceReviewDetail(sliceReviewList);
     }
-    public SliceDto<ReviewDetail> findChangeMenuReviewList(Long mealId, Pageable pageable, Long lastReviewId) {
+    public SliceDto<ReviewDetail> findReviewListByMealId(Long mealId, Pageable pageable, Long lastReviewId) {
         Meal meal = mealRepository.findById(mealId)
                 .orElseThrow(()->new BaseException(NOT_FOUND_MEAL));
         //pageable에서 sort값 가져옴
