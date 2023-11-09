@@ -47,10 +47,10 @@ public class UserController {
      */
     @Operation(summary = "이메일 중복 체크", description = "존재하는 이메일이면 errorCode 2011")
     @PostMapping("/user-emails/{email}/exist")
-    public BaseResponse checkEmailDuplicate(@Parameter(description = "이메일")@PathVariable String email){
+    public ResponseEntity checkEmailDuplicate(@Parameter(description = "이메일")@PathVariable String email){
         boolean duplicated = userRepository.existsByEmail(email);
         if(!duplicated){
-            return new BaseResponse("");
+            return ResponseEntity.ok("");
         }else{
             throw new BaseException(EMAIL_DUPLICATE);
         }
@@ -82,11 +82,11 @@ public class UserController {
      */
     @Operation(summary = "닉네임 중복 체크", description = "존재하는 닉네임이면 errorCode 2012")
     @GetMapping("/check-nickname")
-    public BaseResponse checkNicknameDuplicate(@Parameter(description = "닉네임")@RequestParam(value =
+    public ResponseEntity checkNicknameDuplicate(@Parameter(description = "닉네임")@RequestParam(value =
             "nickname") String nickname){
         boolean duplicated = userRepository.existsByNickname(nickname);
         if(!duplicated){
-            return new BaseResponse("");
+            return ResponseEntity.ok("");
         }else{
             throw new BaseException(NICKNAME_DUPLICATE);
         }
@@ -117,9 +117,9 @@ public class UserController {
      */
     @Operation(summary = "유저 탈퇴", description = "유저 탈퇴")
     @DeleteMapping("/signout")
-    public BaseResponse signout(){
+    public ResponseEntity signout(){
         userService.signout(getLoginUserId());
-        return new BaseResponse("");
+        return ResponseEntity.ok("");
     }
 
     @ExceptionHandler(BaseException.class)
