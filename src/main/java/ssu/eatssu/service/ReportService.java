@@ -25,7 +25,7 @@ public class ReportService {
     private final UserRepository userRepository;
     private final ReviewReportRepository reviewReportRepository;
 
-    public void reportReview(Long userId, ReviewReportCreate reviewReportCreate) {
+    public ReviewReport reportReview(Long userId, ReviewReportCreate reviewReportCreate) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
         Review review = reviewRepository.findById(reviewReportCreate.getReviewId())
                 .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
@@ -33,6 +33,6 @@ public class ReportService {
                 .review(review).user(user).reportType(reviewReportCreate.getReportType())
                 .content(reviewReportCreate.getContent()).status(ReportStatus.PENDING)
                 .build();
-        reviewReportRepository.save(reviewReport);
+        return reviewReportRepository.save(reviewReport);
     }
 }
