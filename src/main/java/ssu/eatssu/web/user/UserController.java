@@ -45,12 +45,12 @@ public class UserController {
     /**
      * 이메일 중복체크. 중복이면 true
      */
-    @Operation(summary = "이메일 중복 체크", description = "존재하는 이메일이면 errorCode 2011")
+    @Operation(summary = "이메일 중복 체크", description = "통과하면 true, 존재하는 이메일이면 errorCode 2011")
     @PostMapping("/user-emails/{email}/exist")
     public ResponseEntity checkEmailDuplicate(@Parameter(description = "이메일")@PathVariable String email){
         boolean duplicated = userRepository.existsByEmail(email);
         if(!duplicated){
-            return ResponseEntity.ok("");
+            return ResponseEntity.ok(true);
         }else{
             throw new BaseException(EMAIL_DUPLICATE);
         }
@@ -80,13 +80,13 @@ public class UserController {
     /**
      * 닉네임 중복 체크
      */
-    @Operation(summary = "닉네임 중복 체크", description = "존재하는 닉네임이면 errorCode 2012")
+    @Operation(summary = "닉네임 중복 체크", description = "통과하면 true, 존재하는 닉네임이면 errorCode 2012")
     @GetMapping("/check-nickname")
     public ResponseEntity checkNicknameDuplicate(@Parameter(description = "닉네임")@RequestParam(value =
             "nickname") String nickname){
         boolean duplicated = userRepository.existsByNickname(nickname);
         if(!duplicated){
-            return ResponseEntity.ok("");
+            return ResponseEntity.ok(true);
         }else{
             throw new BaseException(NICKNAME_DUPLICATE);
         }
@@ -115,11 +115,11 @@ public class UserController {
     /**
      * 유저 탈퇴
      */
-    @Operation(summary = "유저 탈퇴", description = "유저 탈퇴")
+    @Operation(summary = "유저 탈퇴", description = "탈퇴 성공하면 true 반환")
     @DeleteMapping("/signout")
     public ResponseEntity signout(){
         userService.signout(getLoginUserId());
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok(true);
     }
 
     @ExceptionHandler(BaseException.class)
