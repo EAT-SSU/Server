@@ -12,7 +12,7 @@ import static ssu.eatssu.domain.enums.RestaurantName.*;
 
 @Getter
 public enum MenuTypeGroup {
-    FIX("고정 메뉴", Arrays.asList(FOOD_COURT, SNACK_CORNER, THE_KITCHEN)),
+    FIX("고정 메뉴", Arrays.asList(FOOD_COURT, SNACK_CORNER)),
     CHANGE("변동 메뉴", Arrays.asList(DODAM, DORMITORY, HAKSIK));
 
 
