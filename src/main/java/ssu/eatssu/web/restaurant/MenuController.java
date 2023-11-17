@@ -82,8 +82,7 @@ public class MenuController {
      */
     @Operation(summary = "특정 식당 식단 추가", description = "특정 식당의 식단 추가")
     @PostMapping("/")
-    public ResponseEntity todayMenuAdd(@Parameter(description = "날짜(yyyyMMdd)") @RequestParam(
-            "date")
+    public ResponseEntity todayMenuAdd(@Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date")
                                                  String date,
                                          @Parameter(description = "식당이름") @RequestParam("restaurant")
                                                  RestaurantName restaurantName,
@@ -92,6 +91,14 @@ public class MenuController {
                                          @RequestBody AddTodayMenuList addTodayMenuList) throws ParseException {
 
         if (MenuTypeGroup.isChange(restaurantName)) {
+            try{
+               if(menuService.dupliicateMealCheck(timePart,date, restaurantName, addTodayMenuList)){//이미 추가된 식단이면
+                   log.info("식단 중복 발견!");
+                   return ResponseEntity.ok(HttpStatus.OK);
+               }
+            }catch (ParseException e){
+                throw new BaseException(INVALID_DATE);
+            }
             menuService.addMeal(timePart, date, restaurantName, addTodayMenuList);
             return ResponseEntity.ok(HttpStatus.OK);
         } else {
