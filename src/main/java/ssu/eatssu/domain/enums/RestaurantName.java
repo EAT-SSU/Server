@@ -11,8 +11,7 @@ public enum RestaurantName {
     DORMITORY("기숙사 식당", 5000),
     FOOD_COURT("푸드 코트", 0),
     SNACK_CORNER("스낵 코너", 0),
-    HAKSIK("학생 식당", 5000),
-    THE_KITCHEN("더 키친", 0);
+    HAKSIK("학생 식당", 5000);
 
     private String krName;
     private Integer price;
