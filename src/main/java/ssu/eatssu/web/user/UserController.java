@@ -52,7 +52,8 @@ public class UserController {
         if(!duplicated){
             return ResponseEntity.ok(true);
         }else{
-            throw new BaseException(EMAIL_DUPLICATE);
+            //throw new BaseException(EMAIL_DUPLICATE);
+            return ResponseEntity.ok(false);
         }
     }
 
@@ -88,7 +89,8 @@ public class UserController {
         if(!duplicated){
             return ResponseEntity.ok(true);
         }else{
-            throw new BaseException(NICKNAME_DUPLICATE);
+            //throw new BaseException(NICKNAME_DUPLICATE);
+            return ResponseEntity.ok(false);
         }
     }
 
