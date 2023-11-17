@@ -18,6 +18,8 @@ import ssu.eatssu.web.restaurant.dto.MenuReqDto;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -74,6 +76,28 @@ public class MenuService {
             mealMenuRepository.save(mealMenu);
         }
         newMeal.caculateGrade();
+    }
+
+    public boolean dupliicateMealCheck(TimePart timePart, String date, RestaurantName restaurantName,
+                               MenuReqDto.AddTodayMenuList addTodayMenuList) throws ParseException {
+        //date format 맞추기
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        Date formatDate = simpleDateFormat.parse(date);
+        Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
+                .orElseThrow(()->new BaseException(NOT_FOUND_RESTAURANT));
+        List<Meal> meals = mealRepository.findAllByDateAndTimePartAndRestaurant(formatDate,timePart,restaurant);
+        Collections.sort(addTodayMenuList.getTodayMenuList());
+        for(Meal meal : meals){
+            List<String> menuNameList = new ArrayList<String>();
+            for(MealMenu mealMenu: meal.getMealMenus()){
+                menuNameList.add(mealMenu.getMenu().getName());
+            }
+            Collections.sort(menuNameList);
+            if(menuNameList.equals(addTodayMenuList.getTodayMenuList())){
+                return true;
+            };
+        }
+        return false;
     }
 
     public MenuList findAllMenu(Long mealId) {
