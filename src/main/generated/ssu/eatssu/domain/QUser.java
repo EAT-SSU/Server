@@ -40,6 +40,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath pwd = createString("pwd");
 
+    public final ListPath<ReviewReport, QReviewReport> reviewReports = this.<ReviewReport, QReviewReport>createList("reviewReports", ReviewReport.class, QReviewReport.class, PathInits.DIRECT2);
+
     public final ListPath<Review, QReview> reviews = this.<Review, QReview>createList("reviews", Review.class, QReview.class, PathInits.DIRECT2);
 
     public final EnumPath<ssu.eatssu.domain.enums.Role> role = createEnum("role", ssu.eatssu.domain.enums.Role.class);
