@@ -116,6 +116,17 @@ public class MenuController {
         return ResponseEntity.ok(menuList);
     }
 
+    /**
+     * mealId로 meal 삭제
+     */
+    @Operation(summary = "식단 삭제", description = "mealId로 meal 삭제")
+    @DeleteMapping("/meal/{mealId}")
+    public ResponseEntity mealDelete(@Parameter(description = "mealId") @PathVariable("mealId") Long mealId) {
+        List<Long> menuIdList = menuService.deleteMeal(mealId);
+        menuService.cleanupGarbageMenu(menuIdList);
+        return ResponseEntity.ok("");
+    }
+
     @ExceptionHandler(BaseException.class)
     public BaseResponse<String> handleBaseException(BaseException e) {
         log.info(e.getStatus().toString());
