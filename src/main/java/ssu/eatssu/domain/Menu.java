@@ -99,10 +99,21 @@ public class Menu {
     }
 
     private void calculateGrade(){ // 평점 계산 후 적용
-        if(this.reviewCnt!=0){
+        if(this.reviewCnt==0){
+            gradeReset();
+        }else{
             this.mainGrade = this.totalMainGrade.doubleValue()/this.reviewCnt.doubleValue();
             this.tasteGrade = this.totalTasteGrade.doubleValue()/this.reviewCnt.doubleValue();
             this.amountGrade = this.totalAmountGrade.doubleValue()/this.reviewCnt.doubleValue();
         }
+    }
+
+    private void gradeReset(){ //평점 초기화
+        this.totalMainGrade = 0;
+        this.totalTasteGrade = 0;
+        this.totalAmountGrade = 0;
+        this.mainGrade = 0.0;
+        this.tasteGrade = 0.0;
+        this.amountGrade = 0.0;
     }
 }
