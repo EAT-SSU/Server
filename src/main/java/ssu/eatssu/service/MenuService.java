@@ -18,7 +18,10 @@ import ssu.eatssu.web.restaurant.dto.MenuReqDto;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 import static ssu.eatssu.response.BaseResponseStatus.*;
 import static ssu.eatssu.web.restaurant.dto.MenuResDto.*;
@@ -85,14 +88,14 @@ public class MenuService {
         List<Meal> meals = mealRepository.findAllByDateAndTimePartAndRestaurant(formatDate,timePart,restaurant);
         Collections.sort(addTodayMenuList.getTodayMenuList());
         for(Meal meal : meals){
-            List<String> menuNameList = new ArrayList<>();
+            List<String> menuNameList = new ArrayList<String>();
             for(MealMenu mealMenu: meal.getMealMenus()){
                 menuNameList.add(mealMenu.getMenu().getName());
             }
             Collections.sort(menuNameList);
             if(menuNameList.equals(addTodayMenuList.getTodayMenuList())){
                 return true;
-            }
+            };
         }
         return false;
     }
@@ -100,28 +103,5 @@ public class MenuService {
     public MenuList findAllMenu(Long mealId) {
         Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
         return MenuList.from(meal);
-    }
-
-    public List<Long> deleteMeal(Long mealId) {
-        Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
-        List<Long> menuIdList = new ArrayList<>();
-        meal.getMealMenus().forEach(mealMenu -> menuIdList.add(mealMenu.getMenu().getId()));
-        for(Iterator<MealMenu> it = meal.getMealMenus().iterator(); it.hasNext() ; )
-        {
-            MealMenu mealMenu = it.next();
-            it.remove();
-            mealMenuRepository.delete(mealMenu);
-        }
-        mealRepository.delete(meal);
-        return menuIdList;
-    }
-
-    public void cleanupGarbageMenu(List<Long> menuIdList) {
-        for(Long menuId : menuIdList){
-            Optional<Menu> menu = menuRepository.findById(menuId);
-            if(menu.isPresent()&&menu.get().getMealMenus().isEmpty()){
-                menuRepository.delete(menu.get());
-            }
-        }
     }
 }
