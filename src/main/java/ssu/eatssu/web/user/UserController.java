@@ -17,7 +17,6 @@ import ssu.eatssu.service.UserService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.user.dto.*;
 
-import static ssu.eatssu.response.BaseResponseStatus.*;
 import static ssu.eatssu.utils.SecurityUtil.getLoginUser;
 import static ssu.eatssu.utils.SecurityUtil.getLoginUserId;
 
@@ -37,9 +36,9 @@ public class UserController {
      */
     @Operation(summary = "회원가입", description = "회원가입.")
     @PostMapping("/join")
-    public ResponseEntity<Tokens> join(@Valid @RequestBody Join join) throws JsonProcessingException {
+    public BaseResponse<Tokens> join(@Valid @RequestBody Join join) throws JsonProcessingException {
         Tokens tokens = userService.join(join.getEmail(), join.getPwd());
-        return ResponseEntity.ok(tokens);
+        return new BaseResponse<>(tokens);
     }
 
     /**
@@ -47,13 +46,13 @@ public class UserController {
      */
     @Operation(summary = "이메일 중복 체크", description = "통과하면 true, 존재하는 이메일이면 errorCode 2011")
     @PostMapping("/user-emails/{email}/exist")
-    public ResponseEntity checkEmailDuplicate(@Parameter(description = "이메일")@PathVariable String email){
+    public BaseResponse<Boolean> checkEmailDuplicate(@Parameter(description = "이메일")@PathVariable String email){
         boolean duplicated = userRepository.existsByEmail(email);
         if(!duplicated){
-            return ResponseEntity.ok(true);
+            return new BaseResponse<>(true);
         }else{
             //throw new BaseException(EMAIL_DUPLICATE);
-            return ResponseEntity.ok(false);
+            return new BaseResponse<>(false);
         }
     }
 
@@ -62,9 +61,9 @@ public class UserController {
      */
     @Operation(summary = "로그인", description = "로그인")
     @PostMapping("/login")
-    public ResponseEntity<Tokens> login(@Valid @RequestBody Login login) throws JsonProcessingException {
+    public BaseResponse<Tokens> login(@Valid @RequestBody Login login) throws JsonProcessingException {
         Tokens tokens = userService.login(login.getEmail(), login.getPwd());
-        return ResponseEntity.ok(tokens);
+        return new BaseResponse<>(tokens);
     }
 
     /**
@@ -72,10 +71,10 @@ public class UserController {
      */
     @Operation(summary = "닉네임 수정", description = "닉네임 수정")
     @PatchMapping("/nickname")
-    public ResponseEntity nicknameUpdate(@Valid @RequestBody NicknameEdit nicknameEdit){
+    public BaseResponse<String> nicknameUpdate(@Valid @RequestBody NicknameEdit nicknameEdit){
         Long userId = getLoginUserId();
         userService.updateNickname(userId, nicknameEdit.getNickname());
-        return new ResponseEntity(HttpStatus.OK);
+        return new BaseResponse<>("");
     }
 
     /**
@@ -83,14 +82,14 @@ public class UserController {
      */
     @Operation(summary = "닉네임 중복 체크", description = "통과하면 true, 존재하는 닉네임이면 errorCode 2012")
     @GetMapping("/check-nickname")
-    public ResponseEntity checkNicknameDuplicate(@Parameter(description = "닉네임")@RequestParam(value =
+    public BaseResponse<Boolean> checkNicknameDuplicate(@Parameter(description = "닉네임")@RequestParam(value =
             "nickname") String nickname){
         boolean duplicated = userRepository.existsByNickname(nickname);
         if(!duplicated){
-            return ResponseEntity.ok(true);
+            return new BaseResponse<>(true);
         }else{
             //throw new BaseException(NICKNAME_DUPLICATE);
-            return ResponseEntity.ok(false);
+            return new BaseResponse<>(false);
         }
     }
 
@@ -99,10 +98,10 @@ public class UserController {
      */
     @Operation(summary = "비밀번호 변경", description = "비밀번호 변경")
     @PatchMapping("/password")
-    public ResponseEntity passwordChange(@Valid @RequestBody PasswordChange passwordChange){
+    public BaseResponse<String> passwordChange(@Valid @RequestBody PasswordChange passwordChange){
         Long userId = getLoginUserId();
         userService.changePassword(userId, passwordChange.getPwd());
-        return new ResponseEntity(HttpStatus.OK);
+        return new BaseResponse<>("");
     }
 
     /**
@@ -110,18 +109,18 @@ public class UserController {
      */
     @Operation(summary = "accessToken, refreshToken 재발급", description = "accessToken, refreshToken 재발급")
     @PostMapping("/token/reissue")
-    public ResponseEntity<Tokens> refreshAccessToken() throws JsonProcessingException{
+    public BaseResponse<Tokens> refreshAccessToken() throws JsonProcessingException{
         Tokens tokens = userService.refreshAccessToken(getLoginUser());
-        return ResponseEntity.ok(tokens);
+        return new BaseResponse<>(tokens);
     }
     /**
      * 유저 탈퇴
      */
     @Operation(summary = "유저 탈퇴", description = "탈퇴 성공하면 true 반환")
     @DeleteMapping("/signout")
-    public ResponseEntity signout(){
+    public BaseResponse<Boolean> signout(){
         userService.signout(getLoginUserId());
-        return ResponseEntity.ok(true);
+        return new BaseResponse<>(true);
     }
 
     @ExceptionHandler(BaseException.class)
