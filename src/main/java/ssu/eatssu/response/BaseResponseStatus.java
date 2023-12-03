@@ -37,6 +37,10 @@ public enum BaseResponseStatus {
 
     INVALID_DATE(false, 2013, "잘못된 날짜형식입니다."),
 
+    NOT_FOUND_REVIEW_REPORT(false, 2014, "해당 문의내역을 찾을 수 없습니다."),
+    NOT_FOUND_USER_INQUIRIES(false, 2015, "해당 문의내역을 찾을 수 없습니다."),
+
+
 
     /**
      * 3000 : Response 오류
