@@ -11,6 +11,7 @@ import ssu.eatssu.response.BaseException;
 import ssu.eatssu.response.BaseResponse;
 import ssu.eatssu.service.UserInquiriesService;
 import ssu.eatssu.slack.SlackChannel;
+import ssu.eatssu.slack.SlackMessageFormat;
 import ssu.eatssu.slack.SlackService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.user_inquiries.dto.UserInquiriesCreate;
@@ -33,21 +34,8 @@ public class UserInquiriesController {
     public BaseResponse<String> userInquiriesCreate(@RequestBody UserInquiriesCreate userInquiriesCreate) {
         Long userId = SecurityUtil.getLoginUserId();
         UserInquiries inquiries = userInquiriesService.createUserInquiries(userId, userInquiriesCreate.getContent());
-        slackService.sendSlackMessage(String.format(
-                        """
-                                ===================
-                                *문의 INFO*
-                                - 문의자 ID: %d
-                                - 닉네임: %s
-                                - 이메일: %s
-                                *문의 내용*
-                                - Date: %s
-                                - Content: %s
-                                ===================
-                                """
-                        , inquiries.getUser().getId(), inquiries.getUser().getNickname()
-                ,inquiries.getUser().getEmail(),inquiries.getCreatedDate(), inquiries.getContent()),
-                SlackChannel.USER_INQUIRIES_CHANNEL);
+        slackService.sendSlackMessage(SlackMessageFormat.sendUserInquiries(inquiries)
+                , SlackChannel.USER_INQUIRIES_CHANNEL);
         return new BaseResponse<>("");
     }
 
