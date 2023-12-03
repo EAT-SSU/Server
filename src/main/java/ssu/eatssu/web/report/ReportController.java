@@ -16,6 +16,7 @@ import ssu.eatssu.response.BaseException;
 import ssu.eatssu.response.BaseResponse;
 import ssu.eatssu.service.ReportService;
 import ssu.eatssu.slack.SlackChannel;
+import ssu.eatssu.slack.SlackMessageFormat;
 import ssu.eatssu.slack.SlackService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.report.dto.ReviewReportCreate;
@@ -59,33 +60,7 @@ public class ReportController {
     public BaseResponse<String> reportReview(@RequestBody ReviewReportCreate reviewReportCreate) {
         Long userId = SecurityUtil.getLoginUserId();
         ReviewReport report = reportService.reportReview(userId, reviewReportCreate);
-        User reporter = userRepository.findById(userId).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        Review review = reviewRepository.findById(reviewReportCreate.getReviewId())
-                .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
-        slackService.sendSlackMessage(String.format(
-                        """
-                                ===================
-                                *신고자 INFO*
-                                - 신고자 ID: %d
-                                - 닉네임: %s
-                                *신고된 리뷰 INFO*
-                                - 리뷰 ID: %d
-                                - 리뷰 작성자 ID : %d
-                                - 리뷰 작성자 닉네임 : %s
-                                - 리뷰 메뉴: %s
-                                - 리뷰 내용: %s
-                                - 리뷰 날짜: %s
-                                *신고 INFO*
-                                - 신고사유: %s
-                                - 신고 날짜: %s
-                                ===================
-                                """
-                        , reporter.getId(), reporter.getNickname()
-                        , review.getId(), review.getUser().getId(),review.getUser().getNickname(), review.getMenu().getName(),
-                        review.getContent(),
-                        review.getModifiedDate().toString()
-                        ,report.getReportType().getKrName(), report.getCreatedDate()),
-                SlackChannel.REPORT_CHANNEL);
+        slackService.sendSlackMessage(SlackMessageFormat.sendReport(report), SlackChannel.REPORT_CHANNEL);
         return new BaseResponse<>("Success");
     }
 
