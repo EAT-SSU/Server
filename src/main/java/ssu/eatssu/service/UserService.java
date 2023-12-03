@@ -9,7 +9,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.Review;
+import ssu.eatssu.domain.ReviewReport;
 import ssu.eatssu.domain.User;
+import ssu.eatssu.domain.repository.ReviewReportRepository;
 import ssu.eatssu.domain.repository.UserRepository;
 import ssu.eatssu.jwt.JwtTokenProvider;
 import ssu.eatssu.response.BaseException;
@@ -24,6 +26,7 @@ import static ssu.eatssu.response.BaseResponseStatus.*;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
+    private final ReviewReportRepository reviewReportRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -80,9 +83,19 @@ public class UserService {
 
     public void signout (Long userId) {
         User user = userRepository.findById(userId).orElseThrow(()-> new BaseException(NOT_FOUND_USER));
+        //작성한 리뷰 삭제
         for(Review review: user.getReviews()) {
             review.signoutUser();
         }
+        //작성한 신고 삭제
+        for(ReviewReport report: user.getReviewReports()){
+            reviewReportRepository.delete(report);
+        }
+        /*
+        TODO 작성한 문의내역 삭제??
+        for(UserInquiries inquiries : user.getUserInquiries()){
+            inquiries.signoutWriter();
+        }*/
         userRepository.delete(user);
     }
 }
