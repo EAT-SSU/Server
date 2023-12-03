@@ -19,4 +19,8 @@ public class UserInquiries extends BaseTimeEntity{
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+/*
+    public void signoutWriter() {
+        this.user = null;
+    }*/
 }
