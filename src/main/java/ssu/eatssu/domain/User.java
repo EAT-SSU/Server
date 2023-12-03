@@ -46,6 +46,9 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
     private List<ReviewReport> reviewReports;
 
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+    private List<UserInquiries> userInquiries;
+
     public static User join(@NotNull String email, @NotNull String pwd) {
         User user = new User();
         user.email = email;
