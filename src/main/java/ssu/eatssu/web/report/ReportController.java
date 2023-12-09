@@ -45,11 +45,11 @@ public class ReportController {
      */
     @Operation(summary = "리뷰 신고 사유 받아오기", description = "리뷰 신고 사유 받아오기")
     @GetMapping("/type")
-    public BaseResponse<List<ReviewReportTypeInfo>> reportReviewType() {
+    public ResponseEntity<List<ReviewReportTypeInfo>> reportReviewType() {
         List<ReviewReportTypeInfo> reportInfo = new ArrayList<>();
         Arrays.stream(ReviewReportType.values())
                 .forEach(reportType -> reportInfo.add(new ReviewReportTypeInfo(reportType)));
-        return new BaseResponse<>(reportInfo);
+        return ResponseEntity.ok(reportInfo);
     }
 
     /**
@@ -57,11 +57,11 @@ public class ReportController {
      */
     @Operation(summary = "리뷰 신고하기", description = "리뷰 신고하기")
     @PostMapping("/")
-    public BaseResponse<String> reportReview(@RequestBody ReviewReportCreate reviewReportCreate) {
+    public ResponseEntity<String> reportReview(@RequestBody ReviewReportCreate reviewReportCreate) {
         Long userId = SecurityUtil.getLoginUserId();
         ReviewReport report = reportService.reportReview(userId, reviewReportCreate);
         slackService.sendSlackMessage(SlackMessageFormat.sendReport(report), SlackChannel.REPORT_CHANNEL);
-        return new BaseResponse<>("Success");
+        return ResponseEntity.ok("Success");
     }
 
     @ExceptionHandler(BaseException.class)

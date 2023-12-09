@@ -33,14 +33,14 @@ public class MyPageController {
      */
     @Operation(summary = "내가 쓴 리뷰 모아보기", description = "내가 쓴 리뷰 리스트")
     @GetMapping("/myreview")
-    public BaseResponse<SliceDto<MyReviewDetail>> myReviewList(
+    public ResponseEntity<SliceDto<MyReviewDetail>> myReviewList(
             @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)",
                     in = ParameterIn.QUERY) @RequestParam(required = false) Long lastReviewId,
             @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Long userId = SecurityUtil.getLoginUserId();
         SliceDto<MyReviewDetail> myReviewList = myPageService.findMyReviewList(userId, pageable, lastReviewId);
-        return new BaseResponse<>(myReviewList);
+        return ResponseEntity.ok(myReviewList);
     }
 
     /**
@@ -48,10 +48,10 @@ public class MyPageController {
      */
     @Operation(summary = "마이페이지 정보", description = "마이페이지 정보")
     @GetMapping("/info")
-    public BaseResponse<MypageInfo> mypageInfo() {
+    public ResponseEntity<MypageInfo> mypageInfo() {
         Long userId = SecurityUtil.getLoginUserId();
         MypageInfo mypageInfo = myPageService.mypageInfo(userId);
-        return new BaseResponse<>(mypageInfo);
+        return ResponseEntity.ok(mypageInfo);
     }
 
     @ExceptionHandler(BaseException.class)
