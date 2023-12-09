@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.Restaurant;
 import ssu.eatssu.domain.enums.RestaurantName;
 import ssu.eatssu.domain.repository.RestaurantRepository;
+import ssu.eatssu.response.BaseResponse;
 import ssu.eatssu.web.restaurant.dto.RestaurantInfo;
 
 @RestController
@@ -29,7 +30,6 @@ public class RestaurantController {
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이름의 식당이 없습니다."));
         return ResponseEntity.ok(RestaurantInfo.from(restaurant));
-
     }
 
 }

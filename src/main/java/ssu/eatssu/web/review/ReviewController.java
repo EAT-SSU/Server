@@ -78,7 +78,7 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 삭제", description = "리뷰 삭제")
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity reviewDelete(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
+    public ResponseEntity<String> reviewDelete(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.deleteReview(userId, reviewId);
         return new ResponseEntity(HttpStatus.OK);
@@ -121,7 +121,8 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 리스트 조회", description = "리뷰 리스트 조회")
     @GetMapping("/list")
-    public ResponseEntity<SliceDto<ReviewDetail>> menuReviewInfo(@Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType")
+    public ResponseEntity<SliceDto<ReviewDetail>> menuReviewInfo(@Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam(
+            "menuType")
                                                                          MenuTypeGroup menuTypeGroup,
                                                                  @Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false)
                                                                          Long menuId,

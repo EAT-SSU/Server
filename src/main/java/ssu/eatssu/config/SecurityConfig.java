@@ -21,7 +21,8 @@ public class SecurityConfig {
     private static final String[] AUTH_WHITELIST = {
             "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**",
             "/", "/user/join", "/user/login", "/user/user-emails/{email}/exist", "/user/check-nickname",
-            "/menu/**", "/restaurants/**", "/review/info","/review/list", "/oauth/**"
+            "/menu/**", "/restaurants/**", "/review/info","/review/list", "/oauth/**", "/inquiries/{userInquiriesId}",
+            "/inquiries/list"
     };
 
     private final JwtTokenProvider jwtTokenProvider;

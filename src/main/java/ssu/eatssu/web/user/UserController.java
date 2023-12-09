@@ -17,7 +17,6 @@ import ssu.eatssu.service.UserService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.user.dto.*;
 
-import static ssu.eatssu.response.BaseResponseStatus.*;
 import static ssu.eatssu.utils.SecurityUtil.getLoginUser;
 import static ssu.eatssu.utils.SecurityUtil.getLoginUserId;
 
@@ -47,7 +46,7 @@ public class UserController {
      */
     @Operation(summary = "이메일 중복 체크", description = "통과하면 true, 존재하는 이메일이면 errorCode 2011")
     @PostMapping("/user-emails/{email}/exist")
-    public ResponseEntity checkEmailDuplicate(@Parameter(description = "이메일")@PathVariable String email){
+    public ResponseEntity<Boolean> checkEmailDuplicate(@Parameter(description = "이메일")@PathVariable String email){
         boolean duplicated = userRepository.existsByEmail(email);
         if(!duplicated){
             return ResponseEntity.ok(true);
