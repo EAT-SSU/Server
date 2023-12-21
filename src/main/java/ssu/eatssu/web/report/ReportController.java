@@ -61,7 +61,7 @@ public class ReportController {
         Long userId = SecurityUtil.getLoginUserId();
         ReviewReport report = reportService.reportReview(userId, reviewReportCreate);
         slackService.sendSlackMessage(SlackMessageFormat.sendReport(report), SlackChannel.REPORT_CHANNEL);
-        return ResponseEntity.ok("Success");
+        return new BaseResponse<>("Success");
     }
 
     @ExceptionHandler(BaseException.class)
