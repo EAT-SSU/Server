@@ -39,7 +39,7 @@ public class MenuController {
      */
     @Operation(summary = "변동메뉴 식단 리스트 조회 By 식당", description = "변동메뉴 식단 리스트 조회(학생식당, 도담, 기숙사 식당)")
     @GetMapping("/today-meal")
-    public ResponseEntity<List<TodayMeal>> todayMealList(@Parameter(description = "날짜(yyyyMMdd)") @RequestParam(
+    public BaseResponse<List<TodayMeal>> todayMealList(@Parameter(description = "날짜(yyyyMMdd)") @RequestParam(
             "date")
                                                                  String date,
                                                          @Parameter(description = "식당이름") @RequestParam("restaurant")
@@ -53,7 +53,7 @@ public class MenuController {
                 TodayMeal todayMeal = TodayMeal.from(meal);
                 todayMealList.add(todayMeal);
             }
-            return ResponseEntity.ok(todayMealList);
+            return new BaseResponse<>(todayMealList);
         } else {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
@@ -65,12 +65,12 @@ public class MenuController {
      */
     @Operation(summary = "고정 메뉴 리스트 조회", description = "고정 메뉴 리스트 조회(푸드코트, 스낵코너, 더 키친)")
     @GetMapping("/fix-menu")
-    public ResponseEntity<FixMenuList> fixMenuList(@Parameter(description = "식당이름") @RequestParam("restaurant")
+    public BaseResponse<FixMenuList> fixMenuList(@Parameter(description = "식당이름") @RequestParam("restaurant")
                                                            RestaurantName restaurantName) {
         if (MenuTypeGroup.isFix(restaurantName)) {
             List<Menu> menuList = menuService.findFixMenuByRestaurant(restaurantName);
             FixMenuList fixMenuList = FixMenuList.from(menuList);
-            return ResponseEntity.ok(fixMenuList);
+            return new BaseResponse<>(fixMenuList);
         } else {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
@@ -82,7 +82,7 @@ public class MenuController {
      */
     @Operation(summary = "특정 식당 식단 추가", description = "특정 식당의 식단 추가")
     @PostMapping("/")
-    public ResponseEntity todayMenuAdd(@Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date")
+    public BaseResponse<String> todayMenuAdd(@Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date")
                                                  String date,
                                          @Parameter(description = "식당이름") @RequestParam("restaurant")
                                                  RestaurantName restaurantName,
@@ -94,13 +94,13 @@ public class MenuController {
             try{
                if(menuService.dupliicateMealCheck(timePart,date, restaurantName, addTodayMenuList)){//이미 추가된 식단이면
                    log.info("식단 중복 발견!");
-                   return ResponseEntity.ok(HttpStatus.OK);
+                   return new BaseResponse<>("Duplicated");
                }
             }catch (ParseException e){
                 throw new BaseException(INVALID_DATE);
             }
             menuService.addMeal(timePart, date, restaurantName, addTodayMenuList);
-            return ResponseEntity.ok(HttpStatus.OK);
+            return new BaseResponse<>("");
         } else {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
@@ -111,9 +111,9 @@ public class MenuController {
      */
     @Operation(summary = "메뉴 정보 조회 By mealId", description = "메뉴 정보(Id, name) 조회 By mealId")
     @GetMapping("/menus")
-    public ResponseEntity menuList(@Parameter(description = "mealId") @RequestParam("mealId") Long mealId) {
+    public BaseResponse<MenuList> menuList(@Parameter(description = "mealId") @RequestParam("mealId") Long mealId) {
         MenuList menuList = menuService.findAllMenu(mealId);
-        return ResponseEntity.ok(menuList);
+        return new BaseResponse<>(menuList);
     }
 
     /**
@@ -121,10 +121,10 @@ public class MenuController {
      */
     @Operation(summary = "식단 삭제", description = "mealId로 meal 삭제")
     @DeleteMapping("/meal/{mealId}")
-    public ResponseEntity mealDelete(@Parameter(description = "mealId") @PathVariable("mealId") Long mealId) {
+    public BaseResponse<String> mealDelete(@Parameter(description = "mealId") @PathVariable("mealId") Long mealId) {
         List<Long> menuIdList = menuService.deleteMeal(mealId);
         menuService.cleanupGarbageMenu(menuIdList);
-        return ResponseEntity.ok("");
+        return new BaseResponse<>("");
     }
 
     @ExceptionHandler(BaseException.class)

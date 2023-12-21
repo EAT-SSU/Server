@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.Restaurant;
 import ssu.eatssu.domain.enums.RestaurantName;
@@ -25,11 +24,11 @@ public class RestaurantController {
      */
     @Operation(summary = "식당 정보 조회", description = "식당 위치, 운영시간 조회")
     @GetMapping("/{restaurantName}")
-    public ResponseEntity<RestaurantInfo> restaurantInfo(@Parameter(description = "식당이름")@PathVariable("restaurantName")
+    public BaseResponse<RestaurantInfo> restaurantInfo(@Parameter(description = "식당이름")@PathVariable("restaurantName")
                                                                      RestaurantName restaurantName) {
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이름의 식당이 없습니다."));
-        return ResponseEntity.ok(RestaurantInfo.from(restaurant));
+        return new BaseResponse<>(RestaurantInfo.from(restaurant));
     }
 
 }
