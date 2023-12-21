@@ -29,7 +29,6 @@ public class RestaurantController {
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이름의 식당이 없습니다."));
         return new BaseResponse<>(RestaurantInfo.from(restaurant));
-
     }
 
 }
