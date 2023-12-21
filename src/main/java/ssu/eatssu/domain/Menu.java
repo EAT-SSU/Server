@@ -88,7 +88,7 @@ public class Menu {
         int totalAmount = 0;
         for(Review review : this.reviews){
             totalMain+=review.getMainGrade();
-            totalTaste = review.getTasteGrade();
+            totalTaste += review.getTasteGrade();
             totalAmount+=review.getAmountGrade();
         }
         this.totalMainGrade = totalMain;

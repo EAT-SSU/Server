@@ -17,7 +17,6 @@ import ssu.eatssu.service.UserService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.user.dto.*;
 
-import static ssu.eatssu.response.BaseResponseStatus.*;
 import static ssu.eatssu.utils.SecurityUtil.getLoginUser;
 import static ssu.eatssu.utils.SecurityUtil.getLoginUserId;
 
