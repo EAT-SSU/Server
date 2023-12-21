@@ -52,13 +52,13 @@ public class ReviewController {
     @PostMapping(value = "/{menuId}", consumes = {
             MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, produces =
             MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity reviewCreate(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
+    public BaseResponse<String> reviewCreate(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
                                        @RequestPart(value = "reviewCreate") ReviewCreate reviewCreate,
                                        @RequestPart(value = "multipartFileList", required = false) List<MultipartFile> multipartFileList
     ) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.createReview(userId, menuId, reviewCreate, multipartFileList);
-        return new ResponseEntity(HttpStatus.OK);
+        return new BaseResponse<>("");
     }
 
     /**
@@ -66,11 +66,11 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 수정(글 수정)", description = "리뷰 수정(글 수정)")
     @PatchMapping("/{reviewId}")
-    public ResponseEntity reviewUpdate(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId,
+    public BaseResponse<String> reviewUpdate(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId,
                                        @RequestBody ReviewUpdate reviewUpdate) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.updateReview(userId, reviewId, reviewUpdate);
-        return new ResponseEntity(HttpStatus.OK);
+        return new BaseResponse<>("");
     }
 
     /**
@@ -78,10 +78,10 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 삭제", description = "리뷰 삭제")
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<String> reviewDelete(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
+    public BaseResponse<String> reviewDelete(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.deleteReview(userId, reviewId);
-        return new ResponseEntity(HttpStatus.OK);
+        return new BaseResponse<>("");
     }
 
     /**
@@ -89,7 +89,7 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 정보 조회(평점 등등)", description = "리뷰 정보 조회(평점 등등)")
     @GetMapping("/info")
-    public ResponseEntity<MenuReviewInfo> menuReviewInfo(
+    public BaseResponse<MenuReviewInfo> menuReviewInfo(
             @Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType")
                     MenuTypeGroup menuTypeGroup,
             @Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false)
@@ -113,7 +113,7 @@ public class ReviewController {
         } else {
             throw new BaseException(MISSING_QUERY_PARAM);
         }
-        return ResponseEntity.ok(menuReviewInfo);
+        return new BaseResponse<>(menuReviewInfo);
     }
 
     /**
@@ -121,7 +121,7 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 리스트 조회", description = "리뷰 리스트 조회")
     @GetMapping("/list")
-    public ResponseEntity<SliceDto<ReviewDetail>> menuReviewInfo(@Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam(
+    public BaseResponse<SliceDto<ReviewDetail>> menuReviewInfo(@Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam(
             "menuType")
                                                                          MenuTypeGroup menuTypeGroup,
                                                                  @Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false)
@@ -150,13 +150,13 @@ public class ReviewController {
         } else {
             throw new BaseException(MISSING_QUERY_PARAM);
         }
-        return ResponseEntity.ok(reviewList);
+        return new BaseResponse<>(reviewList);
     }
     /*
     review 갯수, 별점 refresh
      */
     @GetMapping("/refresh")
-    public BaseResponse refreshReviewInfo(){
+    public BaseResponse<String> refreshReviewInfo(){
         refreshingService.refreshAllReviews();
         return new BaseResponse<>("");
     }

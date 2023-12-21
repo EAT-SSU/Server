@@ -38,9 +38,9 @@ public class OauthController {
      */
     @Operation(summary = "카카오 로그인, 회원가입", description = "카카오 로그인, 회원가입")
     @PostMapping("/kakao")
-    public ResponseEntity<Tokens> kakaoLogin(@Valid @RequestBody KakaoLogin login) throws JsonProcessingException {
+    public BaseResponse<Tokens> kakaoLogin(@Valid @RequestBody KakaoLogin login) {
         Tokens tokens = oauthService.loginByKakao(login.getEmail(), login.getProviderId());
-        return ResponseEntity.ok(tokens);
+        return new BaseResponse<>(tokens);
     }
 
     /**
@@ -48,9 +48,10 @@ public class OauthController {
      */
     @Operation(summary = "애플 로그인, 회원가입", description = "애플 로그인, 회원가입")
     @PostMapping("/apple")
-    public ResponseEntity<Tokens> appleLogin(@Valid @RequestBody AppleLogin login) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public BaseResponse<Tokens> appleLogin(@Valid @RequestBody AppleLogin login) throws NoSuchAlgorithmException,
+            InvalidKeySpecException {
         Tokens tokens = oauthService.loginByApple(login.getIdentityToken());
-        return ResponseEntity.ok(tokens);
+        return new BaseResponse<>(tokens);
     }
 
     @ExceptionHandler(BaseException.class)
