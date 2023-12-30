@@ -1,4 +1,4 @@
-package ssu.eatssu.web.restaurant.dto;
+package ssu.eatssu.web.menu.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
