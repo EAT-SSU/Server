@@ -10,7 +10,6 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.response.BaseException;
 import ssu.eatssu.response.BaseResponse;
@@ -33,9 +32,9 @@ public class MyPageController {
      */
     @Operation(summary = "내가 쓴 리뷰 모아보기", description = "내가 쓴 리뷰 리스트")
     @GetMapping("/myreview")
-    public BaseResponse<SliceDto<MyReviewDetail>> myReviewList(
-            @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)",
-                    in = ParameterIn.QUERY) @RequestParam(required = false) Long lastReviewId,
+    public BaseResponse<SliceDto<MyReviewDetail>> getMyReviewList(
+            @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY)
+            @RequestParam(required = false) Long lastReviewId,
             @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Long userId = SecurityUtil.getLoginUserId();
@@ -48,7 +47,7 @@ public class MyPageController {
      */
     @Operation(summary = "마이페이지 정보", description = "마이페이지 정보")
     @GetMapping("/info")
-    public BaseResponse<MypageInfo> mypageInfo() {
+    public BaseResponse<MypageInfo> getMyPageInfo() {
         Long userId = SecurityUtil.getLoginUserId();
         MypageInfo mypageInfo = myPageService.mypageInfo(userId);
         return new BaseResponse<>(mypageInfo);

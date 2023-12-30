@@ -22,7 +22,7 @@ import static ssu.eatssu.utils.SecurityUtil.getLoginUserId;
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
-@Tag(name="User",description = "유저 API")
+@Tag(name = "User", description = "유저 API")
 public class UserController {
 
     private final UserService userService;
@@ -48,11 +48,11 @@ public class UserController {
      */
     @Operation(summary = "이메일 중복 체크", description = "통과하면 true, 존재하는 이메일이면 errorCode 2011")
     @PostMapping("/user-emails/{email}/exist")
-    public BaseResponse<Boolean> checkEmailDuplicate(@Parameter(description = "이메일")@PathVariable String email){
+    public BaseResponse<Boolean> checkEmailDuplicate(@Parameter(description = "이메일") @PathVariable String email) {
         boolean duplicated = userRepository.existsByEmail(email);
-        if(!duplicated){
+        if (!duplicated) {
             return new BaseResponse<>(true);
-        }else{
+        } else {
             //throw new BaseException(EMAIL_DUPLICATE);
             return new BaseResponse<>(false);
         }
@@ -64,7 +64,8 @@ public class UserController {
      */
     @Operation(summary = "로그인", description = "로그인")
     @PostMapping("/login")
-    public BaseResponse<Tokens> login(@Valid @RequestBody Login login) throws JsonProcessingException {
+    public BaseResponse<Tokens> login(@Valid @RequestBody Login login) throws JsonProcessingException { // todo:
+        // exceiption service단에서 처리
         Tokens tokens = userService.login(login.getEmail(), login.getPwd());
         return new BaseResponse<>(tokens);
     }
@@ -75,7 +76,7 @@ public class UserController {
      */
     @Operation(summary = "닉네임 수정", description = "닉네임 수정")
     @PatchMapping("/nickname")
-    public BaseResponse<String> nicknameUpdate(@Valid @RequestBody NicknameEdit nicknameEdit){
+    public BaseResponse<String> updateNickname(@Valid @RequestBody NicknameEdit nicknameEdit) {
         Long userId = getLoginUserId();
         userService.updateNickname(userId, nicknameEdit.getNickname());
         return new BaseResponse<>("");
@@ -87,12 +88,12 @@ public class UserController {
      */
     @Operation(summary = "닉네임 중복 체크", description = "통과하면 true, 존재하는 닉네임이면 errorCode 2012")
     @GetMapping("/check-nickname")
-    public BaseResponse<Boolean> checkNicknameDuplicate(@Parameter(description = "닉네임")@RequestParam(value =
-            "nickname") String nickname){
+    public BaseResponse<Boolean> checkNicknameDuplicate(@Parameter(description = "닉네임")
+                                                        @RequestParam(value = "nickname") String nickname) {
         boolean duplicated = userRepository.existsByNickname(nickname);
-        if(!duplicated){
+        if (!duplicated) {
             return new BaseResponse<>(true);
-        }else{
+        } else {
             //throw new BaseException(NICKNAME_DUPLICATE);
             return new BaseResponse<>(false);
         }
@@ -104,7 +105,7 @@ public class UserController {
      */
     @Operation(summary = "비밀번호 변경", description = "비밀번호 변경")
     @PatchMapping("/password")
-    public BaseResponse<String> passwordChange(@Valid @RequestBody PasswordChange passwordChange){
+    public BaseResponse<String> updatePassword(@Valid @RequestBody PasswordChange passwordChange) {
         Long userId = getLoginUserId();
         userService.changePassword(userId, passwordChange.getPwd());
         return new BaseResponse<>("");
@@ -116,17 +117,18 @@ public class UserController {
      */
     @Operation(summary = "accessToken, refreshToken 재발급", description = "accessToken, refreshToken 재발급")
     @PostMapping("/token/reissue")
-    public BaseResponse<Tokens> refreshAccessToken() throws JsonProcessingException{
+    public BaseResponse<Tokens> refreshToken() throws JsonProcessingException {
         Tokens tokens = userService.refreshAccessToken(getLoginUser());
         return new BaseResponse<>(tokens);
     }
+
     /**
      * 유저 탈퇴
      * <p>유저를 탈퇴처리합니다.</p>
      */
     @Operation(summary = "유저 탈퇴", description = "탈퇴 성공하면 true 반환")
     @DeleteMapping("/signout")
-    public BaseResponse<Boolean> signout(){
+    public BaseResponse<Boolean> signout() {
         userService.signout(getLoginUserId());
         return new BaseResponse<>(true);
     }

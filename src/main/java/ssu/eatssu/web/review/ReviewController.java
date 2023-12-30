@@ -10,9 +10,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ssu.eatssu.domain.enums.MenuTypeGroup;
@@ -27,8 +25,6 @@ import ssu.eatssu.web.review.dto.ReviewCreate;
 import ssu.eatssu.web.review.dto.ReviewDetail;
 import ssu.eatssu.web.review.dto.ReviewUpdate;
 
-import javax.net.ssl.SSLEngineResult;
-import java.awt.*;
 import java.util.List;
 
 import static ssu.eatssu.domain.enums.MenuTypeGroup.CHANGE;
@@ -50,13 +46,13 @@ public class ReviewController {
      * <p>메뉴식별자(menuId)에 해당하는 메뉴에 리뷰를 작성한다. 사진은 여러장 첨부 가능하다.</p>
      */
     @Operation(summary = "리뷰 작성", description = "리뷰 작성")
-    @PostMapping(value = "/{menuId}", consumes = {
-            MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}, produces =
-            MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse<String> reviewCreate(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
-                                       @RequestPart(value = "reviewCreate") ReviewCreate reviewCreate,
-                                       @RequestPart(value = "multipartFileList", required = false) List<MultipartFile> multipartFileList
-    ) {
+    @PostMapping(value = "/{menuId}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse<String> writeReview(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
+                                            @RequestPart(value = "reviewCreate") ReviewCreate reviewCreate,
+                                            @RequestPart(value = "multipartFileList", required = false)
+                                                    List<MultipartFile> multipartFileList) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.createReview(userId, menuId, reviewCreate, multipartFileList);
         return new BaseResponse<>("");
@@ -68,8 +64,9 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 수정(글 수정)", description = "리뷰 수정(글 수정)")
     @PatchMapping("/{reviewId}")
-    public BaseResponse<String> reviewUpdate(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId,
-                                       @RequestBody ReviewUpdate reviewUpdate) {
+    public BaseResponse<String> updateReview(@Parameter(description = "reviewId")
+                                             @PathVariable("reviewId") Long reviewId,
+                                             @RequestBody ReviewUpdate reviewUpdate) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.updateReview(userId, reviewId, reviewUpdate);
         return new BaseResponse<>("");
@@ -81,7 +78,7 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 삭제", description = "리뷰 삭제")
     @DeleteMapping("/{reviewId}")
-    public BaseResponse<String> reviewDelete(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
+    public BaseResponse<String> deleteReview(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.deleteReview(userId, reviewId);
         return new BaseResponse<>("");
@@ -94,14 +91,12 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 정보 조회(평점 등등)", description = "리뷰 정보 조회(평점 등등)")
     @GetMapping("/info")
-    public BaseResponse<MenuReviewInfo> menuReviewInfo(
-            @Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType")
-                    MenuTypeGroup menuTypeGroup,
-            @Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false)
-                    Long menuId,
-            @Parameter(description = "mealId(고정메뉴)") @RequestParam(value = "mealId", required = false)
-                    Long mealId
-    ) {
+    public BaseResponse<MenuReviewInfo> getMenuReviewInfo(@Parameter(description = "타입(변동메뉴(식단)/고정메뉴)")
+                                                          @RequestParam("menuType") MenuTypeGroup menuTypeGroup,
+                                                          @Parameter(description = "menuId(고정메뉴)")
+                                                          @RequestParam(value = "menuId", required = false) Long menuId,
+                                                          @Parameter(description = "mealId(고정메뉴)")
+                                                          @RequestParam(value = "mealId", required = false) Long mealId) {
         MenuReviewInfo menuReviewInfo;
         if (menuTypeGroup == FIX) {
             if (menuId == null) {
@@ -128,19 +123,13 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 리스트 조회", description = "리뷰 리스트 조회")
     @GetMapping("/list")
-    public BaseResponse<SliceDto<ReviewDetail>> menuReviewInfo(@Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam(
-            "menuType")
-                                                                         MenuTypeGroup menuTypeGroup,
-                                                                 @Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false)
-                                                                         Long menuId,
-                                                                 @Parameter(description = "mealId(변동메뉴)") @RequestParam(value = "mealId", required = false)
-                                                                             Long mealId,
-                                                                 @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 " +
-                                                                         "값 필요 없음)",
-                                                                         in = ParameterIn.QUERY) @RequestParam(value
-                                                                         = "lastReviewId", required = false) Long lastReviewId,
-                                                                 @ParameterObject @PageableDefault(size = 20, sort =
-                                                                         "date", direction = Sort.Direction.DESC) Pageable pageable) {
+    public BaseResponse<SliceDto<ReviewDetail>> getReviewList(
+            @Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType") MenuTypeGroup menuTypeGroup,
+            @Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false) Long menuId,
+            @Parameter(description = "mealId(변동메뉴)") @RequestParam(value = "mealId", required = false) Long mealId,
+            @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY)
+            @RequestParam(value = "lastReviewId", required = false) Long lastReviewId,
+            @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable) {
         SliceDto<ReviewDetail> reviewList;
         if (menuTypeGroup == FIX) {
             if (menuId == null) {
@@ -159,12 +148,13 @@ public class ReviewController {
         }
         return new BaseResponse<>(reviewList);
     }
+
     /*
     review 갯수, 별점 refresh
     //todo 관리자 api로 이동 필요
      */
     @GetMapping("/refresh")
-    public BaseResponse<String> refreshReviewInfo(){
+    public BaseResponse<String> refreshReviewInfo() {
         refreshingService.refreshAllReviews();
         return new BaseResponse<>("");
     }
