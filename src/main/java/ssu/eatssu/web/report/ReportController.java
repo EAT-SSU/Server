@@ -41,7 +41,7 @@ public class ReportController {
     private final ReviewRepository reviewRepository;
 
     /**
-     * 리뷰 신고 사유 받아오기
+     * 리뷰 신고 사유 종류 조회
      */
     @Operation(summary = "리뷰 신고 사유 받아오기", description = "리뷰 신고 사유 받아오기")
     @GetMapping("/type")
@@ -53,7 +53,7 @@ public class ReportController {
     }
 
     /**
-     * 리뷰 신고하기
+     * 리뷰 신고
      */
     @Operation(summary = "리뷰 신고하기", description = "리뷰 신고하기")
     @PostMapping("/")

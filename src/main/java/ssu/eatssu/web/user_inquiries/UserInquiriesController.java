@@ -34,7 +34,8 @@ public class UserInquiriesController {
     private final UserInquiriesService userInquiriesService;
 
     /**
-     * 문의 남기기
+     * 문의 작성
+     * <p>문의를 작성합니다.</p>
      */
     @Operation(summary = "문의 남기기", description = "문의 남기기")
     @PostMapping("/")
@@ -47,7 +48,8 @@ public class UserInquiriesController {
     }
 
     /**
-     * 문의내역 조회 By Id
+     * 문의 내용 조회
+     * <p>문의 식별자(userInquiriesId)에 해당하는 문의 내용을 조회합니다.</p>
      */
     @Operation(summary = "고객 문의 내역 조회", description = "고객 문의 내역 조회 By Id")
     @GetMapping("/{userInquiriesId}")

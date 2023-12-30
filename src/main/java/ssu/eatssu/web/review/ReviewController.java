@@ -47,6 +47,7 @@ public class ReviewController {
 
     /**
      * 리뷰 작성
+     * <p>메뉴식별자(menuId)에 해당하는 메뉴에 리뷰를 작성한다. 사진은 여러장 첨부 가능하다.</p>
      */
     @Operation(summary = "리뷰 작성", description = "리뷰 작성")
     @PostMapping(value = "/{menuId}", consumes = {
@@ -63,6 +64,7 @@ public class ReviewController {
 
     /**
      * 리뷰 수정(글 수정)
+     * <p>리뷰식별자(reviewId)에 해당하는 리뷰 속 글을 수정한다. 사진은 수정 X</p>
      */
     @Operation(summary = "리뷰 수정(글 수정)", description = "리뷰 수정(글 수정)")
     @PatchMapping("/{reviewId}")
@@ -75,6 +77,7 @@ public class ReviewController {
 
     /**
      * 리뷰 삭제
+     * <p>리뷰식별자(reviewId)에 해당하는 리뷰를 삭제한다.</p>
      */
     @Operation(summary = "리뷰 삭제", description = "리뷰 삭제")
     @DeleteMapping("/{reviewId}")
@@ -85,7 +88,9 @@ public class ReviewController {
     }
 
     /**
-     * 리뷰 정보 조회(평점 등등)
+     * 리뷰 정보 조회
+     * <p>식단(변동메뉴)리뷰 조회 시 <b>메뉴명 리스트</b>, 리뷰 수, 메인 평점, 양 평점, 맛 평점, 평점 별 개수를 조회한다.<br>
+     * 고정메뉴 리뷰 조회 시 <b>메뉴명</b>, 리뷰 수, 메인 평점, 양 평점, 맛 평점, 평점 별 개수를 조회한다.</p>
      */
     @Operation(summary = "리뷰 정보 조회(평점 등등)", description = "리뷰 정보 조회(평점 등등)")
     @GetMapping("/info")
@@ -118,6 +123,8 @@ public class ReviewController {
 
     /**
      * 리뷰 리스트 조회
+     * <p>커서 기반 페이지네이션으로 리뷰 리스트를 조회한다.<br>
+     * pageable default={size=20, sort=date, direction=desc}</p>
      */
     @Operation(summary = "리뷰 리스트 조회", description = "리뷰 리스트 조회")
     @GetMapping("/list")
@@ -154,6 +161,7 @@ public class ReviewController {
     }
     /*
     review 갯수, 별점 refresh
+    //todo 관리자 api로 이동 필요
      */
     @GetMapping("/refresh")
     public BaseResponse<String> refreshReviewInfo(){

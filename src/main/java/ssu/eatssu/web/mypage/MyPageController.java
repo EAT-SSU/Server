@@ -29,7 +29,7 @@ public class MyPageController {
     private final MyPageService myPageService;
 
     /**
-     * 내가 쓴 리뷰 리스트
+     * 내가 쓴 리뷰 목록 조회
      */
     @Operation(summary = "내가 쓴 리뷰 모아보기", description = "내가 쓴 리뷰 리스트")
     @GetMapping("/myreview")
@@ -44,7 +44,7 @@ public class MyPageController {
     }
 
     /**
-     * 마이페이지 정보
+     * 마이페이지 정보 조회
      */
     @Operation(summary = "마이페이지 정보", description = "마이페이지 정보")
     @GetMapping("/info")
