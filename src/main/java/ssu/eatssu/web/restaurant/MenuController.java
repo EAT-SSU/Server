@@ -35,7 +35,9 @@ public class MenuController {
     private final MenuService menuService;
 
     /**
-     * 특정 식당의 식단 조회
+     * 식단 목록 조회
+     *  <p>변동메뉴 식당(학생식당, 도담, 기숙사 식당)의 특정날짜(yyyyMMdd), 특정시간대(아침/점심/저녁)에 해당하는 식단 목록을 조회한다.
+     *  일반적으로 학생식당과 도담의 경우 식단 여러개가 조회되고 기숙사식당은 한개만 조회된다.</p>
      */
     @Operation(summary = "변동메뉴 식단 리스트 조회 By 식당", description = "변동메뉴 식단 리스트 조회(학생식당, 도담, 기숙사 식당)")
     @GetMapping("/today-meal")
@@ -61,7 +63,8 @@ public class MenuController {
 
 
     /**
-     * 고정메뉴 조회
+     * 고정 메뉴 목록 조회
+     * <p>메뉴가 고정된 식당(푸드코트, 스낵코너, <s>더 키친</s>)의 메뉴 목록을 조회한다.</p>
      */
     @Operation(summary = "고정 메뉴 리스트 조회", description = "고정 메뉴 리스트 조회(푸드코트, 스낵코너, 더 키친)")
     @GetMapping("/fix-menu")
@@ -78,7 +81,9 @@ public class MenuController {
 
 
     /**
-     * 특정 식당의 특정 날짜 식단 추가하기
+     * 식단 추가
+     * <p>변동메뉴 식당(학생식당, 도담, 기숙사 식당)의 특정날짜(yyyyMMdd), 특정시간대(아침/점심/저녁)에 해당하는 식단을 추가.
+     * 이미 존재하는 식단일 경우 중복저장 되지 않도록 처리한다.(별도의 ErrorResponse 응답 X)</p>
      */
     @Operation(summary = "특정 식당 식단 추가", description = "특정 식당의 식단 추가")
     @PostMapping("/")
@@ -107,7 +112,8 @@ public class MenuController {
     }
 
     /**
-     * mealId로 menuId, name 리스트 조회
+     * 식단의 메뉴정보 목록 조회
+     * <p>식단식별자(mealId)로 식단에 속하는 메뉴정보(menuId, name) 목록을 조회한다.</p>
      */
     @Operation(summary = "메뉴 정보 조회 By mealId", description = "메뉴 정보(Id, name) 조회 By mealId")
     @GetMapping("/menus")
@@ -117,7 +123,8 @@ public class MenuController {
     }
 
     /**
-     * mealId로 meal 삭제
+     * 식단 삭제
+     * <p>식단식별자(mealId)에 해당하는 식단을 삭제한다.</p>
      */
     @Operation(summary = "식단 삭제", description = "mealId로 meal 삭제")
     @DeleteMapping("/meal/{mealId}")
