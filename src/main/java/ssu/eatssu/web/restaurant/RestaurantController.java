@@ -11,6 +11,7 @@ import ssu.eatssu.domain.repository.RestaurantRepository;
 import ssu.eatssu.response.BaseResponse;
 import ssu.eatssu.web.restaurant.dto.RestaurantInfo;
 
+//todo: 삭제
 @RestController
 @RequestMapping("/restaurants")
 @RequiredArgsConstructor
@@ -18,7 +19,6 @@ import ssu.eatssu.web.restaurant.dto.RestaurantInfo;
 public class RestaurantController {
 
     private final RestaurantRepository restaurantRepository;
-
     /**
      * 식당 위치, 운영 시간 조회
      */
