@@ -1,12 +1,10 @@
-package ssu.eatssu.web.restaurant;
+package ssu.eatssu.web.menu;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.Meal;
 import ssu.eatssu.domain.Menu;
@@ -16,14 +14,14 @@ import ssu.eatssu.domain.enums.TimePart;
 import ssu.eatssu.response.BaseException;
 import ssu.eatssu.response.BaseResponse;
 import ssu.eatssu.service.MenuService;
-import ssu.eatssu.web.restaurant.dto.MenuReqDto.AddTodayMenuList;
+import ssu.eatssu.web.menu.dto.MenuReqDto.AddTodayMenuList;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static ssu.eatssu.response.BaseResponseStatus.*;
-import static ssu.eatssu.web.restaurant.dto.MenuResDto.*;
+import static ssu.eatssu.web.menu.dto.MenuResDto.*;
 
 @Slf4j
 @RestController
