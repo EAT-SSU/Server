@@ -20,7 +20,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ssu.eatssu.response.BaseResponseStatus.*;
+import static ssu.eatssu.response.BaseResponseStatus.INVALID_DATE;
+import static ssu.eatssu.response.BaseResponseStatus.NOT_SUPPORT_RESTAURANT;
 import static ssu.eatssu.web.menu.dto.MenuResDto.*;
 
 @Slf4j
@@ -34,20 +35,19 @@ public class MenuController {
 
     /**
      * 식단 목록 조회
-     *  <p>변동메뉴 식당(학생식당, 도담, 기숙사 식당)의 특정날짜(yyyyMMdd), 특정시간대(아침/점심/저녁)에 해당하는 식단 목록을 조회한다.
-     *  일반적으로 학생식당과 도담의 경우 식단 여러개가 조회되고 기숙사식당은 한개만 조회된다.</p>
+     * <p>변동메뉴 식당(학생식당, 도담, 기숙사 식당)의 특정날짜(yyyyMMdd), 특정시간대(아침/점심/저녁)에 해당하는 식단 목록을 조회한다.
+     * 일반적으로 학생식당과 도담의 경우 식단 여러개가 조회되고 기숙사식당은 한개만 조회된다.</p>
      */
     @Operation(summary = "변동메뉴 식단 리스트 조회 By 식당", description = "변동메뉴 식단 리스트 조회(학생식당, 도담, 기숙사 식당)")
-    @GetMapping("/today-meal")
-    public BaseResponse<List<TodayMeal>> todayMealList(@Parameter(description = "날짜(yyyyMMdd)") @RequestParam(
-            "date")
-                                                                 String date,
-                                                         @Parameter(description = "식당이름") @RequestParam("restaurant")
-                                                                 RestaurantName restaurantName,
-                                                         @Parameter(description = "시간대") @RequestParam("time")
-                                                                 TimePart timePart) throws ParseException {
+    @GetMapping("/today-meal") //todo today-meal은 아닌것 같음
+    public BaseResponse<List<TodayMeal>> getMealList(@Parameter(description = "날짜(yyyyMMdd)")
+                                                     @RequestParam("date") String date,
+                                                     @Parameter(description = "식당이름")
+                                                     @RequestParam("restaurant") RestaurantName restaurantName,
+                                                     @Parameter(description = "시간대")
+                                                     @RequestParam("time") TimePart timePart) throws ParseException { //todo Exceiption service단에서 처리
         if (MenuTypeGroup.isChange(restaurantName)) {
-            List<Meal> mealList = menuService.findTodayMeals(timePart, date, restaurantName);
+            List<Meal> mealList = menuService.findMealList(timePart, date, restaurantName);
             List<TodayMeal> todayMealList = new ArrayList<>();
             for (Meal meal : mealList) {
                 TodayMeal todayMeal = TodayMeal.from(meal);
@@ -66,10 +66,10 @@ public class MenuController {
      */
     @Operation(summary = "고정 메뉴 리스트 조회", description = "고정 메뉴 리스트 조회(푸드코트, 스낵코너, 더 키친)")
     @GetMapping("/fix-menu")
-    public BaseResponse<FixMenuList> fixMenuList(@Parameter(description = "식당이름") @RequestParam("restaurant")
-                                                           RestaurantName restaurantName) {
+    public BaseResponse<FixMenuList> getFixMenuList(@Parameter(description = "식당이름")
+                                                    @RequestParam("restaurant") RestaurantName restaurantName) {
         if (MenuTypeGroup.isFix(restaurantName)) {
-            List<Menu> menuList = menuService.findFixMenuByRestaurant(restaurantName);
+            List<Menu> menuList = menuService.findFixMenuList(restaurantName);
             FixMenuList fixMenuList = FixMenuList.from(menuList);
             return new BaseResponse<>(fixMenuList);
         } else {
@@ -85,24 +85,24 @@ public class MenuController {
      */
     @Operation(summary = "특정 식당 식단 추가", description = "특정 식당의 식단 추가")
     @PostMapping("/")
-    public BaseResponse<String> todayMenuAdd(@Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date")
-                                                 String date,
-                                         @Parameter(description = "식당이름") @RequestParam("restaurant")
-                                                 RestaurantName restaurantName,
-                                         @Parameter(description = "시간대") @RequestParam("time")
-                                                 TimePart timePart,
-                                         @RequestBody AddTodayMenuList addTodayMenuList) throws ParseException {
-
+    public BaseResponse<String> addMeal(@Parameter(description = "날짜(yyyyMMdd)")
+                                        @RequestParam("date") String date,
+                                        @Parameter(description = "식당이름")
+                                        @RequestParam("restaurant") RestaurantName restaurantName,
+                                        @Parameter(description = "시간대")
+                                        @RequestParam("time") TimePart timePart,
+                                        @RequestBody AddTodayMenuList addTodayMenuList) throws ParseException {
+        //todo Exceiption service단에서 처리
         if (MenuTypeGroup.isChange(restaurantName)) {
-            try{
-               if(menuService.dupliicateMealCheck(timePart,date, restaurantName, addTodayMenuList)){//이미 추가된 식단이면
-                   log.info("식단 중복 발견!");
-                   return new BaseResponse<>("Duplicated");
-               }
-            }catch (ParseException e){
+            try {
+                if (menuService.isExistMeal(timePart, date, restaurantName, addTodayMenuList)) {//이미 추가된 식단이면
+                    log.info("식단 중복 발견!");
+                    return new BaseResponse<>("Duplicated");
+                }
+            } catch (ParseException e) {
                 throw new BaseException(INVALID_DATE);
             }
-            menuService.addMeal(timePart, date, restaurantName, addTodayMenuList);
+            menuService.createMeal(timePart, date, restaurantName, addTodayMenuList);
             return new BaseResponse<>("");
         } else {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
@@ -115,8 +115,9 @@ public class MenuController {
      */
     @Operation(summary = "메뉴 정보 조회 By mealId", description = "메뉴 정보(Id, name) 조회 By mealId")
     @GetMapping("/menus")
-    public BaseResponse<MenuList> menuList(@Parameter(description = "mealId") @RequestParam("mealId") Long mealId) {
-        MenuList menuList = menuService.findAllMenu(mealId);
+    public BaseResponse<MenuList> getMenuListInMeal(@Parameter(description = "mealId")
+                                                    @RequestParam("mealId") Long mealId) {
+        MenuList menuList = menuService.findMenuListInMeal(mealId);
         return new BaseResponse<>(menuList);
     }
 
@@ -126,7 +127,7 @@ public class MenuController {
      */
     @Operation(summary = "식단 삭제", description = "mealId로 meal 삭제")
     @DeleteMapping("/meal/{mealId}")
-    public BaseResponse<String> mealDelete(@Parameter(description = "mealId") @PathVariable("mealId") Long mealId) {
+    public BaseResponse<String> deleteMeal(@Parameter(description = "mealId") @PathVariable("mealId") Long mealId) {
         List<Long> menuIdList = menuService.deleteMeal(mealId);
         menuService.cleanupGarbageMenu(menuIdList);
         return new BaseResponse<>("");

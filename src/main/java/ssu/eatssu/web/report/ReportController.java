@@ -45,7 +45,7 @@ public class ReportController {
      */
     @Operation(summary = "리뷰 신고 사유 받아오기", description = "리뷰 신고 사유 받아오기")
     @GetMapping("/type")
-    public BaseResponse<List<ReviewReportTypeInfo>> reportReviewType() {
+    public BaseResponse<List<ReviewReportTypeInfo>> getReportType() {
         List<ReviewReportTypeInfo> reportInfo = new ArrayList<>();
         Arrays.stream(ReviewReportType.values())
                 .forEach(reportType -> reportInfo.add(new ReviewReportTypeInfo(reportType)));

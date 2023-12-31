@@ -53,13 +53,19 @@ public class OauthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RestTemplate restTemplate;
 
+    /**
+     * 회원가입
+     */
     private User join(String email, String providerId, OauthProvider provider) {
-        String pwd = makePassword(provider, providerId);
+        String pwd = createOAuthUserPassword(provider, providerId);
         String encodedPwd = passwordEncoder.encode(pwd);
         User user = User.oAuthJoin(email, encodedPwd, provider, providerId);
         return userRepository.save(user);
     }
 
+    /**
+     * email, pwd를 통해 JwtToken을 생성 //todo: JwtTokenProvider로 옮길까?
+     */
     public Tokens generateJwtTokens(String email, String pwd){
         // 1. email/pwd 를 기반으로 Authentication 객체 생성
         //    이때 authentication은 인증 여부를 확인하는 authenticated 값이 false
@@ -77,21 +83,31 @@ public class OauthService {
         }
     }
 
-    private String makePassword(OauthProvider provider, String providerId) {
+    /**
+     * OAuth 유저용 Password 생성
+     * todo 자체회원가입 안써서 password 컬럼이 필요없는데 삭제?
+     */
+    private String createOAuthUserPassword(OauthProvider provider, String providerId) {
         return provider.toString() + providerId;
     }
 
-    public Tokens loginByKakao(String email, String providerId) {
+    /**
+     * 카카오 로그인
+     */
+    public Tokens kakaoLogin(String email, String providerId) {
         Optional<User> user = userRepository.findByProviderId(providerId);
         if (user.isEmpty()) {
             join(email, providerId, OauthProvider.KAKAO);
         }
-        String pwd = makePassword(OauthProvider.KAKAO, providerId);
+        String pwd = createOAuthUserPassword(OauthProvider.KAKAO, providerId);
         return generateJwtTokens(email, pwd);
     }
 
-    public Tokens loginByApple(String identityToken) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        OauthInfo oauthInfo = userInfoFromApple(identityToken);
+    /**
+     * 애플 로그인
+     */
+    public Tokens appleLogin(String identityToken) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        OauthInfo oauthInfo = getUserInfoFromApple(identityToken);
         Optional<User> userOptional = userRepository.findByProviderId(oauthInfo.getProviderId());
         User user;
         if (userOptional.isEmpty()) {//최초로그인시 회원가입
@@ -103,11 +119,15 @@ public class OauthService {
                 userRepository.save(user);
             }
         }
-        String pwd = makePassword(OauthProvider.APPLE, oauthInfo.getProviderId());
+        String pwd = createOAuthUserPassword(OauthProvider.APPLE, oauthInfo.getProviderId());
         return generateJwtTokens(user.getEmail(), pwd);
     }
 
-    private OauthInfo userInfoFromApple(String identityToken) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    /**
+     * 애플 로그인 - 애플 API 호출을 통해 유저 정보(providerId, email) 조회
+     */
+    private OauthInfo getUserInfoFromApple(String identityToken) throws NoSuchAlgorithmException,
+            InvalidKeySpecException {
 
         //identity token decode
         String[] decodeArray = identityToken.split("\\.");
@@ -155,6 +175,9 @@ public class OauthService {
         }
     }
 
+    /**
+     * 애플 로그인 - 이메일 가리기 선택한지 확인
+     */
     private boolean isHideEmail(String email){
         if(email.length()>25){
             return email.substring(email.length() - 25, email.length()).equals("@privaterelay.appleid.com");

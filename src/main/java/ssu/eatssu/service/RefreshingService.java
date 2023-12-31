@@ -9,6 +9,9 @@ import ssu.eatssu.domain.repository.*;
 
 import java.util.List;
 
+/**
+ * 리뷰 정보(별점, 리뷰 개수 ..) 이상할 때 refresh하는 클래스
+ */
 @RequiredArgsConstructor
 @Service
 @Transactional
