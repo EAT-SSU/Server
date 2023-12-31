@@ -22,19 +22,19 @@ public class QMeal extends EntityPathBase<Meal> {
 
     public static final QMeal meal = new QMeal("meal");
 
-    public final NumberPath<Double> amountGrade = createNumber("amountGrade", Double.class);
+    public final NumberPath<Double> amountRate = createNumber("amountRate", Double.class);
 
     public final DatePath<java.util.Date> date = createDate("date", java.util.Date.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final NumberPath<Double> mainGrade = createNumber("mainGrade", Double.class);
+    public final NumberPath<Double> mainRate = createNumber("mainRate", Double.class);
 
     public final ListPath<MealMenu, QMealMenu> mealMenus = this.<MealMenu, QMealMenu>createList("mealMenus", MealMenu.class, QMealMenu.class, PathInits.DIRECT2);
 
     public final QRestaurant restaurant;
 
-    public final NumberPath<Double> tasteGrade = createNumber("tasteGrade", Double.class);
+    public final NumberPath<Double> tasteRate = createNumber("tasteRate", Double.class);
 
     public final EnumPath<ssu.eatssu.domain.enums.TimePart> timePart = createEnum("timePart", ssu.eatssu.domain.enums.TimePart.class);
 

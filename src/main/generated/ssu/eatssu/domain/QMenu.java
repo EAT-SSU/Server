@@ -22,11 +22,11 @@ public class QMenu extends EntityPathBase<Menu> {
 
     public static final QMenu menu = new QMenu("menu");
 
-    public final NumberPath<Double> amountGrade = createNumber("amountGrade", Double.class);
+    public final NumberPath<Double> amountRate = createNumber("amountRate", Double.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final NumberPath<Double> mainGrade = createNumber("mainGrade", Double.class);
+    public final NumberPath<Double> mainRate = createNumber("mainRate", Double.class);
 
     public final ListPath<MealMenu, QMealMenu> mealMenus = this.<MealMenu, QMealMenu>createList("mealMenus", MealMenu.class, QMealMenu.class, PathInits.DIRECT2);
 
@@ -40,13 +40,13 @@ public class QMenu extends EntityPathBase<Menu> {
 
     public final ListPath<Review, QReview> reviews = this.<Review, QReview>createList("reviews", Review.class, QReview.class, PathInits.DIRECT2);
 
-    public final NumberPath<Double> tasteGrade = createNumber("tasteGrade", Double.class);
+    public final NumberPath<Double> tasteRate = createNumber("tasteRate", Double.class);
 
-    public final NumberPath<Integer> totalAmountGrade = createNumber("totalAmountGrade", Integer.class);
+    public final NumberPath<Integer> totalAmountRate = createNumber("totalAmountRate", Integer.class);
 
-    public final NumberPath<Integer> totalMainGrade = createNumber("totalMainGrade", Integer.class);
+    public final NumberPath<Integer> totalMainRate = createNumber("totalMainRate", Integer.class);
 
-    public final NumberPath<Integer> totalTasteGrade = createNumber("totalTasteGrade", Integer.class);
+    public final NumberPath<Integer> totalTasteRate = createNumber("totalTasteRate", Integer.class);
 
     public QMenu(String variable) {
         this(Menu.class, forVariable(variable), INITS);
