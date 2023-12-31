@@ -53,7 +53,7 @@ public class MenuController {
                 TodayMeal todayMeal = TodayMeal.from(meal);
                 todayMealList.add(todayMeal);
             }
-            return new BaseResponse<>(todayMealList);
+            return BaseResponse.success(todayMealList);
         } else {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
@@ -71,7 +71,7 @@ public class MenuController {
         if (MenuTypeGroup.isFix(restaurantName)) {
             List<Menu> menuList = menuService.findFixMenuList(restaurantName);
             FixMenuList fixMenuList = FixMenuList.from(menuList);
-            return new BaseResponse<>(fixMenuList);
+            return BaseResponse.success(fixMenuList);
         } else {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
@@ -85,7 +85,7 @@ public class MenuController {
      */
     @Operation(summary = "특정 식당 식단 추가", description = "특정 식당의 식단 추가")
     @PostMapping("/")
-    public BaseResponse<String> addMeal(@Parameter(description = "날짜(yyyyMMdd)")
+    public BaseResponse addMeal(@Parameter(description = "날짜(yyyyMMdd)")
                                         @RequestParam("date") String date,
                                         @Parameter(description = "식당이름")
                                         @RequestParam("restaurant") RestaurantName restaurantName,
@@ -97,13 +97,13 @@ public class MenuController {
             try {
                 if (menuService.isExistMeal(timePart, date, restaurantName, addTodayMenuList)) {//이미 추가된 식단이면
                     log.info("식단 중복 발견!");
-                    return new BaseResponse<>("Duplicated");
+                    return BaseResponse.success();
                 }
             } catch (ParseException e) {
                 throw new BaseException(INVALID_DATE);
             }
             menuService.createMeal(timePart, date, restaurantName, addTodayMenuList);
-            return new BaseResponse<>("");
+            return BaseResponse.success();
         } else {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
@@ -118,7 +118,7 @@ public class MenuController {
     public BaseResponse<MenuList> getMenuListInMeal(@Parameter(description = "mealId")
                                                     @RequestParam("mealId") Long mealId) {
         MenuList menuList = menuService.findMenuListInMeal(mealId);
-        return new BaseResponse<>(menuList);
+        return BaseResponse.success(menuList);
     }
 
     /**
@@ -127,16 +127,10 @@ public class MenuController {
      */
     @Operation(summary = "식단 삭제", description = "mealId로 meal 삭제")
     @DeleteMapping("/meal/{mealId}")
-    public BaseResponse<String> deleteMeal(@Parameter(description = "mealId") @PathVariable("mealId") Long mealId) {
+    public BaseResponse deleteMeal(@Parameter(description = "mealId") @PathVariable("mealId") Long mealId) {
         List<Long> menuIdList = menuService.deleteMeal(mealId);
         menuService.cleanupGarbageMenu(menuIdList);
-        return new BaseResponse<>("");
-    }
-
-    @ExceptionHandler(BaseException.class)
-    public BaseResponse<String> handleBaseException(BaseException e) {
-        log.info(e.getStatus().toString());
-        return new BaseResponse<>(e.getStatus());
+        return BaseResponse.success();
     }
 
 }

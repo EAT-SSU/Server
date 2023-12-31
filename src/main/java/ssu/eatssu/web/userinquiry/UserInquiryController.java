@@ -36,12 +36,12 @@ public class UserInquiryController {
      */
     @Operation(summary = "문의 남기기", description = "문의 남기기")
     @PostMapping("/")
-    public BaseResponse<String> writeInquiry(@RequestBody UserInquiryCreate userInquiryCreate) {
+    public BaseResponse writeInquiry(@RequestBody UserInquiryCreate userInquiryCreate) {
         Long userId = SecurityUtil.getLoginUserId();
         UserInquiry inquiry = userInquiryService.createUserInquiry(userId, userInquiryCreate.getContent());
         slackService.sendSlackMessage(SlackMessageFormat.sendUserInquiry(inquiry)
                 , SlackChannel.USER_INQUIRY_CHANNEL);
-        return new BaseResponse<>("");
+        return BaseResponse.success();
     }
 
     /**
@@ -56,13 +56,7 @@ public class UserInquiryController {
                 userInquiryRepository.findById(userInquiryId).orElseThrow(() -> new BaseException(NOT_FOUND_USER_INQUIRY));
         slackService.sendSlackMessage(SlackMessageFormat.sendUserInquiry(inquiry)
                 , SlackChannel.USER_INQUIRY_CHANNEL);
-        return new BaseResponse<>(UserInquiryDetail.fromUserInquiry(inquiry));
-    }
-
-    @ExceptionHandler(BaseException.class)
-    public BaseResponse<String> handleBaseException(BaseException e) {
-        log.info(e.getStatus().toString());
-        return new BaseResponse<>(e.getStatus());
+        return BaseResponse.success(UserInquiryDetail.fromUserInquiry(inquiry));
     }
 
 }
