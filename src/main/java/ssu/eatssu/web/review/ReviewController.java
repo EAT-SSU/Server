@@ -68,7 +68,7 @@ public class ReviewController {
                                              @PathVariable("reviewId") Long reviewId,
                                              @RequestBody ReviewUpdate reviewUpdate) {
         Long userId = SecurityUtil.getLoginUserId();
-        reviewService.updateReview(userId, reviewId, reviewUpdate);
+        reviewService.updateReviewContent(userId, reviewId, reviewUpdate);
         return new BaseResponse<>("");
     }
 

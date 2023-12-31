@@ -47,7 +47,7 @@ public class MenuController {
                                                      @Parameter(description = "시간대")
                                                      @RequestParam("time") TimePart timePart) throws ParseException { //todo Exceiption service단에서 처리
         if (MenuTypeGroup.isChange(restaurantName)) {
-            List<Meal> mealList = menuService.findTodayMeals(timePart, date, restaurantName);
+            List<Meal> mealList = menuService.findMealList(timePart, date, restaurantName);
             List<TodayMeal> todayMealList = new ArrayList<>();
             for (Meal meal : mealList) {
                 TodayMeal todayMeal = TodayMeal.from(meal);
@@ -69,7 +69,7 @@ public class MenuController {
     public BaseResponse<FixMenuList> getFixMenuList(@Parameter(description = "식당이름")
                                                     @RequestParam("restaurant") RestaurantName restaurantName) {
         if (MenuTypeGroup.isFix(restaurantName)) {
-            List<Menu> menuList = menuService.findFixMenuByRestaurant(restaurantName);
+            List<Menu> menuList = menuService.findFixMenuList(restaurantName);
             FixMenuList fixMenuList = FixMenuList.from(menuList);
             return new BaseResponse<>(fixMenuList);
         } else {
@@ -95,14 +95,14 @@ public class MenuController {
         //todo Exceiption service단에서 처리
         if (MenuTypeGroup.isChange(restaurantName)) {
             try {
-                if (menuService.dupliicateMealCheck(timePart, date, restaurantName, addTodayMenuList)) {//이미 추가된 식단이면
+                if (menuService.isExistMeal(timePart, date, restaurantName, addTodayMenuList)) {//이미 추가된 식단이면
                     log.info("식단 중복 발견!");
                     return new BaseResponse<>("Duplicated");
                 }
             } catch (ParseException e) {
                 throw new BaseException(INVALID_DATE);
             }
-            menuService.addMeal(timePart, date, restaurantName, addTodayMenuList);
+            menuService.createMeal(timePart, date, restaurantName, addTodayMenuList);
             return new BaseResponse<>("");
         } else {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
@@ -117,7 +117,7 @@ public class MenuController {
     @GetMapping("/menus")
     public BaseResponse<MenuList> getMenuListInMeal(@Parameter(description = "mealId")
                                                     @RequestParam("mealId") Long mealId) {
-        MenuList menuList = menuService.findAllMenu(mealId);
+        MenuList menuList = menuService.findMenuListInMeal(mealId);
         return new BaseResponse<>(menuList);
     }
 

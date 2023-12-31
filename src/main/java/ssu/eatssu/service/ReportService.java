@@ -25,6 +25,9 @@ public class ReportService {
     private final UserRepository userRepository;
     private final ReviewReportRepository reviewReportRepository;
 
+    /**
+     * 리뷰 신고
+     */
     public ReviewReport reportReview(Long userId, ReviewReportCreate reviewReportCreate) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
         Review review = reviewRepository.findById(reviewReportCreate.getReviewId())

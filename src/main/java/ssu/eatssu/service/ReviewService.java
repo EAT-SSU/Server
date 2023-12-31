@@ -36,6 +36,9 @@ public class ReviewService {
     private final MealRepository mealRepository;
     private final S3Uploader s3Uploader;
 
+    /**
+     * 리뷰 작성
+     */
     public void createReview(Long userId, Long menuId, ReviewCreate reviewCreate, List<MultipartFile> imgList)  {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new BaseException(NOT_FOUND_USER));
@@ -52,6 +55,10 @@ public class ReviewService {
             }
         }
     }
+
+    /**
+     * 리뷰 이미지 추가
+     */
     public void addReviewImg(Review review, MultipartFile image) {
         if(!image.isEmpty()){
             try{
@@ -63,7 +70,11 @@ public class ReviewService {
             }
         }
     }
-    public void updateReview(Long userId, Long reviewId, ReviewUpdate reviewUpdate) {
+
+    /**
+     * 리뷰 문장 수정
+     */
+    public void updateReviewContent(Long userId, Long reviewId, ReviewUpdate reviewUpdate) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new BaseException(NOT_FOUND_USER));
 
@@ -78,6 +89,10 @@ public class ReviewService {
             throw new BaseException(PERMISSION_DENIED);
         }
     }
+
+    /**
+     * 리뷰 삭제
+     */
     public void deleteReview(Long userId, Long reviewId){
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new BaseException(NOT_FOUND_USER));
@@ -92,9 +107,17 @@ public class ReviewService {
             throw new BaseException(PERMISSION_DENIED);
         }
     }
+
+    /**
+     * 리뷰 작성자/관리자 인지 확인 //todo 관리자인지는 빼도 될듯
+     */
     public boolean isWriterOrAdmin(Review review, User user){
         return review.getUser() == user;
     }
+
+    /**
+     * 고정메뉴 - 리뷰 정보 조회
+     */
     public MenuReviewInfo findReviewInfoByMenuId(Long menuId) {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
@@ -104,9 +127,13 @@ public class ReviewService {
         return MenuReviewInfo.builder()
                 .menuName(reviewMenuList).mainGrade(menu.getMainGrade()).tasteGrade(menu.getTasteGrade())
                 .amountGrade(menu.getAmountGrade()).totalReviewCount(menu.getReviewCnt())
-                .reviewGradeCnt(MenuReviewInfo.ReviewGradeCnt.fromMap(findMenuReviewGradeCnt(menu)))
+                .reviewGradeCnt(MenuReviewInfo.ReviewGradeCnt.fromMap(getReviewGradeCnt(menu)))
                 .build();
     }
+
+    /**
+     * 변동메뉴 - 리뷰 정보 조회
+     */
     public MenuReviewInfo findReviewInfoByMealId(Long mealId) {
         Meal meal = mealRepository.findById(mealId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
@@ -115,7 +142,7 @@ public class ReviewService {
         List<String> reviewMenuList = new ArrayList<>();
         menuList.forEach(menu ->reviewMenuList.add(menu.getName()));
         List<Map<Integer, Long>> gradeCntMapList =
-                menuList.stream().map(this::findMenuReviewGradeCnt).toList();
+                menuList.stream().map(this::getReviewGradeCnt).toList();
         Map<Integer, Long> totalGradeCntMap = gradeCntMapList.stream().flatMap(m -> m.entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Long::sum));
         meal.caculateGrade();
@@ -125,7 +152,11 @@ public class ReviewService {
                 .reviewGradeCnt(MenuReviewInfo.ReviewGradeCnt.fromMap(totalGradeCntMap))
                 .build();
     }
-    public Map<Integer, Long> findMenuReviewGradeCnt(Menu menu) {
+
+    /**
+     * 메뉴의 리뷰 평점별 개수 조회
+     */
+    public Map<Integer, Long> getReviewGradeCnt(Menu menu) {
         List<Review> reviewList = menu.getReviews();
         long oneCnt = reviewList.stream().filter(r -> r.getMainGrade() == 1).count();
         long twoCnt = reviewList.stream().filter(r -> r.getMainGrade() == 2).count();
@@ -140,6 +171,10 @@ public class ReviewService {
         reviewGradeCntMap.put(5,fiveCnt);
         return reviewGradeCntMap;
     }
+
+    /**
+     * Slice<Review>를 Slice<ReviewDetail>로 변환
+     */
     private SliceDto<ReviewDetail> sliceReviewToSliceReviewDetail(Slice<Review> sliceReviewList){
         Long userId = SecurityUtil.getLoginUserId();
         List<ReviewDetail> reviewDetailList = new ArrayList<>();
@@ -150,6 +185,10 @@ public class ReviewService {
         return new SliceDto<>(sliceReviewList.getNumberOfElements(),
                 sliceReviewList.hasNext(), reviewDetailList);
     }
+
+    /**
+     * 고정메뉴 - 리뷰 목록 조회
+     */
     public SliceDto<ReviewDetail> findReviewListByMenuId(Long menuId, Pageable pageable, Long lastReviewId) {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(()->new BaseException(NOT_FOUND_MENU));
@@ -169,6 +208,10 @@ public class ReviewService {
         }
         return sliceReviewToSliceReviewDetail(sliceReviewList);
     }
+
+    /**
+     * 변동메뉴 - 리뷰 목록 조회
+     */
     public SliceDto<ReviewDetail> findReviewListByMealId(Long mealId, Pageable pageable, Long lastReviewId) {
         Meal meal = mealRepository.findById(mealId)
                 .orElseThrow(()->new BaseException(NOT_FOUND_MEAL));

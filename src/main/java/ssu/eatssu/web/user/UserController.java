@@ -107,7 +107,7 @@ public class UserController {
     @PatchMapping("/password")
     public BaseResponse<String> updatePassword(@Valid @RequestBody PasswordChange passwordChange) {
         Long userId = getLoginUserId();
-        userService.changePassword(userId, passwordChange.getPwd());
+        userService.updatePassword(userId, passwordChange.getPwd());
         return new BaseResponse<>("");
     }
 
@@ -118,7 +118,7 @@ public class UserController {
     @Operation(summary = "accessToken, refreshToken 재발급", description = "accessToken, refreshToken 재발급")
     @PostMapping("/token/reissue")
     public BaseResponse<Tokens> refreshToken() throws JsonProcessingException {
-        Tokens tokens = userService.refreshAccessToken(getLoginUser());
+        Tokens tokens = userService.refreshTokens(getLoginUser());
         return new BaseResponse<>(tokens);
     }
 
