@@ -48,7 +48,7 @@ public class QUser extends EntityPathBase<User> {
 
     public final EnumPath<ssu.eatssu.domain.enums.UserStatus> status = createEnum("status", ssu.eatssu.domain.enums.UserStatus.class);
 
-    public final ListPath<UserInquiries, QUserInquiries> userInquiries = this.<UserInquiries, QUserInquiries>createList("userInquiries", UserInquiries.class, QUserInquiries.class, PathInits.DIRECT2);
+    public final ListPath<UserInquiry, QUserInquiry> userInquiry = this.<UserInquiry, QUserInquiry>createList("userInquiry", UserInquiry.class, QUserInquiry.class, PathInits.DIRECT2);
 
     public QUser(String variable) {
         super(User.class, forVariable(variable));

@@ -1,16 +1,16 @@
-package ssu.eatssu.web.user_inquiries.dto;
+package ssu.eatssu.web.userinquiry.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import ssu.eatssu.domain.UserInquiries;
+import ssu.eatssu.domain.UserInquiry;
 
 @AllArgsConstructor
 @Builder
 @Schema(title = "문의내역 상세")
 @Getter
-public class UserInquiriesDetail {
+public class UserInquiryDetail {
 
     @Schema(description = "문의 작성자 Id", example = "123")
     private Long writerId;
@@ -24,9 +24,9 @@ public class UserInquiriesDetail {
     @Schema(description = "문의 내용", example = "어쩌고 저쩌고 문의드립니다")
     private String content;
 
-    public static UserInquiriesDetail fromUserInquiries(UserInquiries userInquiries) {
-        return UserInquiriesDetail.builder().writerId(userInquiries.getUser().getId())
-                .writerNickName(userInquiries.getUser().getNickname())
-                .writerEmail(userInquiries.getUser().getEmail()).content(userInquiries.getContent()).build();
+    public static UserInquiryDetail fromUserInquiry(UserInquiry userInquiry) {
+        return UserInquiryDetail.builder().writerId(userInquiry.getUser().getId())
+                .writerNickName(userInquiry.getUser().getNickname())
+                .writerEmail(userInquiry.getUser().getEmail()).content(userInquiry.getContent()).build();
     }
 }
