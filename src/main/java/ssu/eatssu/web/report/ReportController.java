@@ -4,15 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ssu.eatssu.domain.Review;
 import ssu.eatssu.domain.ReviewReport;
-import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.enums.ReviewReportType;
 import ssu.eatssu.domain.repository.ReviewRepository;
 import ssu.eatssu.domain.repository.UserRepository;
-import ssu.eatssu.response.BaseException;
 import ssu.eatssu.response.BaseResponse;
 import ssu.eatssu.service.ReportService;
 import ssu.eatssu.slack.SlackChannel;
@@ -25,9 +21,6 @@ import ssu.eatssu.web.report.dto.ReviewReportTypeInfo;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static ssu.eatssu.response.BaseResponseStatus.NOT_FOUND_REVIEW;
-import static ssu.eatssu.response.BaseResponseStatus.NOT_FOUND_USER;
 
 @Slf4j
 @RestController
@@ -49,7 +42,7 @@ public class ReportController {
         List<ReviewReportTypeInfo> reportInfo = new ArrayList<>();
         Arrays.stream(ReviewReportType.values())
                 .forEach(reportType -> reportInfo.add(new ReviewReportTypeInfo(reportType)));
-        return new BaseResponse<>(reportInfo);
+        return BaseResponse.success(reportInfo);
     }
 
     /**
@@ -57,17 +50,11 @@ public class ReportController {
      */
     @Operation(summary = "리뷰 신고하기", description = "리뷰 신고하기")
     @PostMapping("/")
-    public BaseResponse<String> reportReview(@RequestBody ReviewReportCreate reviewReportCreate) {
+    public BaseResponse reportReview(@RequestBody ReviewReportCreate reviewReportCreate) {
         Long userId = SecurityUtil.getLoginUserId();
         ReviewReport report = reportService.reportReview(userId, reviewReportCreate);
         slackService.sendSlackMessage(SlackMessageFormat.sendReport(report), SlackChannel.REPORT_CHANNEL);
-        return new BaseResponse<>("Success");
-    }
-
-    @ExceptionHandler(BaseException.class)
-    public BaseResponse<String> handleBaseException(BaseException e) {
-        log.info(e.getStatus().toString());
-        return new BaseResponse<>(e.getStatus());
+        return BaseResponse.success();
     }
 
 }
