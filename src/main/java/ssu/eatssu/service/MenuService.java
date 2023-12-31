@@ -33,13 +33,21 @@ public class MenuService {
     private final MealMenuRepository mealMenuRepository;
     private final RestaurantRepository restaurantRepository;
 
-    public List<Menu> findFixMenuByRestaurant(RestaurantName restaurantName) {
+    /**
+     * 고정 메뉴 조회
+     * <p>특정 식당에 해당하는 고정메뉴 목록을 조회합니다.</p>
+     */
+    public List<Menu> findFixMenuList(RestaurantName restaurantName) {
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_RESTAURANT));
         return menuRepository.findAllByRestaurant(restaurant);
     }
 
-    public List<Meal> findTodayMeals(TimePart timePart, String date,
+    /**
+     * 식단 목록 조회
+     * <p>변동메뉴 식당(학생식당, 도담, 기숙사 식당)의 특정날짜(yyyyMMdd), 특정시간대(아침/점심/저녁)에 해당하는 식단 목록을 조회한다.</p>
+     */
+    public List<Meal> findMealList(TimePart timePart, String date,
                                      RestaurantName restaurantName) throws ParseException {
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_RESTAURANT));
@@ -49,9 +57,11 @@ public class MenuService {
         return mealRepository.findAllByDateAndTimePartAndRestaurant(formatDate, timePart, restaurant);
     }
 
-
-    public void addMeal(TimePart timePart, String date, RestaurantName restaurantName,
-                        MenuReqDto.AddTodayMenuList addTodayMenuList) throws ParseException {
+    /**
+     * 식단 등록
+     */
+    public void createMeal(TimePart timePart, String date, RestaurantName restaurantName,
+                           MenuReqDto.AddTodayMenuList addTodayMenuList) throws ParseException {
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_RESTAURANT));
         //date format 맞추기
@@ -75,7 +85,10 @@ public class MenuService {
         newMeal.caculateGrade();
     }
 
-    public boolean dupliicateMealCheck(TimePart timePart, String date, RestaurantName restaurantName,
+    /**
+     * 이미 존재하는 식단인지 확인
+     */
+    public boolean isExistMeal(TimePart timePart, String date, RestaurantName restaurantName,
                                MenuReqDto.AddTodayMenuList addTodayMenuList) throws ParseException {
         //date format 맞추기
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -97,11 +110,17 @@ public class MenuService {
         return false;
     }
 
-    public MenuList findAllMenu(Long mealId) {
+    /**
+     * 식단 속 메뉴 목록 조회
+     */
+    public MenuList findMenuListInMeal(Long mealId) {
         Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
         return MenuList.from(meal);
     }
 
+    /**
+     * 식단 삭제
+     */
     public List<Long> deleteMeal(Long mealId) {
         Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
         List<Long> menuIdList = new ArrayList<>();
@@ -116,6 +135,9 @@ public class MenuService {
         return menuIdList;
     }
 
+    /**
+     * 변동 메뉴 중 어떤 식단에도 포함되지 않는 메뉴를 찾아 삭제한다.
+     */
     public void cleanupGarbageMenu(List<Long> menuIdList) {
         for(Long menuId : menuIdList){
             Optional<Menu> menu = menuRepository.findById(menuId);
