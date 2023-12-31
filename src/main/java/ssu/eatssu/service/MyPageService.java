@@ -28,6 +28,9 @@ public class MyPageService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
 
+    /**
+     * 유저가 작성한 리뷰 목록 조회
+     */
     public SliceDto<MyReviewDetail> findMyReviewList(Long userId, Pageable pageable, Long lastReviewId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
@@ -51,6 +54,9 @@ public class MyPageService {
 
     }
 
+    /**
+     * Slice<Review>를 Slice<MyReviewDetail>로 변환
+     */
     private SliceDto<MyReviewDetail> sliceReviewToSliceMyReviewDetail(Slice<Review> sliceReviewList) {
         List<MyReviewDetail> myReviewDetailList = new ArrayList<>();
         for (Review review : sliceReviewList) {
@@ -61,7 +67,10 @@ public class MyPageService {
                 sliceReviewList.hasNext(), myReviewDetailList);
     }
 
-    public MypageInfo mypageInfo(Long userId) {
+    /**
+     * 마이페이지 정보(닉네임, OAuth 제공처) 조회
+     */
+    public MypageInfo findMyPageInfo(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
         return new MypageInfo(user.getNickname(), user.getProvider());
     }

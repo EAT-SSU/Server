@@ -20,6 +20,9 @@ public class UserInquiriesService {
     private final UserRepository userRepository;
     private final UserInquiriesRepository userInquiriesRepository;
 
+    /**
+     * 문의 작성
+     */
     public UserInquiries createUserInquiries(Long userId, String content) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
         UserInquiries userInquiries = UserInquiries.builder().user(user).content(content).build();

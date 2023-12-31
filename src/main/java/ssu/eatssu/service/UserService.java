@@ -31,6 +31,11 @@ public class UserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
 
+    /**
+     * 자체 회원가입
+     *
+     * @deprecated
+     */
     public Tokens join(String email, String pwd) throws JsonProcessingException{
         String encodedPwd = passwordEncoder.encode(pwd);
         User user = User.join(email, encodedPwd);
@@ -39,6 +44,11 @@ public class UserService {
         return generateJwtTokens(email, pwd);
     }
 
+    /**
+     * 자체 로그인
+     *
+     * @deprecated
+     */
     public Tokens login(String email, String pwd) throws JsonProcessingException {
         //유저 존재 여부 체크
         Optional<User> user = userRepository.findByEmail(email);
@@ -48,6 +58,9 @@ public class UserService {
         return generateJwtTokens(email, pwd);
     }
 
+    /**
+     * 닉네임 변경
+     */
     public void updateNickname(Long userId, String nickname) {
         User user = userRepository.findById(userId)
               .orElseThrow(()-> new RuntimeException("User not found"));
@@ -55,6 +68,9 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * email, pwd를 통해 JwtToken을 생성 //todo: JwtTokenProvider로 옮길까?
+     */
     public Tokens generateJwtTokens(String email, String pwd) throws JsonProcessingException {
         // 1. email/pwd 를 기반으로 Authentication 객체 생성
         //    이때 authentication은 인증 여부를 확인하는 authenticated 값이 false
@@ -68,7 +84,10 @@ public class UserService {
         return jwtTokenProvider.generateTokens(authentication);
     }
 
-    public void changePassword(Long userId, String pwd) {
+    /**
+     * 비밀번호 변경
+     */
+    public void updatePassword(Long userId, String pwd) {
         User user = userRepository.findById(userId)
               .orElseThrow(()-> new RuntimeException("User not found"));
         String encodedPwd = passwordEncoder.encode(pwd);
@@ -76,11 +95,16 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public Tokens refreshAccessToken(Authentication authentication) throws JsonProcessingException{
-
+    /**
+     * JWT 토큰 재발급
+     */
+    public Tokens refreshTokens(Authentication authentication) throws JsonProcessingException{
         return jwtTokenProvider.generateTokens(authentication);
     }
 
+    /**
+     * 유저 탈퇴
+     */
     public void signout (Long userId) {
         User user = userRepository.findById(userId).orElseThrow(()-> new BaseException(NOT_FOUND_USER));
         //작성한 리뷰 삭제

@@ -49,7 +49,7 @@ public class MyPageController {
     @GetMapping("/info")
     public BaseResponse<MypageInfo> getMyPageInfo() {
         Long userId = SecurityUtil.getLoginUserId();
-        MypageInfo mypageInfo = myPageService.mypageInfo(userId);
+        MypageInfo mypageInfo = myPageService.findMyPageInfo(userId);
         return new BaseResponse<>(mypageInfo);
     }
 
