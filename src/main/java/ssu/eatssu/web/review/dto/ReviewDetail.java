@@ -33,13 +33,13 @@ public class ReviewDetail {
     private String writerNickname;
 
     @Schema(description = "평점-메인", example = "4")
-    private Integer mainGrade;
+    private Integer mainRate;
 
     @Schema(description = "평점-양", example = "4")
-    private Integer amountGrade;
+    private Integer amountRate;
 
     @Schema(description = "평점-맛", example = "4")
-    private Integer tasteGrade;
+    private Integer tasteRate;
 
     @Schema(description = "리뷰 작성 날짜(format = yyyy-MM-dd)", example = "2023-04-07")
     private LocalDate writeDate;
@@ -58,7 +58,7 @@ public class ReviewDetail {
             return ReviewDetail.builder()
                     .reviewId(review.getId())
                     .writerId(null).writerNickname("알 수 없음")
-                    .mainGrade(review.getMainGrade()).amountGrade(review.getAmountGrade()).tasteGrade(review.getTasteGrade())
+                    .mainRate(review.getMainRate()).amountRate(review.getAmountRate()).tasteRate(review.getTasteRate())
                     .writeDate(review.getCreatedDate().toLocalDate()).content(review.getContent())
                     .isWriter(false).imgUrlList(imgUrlList).menu(review.getMenu().getName())
                     .build();
@@ -67,7 +67,7 @@ public class ReviewDetail {
             return ReviewDetail.builder()
                     .reviewId(review.getId())
                     .writerId(review.getUser().getId()).writerNickname(review.getUser().getNickname())
-                    .mainGrade(review.getMainGrade()).amountGrade(review.getAmountGrade()).tasteGrade(review.getTasteGrade())
+                    .mainRate(review.getMainRate()).amountRate(review.getAmountRate()).tasteRate(review.getTasteRate())
                     .writeDate(review.getCreatedDate().toLocalDate()).content(review.getContent())
                     .isWriter(isWriter).imgUrlList(imgUrlList).menu(review.getMenu().getName())
                     .build();

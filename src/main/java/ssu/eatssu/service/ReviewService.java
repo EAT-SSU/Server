@@ -46,7 +46,7 @@ public class ReviewService {
                 .orElseThrow(()-> new BaseException(NOT_FOUND_MENU));
         Review review = reviewCreate.toEntity(user, menu);
         reviewRepository.save(review);
-        menu.addReview(reviewCreate.getMainGrade(),reviewCreate.getTasteGrade(), reviewCreate.getAmountGrade());
+        menu.addReview(reviewCreate.getMainRate(),reviewCreate.getTasteRate(), reviewCreate.getAmountRate());
         menuRepository.save(menu);
 
         if(imgList!=null&&!imgList.isEmpty()){
@@ -82,8 +82,8 @@ public class ReviewService {
                 .orElseThrow(()-> new BaseException(NOT_FOUND_REVIEW));
 
         if(isWriterOrAdmin(review, user)){
-            review.update(reviewUpdate.getContent(), reviewUpdate.getMainGrade(), reviewUpdate.getAmountGrade()
-                    , reviewUpdate.getTasteGrade());
+            review.update(reviewUpdate.getContent(), reviewUpdate.getMainRate(), reviewUpdate.getAmountRate()
+                    , reviewUpdate.getTasteRate());
             review.getMenu().updateReview();
         }else{
             throw new BaseException(PERMISSION_DENIED);
@@ -125,9 +125,9 @@ public class ReviewService {
         reviewMenuList.add(menu.getName());
 
         return MenuReviewInfo.builder()
-                .menuName(reviewMenuList).mainGrade(menu.getMainGrade()).tasteGrade(menu.getTasteGrade())
-                .amountGrade(menu.getAmountGrade()).totalReviewCount(menu.getReviewCnt())
-                .reviewGradeCnt(MenuReviewInfo.ReviewGradeCnt.fromMap(getReviewGradeCnt(menu)))
+                .menuName(reviewMenuList).mainRate(menu.getMainRate()).tasteRate(menu.getTasteRate())
+                .amountRate(menu.getAmountRate()).totalReviewCount(menu.getReviewCnt())
+                .reviewRateCnt(MenuReviewInfo.ReviewRateCnt.fromMap(getReviewRateCnt(menu)))
                 .build();
     }
 
@@ -141,35 +141,35 @@ public class ReviewService {
         meal.getMealMenus().forEach(mealMenu -> menuList.add(mealMenu.getMenu()));
         List<String> reviewMenuList = new ArrayList<>();
         menuList.forEach(menu ->reviewMenuList.add(menu.getName()));
-        List<Map<Integer, Long>> gradeCntMapList =
-                menuList.stream().map(this::getReviewGradeCnt).toList();
-        Map<Integer, Long> totalGradeCntMap = gradeCntMapList.stream().flatMap(m -> m.entrySet().stream())
+        List<Map<Integer, Long>> rateCntMapList =
+                menuList.stream().map(this::getReviewRateCnt).toList();
+        Map<Integer, Long> totalRateCntMap = rateCntMapList.stream().flatMap(m -> m.entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Long::sum));
-        meal.caculateGrade();
+        meal.caculateRate();
         return MenuReviewInfo.builder()
-                .menuName(reviewMenuList).mainGrade(meal.getMainGrade()).tasteGrade(meal.getTasteGrade())
-                .amountGrade(meal.getAmountGrade()).totalReviewCount(menuList.stream().mapToInt(Menu::getReviewCnt).sum())
-                .reviewGradeCnt(MenuReviewInfo.ReviewGradeCnt.fromMap(totalGradeCntMap))
+                .menuName(reviewMenuList).mainRate(meal.getMainRate()).tasteRate(meal.getTasteRate())
+                .amountRate(meal.getAmountRate()).totalReviewCount(menuList.stream().mapToInt(Menu::getReviewCnt).sum())
+                .reviewRateCnt(MenuReviewInfo.ReviewRateCnt.fromMap(totalRateCntMap))
                 .build();
     }
 
     /**
      * 메뉴의 리뷰 평점별 개수 조회
      */
-    public Map<Integer, Long> getReviewGradeCnt(Menu menu) {
+    public Map<Integer, Long> getReviewRateCnt(Menu menu) {
         List<Review> reviewList = menu.getReviews();
-        long oneCnt = reviewList.stream().filter(r -> r.getMainGrade() == 1).count();
-        long twoCnt = reviewList.stream().filter(r -> r.getMainGrade() == 2).count();
-        long threeCnt = reviewList.stream().filter(r -> r.getMainGrade() == 3).count();
-        long fourCnt = reviewList.stream().filter(r -> r.getMainGrade() == 4).count();
-        long fiveCnt = reviewList.stream().filter(r -> r.getMainGrade() == 5).count();
-        Map<Integer, Long> reviewGradeCntMap = new HashMap<>();
-        reviewGradeCntMap.put(1, oneCnt);
-        reviewGradeCntMap.put(2,twoCnt);
-        reviewGradeCntMap.put(3,threeCnt);
-        reviewGradeCntMap.put(4,fourCnt);
-        reviewGradeCntMap.put(5,fiveCnt);
-        return reviewGradeCntMap;
+        long oneCnt = reviewList.stream().filter(r -> r.getMainRate() == 1).count();
+        long twoCnt = reviewList.stream().filter(r -> r.getMainRate() == 2).count();
+        long threeCnt = reviewList.stream().filter(r -> r.getMainRate() == 3).count();
+        long fourCnt = reviewList.stream().filter(r -> r.getMainRate() == 4).count();
+        long fiveCnt = reviewList.stream().filter(r -> r.getMainRate() == 5).count();
+        Map<Integer, Long> reviewRateCntMap = new HashMap<>();
+        reviewRateCntMap.put(1, oneCnt);
+        reviewRateCntMap.put(2,twoCnt);
+        reviewRateCntMap.put(3,threeCnt);
+        reviewRateCntMap.put(4,fourCnt);
+        reviewRateCntMap.put(5,fiveCnt);
+        return reviewRateCntMap;
     }
 
     /**

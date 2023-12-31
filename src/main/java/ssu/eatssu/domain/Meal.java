@@ -31,11 +31,11 @@ public class Meal {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    private Double mainGrade = 0.0;
+    private Double mainRate = 0.0;
 
-    private Double amountGrade = 0.0;
+    private Double amountRate = 0.0;
 
-    private Double tasteGrade = 0.0;
+    private Double tasteRate = 0.0;
 
 
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
@@ -48,37 +48,37 @@ public class Meal {
         this.restaurant = restaurant;
     }
 
-    public void caculateGrade(){
+    public void caculateRate(){
         if(!mealMenus.isEmpty()){
             int totalReviewCnt = 0;
-            Double mainGradeSum = 0.0;
-            Double amountGradeSum = 0.0;
-            Double tasteGradeSum = 0.0;
+            Double mainRateSum = 0.0;
+            Double amountRateSum = 0.0;
+            Double tasteRateSum = 0.0;
             for(MealMenu mealMenu : mealMenus){
                 Menu menu = mealMenu.getMenu();
                 totalReviewCnt += menu.getReviewCnt();
-                mainGradeSum += menu.getTotalMainGrade();
-                amountGradeSum += menu.getTotalAmountGrade();
-                tasteGradeSum += menu.getTotalTasteGrade();
+                mainRateSum += menu.getTotalMainRate();
+                amountRateSum += menu.getTotalAmountRate();
+                tasteRateSum += menu.getTotalTasteRate();
             }
             if(totalReviewCnt!=0){
-                this.mainGrade = mainGradeSum/totalReviewCnt;
-                this.amountGrade = amountGradeSum/totalReviewCnt;
-                this.tasteGrade = tasteGradeSum/totalReviewCnt;
+                this.mainRate = mainRateSum/totalReviewCnt;
+                this.amountRate = amountRateSum/totalReviewCnt;
+                this.tasteRate = tasteRateSum/totalReviewCnt;
             }else{
-                this.mainGrade = 0.0;
-                this.amountGrade = 0.0;
-                this.tasteGrade = 0.0;
+                this.mainRate = 0.0;
+                this.amountRate = 0.0;
+                this.tasteRate = 0.0;
             }
 
         }
     }
 
-    public Map<String, Double> getGradeMap() {
-        Map<String, Double> gradeMap = new HashMap<>();
-        gradeMap.put("mainGrade", mainGrade);
-        gradeMap.put("amountGrade", amountGrade);
-        gradeMap.put("tasteGrade", tasteGrade);
-        return gradeMap;
+    public Map<String, Double> getRateMap() {
+        Map<String, Double> rateMap = new HashMap<>();
+        rateMap.put("mainRate", mainRate);
+        rateMap.put("amountRate", amountRate);
+        rateMap.put("tasteRate", tasteRate);
+        return rateMap;
     }
 }

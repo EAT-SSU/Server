@@ -14,13 +14,13 @@ import ssu.eatssu.domain.User;
 public class ReviewCreate {
 
     @Schema(description = "평점-메인", example = "4")
-    private Integer mainGrade;
+    private Integer mainRate;
 
     @Schema(description = "평점-양", example = "4")
-    private Integer amountGrade;
+    private Integer amountRate;
 
     @Schema(description = "평점-맛", example = "4")
-    private Integer tasteGrade;
+    private Integer tasteRate;
 
     @Max(150)
     @Schema(description = "한줄평", example = "맛있어용")
@@ -28,8 +28,8 @@ public class ReviewCreate {
 
     public Review toEntity(User user, Menu menu) {
         return Review.builder()
-                .user(user).content(this.content).mainGrade(this.mainGrade).amountGrade(this.amountGrade)
-                .tasteGrade(this.tasteGrade).menu(menu).build();
+                .user(user).content(this.content).mainRate(this.mainRate).amountRate(this.amountRate)
+                .tasteRate(this.tasteRate).menu(menu).build();
     }
 
 }
