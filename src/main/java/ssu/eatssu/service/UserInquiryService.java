@@ -4,28 +4,27 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.User;
-import ssu.eatssu.domain.UserInquiries;
-import ssu.eatssu.domain.repository.UserInquiriesRepository;
+import ssu.eatssu.domain.UserInquiry;
+import ssu.eatssu.domain.repository.UserInquiryRepository;
 import ssu.eatssu.domain.repository.UserRepository;
 import ssu.eatssu.response.BaseException;
 
-
-import static ssu.eatssu.response.BaseResponseStatus.*;
+import static ssu.eatssu.response.BaseResponseStatus.NOT_FOUND_USER;
 
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class UserInquiriesService {
+public class UserInquiryService {
 
     private final UserRepository userRepository;
-    private final UserInquiriesRepository userInquiriesRepository;
+    private final UserInquiryRepository userInquiryRepository;
 
     /**
      * 문의 작성
      */
-    public UserInquiries createUserInquiries(Long userId, String content) {
+    public UserInquiry createUserInquiry(Long userId, String content) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        UserInquiries userInquiries = UserInquiries.builder().user(user).content(content).build();
-        return userInquiriesRepository.save(userInquiries);
+        UserInquiry userInquiry = UserInquiry.builder().user(user).content(content).build();
+        return userInquiryRepository.save(userInquiry);
     }
 }

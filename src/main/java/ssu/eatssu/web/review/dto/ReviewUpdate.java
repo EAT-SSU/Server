@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 public class ReviewUpdate {
 
     @Schema(description = "평점-메인", example = "4")
-    private Integer mainGrade;
+    private Integer mainRate;
 
     @Schema(description = "평점-양", example = "4")
-    private Integer amountGrade;
+    private Integer amountRate;
 
     @Schema(description = "평점-맛", example = "4")
-    private Integer tasteGrade;
+    private Integer tasteRate;
 
     @Max(150)
     @Schema(description = "한줄평", example = "맛있어용")
