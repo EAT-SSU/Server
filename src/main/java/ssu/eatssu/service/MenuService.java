@@ -82,7 +82,7 @@ public class MenuService {
             MealMenu mealMenu = MealMenu.builder().menu(menu).meal(newMeal).build();
             mealMenuRepository.save(mealMenu);
         }
-        newMeal.caculateGrade();
+        newMeal.caculateRate();
     }
 
     /**

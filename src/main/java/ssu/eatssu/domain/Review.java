@@ -20,11 +20,11 @@ public class Review extends BaseTimeEntity{
 
     private String content;
 
-    private Integer mainGrade;
+    private Integer mainRate;
 
-    private Integer amountGrade;
+    private Integer amountRate;
 
-    private Integer tasteGrade;
+    private Integer tasteRate;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -37,11 +37,11 @@ public class Review extends BaseTimeEntity{
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
     private List<ReviewImg> reviewImgs;
 
-    public void update(String content, Integer mainGrade, Integer amountGrade, Integer tasteGrade){
+    public void update(String content, Integer mainRate, Integer amountRate, Integer tasteRate){
         this.content = content;
-        this.mainGrade = mainGrade;
-        this.amountGrade = amountGrade;
-        this.tasteGrade = tasteGrade;
+        this.mainRate = mainRate;
+        this.amountRate = amountRate;
+        this.tasteRate = tasteRate;
     }
 
     public void signoutUser(){
