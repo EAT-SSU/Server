@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import ssu.eatssu.domain.Review;
 import ssu.eatssu.domain.ReviewReport;
 import ssu.eatssu.domain.User;
-import ssu.eatssu.domain.UserInquiries;
+import ssu.eatssu.domain.UserInquiry;
 
 import java.text.MessageFormat;
 
@@ -41,7 +41,7 @@ public class SlackMessageFormat {
         return messageFormat.format(args);
     }
 
-    public static String sendUserInquiries(UserInquiries inquiries) {
+    public static String sendUserInquiry(UserInquiry inquiry) {
         MessageFormat messageFormat = new MessageFormat(
                 """
                 ===================
@@ -55,8 +55,8 @@ public class SlackMessageFormat {
                 ===================
                 """
         );
-        Object[] args = {inquiries.getUser().getId(), inquiries.getUser().getNickname(),inquiries.getUser().getEmail()
-                ,inquiries.getCreatedDate(), inquiries.getContent()};
+        Object[] args = {inquiry.getUser().getId(), inquiry.getUser().getNickname(),inquiry.getUser().getEmail()
+                ,inquiry.getCreatedDate(), inquiry.getContent()};
         return messageFormat.format(args);
     }
 }
