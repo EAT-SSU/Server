@@ -85,7 +85,7 @@ public class MenuController {
      */
     @Operation(summary = "특정 식당 식단 추가", description = "특정 식당의 식단 추가")
     @PostMapping("/")
-    public BaseResponse addMeal(@Parameter(description = "날짜(yyyyMMdd)")
+    public BaseResponse<?> addMeal(@Parameter(description = "날짜(yyyyMMdd)")
                                         @RequestParam("date") String date,
                                         @Parameter(description = "식당이름")
                                         @RequestParam("restaurant") RestaurantName restaurantName,
@@ -127,7 +127,7 @@ public class MenuController {
      */
     @Operation(summary = "식단 삭제", description = "mealId로 meal 삭제")
     @DeleteMapping("/meal/{mealId}")
-    public BaseResponse deleteMeal(@Parameter(description = "mealId") @PathVariable("mealId") Long mealId) {
+    public BaseResponse<?> deleteMeal(@Parameter(description = "mealId") @PathVariable("mealId") Long mealId) {
         List<Long> menuIdList = menuService.deleteMeal(mealId);
         menuService.cleanupGarbageMenu(menuIdList);
         return BaseResponse.success();

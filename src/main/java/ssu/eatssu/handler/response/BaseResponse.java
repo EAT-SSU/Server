@@ -37,7 +37,7 @@ public class BaseResponse<T> {
     /**
      * API 성공 응답
      */
-    public static BaseResponse success() {
+    public static <T> BaseResponse<T> success() {
         return new BaseResponse<>(BaseResponseStatus.SUCCESS);
     }
 
@@ -48,7 +48,7 @@ public class BaseResponse<T> {
     /**
      * API 실패 응답
      */
-    public static BaseResponse fail(BaseResponseStatus status) {
+    public static <T> BaseResponse<T> fail(BaseResponseStatus status) {
         return new BaseResponse<>(status);
     }
 }
