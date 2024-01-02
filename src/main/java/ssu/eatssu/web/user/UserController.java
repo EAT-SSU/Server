@@ -75,7 +75,7 @@ public class UserController {
      */
     @Operation(summary = "닉네임 수정", description = "닉네임 수정")
     @PatchMapping("/nickname")
-    public BaseResponse updateNickname(@Valid @RequestBody NicknameEdit nicknameEdit) {
+    public BaseResponse<?> updateNickname(@Valid @RequestBody NicknameEdit nicknameEdit) {
         Long userId = getLoginUserId();
         userService.updateNickname(userId, nicknameEdit.getNickname());
         return BaseResponse.success();
@@ -104,7 +104,7 @@ public class UserController {
      */
     @Operation(summary = "비밀번호 변경", description = "비밀번호 변경")
     @PatchMapping("/password")
-    public BaseResponse updatePassword(@Valid @RequestBody PasswordChange passwordChange) {
+    public BaseResponse<?> updatePassword(@Valid @RequestBody PasswordChange passwordChange) {
         Long userId = getLoginUserId();
         userService.updatePassword(userId, passwordChange.getPwd());
         return BaseResponse.success();

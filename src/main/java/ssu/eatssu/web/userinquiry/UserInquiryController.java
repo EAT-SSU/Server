@@ -36,7 +36,7 @@ public class UserInquiryController {
      */
     @Operation(summary = "문의 남기기", description = "문의 남기기")
     @PostMapping("/")
-    public BaseResponse writeInquiry(@RequestBody UserInquiryCreate userInquiryCreate) {
+    public BaseResponse<?> writeInquiry(@RequestBody UserInquiryCreate userInquiryCreate) {
         Long userId = SecurityUtil.getLoginUserId();
         UserInquiry inquiry = userInquiryService.createUserInquiry(userId, userInquiryCreate.getContent());
         slackService.sendSlackMessage(SlackMessageFormat.sendUserInquiry(inquiry)

@@ -49,7 +49,7 @@ public class ReviewController {
     @PostMapping(value = "/{menuId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse writeReview(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
+    public BaseResponse<?> writeReview(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
                                             @RequestPart(value = "reviewCreate") ReviewCreate reviewCreate,
                                             @RequestPart(value = "multipartFileList", required = false)
                                                     List<MultipartFile> multipartFileList) {
@@ -64,7 +64,7 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 수정(글 수정)", description = "리뷰 수정(글 수정)")
     @PatchMapping("/{reviewId}")
-    public BaseResponse updateReview(@Parameter(description = "reviewId")
+    public BaseResponse<?> updateReview(@Parameter(description = "reviewId")
                                              @PathVariable("reviewId") Long reviewId,
                                              @RequestBody ReviewUpdate reviewUpdate) {
         Long userId = SecurityUtil.getLoginUserId();
@@ -78,7 +78,7 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 삭제", description = "리뷰 삭제")
     @DeleteMapping("/{reviewId}")
-    public BaseResponse deleteReview(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
+    public BaseResponse<?> deleteReview(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.deleteReview(userId, reviewId);
         return BaseResponse.success();
@@ -154,7 +154,7 @@ public class ReviewController {
     //todo 관리자 api로 이동 필요
      */
     @GetMapping("/refresh")
-    public BaseResponse refreshReviewInfo() {
+    public BaseResponse<?> refreshReviewInfo() {
         refreshingService.refreshAllReviews();
         return BaseResponse.success();
     }
