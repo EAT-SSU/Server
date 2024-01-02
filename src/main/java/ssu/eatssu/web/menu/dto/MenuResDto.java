@@ -28,7 +28,7 @@ public class MenuResDto {
         private Integer price;
 
         @Schema(description = "식단 평점(평점이 없으면 null)", example = "4.4")
-        private Double mainGrade;
+        private Double mainRate;
 
         @Schema(description = "식단 속 메뉴 리스트")
         private List<ChangeMenuInfo> changeMenuInfoList;
@@ -55,7 +55,7 @@ public class MenuResDto {
                     changeMenuList.add(changeMenuInfo);
                 }
                 return new TodayMeal(meal.getId(), meal.getRestaurant().getRestaurantName().getPrice()
-                        , meal.getGradeMap().get("mainGrade"), changeMenuList);
+                        , meal.getRateMap().get("mainRate"), changeMenuList);
             }else{
                 return null;
             }
@@ -79,7 +79,7 @@ public class MenuResDto {
             private String name;
 
             @Schema(description = "메뉴 평점(평점이 없으면 null)", example = "4.4")
-            private Double mainGrade;
+            private Double mainRate;
 
             @Schema(description = "가격", example = "5000")
             private Integer price;
@@ -88,7 +88,7 @@ public class MenuResDto {
         public static FixMenuList from(List<Menu> menus){
             List<FixMenuInfo> fixMenuList = new ArrayList<>();
             for (Menu menu : menus) {
-                FixMenuInfo menuInfo = new FixMenuInfo(menu.getId(), menu.getName(), menu.getMainGrade(), menu.getPrice());
+                FixMenuInfo menuInfo = new FixMenuInfo(menu.getId(), menu.getName(), menu.getMainRate(), menu.getPrice());
                 fixMenuList.add(menuInfo);
             }
             return new FixMenuList(fixMenuList);

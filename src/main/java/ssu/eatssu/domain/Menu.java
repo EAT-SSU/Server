@@ -22,22 +22,22 @@ public class Menu {
     private Integer price;
 
     @ColumnDefault("0.0")
-    private Double mainGrade = 0.0;
+    private Double mainRate = 0.0;
 
     @ColumnDefault("0.0")
-    private Double amountGrade = 0.0;
+    private Double amountRate = 0.0;
 
     @ColumnDefault("0.0")
-    private Double tasteGrade = 0.0;
+    private Double tasteRate = 0.0;
 
     @ColumnDefault("0")
-    private Integer totalMainGrade = 0;
+    private Integer totalMainRate = 0;
 
     @ColumnDefault("0")
-    private Integer totalAmountGrade = 0;
+    private Integer totalAmountRate = 0;
 
     @ColumnDefault("0")
-    private Integer totalTasteGrade = 0;
+    private Integer totalTasteRate = 0;
 
     @ColumnDefault("0")
     private Integer reviewCnt = 0 ;
@@ -66,12 +66,12 @@ public class Menu {
         return new Menu(name, restaurant, price);
     }
 
-    public void addReview(Integer mainGrade, Integer tasteGrade, Integer amountGrade) {
+    public void addReview(Integer mainRate, Integer tasteRate, Integer amountRate) {
             this.reviewCnt++;
-            this.totalMainGrade += mainGrade;
-            this.totalTasteGrade += tasteGrade;
-            this.totalAmountGrade += amountGrade;
-            calculateGrade();
+            this.totalMainRate += mainRate;
+            this.totalTasteRate += tasteRate;
+            this.totalAmountRate += amountRate;
+            calculateRate();
     }
 
     public void deleteReview(){
@@ -87,33 +87,33 @@ public class Menu {
         int totalTaste =0;
         int totalAmount = 0;
         for(Review review : this.reviews){
-            totalMain+=review.getMainGrade();
-            totalTaste += review.getTasteGrade();
-            totalAmount+=review.getAmountGrade();
+            totalMain+=review.getMainRate();
+            totalTaste += review.getTasteRate();
+            totalAmount+=review.getAmountRate();
         }
-        this.totalMainGrade = totalMain;
-        this.totalTasteGrade = totalTaste;
-        this.totalAmountGrade = totalAmount;
+        this.totalMainRate = totalMain;
+        this.totalTasteRate = totalTaste;
+        this.totalAmountRate = totalAmount;
         this.reviewCnt = (int)reviews.stream().count();
-        calculateGrade();
+        calculateRate();
     }
 
-    private void calculateGrade(){ // 평점 계산 후 적용
+    private void calculateRate(){ // 평점 계산 후 적용
         if(this.reviewCnt==0){
-            gradeReset();
+            rateReset();
         }else{
-            this.mainGrade = this.totalMainGrade.doubleValue()/this.reviewCnt.doubleValue();
-            this.tasteGrade = this.totalTasteGrade.doubleValue()/this.reviewCnt.doubleValue();
-            this.amountGrade = this.totalAmountGrade.doubleValue()/this.reviewCnt.doubleValue();
+            this.mainRate = this.totalMainRate.doubleValue()/this.reviewCnt.doubleValue();
+            this.tasteRate = this.totalTasteRate.doubleValue()/this.reviewCnt.doubleValue();
+            this.amountRate = this.totalAmountRate.doubleValue()/this.reviewCnt.doubleValue();
         }
     }
 
-    private void gradeReset(){ //평점 초기화
-        this.totalMainGrade = 0;
-        this.totalTasteGrade = 0;
-        this.totalAmountGrade = 0;
-        this.mainGrade = 0.0;
-        this.tasteGrade = 0.0;
-        this.amountGrade = 0.0;
+    private void rateReset(){ //평점 초기화
+        this.totalMainRate = 0;
+        this.totalTasteRate = 0;
+        this.totalAmountRate = 0;
+        this.mainRate = 0.0;
+        this.tasteRate = 0.0;
+        this.amountRate = 0.0;
     }
 }

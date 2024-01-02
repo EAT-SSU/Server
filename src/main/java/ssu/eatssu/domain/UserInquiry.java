@@ -8,10 +8,10 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class UserInquiries extends BaseTimeEntity{
+public class UserInquiry extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_inquiries_id")
+    @Column(name = "user_inquiry_id")
     private Long id;
 
     private String content;

@@ -5,15 +5,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ssu.eatssu.domain.repository.UserRepository;
-import ssu.eatssu.response.BaseException;
-import ssu.eatssu.response.BaseResponse;
+import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.service.OauthService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.oauth.dto.AppleLogin;
 import ssu.eatssu.web.oauth.dto.KakaoLogin;
-import ssu.eatssu.web.user.dto.*;
+import ssu.eatssu.web.user.dto.Tokens;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -36,7 +38,7 @@ public class OauthController {
     @PostMapping("/kakao")
     public BaseResponse<Tokens> kakaoLogin(@Valid @RequestBody KakaoLogin login) {
         Tokens tokens = oauthService.kakaoLogin(login.getEmail(), login.getProviderId());
-        return new BaseResponse<>(tokens);
+        return BaseResponse.success(tokens);
     }
 
     /**
@@ -47,14 +49,7 @@ public class OauthController {
     public BaseResponse<Tokens> appleLogin(@Valid @RequestBody AppleLogin login) throws NoSuchAlgorithmException,
             InvalidKeySpecException {
         Tokens tokens = oauthService.appleLogin(login.getIdentityToken());
-        return new BaseResponse<>(tokens);
+        return BaseResponse.success(tokens);
     }
-
-    @ExceptionHandler(BaseException.class)
-    public BaseResponse<String> handleBaseException(BaseException e) {
-        log.info(e.getStatus().toString());
-        return new BaseResponse<>(e.getStatus());
-    }
-
 
 }

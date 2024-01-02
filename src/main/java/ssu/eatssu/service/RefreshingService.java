@@ -29,7 +29,7 @@ public class RefreshingService {
         }
         List<Meal> mealList = mealRepository.findAll();
         for(Meal meal : mealList){
-            meal.caculateGrade();
+            meal.caculateRate();
         }
     }
 }

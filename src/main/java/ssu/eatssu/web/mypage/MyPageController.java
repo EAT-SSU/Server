@@ -10,9 +10,11 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.*;
-import ssu.eatssu.response.BaseException;
-import ssu.eatssu.response.BaseResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.service.MyPageService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.SliceDto;
@@ -39,7 +41,7 @@ public class MyPageController {
     ) {
         Long userId = SecurityUtil.getLoginUserId();
         SliceDto<MyReviewDetail> myReviewList = myPageService.findMyReviewList(userId, pageable, lastReviewId);
-        return new BaseResponse<>(myReviewList);
+        return BaseResponse.success(myReviewList);
     }
 
     /**
@@ -50,13 +52,7 @@ public class MyPageController {
     public BaseResponse<MypageInfo> getMyPageInfo() {
         Long userId = SecurityUtil.getLoginUserId();
         MypageInfo mypageInfo = myPageService.findMyPageInfo(userId);
-        return new BaseResponse<>(mypageInfo);
-    }
-
-    @ExceptionHandler(BaseException.class)
-    public BaseResponse<String> handleBaseException(BaseException e) {
-        log.info(e.getStatus().toString());
-        return new BaseResponse<>(e.getStatus());
+        return BaseResponse.success(mypageInfo);
     }
 
 }

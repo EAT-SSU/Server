@@ -14,8 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ssu.eatssu.domain.enums.MenuTypeGroup;
-import ssu.eatssu.response.BaseException;
-import ssu.eatssu.response.BaseResponse;
+import ssu.eatssu.handler.response.BaseException;
+import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.service.RefreshingService;
 import ssu.eatssu.service.ReviewService;
 import ssu.eatssu.utils.SecurityUtil;
@@ -29,7 +29,7 @@ import java.util.List;
 
 import static ssu.eatssu.domain.enums.MenuTypeGroup.CHANGE;
 import static ssu.eatssu.domain.enums.MenuTypeGroup.FIX;
-import static ssu.eatssu.response.BaseResponseStatus.MISSING_QUERY_PARAM;
+import static ssu.eatssu.handler.response.BaseResponseStatus.MISSING_REQUEST_PARAM;
 
 @Slf4j
 @RestController
@@ -49,17 +49,13 @@ public class ReviewController {
     @PostMapping(value = "/{menuId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE)
-<<<<<<< Updated upstream
-    public BaseResponse<String> writeReview(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
-=======
     public BaseResponse<?> writeReview(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
->>>>>>> Stashed changes
                                             @RequestPart(value = "reviewCreate") ReviewCreate reviewCreate,
                                             @RequestPart(value = "multipartFileList", required = false)
                                                     List<MultipartFile> multipartFileList) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.createReview(userId, menuId, reviewCreate, multipartFileList);
-        return new BaseResponse<>("");
+        return BaseResponse.success();
     }
 
     /**
@@ -68,16 +64,12 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 수정(글 수정)", description = "리뷰 수정(글 수정)")
     @PatchMapping("/{reviewId}")
-<<<<<<< Updated upstream
-    public BaseResponse<String> updateReview(@Parameter(description = "reviewId")
-=======
     public BaseResponse<?> updateReview(@Parameter(description = "reviewId")
->>>>>>> Stashed changes
                                              @PathVariable("reviewId") Long reviewId,
                                              @RequestBody ReviewUpdate reviewUpdate) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.updateReviewContent(userId, reviewId, reviewUpdate);
-        return new BaseResponse<>("");
+        return BaseResponse.success();
     }
 
     /**
@@ -86,14 +78,10 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 삭제", description = "리뷰 삭제")
     @DeleteMapping("/{reviewId}")
-<<<<<<< Updated upstream
-    public BaseResponse<String> deleteReview(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
-=======
     public BaseResponse<?> deleteReview(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
->>>>>>> Stashed changes
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.deleteReview(userId, reviewId);
-        return new BaseResponse<>("");
+        return BaseResponse.success();
     }
 
     /**
@@ -112,20 +100,20 @@ public class ReviewController {
         MenuReviewInfo menuReviewInfo;
         if (menuTypeGroup == FIX) {
             if (menuId == null) {
-                throw new BaseException(MISSING_QUERY_PARAM);
+                throw new BaseException(MISSING_REQUEST_PARAM);
             } else {
                 menuReviewInfo = reviewService.findReviewInfoByMenuId(menuId);
             }
         } else if (menuTypeGroup == CHANGE) {
             if (mealId == null) {
-                throw new BaseException(MISSING_QUERY_PARAM);
+                throw new BaseException(MISSING_REQUEST_PARAM);
             } else {
                 menuReviewInfo = reviewService.findReviewInfoByMealId(mealId);
             }
         } else {
-            throw new BaseException(MISSING_QUERY_PARAM);
+            throw new BaseException(MISSING_REQUEST_PARAM);
         }
-        return new BaseResponse<>(menuReviewInfo);
+        return BaseResponse.success(menuReviewInfo);
     }
 
     /**
@@ -145,20 +133,20 @@ public class ReviewController {
         SliceDto<ReviewDetail> reviewList;
         if (menuTypeGroup == FIX) {
             if (menuId == null) {
-                throw new BaseException(MISSING_QUERY_PARAM);
+                throw new BaseException(MISSING_REQUEST_PARAM);
             } else {
                 reviewList = reviewService.findReviewListByMenuId(menuId, pageable, lastReviewId);
             }
         } else if (menuTypeGroup == CHANGE) {
             if (mealId == null) {
-                throw new BaseException(MISSING_QUERY_PARAM);
+                throw new BaseException(MISSING_REQUEST_PARAM);
             } else {
                 reviewList = reviewService.findReviewListByMealId(mealId, pageable, lastReviewId);
             }
         } else {
-            throw new BaseException(MISSING_QUERY_PARAM);
+            throw new BaseException(MISSING_REQUEST_PARAM);
         }
-        return new BaseResponse<>(reviewList);
+        return BaseResponse.success(reviewList);
     }
 
     /*
@@ -166,19 +154,9 @@ public class ReviewController {
     //todo 관리자 api로 이동 필요
      */
     @GetMapping("/refresh")
-<<<<<<< Updated upstream
-    public BaseResponse<String> refreshReviewInfo() {
-=======
     public BaseResponse<?> refreshReviewInfo() {
->>>>>>> Stashed changes
         refreshingService.refreshAllReviews();
-        return new BaseResponse<>("");
-    }
-
-    @ExceptionHandler(BaseException.class)
-    public BaseResponse<String> handleBaseException(BaseException e) {
-        log.info(e.getStatus().toString());
-        return new BaseResponse<>(e.getStatus());
+        return BaseResponse.success();
     }
 
 }
