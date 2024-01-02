@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ssu.eatssu.domain.*;
 import ssu.eatssu.domain.repository.*;
-import ssu.eatssu.response.BaseException;
+import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.utils.S3Uploader;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.SliceDto;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static ssu.eatssu.response.BaseResponseStatus.*;
+import static ssu.eatssu.handler.response.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service
@@ -86,7 +86,7 @@ public class ReviewService {
                     , reviewUpdate.getTasteRate());
             review.getMenu().updateReview();
         }else{
-            throw new BaseException(PERMISSION_DENIED);
+            throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
     }
 
@@ -104,7 +104,7 @@ public class ReviewService {
             reviewRepository.flush();
             review.getMenu().deleteReview();
         }else{
-            throw new BaseException(PERMISSION_DENIED);
+            throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
     }
 

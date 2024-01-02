@@ -10,11 +10,11 @@ import ssu.eatssu.domain.enums.ReportStatus;
 import ssu.eatssu.domain.repository.ReviewReportRepository;
 import ssu.eatssu.domain.repository.ReviewRepository;
 import ssu.eatssu.domain.repository.UserRepository;
-import ssu.eatssu.response.BaseException;
+import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.web.report.dto.ReviewReportCreate;
 
-import static ssu.eatssu.response.BaseResponseStatus.NOT_FOUND_REVIEW;
-import static ssu.eatssu.response.BaseResponseStatus.NOT_FOUND_USER;
+import static ssu.eatssu.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
+import static ssu.eatssu.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
 @RequiredArgsConstructor
 @Service

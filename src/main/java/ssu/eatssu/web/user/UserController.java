@@ -9,8 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.repository.UserRepository;
-import ssu.eatssu.response.BaseException;
-import ssu.eatssu.response.BaseResponse;
+import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.service.UserService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.user.dto.*;
@@ -39,7 +38,7 @@ public class UserController {
     @PostMapping("/join")
     public BaseResponse<Tokens> join(@Valid @RequestBody Join join) throws JsonProcessingException {
         Tokens tokens = userService.join(join.getEmail(), join.getPwd());
-        return new BaseResponse<>(tokens);
+        return BaseResponse.success(tokens);
     }
 
     /**
@@ -51,10 +50,10 @@ public class UserController {
     public BaseResponse<Boolean> checkEmailDuplicate(@Parameter(description = "이메일") @PathVariable String email) {
         boolean duplicated = userRepository.existsByEmail(email);
         if (!duplicated) {
-            return new BaseResponse<>(true);
+            return BaseResponse.success(true);
         } else {
             //throw new BaseException(EMAIL_DUPLICATE);
-            return new BaseResponse<>(false);
+            return BaseResponse.success(false);
         }
     }
 
@@ -67,7 +66,7 @@ public class UserController {
     public BaseResponse<Tokens> login(@Valid @RequestBody Login login) throws JsonProcessingException { // todo:
         // exceiption service단에서 처리
         Tokens tokens = userService.login(login.getEmail(), login.getPwd());
-        return new BaseResponse<>(tokens);
+        return BaseResponse.success(tokens);
     }
 
     /**
@@ -76,10 +75,10 @@ public class UserController {
      */
     @Operation(summary = "닉네임 수정", description = "닉네임 수정")
     @PatchMapping("/nickname")
-    public BaseResponse<String> updateNickname(@Valid @RequestBody NicknameEdit nicknameEdit) {
+    public BaseResponse updateNickname(@Valid @RequestBody NicknameEdit nicknameEdit) {
         Long userId = getLoginUserId();
         userService.updateNickname(userId, nicknameEdit.getNickname());
-        return new BaseResponse<>("");
+        return BaseResponse.success();
     }
 
     /**
@@ -92,10 +91,10 @@ public class UserController {
                                                         @RequestParam(value = "nickname") String nickname) {
         boolean duplicated = userRepository.existsByNickname(nickname);
         if (!duplicated) {
-            return new BaseResponse<>(true);
+            return BaseResponse.success(true);
         } else {
             //throw new BaseException(NICKNAME_DUPLICATE);
-            return new BaseResponse<>(false);
+            return BaseResponse.success(false);
         }
     }
 
@@ -105,10 +104,10 @@ public class UserController {
      */
     @Operation(summary = "비밀번호 변경", description = "비밀번호 변경")
     @PatchMapping("/password")
-    public BaseResponse<String> updatePassword(@Valid @RequestBody PasswordChange passwordChange) {
+    public BaseResponse updatePassword(@Valid @RequestBody PasswordChange passwordChange) {
         Long userId = getLoginUserId();
         userService.updatePassword(userId, passwordChange.getPwd());
-        return new BaseResponse<>("");
+        return BaseResponse.success();
     }
 
     /**
@@ -119,7 +118,7 @@ public class UserController {
     @PostMapping("/token/reissue")
     public BaseResponse<Tokens> refreshToken() throws JsonProcessingException {
         Tokens tokens = userService.refreshTokens(getLoginUser());
-        return new BaseResponse<>(tokens);
+        return BaseResponse.success(tokens);
     }
 
     /**
@@ -130,14 +129,7 @@ public class UserController {
     @DeleteMapping("/signout")
     public BaseResponse<Boolean> signout() {
         userService.signout(getLoginUserId());
-        return new BaseResponse<>(true);
+        return BaseResponse.success(true);
     }
-
-    @ExceptionHandler(BaseException.class)
-    public BaseResponse<String> handleBaseException(BaseException e) {
-        log.info(e.getStatus().toString());
-        return new BaseResponse<>(e.getStatus());
-    }
-
 
 }

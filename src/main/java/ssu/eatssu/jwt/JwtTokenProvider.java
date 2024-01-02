@@ -14,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import ssu.eatssu.handler.response.BaseException;
+import ssu.eatssu.handler.response.BaseResponseStatus;
 import ssu.eatssu.security.CustomUserDetails;
 import ssu.eatssu.security.UserPrincipalDto;
 import ssu.eatssu.web.user.dto.Tokens;
@@ -55,7 +57,7 @@ public class JwtTokenProvider {
     }
 
     //토큰 발급
-    public Tokens generateTokens(Authentication authentication) throws JsonProcessingException {
+    public Tokens generateTokens(Authentication authentication){
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -65,7 +67,13 @@ public class JwtTokenProvider {
                 .collect(Collectors.joining(","));
 
         UserPrincipalDto userPrincipalDto = UserPrincipalDto.from((CustomUserDetails) authentication.getPrincipal());
-        String subject = objectMapper.writeValueAsString(userPrincipalDto);
+        String subject;
+        try{
+            subject = objectMapper.writeValueAsString(userPrincipalDto);
+        } catch (JsonProcessingException e) {
+            log.error("Cannot generate JWT Tokens \n errorTrackStace: {}", e.getStackTrace());
+            throw new BaseException(BaseResponseStatus.INTERNAL_SERVER_ERROR);
+        }
 
         Claims claims = Jwts.claims();
         claims.setSubject(subject);
