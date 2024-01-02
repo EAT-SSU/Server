@@ -13,14 +13,14 @@ import ssu.eatssu.domain.repository.MealMenuRepository;
 import ssu.eatssu.domain.repository.MealRepository;
 import ssu.eatssu.domain.repository.MenuRepository;
 import ssu.eatssu.domain.repository.RestaurantRepository;
-import ssu.eatssu.response.BaseException;
+import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.web.menu.dto.MenuReqDto;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static ssu.eatssu.response.BaseResponseStatus.*;
+import static ssu.eatssu.handler.response.BaseResponseStatus.*;
 import static ssu.eatssu.web.menu.dto.MenuResDto.*;
 
 @Service
