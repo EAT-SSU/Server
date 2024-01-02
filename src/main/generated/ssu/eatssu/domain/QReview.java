@@ -24,7 +24,7 @@ public class QReview extends EntityPathBase<Review> {
 
     public final QBaseTimeEntity _super = new QBaseTimeEntity(this);
 
-    public final NumberPath<Integer> amountGrade = createNumber("amountGrade", Integer.class);
+    public final NumberPath<Integer> amountRate = createNumber("amountRate", Integer.class);
 
     public final StringPath content = createString("content");
 
@@ -33,7 +33,7 @@ public class QReview extends EntityPathBase<Review> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final NumberPath<Integer> mainGrade = createNumber("mainGrade", Integer.class);
+    public final NumberPath<Integer> mainRate = createNumber("mainRate", Integer.class);
 
     public final QMenu menu;
 
@@ -42,7 +42,7 @@ public class QReview extends EntityPathBase<Review> {
 
     public final ListPath<ReviewImg, QReviewImg> reviewImgs = this.<ReviewImg, QReviewImg>createList("reviewImgs", ReviewImg.class, QReviewImg.class, PathInits.DIRECT2);
 
-    public final NumberPath<Integer> tasteGrade = createNumber("tasteGrade", Integer.class);
+    public final NumberPath<Integer> tasteRate = createNumber("tasteRate", Integer.class);
 
     public final QUser user;
 

@@ -20,20 +20,20 @@ public class MenuReviewInfo {
     private Integer totalReviewCount;
 
     @Schema(description = "평점-메인", example = "4.4")
-    private Double mainGrade;
+    private Double mainRate;
 
     @Schema(description = "평점-양", example = "4.4")
-    private Double amountGrade;
+    private Double amountRate;
 
     @Schema(description = "평점-맛", example = "4.4")
-    private Double tasteGrade;
+    private Double tasteRate;
 
-    private ReviewGradeCnt reviewGradeCnt;
+    private ReviewRateCnt reviewRateCnt;
 
     @Getter
     @AllArgsConstructor
     @Builder
-    public static class ReviewGradeCnt{
+    public static class ReviewRateCnt{
         @Schema(description = "평점5 개수", example = "5")
         private Long fiveCnt;
 
@@ -49,10 +49,10 @@ public class MenuReviewInfo {
         @Schema(description = "평점1 개수", example = "5")
         private Long oneCnt;
 
-        public static ReviewGradeCnt fromMap (Map<Integer, Long> gradeCntMap){
-            return ReviewGradeCnt.builder()
-                    .oneCnt(gradeCntMap.get(1)).twoCnt(gradeCntMap.get(2)).threeCnt(gradeCntMap.get(3))
-                    .fourCnt(gradeCntMap.get(4)).fiveCnt(gradeCntMap.get(5)).build();
+        public static ReviewRateCnt fromMap (Map<Integer, Long> rateCntMap){
+            return ReviewRateCnt.builder()
+                    .oneCnt(rateCntMap.get(1)).twoCnt(rateCntMap.get(2)).threeCnt(rateCntMap.get(3))
+                    .fourCnt(rateCntMap.get(4)).fiveCnt(rateCntMap.get(5)).build();
         }
     }
 

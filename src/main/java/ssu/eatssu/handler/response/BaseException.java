@@ -1,4 +1,4 @@
-package ssu.eatssu.response;
+package ssu.eatssu.handler.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

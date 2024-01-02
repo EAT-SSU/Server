@@ -10,7 +10,7 @@ import ssu.eatssu.domain.Review;
 import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.repository.ReviewRepository;
 import ssu.eatssu.domain.repository.UserRepository;
-import ssu.eatssu.response.BaseException;
+import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.web.SliceDto;
 import ssu.eatssu.web.mypage.dto.MyReviewDetail;
 import ssu.eatssu.web.mypage.dto.MypageInfo;
@@ -18,7 +18,7 @@ import ssu.eatssu.web.mypage.dto.MypageInfo;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ssu.eatssu.response.BaseResponseStatus.NOT_FOUND_USER;
+import static ssu.eatssu.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
 @RequiredArgsConstructor
 @Service
