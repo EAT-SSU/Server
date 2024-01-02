@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.repository.UserRepository;
-import ssu.eatssu.response.BaseResponse;
+import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.service.UserService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.user.dto.*;

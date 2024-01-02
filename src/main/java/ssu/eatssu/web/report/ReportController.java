@@ -9,7 +9,7 @@ import ssu.eatssu.domain.ReviewReport;
 import ssu.eatssu.domain.enums.ReviewReportType;
 import ssu.eatssu.domain.repository.ReviewRepository;
 import ssu.eatssu.domain.repository.UserRepository;
-import ssu.eatssu.response.BaseResponse;
+import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.service.ReportService;
 import ssu.eatssu.slack.SlackChannel;
 import ssu.eatssu.slack.SlackMessageFormat;

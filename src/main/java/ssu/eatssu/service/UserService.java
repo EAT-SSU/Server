@@ -14,12 +14,12 @@ import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.repository.ReviewReportRepository;
 import ssu.eatssu.domain.repository.UserRepository;
 import ssu.eatssu.jwt.JwtTokenProvider;
-import ssu.eatssu.response.BaseException;
+import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.web.user.dto.Tokens;
 
 import java.util.Optional;
 
-import static ssu.eatssu.response.BaseResponseStatus.*;
+import static ssu.eatssu.handler.response.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
