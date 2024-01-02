@@ -49,7 +49,11 @@ public class ReviewController {
     @PostMapping(value = "/{menuId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE)
+<<<<<<< Updated upstream
     public BaseResponse<String> writeReview(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
+=======
+    public BaseResponse<?> writeReview(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
+>>>>>>> Stashed changes
                                             @RequestPart(value = "reviewCreate") ReviewCreate reviewCreate,
                                             @RequestPart(value = "multipartFileList", required = false)
                                                     List<MultipartFile> multipartFileList) {
@@ -64,7 +68,11 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 수정(글 수정)", description = "리뷰 수정(글 수정)")
     @PatchMapping("/{reviewId}")
+<<<<<<< Updated upstream
     public BaseResponse<String> updateReview(@Parameter(description = "reviewId")
+=======
+    public BaseResponse<?> updateReview(@Parameter(description = "reviewId")
+>>>>>>> Stashed changes
                                              @PathVariable("reviewId") Long reviewId,
                                              @RequestBody ReviewUpdate reviewUpdate) {
         Long userId = SecurityUtil.getLoginUserId();
@@ -78,7 +86,11 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 삭제", description = "리뷰 삭제")
     @DeleteMapping("/{reviewId}")
+<<<<<<< Updated upstream
     public BaseResponse<String> deleteReview(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
+=======
+    public BaseResponse<?> deleteReview(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
+>>>>>>> Stashed changes
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.deleteReview(userId, reviewId);
         return new BaseResponse<>("");
@@ -154,7 +166,11 @@ public class ReviewController {
     //todo 관리자 api로 이동 필요
      */
     @GetMapping("/refresh")
+<<<<<<< Updated upstream
     public BaseResponse<String> refreshReviewInfo() {
+=======
+    public BaseResponse<?> refreshReviewInfo() {
+>>>>>>> Stashed changes
         refreshingService.refreshAllReviews();
         return new BaseResponse<>("");
     }
