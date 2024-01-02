@@ -57,7 +57,11 @@ public class ReportController {
      */
     @Operation(summary = "리뷰 신고하기", description = "리뷰 신고하기")
     @PostMapping("/")
+<<<<<<< Updated upstream
     public BaseResponse<String> reportReview(@RequestBody ReviewReportCreate reviewReportCreate) {
+=======
+    public BaseResponse<?> reportReview(@RequestBody ReviewReportCreate reviewReportCreate) {
+>>>>>>> Stashed changes
         Long userId = SecurityUtil.getLoginUserId();
         ReviewReport report = reportService.reportReview(userId, reviewReportCreate);
         slackService.sendSlackMessage(SlackMessageFormat.sendReport(report), SlackChannel.REPORT_CHANNEL);
