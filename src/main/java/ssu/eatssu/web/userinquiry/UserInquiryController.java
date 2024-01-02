@@ -8,8 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.UserInquiry;
 import ssu.eatssu.domain.repository.UserInquiryRepository;
-import ssu.eatssu.response.BaseException;
-import ssu.eatssu.response.BaseResponse;
+import ssu.eatssu.handler.response.BaseException;
+import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.service.UserInquiryService;
 import ssu.eatssu.slack.SlackChannel;
 import ssu.eatssu.slack.SlackMessageFormat;
@@ -18,7 +18,7 @@ import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.userinquiry.dto.UserInquiryCreate;
 import ssu.eatssu.web.userinquiry.dto.UserInquiryDetail;
 
-import static ssu.eatssu.response.BaseResponseStatus.NOT_FOUND_USER_INQUIRY;
+import static ssu.eatssu.handler.response.BaseResponseStatus.NOT_FOUND_USER_INQUIRY;
 
 @Slf4j
 @RestController

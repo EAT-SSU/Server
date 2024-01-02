@@ -1,4 +1,4 @@
-package ssu.eatssu.response;
+package ssu.eatssu.handler.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

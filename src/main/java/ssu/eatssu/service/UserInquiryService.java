@@ -7,9 +7,9 @@ import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.UserInquiry;
 import ssu.eatssu.domain.repository.UserInquiryRepository;
 import ssu.eatssu.domain.repository.UserRepository;
-import ssu.eatssu.response.BaseException;
+import ssu.eatssu.handler.response.BaseException;
 
-import static ssu.eatssu.response.BaseResponseStatus.NOT_FOUND_USER;
+import static ssu.eatssu.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
 @RequiredArgsConstructor
 @Service

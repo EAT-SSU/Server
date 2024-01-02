@@ -24,7 +24,7 @@ import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.enums.OauthProvider;
 import ssu.eatssu.domain.repository.UserRepository;
 import ssu.eatssu.jwt.JwtTokenProvider;
-import ssu.eatssu.response.BaseException;
+import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.web.oauth.dto.AppleKeys;
 import ssu.eatssu.web.user.dto.Tokens;
 
@@ -39,8 +39,7 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
 
-import static ssu.eatssu.response.BaseResponseStatus.FAIL_MAKE_TOKEN;
-import static ssu.eatssu.response.BaseResponseStatus.INVALID_TOKEN;
+import static ssu.eatssu.handler.response.BaseResponseStatus.INVALID_TOKEN;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -76,11 +75,7 @@ public class OauthService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         // 3. 인증 정보를 바탕으로 JWT 토큰 생성
-        try{
-            return jwtTokenProvider.generateTokens(authentication);
-        } catch (JsonProcessingException e){
-            throw new BaseException(FAIL_MAKE_TOKEN);
-        }
+        return jwtTokenProvider.generateTokens(authentication);
     }
 
     /**

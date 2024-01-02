@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ssu.eatssu.domain.repository.UserRepository;
-import ssu.eatssu.response.BaseResponse;
+import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.service.OauthService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.oauth.dto.AppleLogin;

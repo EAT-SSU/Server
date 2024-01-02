@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ssu.eatssu.response.BaseResponse;
+import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.service.MyPageService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.SliceDto;
