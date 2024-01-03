@@ -155,7 +155,7 @@ public class UserController {
      * AccessToken, RefreshToken 재발급
      * <p>유효한 Token을 받으면 AccessToken, RefreshToken을 새로 발급합니다.</p>
      */
-    @Operation(summary = "Tokens 재발급", description = "accessToken, refreshToken 재발급 API 입니다.")
+    @Operation(summary = "토큰 재발급", description = "accessToken, refreshToken 재발급 API 입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토큰 재발급 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
