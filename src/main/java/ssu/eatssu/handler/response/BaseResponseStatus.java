@@ -31,8 +31,8 @@ public enum BaseResponseStatus {
     /**
      * 401 UNAUTHORIZED 권한없음(인증 실패)
      */
-    UNAUTHORIZED(false, HttpStatus.UNAUTHORIZED, 401, "권한 인증에 실패했습니다."),
-    INVALID_TOKEN(false, HttpStatus.UNAUTHORIZED, 40101, "유효하지 않은 토큰 값입니다." ),
+    UNAUTHORIZED(false, HttpStatus.UNAUTHORIZED, 401, "인증에 실패했습니다."),
+    INVALID_TOKEN(false, HttpStatus.UNAUTHORIZED, 40101, "유효하지 않은 토큰 입니다." ),
 
     /**
      * 403 FORBIDDEN 권한없음(인가 실패)
