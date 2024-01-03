@@ -36,6 +36,8 @@ public class JwtTokenProvider {
     private final long refreshTokenValidityInMilliseconds;
     private Key key;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     /*@Autowired
     private final RedisTemplate redisTemplate;*/
 
@@ -59,8 +61,6 @@ public class JwtTokenProvider {
     //토큰 발급
     public Tokens generateTokens(Authentication authentication){
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -71,8 +71,9 @@ public class JwtTokenProvider {
         try{
             subject = objectMapper.writeValueAsString(userPrincipalDto);
         } catch (JsonProcessingException e) {
-            log.error("Cannot generate JWT Tokens \n errorTrackStace: {}", e.getStackTrace());
-            throw new BaseException(BaseResponseStatus.INTERNAL_SERVER_ERROR); //todo : token값이 잘못됬다면?
+            log.error("Cannot generate JWT Tokens because an error occurred during json parsing.");
+            log.error("errorTrackStace: {}", (Object) e.getStackTrace());
+            throw new BaseException(BaseResponseStatus.INTERNAL_SERVER_ERROR);
         }
 
         Claims claims = Jwts.claims();
@@ -121,7 +122,6 @@ public class JwtTokenProvider {
                         .toList();
 
         String subject = claims.getSubject();
-        ObjectMapper objectMapper = new ObjectMapper();
         UserPrincipalDto userPrincipalDto = objectMapper.readValue(subject, UserPrincipalDto.class);
         CustomUserDetails principal = new CustomUserDetails(userPrincipalDto.getId(),userPrincipalDto.getEmail(),  "",
                 authorities.get(0));

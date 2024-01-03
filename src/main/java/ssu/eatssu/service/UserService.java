@@ -69,9 +69,9 @@ public class UserService {
     }
 
     /**
-     * email, pwd를 통해 JwtToken을 생성 //todo: JwtTokenProvider로 옮길까?
+     * email, pwd 를 통해 JwtToken 을 생성
      */
-    public Tokens generateJwtTokens(String email, String pwd) throws JsonProcessingException {
+    public Tokens generateJwtTokens(String email, String pwd) {
         // 1. email/pwd 를 기반으로 Authentication 객체 생성
         //    이때 authentication은 인증 여부를 확인하는 authenticated 값이 false
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, pwd);

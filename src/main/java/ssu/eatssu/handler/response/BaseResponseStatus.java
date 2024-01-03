@@ -27,6 +27,7 @@ public enum BaseResponseStatus {
     FAILED_VALIDATION(false, HttpStatus.BAD_REQUEST,40007,"입력값이 누락되었거나, 부적절한 입력 값이 있습니다."),
     INVALID_DATE(false, HttpStatus.BAD_REQUEST, 40008, "잘못된 날짜형식입니다."),
     NOT_SUPPORT_RESTAURANT(false, HttpStatus.BAD_REQUEST, 40009, "해당 식당은 지원하지 않습니다."),
+    INVALID_IDENTITY_TOKEN(false, HttpStatus.BAD_REQUEST, 40010, "잘못된 identityToken 입니다."),
 
     /**
      * 401 UNAUTHORIZED 권한없음(인증 실패)
