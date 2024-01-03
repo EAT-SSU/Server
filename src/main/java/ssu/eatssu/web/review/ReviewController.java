@@ -3,6 +3,10 @@ package ssu.eatssu.web.review;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +49,17 @@ public class ReviewController {
      * 리뷰 작성
      * <p>메뉴식별자(menuId)에 해당하는 메뉴에 리뷰를 작성한다. 사진은 여러장 첨부 가능하다.</p>
      */
-    @Operation(summary = "리뷰 작성", description = "리뷰 작성")
+    @Operation(summary = "리뷰 작성", description = """
+            리뷰를 작성하는 API 입니다.<br><br>
+            reviewCreate는 application/json, multipartFileList는 multipart/form-data로 요청해주세요.<br><br>
+            사진은 여러장 첨부 가능합니다.(기획상으로는 한 장만 첨부하도록 제한이 있지만 API 스펙 자체는 여러 장 첨부 가능)
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 작성 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "이미지 업로드 실패", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
     @PostMapping(value = "/{menuId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -62,7 +76,16 @@ public class ReviewController {
      * 리뷰 수정(글 수정)
      * <p>리뷰식별자(reviewId)에 해당하는 리뷰 속 글을 수정한다. 사진은 수정 X</p>
      */
-    @Operation(summary = "리뷰 수정(글 수정)", description = "리뷰 수정(글 수정)")
+    @Operation(summary = "리뷰 수정(글 수정)", description = """
+            리뷰 내용을 수정하는 API 입니다.<br><br>
+            글 수정만 가능하며 사진 수정은 지원하지 않습니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 수정 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "403", description = "리뷰에 대한 권한이 없음", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 리뷰", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
     @PatchMapping("/{reviewId}")
     public BaseResponse<?> updateReview(@Parameter(description = "reviewId")
                                              @PathVariable("reviewId") Long reviewId,
@@ -76,7 +99,13 @@ public class ReviewController {
      * 리뷰 삭제
      * <p>리뷰식별자(reviewId)에 해당하는 리뷰를 삭제한다.</p>
      */
-    @Operation(summary = "리뷰 삭제", description = "리뷰 삭제")
+    @Operation(summary = "리뷰 삭제", description = "리뷰를 삭제하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 삭제 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "403", description = "리뷰에 대한 권한이 없음", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 리뷰", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
     @DeleteMapping("/{reviewId}")
     public BaseResponse<?> deleteReview(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
         Long userId = SecurityUtil.getLoginUserId();
@@ -89,7 +118,19 @@ public class ReviewController {
      * <p>식단(변동메뉴)리뷰 조회 시 <b>메뉴명 리스트</b>, 리뷰 수, 메인 평점, 양 평점, 맛 평점, 평점 별 개수를 조회한다.<br>
      * 고정메뉴 리뷰 조회 시 <b>메뉴명</b>, 리뷰 수, 메인 평점, 양 평점, 맛 평점, 평점 별 개수를 조회한다.</p>
      */
-    @Operation(summary = "리뷰 정보 조회(평점 등등)", description = "리뷰 정보 조회(평점 등등)")
+    @Operation(summary = "리뷰 정보 조회(평점 등등)", description = """
+        리뷰 정보를 조회하는 API 입니다.<br><br>
+        menuType=FIX 의 경우 menuId 파라미터를 넣어주세요.<br><br>
+        고정메뉴 리뷰 조회 시 <b>메뉴명</b>, 리뷰 수, 메인 평점, 양 평점, 맛 평점, 평점 별 개수를 조회합니다.
+        menuType=CHANGE 의 경우 mealId 파라미터를 넣어주세요.<br><br>
+        식단(변동메뉴)리뷰 조회 시 <b>메뉴명 리스트</b>, 리뷰 수, 메인 평점, 양 평점, 맛 평점, 평점 별 개수를 조회합니다.<br><br>
+        """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 정보 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
     @GetMapping("/info")
     public BaseResponse<MenuReviewInfo> getMenuReviewInfo(@Parameter(description = "타입(변동메뉴(식단)/고정메뉴)")
                                                           @RequestParam("menuType") MenuTypeGroup menuTypeGroup,
@@ -117,11 +158,23 @@ public class ReviewController {
     }
 
     /**
-     * 리뷰 리스트 조회
-     * <p>커서 기반 페이지네이션으로 리뷰 리스트를 조회한다.<br>
+     * 리뷰 목록 조회
+     * <p>커서 기반 페이지네이션으로 리뷰 목록을 조회한다.<br>
      * pageable default={size=20, sort=date, direction=desc}</p>
      */
-    @Operation(summary = "리뷰 리스트 조회", description = "리뷰 리스트 조회")
+    @Operation(summary = "리뷰 리스트 조회", description = """
+         리뷰 리스트를 조회하는 API 입니다.<br><br>
+         menuType=FIX 의 경우 menuId 파라미터를 넣어주세요.<br><br>
+         menuType=CHANGE 의 경우 mealId 파라미터를 넣어주세요.<br><br>
+         커서 기반 페이지네이션으로 리뷰 리스트를 조회합니다.<br><br>
+         페이징 기본 값 = {size=20, sort=date, direction=desc}<br><br>
+         """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 리스트 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
     @GetMapping("/list")
     public BaseResponse<SliceDto<ReviewDetail>> getReviewList(
             @Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType") MenuTypeGroup menuTypeGroup,

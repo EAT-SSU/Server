@@ -1,6 +1,10 @@
 package ssu.eatssu.web.report;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +13,7 @@ import ssu.eatssu.domain.ReviewReport;
 import ssu.eatssu.domain.enums.ReviewReportType;
 import ssu.eatssu.domain.repository.ReviewRepository;
 import ssu.eatssu.domain.repository.UserRepository;
+import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.service.ReportService;
 import ssu.eatssu.slack.SlackChannel;
@@ -36,7 +41,7 @@ public class ReportController {
     /**
      * 리뷰 신고 사유 종류 조회
      */
-    @Operation(summary = "리뷰 신고 사유 받아오기", description = "리뷰 신고 사유 받아오기")
+    @Operation(summary = "리뷰 신고 사유 종류 조회", description = "리뷰 신고 사유 종류를 조회하는 API 입니다.")
     @GetMapping("/type")
     public BaseResponse<List<ReviewReportTypeInfo>> getReportType() {
         List<ReviewReportTypeInfo> reportInfo = new ArrayList<>();
@@ -48,8 +53,12 @@ public class ReportController {
     /**
      * 리뷰 신고
      */
-    @Operation(summary = "리뷰 신고하기", description = "리뷰 신고하기")
+    @Operation(summary = "리뷰 신고하기", description = "리뷰를 신고하는 API 입니다.")
     @PostMapping("/")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 신고 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
     public BaseResponse<?> reportReview(@RequestBody ReviewReportCreate reviewReportCreate) {
         Long userId = SecurityUtil.getLoginUserId();
         ReviewReport report = reportService.reportReview(userId, reviewReportCreate);
