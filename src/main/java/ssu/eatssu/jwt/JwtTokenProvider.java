@@ -72,7 +72,7 @@ public class JwtTokenProvider {
             subject = objectMapper.writeValueAsString(userPrincipalDto);
         } catch (JsonProcessingException e) {
             log.error("Cannot generate JWT Tokens \n errorTrackStace: {}", e.getStackTrace());
-            throw new BaseException(BaseResponseStatus.INTERNAL_SERVER_ERROR);
+            throw new BaseException(BaseResponseStatus.INTERNAL_SERVER_ERROR); //todo : token값이 잘못됬다면?
         }
 
         Claims claims = Jwts.claims();

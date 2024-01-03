@@ -2,6 +2,10 @@ package ssu.eatssu.web.userinquiry;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +38,11 @@ public class UserInquiryController {
      * 문의 작성
      * <p>문의를 작성합니다.</p>
      */
-    @Operation(summary = "문의 남기기", description = "문의 남기기")
+    @Operation(summary = "문의 작성", description = "문의를 작성하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "문의 작성 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
     @PostMapping("/")
     public BaseResponse<?> writeInquiry(@RequestBody UserInquiryCreate userInquiryCreate) {
         Long userId = SecurityUtil.getLoginUserId();
@@ -48,7 +56,11 @@ public class UserInquiryController {
      * 문의 내용 조회
      * <p>문의 식별자(userInquiryId)에 해당하는 문의 내용을 조회합니다.</p>
      */
-    @Operation(summary = "고객 문의 내역 조회", description = "고객 문의 내역 조회 By Id")
+    @Operation(summary = "문의 내용 조회", description = "문의 내용을 조회하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "문의 작성 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 문의", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
     @GetMapping("/{userInquiryId}")
     public BaseResponse<UserInquiryDetail> getInquiryDetail(@Parameter(description = "userInquiryId")
                                                                 @PathVariable("userInquiryId") Long userInquiryId) {
