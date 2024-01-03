@@ -130,17 +130,13 @@ public class JwtTokenProvider {
     }
 
     //토큰 유효성 검증
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token) throws BaseException{
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return true;
-        }catch (ExpiredJwtException e){
-            log.error("만료된 토큰입니다.");
+        } catch (Exception e) {
+            return false;
         }
-        catch (Exception e) {
-            log.error("유효하지 않은 토큰입니다.");
-        }
-        return false;
+        return true;
     }
 
     // 토큰 만료 시간 확인(밀리세컨드)
@@ -154,6 +150,7 @@ public class JwtTokenProvider {
                 .getExpiration();
 
         Long now = new Date().getTime();
+
         return (expiration.getTime() - now);
     }
 
