@@ -81,4 +81,8 @@ public class Meal {
         rateMap.put("tasteRate", tasteRate);
         return rateMap;
     }
+
+    public List<String> getMenuNameList(){
+        return mealMenus.stream().map(mealMenu -> mealMenu.getMenu().getName()).toList();
+    }
 }

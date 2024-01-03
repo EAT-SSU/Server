@@ -58,20 +58,13 @@ public class MenuController {
                                                      @Parameter(description = "식당이름")
                                                      @RequestParam("restaurant") RestaurantName restaurantName,
                                                      @Parameter(description = "시간대")
-                                                     @RequestParam("time") TimePart timePart) throws ParseException { //todo Exceiption service단에서 처리
-        if (MenuTypeGroup.isChange(restaurantName)) {
-            List<Meal> mealList = menuService.findMealList(timePart, date, restaurantName);
-            List<TodayMeal> todayMealList = new ArrayList<>();
-            for (Meal meal : mealList) {
-                TodayMeal todayMeal = TodayMeal.from(meal);
-                todayMealList.add(todayMeal);
-            }
-            return BaseResponse.success(todayMealList);
-        } else {
+                                                     @RequestParam("time") TimePart timePart) {
+        if (MenuTypeGroup.isFix(restaurantName)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
-    }
 
+        return BaseResponse.success(menuService.findMealList(timePart, date, restaurantName));
+    }
 
     /**
      * 고정 메뉴 목록 조회
@@ -89,13 +82,11 @@ public class MenuController {
     @GetMapping("/fix-menu")
     public BaseResponse<FixMenuList> getFixMenuList(@Parameter(description = "식당이름")
                                                     @RequestParam("restaurant") RestaurantName restaurantName) {
-        if (MenuTypeGroup.isFix(restaurantName)) {
-            List<Menu> menuList = menuService.findFixMenuList(restaurantName);
-            FixMenuList fixMenuList = FixMenuList.from(menuList);
-            return BaseResponse.success(fixMenuList);
-        } else {
+        if(MenuTypeGroup.isChange(restaurantName)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
+
+        return BaseResponse.success(menuService.findFixMenuList(restaurantName));
     }
 
 
@@ -122,22 +113,13 @@ public class MenuController {
                                         @RequestParam("restaurant") RestaurantName restaurantName,
                                         @Parameter(description = "시간대")
                                         @RequestParam("time") TimePart timePart,
-                                        @RequestBody AddTodayMenuList addTodayMenuList) throws ParseException {
-        //todo Exceiption service단에서 처리
-        if (MenuTypeGroup.isChange(restaurantName)) {
-            try {
-                if (menuService.isExistMeal(timePart, date, restaurantName, addTodayMenuList)) {//이미 추가된 식단이면
-                    log.info("식단 중복 발견!");
-                    return BaseResponse.success();
-                }
-            } catch (ParseException e) {
-                throw new BaseException(INVALID_DATE);
-            }
-            menuService.createMeal(timePart, date, restaurantName, addTodayMenuList);
-            return BaseResponse.success();
-        } else {
+                                        @RequestBody AddTodayMenuList addTodayMenuList) {
+        if (MenuTypeGroup.isFix(restaurantName)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
+
+        menuService.createMeal(timePart, date, restaurantName, addTodayMenuList);
+        return BaseResponse.success();
     }
 
     /**
@@ -155,8 +137,7 @@ public class MenuController {
     @GetMapping("/menus")
     public BaseResponse<MenuList> getMenuListInMeal(@Parameter(description = "mealId")
                                                     @RequestParam("mealId") Long mealId) {
-        MenuList menuList = menuService.findMenuListInMeal(mealId);
-        return BaseResponse.success(menuList);
+        return BaseResponse.success(menuService.findMenuListInMeal(mealId));
     }
 
     /**
@@ -170,8 +151,7 @@ public class MenuController {
     })
     @DeleteMapping("/meal/{mealId}")
     public BaseResponse<?> deleteMeal(@Parameter(description = "mealId") @PathVariable("mealId") Long mealId) { //todo : 관리자 API
-        List<Long> menuIdList = menuService.deleteMeal(mealId);
-        menuService.cleanupGarbageMenu(menuIdList);
+        menuService.deleteMeal(mealId);
         return BaseResponse.success();
     }
 
