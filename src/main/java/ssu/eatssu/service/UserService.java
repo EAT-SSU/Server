@@ -13,11 +13,10 @@ import ssu.eatssu.domain.ReviewReport;
 import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.repository.ReviewReportRepository;
 import ssu.eatssu.domain.repository.UserRepository;
+import ssu.eatssu.handler.response.BaseResponseStatus;
 import ssu.eatssu.jwt.JwtTokenProvider;
 import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.web.user.dto.Tokens;
-
-import java.util.Optional;
 
 import static ssu.eatssu.handler.response.BaseResponseStatus.*;
 
@@ -36,8 +35,10 @@ public class UserService {
      *
      * @deprecated
      */
-    public Tokens join(String email, String pwd) throws JsonProcessingException{
+    public Tokens join(String email, String pwd) {
+
         String encodedPwd = passwordEncoder.encode(pwd);
+
         User user = User.join(email, encodedPwd);
         userRepository.save(user);
 
@@ -49,12 +50,10 @@ public class UserService {
      *
      * @deprecated
      */
-    public Tokens login(String email, String pwd) throws JsonProcessingException {
-        //유저 존재 여부 체크
-        Optional<User> user = userRepository.findByEmail(email);
-        if(user.isEmpty()){
-            throw new BaseException(NOT_FOUND_USER);
-        }
+    public Tokens login(String email, String pwd) {
+        //가입된 유저인지 체크
+        userRepository.findByEmail(email).orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_USER));
+
         return generateJwtTokens(email, pwd);
     }
 
@@ -62,8 +61,10 @@ public class UserService {
      * 닉네임 변경
      */
     public void updateNickname(Long userId, String nickname) {
+
         User user = userRepository.findById(userId)
-              .orElseThrow(()-> new RuntimeException("User not found"));
+                        .orElseThrow(()-> new BaseException(BaseResponseStatus.NOT_FOUND_USER));
+
         user.updateNickname(nickname);
         userRepository.save(user);
     }
@@ -89,24 +90,27 @@ public class UserService {
      */
     public void updatePassword(Long userId, String pwd) {
         User user = userRepository.findById(userId)
-              .orElseThrow(()-> new RuntimeException("User not found"));
+              .orElseThrow(()-> new BaseException(BaseResponseStatus.NOT_FOUND_USER));
+
         String encodedPwd = passwordEncoder.encode(pwd);
         user.changePassword(encodedPwd);
+
         userRepository.save(user);
     }
 
     /**
      * JWT 토큰 재발급
      */
-    public Tokens refreshTokens(Authentication authentication) throws JsonProcessingException{
+    public Tokens refreshTokens(Authentication authentication) {
         return jwtTokenProvider.generateTokens(authentication);
     }
 
     /**
-     * 유저 탈퇴
+     * 유저 탈퇴 //todo
      */
     public void signout (Long userId) {
         User user = userRepository.findById(userId).orElseThrow(()-> new BaseException(NOT_FOUND_USER));
+
         //작성한 리뷰 삭제
         for(Review review: user.getReviews()) {
             review.signoutUser();

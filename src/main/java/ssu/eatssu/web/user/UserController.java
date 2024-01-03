@@ -88,8 +88,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/login")
-    public BaseResponse<Tokens> login(@Valid @RequestBody Login login) throws JsonProcessingException { // todo:
-        // exceiption service단에서 처리
+    public BaseResponse<Tokens> login(@Valid @RequestBody Login login) {
         Tokens tokens = userService.login(login.getEmail(), login.getPwd());
         return BaseResponse.success(tokens);
     }
@@ -105,8 +104,7 @@ public class UserController {
     })
     @PatchMapping("/nickname")
     public BaseResponse<?> updateNickname(@Valid @RequestBody NicknameEdit nicknameEdit) {
-        Long userId = getLoginUserId();
-        userService.updateNickname(userId, nicknameEdit.getNickname());
+        userService.updateNickname(getLoginUserId(), nicknameEdit.getNickname());
         return BaseResponse.success();
     }
 
@@ -125,11 +123,11 @@ public class UserController {
     public BaseResponse<Boolean> checkNicknameDuplicate(@Parameter(description = "닉네임")
                                                         @RequestParam(value = "nickname") String nickname) {
         boolean duplicated = userRepository.existsByNickname(nickname);
-        if (!duplicated) {
-            return BaseResponse.success(true);
-        } else {
+        if (duplicated) {
             //throw new BaseException(NICKNAME_DUPLICATE);
             return BaseResponse.success(false);
+        } else {
+            return BaseResponse.success(true);
         }
     }
 
@@ -146,8 +144,7 @@ public class UserController {
     })
     @PatchMapping("/password")
     public BaseResponse<?> updatePassword(@Valid @RequestBody PasswordChange passwordChange) {
-        Long userId = getLoginUserId();
-        userService.updatePassword(userId, passwordChange.getPwd());
+        userService.updatePassword(getLoginUserId(), passwordChange.getPwd());
         return BaseResponse.success();
     }
 
@@ -160,7 +157,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "토큰 재발급 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/token/reissue")
-    public BaseResponse<Tokens> refreshToken() throws JsonProcessingException {
+    public BaseResponse<Tokens> refreshToken() {
         Tokens tokens = userService.refreshTokens(getLoginUser());
         return BaseResponse.success(tokens);
     }
