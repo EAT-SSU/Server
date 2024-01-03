@@ -9,6 +9,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ssu.eatssu.handler.JwtAccessDeniedHandler;
+import ssu.eatssu.handler.JwtAuthenticationEntryPoint;
 import ssu.eatssu.jwt.JwtAuthenticationFilter;
 import ssu.eatssu.jwt.JwtTokenProvider;
 
@@ -26,6 +28,8 @@ public class SecurityConfig {
     };
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -42,7 +46,10 @@ public class SecurityConfig {
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .anyRequest().authenticated()
                         .and().addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-                                UsernamePasswordAuthenticationFilter.class));
+                                UsernamePasswordAuthenticationFilter.class))
+                .exceptionHandling()
+                .accessDeniedHandler(jwtAccessDeniedHandler)
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint);
         return http.build();
     }
 
