@@ -3,6 +3,7 @@ package ssu.eatssu.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import ssu.eatssu.domain.enums.MenuTypeGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public class Menu {
     private Integer totalTasteRate = 0;
 
     @ColumnDefault("0")
-    private Integer reviewCnt = 0 ;
+    private Integer reviewCnt = 0;
 
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
     private List<MealMenu> mealMenus = new ArrayList<>();
@@ -52,17 +53,30 @@ public class Menu {
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
 
+    //정적 팩토리 메서드
     private Menu(String name, Restaurant restaurant, Integer price) {
         this.name = name;
         this.restaurant = restaurant;
         this.price = price;
     }
 
-    public static Menu addFixPrice(String name, Restaurant restaurant) {
-        Integer price = 0;
-        if(!restaurant.getRestaurantName().getPrice().equals(0)){
+    /**
+     * 변동 메뉴를 생성합니다.
+     * todo: 변동메뉴 식당이 아니라 고정 메뉴 식당으로 잘못 들어온다면 어떻게 처리?
+     */
+    public static Menu createChangeMenu(String name, Restaurant restaurant) {
+        int price = 0;
+        if(MenuTypeGroup.isChange(restaurant.getRestaurantName())){
             price = restaurant.getRestaurantName().getPrice();
         }
+        return new Menu(name, restaurant, price);
+    }
+
+    /**
+     * 고정 메뉴를 생성합니다.
+     * todo: 고정메뉴 식당이 아니라 변동 메뉴 식당으로 잘못 들어온다면 어떻게 처리?
+     */
+    public static Menu createFixedMenu(String name, Restaurant restaurant, Integer price) {
         return new Menu(name, restaurant, price);
     }
 
