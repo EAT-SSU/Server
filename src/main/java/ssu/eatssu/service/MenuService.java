@@ -98,7 +98,7 @@ public class MenuService {
             //메뉴 체크 (기존에 없던 새로운 메뉴 라면)
             if (!menuRepository.existsByNameAndRestaurant(addMenuName, restaurant)) {
                 //메뉴 추가
-                menuRepository.save(Menu.addFixPrice(addMenuName, restaurant));
+                menuRepository.save(Menu.createChangeMenu(addMenuName, restaurant));
             }
 
             //메뉴 찾아서
