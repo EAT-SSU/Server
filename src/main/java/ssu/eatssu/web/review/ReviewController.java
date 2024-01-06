@@ -17,7 +17,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ssu.eatssu.domain.enums.MenuTypeGroup;
+import ssu.eatssu.domain.menu.MenuTypeGroup;
 import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.service.RefreshingService;
@@ -31,8 +31,8 @@ import ssu.eatssu.web.review.dto.UpdateReviewRequest;
 
 import java.util.List;
 
-import static ssu.eatssu.domain.enums.MenuTypeGroup.CHANGE;
-import static ssu.eatssu.domain.enums.MenuTypeGroup.FIX;
+import static ssu.eatssu.domain.menu.MenuTypeGroup.CHANGE;
+import static ssu.eatssu.domain.menu.MenuTypeGroup.FIX;
 import static ssu.eatssu.handler.response.BaseResponseStatus.MISSING_REQUEST_PARAM;
 
 @Slf4j

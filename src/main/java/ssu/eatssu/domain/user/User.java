@@ -1,4 +1,4 @@
-package ssu.eatssu.domain;
+package ssu.eatssu.domain.user;
 
 
 import jakarta.persistence.*;
@@ -6,12 +6,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import ssu.eatssu.domain.enums.OauthProvider;
-import ssu.eatssu.domain.enums.Role;
-import ssu.eatssu.domain.enums.UserStatus;
 
 import java.util.List;
 import ssu.eatssu.domain.review.Review;
+import ssu.eatssu.domain.review.ReviewReport;
 
 @Entity
 @Getter

@@ -1,4 +1,4 @@
-package ssu.eatssu.domain;
+package ssu.eatssu.domain.menu;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import ssu.eatssu.domain.restaurant.Restaurant;
 import ssu.eatssu.domain.enums.TimePart;
 
 import java.util.*;

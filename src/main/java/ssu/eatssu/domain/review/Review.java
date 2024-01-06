@@ -4,10 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
-import ssu.eatssu.domain.BaseTimeEntity;
-import ssu.eatssu.domain.Menu;
-import ssu.eatssu.domain.ReviewImage;
-import ssu.eatssu.domain.User;
+import ssu.eatssu.domain.user.BaseTimeEntity;
+import ssu.eatssu.domain.menu.Menu;
+import ssu.eatssu.domain.user.User;
 import ssu.eatssu.web.review.dto.UpdateReviewRequest;
 
 

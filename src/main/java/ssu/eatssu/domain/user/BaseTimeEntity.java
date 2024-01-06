@@ -1,4 +1,4 @@
-package ssu.eatssu.domain;
+package ssu.eatssu.domain.user;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

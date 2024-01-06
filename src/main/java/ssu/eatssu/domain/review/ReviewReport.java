@@ -1,17 +1,18 @@
-package ssu.eatssu.domain;
+package ssu.eatssu.domain.review;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ssu.eatssu.domain.user.BaseTimeEntity;
+import ssu.eatssu.domain.user.User;
 import ssu.eatssu.domain.enums.ReportStatus;
 import ssu.eatssu.domain.enums.ReviewReportType;
-import ssu.eatssu.domain.review.Review;
 
 @Builder
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ReviewReport extends BaseTimeEntity{
+public class ReviewReport extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

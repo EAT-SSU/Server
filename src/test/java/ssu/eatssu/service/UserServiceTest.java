@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import ssu.eatssu.domain.User;
+import ssu.eatssu.domain.user.User;
 import ssu.eatssu.domain.repository.UserRepository;
 
 import java.util.Optional;

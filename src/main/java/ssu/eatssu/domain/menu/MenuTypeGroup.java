@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.enums;
+package ssu.eatssu.domain.menu;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
@@ -6,8 +6,9 @@ import lombok.Getter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import ssu.eatssu.domain.restaurant.RestaurantName;
 
-import static ssu.eatssu.domain.enums.RestaurantName.*;
+import static ssu.eatssu.domain.restaurant.RestaurantName.*;
 
 
 @Getter

@@ -1,4 +1,4 @@
-package ssu.eatssu.domain;
+package ssu.eatssu.domain.review;
 
 import jakarta.persistence.*;
 import lombok.*;

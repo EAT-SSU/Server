@@ -1,9 +1,9 @@
-package ssu.eatssu.domain;
+package ssu.eatssu.domain.menu;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import ssu.eatssu.domain.enums.MenuTypeGroup;
+import ssu.eatssu.domain.restaurant.Restaurant;
 
 import java.util.ArrayList;
 import java.util.List;

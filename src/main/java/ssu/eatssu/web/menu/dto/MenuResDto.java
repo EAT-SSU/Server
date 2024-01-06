@@ -4,9 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ssu.eatssu.domain.Meal;
-import ssu.eatssu.domain.MealMenu;
-import ssu.eatssu.domain.Menu;
+import ssu.eatssu.domain.menu.Meal;
+import ssu.eatssu.domain.menu.MealMenu;
+import ssu.eatssu.domain.menu.Menu;
 
 import java.util.ArrayList;
 import java.util.List;

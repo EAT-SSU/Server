@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ssu.eatssu.domain.User;
+import ssu.eatssu.domain.user.User;
 
 import java.util.ArrayList;
 import java.util.Collection;

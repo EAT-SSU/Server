@@ -1,8 +1,8 @@
 package ssu.eatssu.domain.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ssu.eatssu.domain.Restaurant;
-import ssu.eatssu.domain.enums.RestaurantName;
+import ssu.eatssu.domain.restaurant.Restaurant;
+import ssu.eatssu.domain.restaurant.RestaurantName;
 
 import java.util.Optional;
 

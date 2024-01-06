@@ -3,8 +3,8 @@ package ssu.eatssu.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ssu.eatssu.domain.Meal;
-import ssu.eatssu.domain.Menu;
+import ssu.eatssu.domain.menu.Meal;
+import ssu.eatssu.domain.menu.Menu;
 import ssu.eatssu.domain.repository.*;
 
 import java.util.List;

@@ -5,9 +5,9 @@ import jakarta.validation.constraints.Max;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
-import ssu.eatssu.domain.Menu;
+import ssu.eatssu.domain.menu.Menu;
 import ssu.eatssu.domain.review.Review;
-import ssu.eatssu.domain.User;
+import ssu.eatssu.domain.user.User;
 
 @Schema(title = "리뷰 작성")
 @NoArgsConstructor

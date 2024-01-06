@@ -1,12 +1,13 @@
-package ssu.eatssu.domain;
+package ssu.eatssu.domain.restaurant;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ssu.eatssu.domain.enums.RestaurantName;
 
 import java.util.List;
+import ssu.eatssu.domain.menu.Meal;
+import ssu.eatssu.domain.menu.Menu;
 
 @Entity
 @Getter

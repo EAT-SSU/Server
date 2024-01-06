@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.enums;
+package ssu.eatssu.domain.restaurant;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;

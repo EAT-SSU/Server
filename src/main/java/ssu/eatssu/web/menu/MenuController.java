@@ -10,21 +10,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ssu.eatssu.domain.Meal;
-import ssu.eatssu.domain.Menu;
-import ssu.eatssu.domain.enums.MenuTypeGroup;
-import ssu.eatssu.domain.enums.RestaurantName;
+import ssu.eatssu.domain.menu.MenuTypeGroup;
+import ssu.eatssu.domain.restaurant.RestaurantName;
 import ssu.eatssu.domain.enums.TimePart;
 import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.service.MenuService;
 import ssu.eatssu.web.menu.dto.MenuReqDto.AddTodayMenuList;
 
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
-import static ssu.eatssu.handler.response.BaseResponseStatus.INVALID_DATE;
 import static ssu.eatssu.handler.response.BaseResponseStatus.NOT_SUPPORT_RESTAURANT;
 import static ssu.eatssu.web.menu.dto.MenuResDto.*;
 
