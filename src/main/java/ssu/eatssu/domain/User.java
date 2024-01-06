@@ -27,7 +27,7 @@ public class User extends BaseTimeEntity {
     @Column(unique = true)
     private String email;
 
-    private String pwd;
+    private String password;
 
     private String nickname;
 
@@ -52,7 +52,7 @@ public class User extends BaseTimeEntity {
     public static User join(@NotNull String email, @NotNull String pwd) {
         User user = new User();
         user.email = email;
-        user.pwd = pwd;
+        user.password = pwd;
         user.role = Role.USER;
         user.provider = OauthProvider.EATSSU;
         user.status = UserStatus.ACTIVE;
@@ -62,7 +62,7 @@ public class User extends BaseTimeEntity {
                                  String providerId) {
         User user = new User();
         user.email = email;
-        user.pwd = pwd;
+        user.password = pwd;
         user.role = Role.USER;
         user.provider = provider;
         user.providerId = providerId;
@@ -75,7 +75,7 @@ public class User extends BaseTimeEntity {
     }
 
     public void changePassword(String newPwd) {
-        this.pwd = newPwd;
+        this.password = newPwd;
     }
 
     public void updateEmail(String email) { this.email = email; }
