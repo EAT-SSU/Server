@@ -59,13 +59,18 @@ public class User extends BaseTimeEntity {
         this.status = UserStatus.ACTIVE;
     }
 
-    private User(String email, String password, OauthProvider provider, String providerId) {
+    private User(String email,OauthProvider provider, String providerId) {
         this.email = email;
-        this.password = password;
         this.role = Role.USER;
         this.provider = provider;
         this.providerId = providerId;
         this.status = UserStatus.ACTIVE;
+    }
+
+    public static User oAuthJoin(@NotNull String email,
+        @NotNull OauthProvider provider,
+        String providerId) {
+        return new User(email, provider, providerId);
     }
 
 
@@ -73,19 +78,12 @@ public class User extends BaseTimeEntity {
         return new User(email, password);
     }
 
-    public static User oAuthJoin(@NotNull String email,
-        @NotNull String password,
-        @NotNull OauthProvider provider,
-        String providerId) {
-        return new User(email, password, provider, providerId);
-    }
-
     public void updateNickname(@NotNull String nickname) {
         this.nickname = nickname;
     }
 
-    public void changePassword(String newPwd) {
-        this.password = newPwd;
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
     }
 
     public void updateEmail(String email) {

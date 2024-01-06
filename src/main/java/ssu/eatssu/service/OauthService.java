@@ -60,7 +60,7 @@ public class OauthService {
 
         //가입 안된 유저일 경우 회원가입 진행
         User user = userRepository.findByProviderId(providerId)
-                .orElse(join(email, providerId, OauthProvider.KAKAO));
+            .orElse(join(email, providerId, OauthProvider.KAKAO));
 
         //OAuth 유저 용 비밀번호 생성
         String pwd = createOAuthUserPassword(OauthProvider.KAKAO, providerId);
@@ -71,14 +71,15 @@ public class OauthService {
     /**
      * 애플 로그인
      */
-    public Tokens appleLogin(String identityToken) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public Tokens appleLogin(String identityToken)
+        throws NoSuchAlgorithmException, InvalidKeySpecException {
 
         //애플 유저 정보 조회
         OauthInfo oauthInfo = getUserInfoFromApple(identityToken);
 
         //가입 안된 유저일 경우 회원가입 진행
         User user = userRepository.findByProviderId(oauthInfo.providerId())
-                .orElse(join(oauthInfo.email(), oauthInfo.providerId(), OauthProvider.APPLE));
+            .orElse(join(oauthInfo.email(), oauthInfo.providerId(), OauthProvider.APPLE));
 
         //이메일 갱신
         updateAppleUserEmail(user, oauthInfo.email());
@@ -93,17 +94,7 @@ public class OauthService {
      * 회원가입
      */
     private User join(String email, String providerId, OauthProvider provider) {
-
-        //OAuth 유저 용 비밀번호 생성
-        String pwd = createOAuthUserPassword(provider, providerId);
-
-        //비밀번호 encode
-        String encodedPwd = passwordEncoder.encode(pwd);
-
-        //회원가입
-        User user = User.oAuthJoin(email, encodedPwd, provider, providerId);
-
-        return userRepository.save(user);
+        return userRepository.save(User.oAuthJoin(email, provider, providerId));
     }
 
     /**
@@ -118,14 +109,16 @@ public class OauthService {
     /**
      * email, pwd 를 통해 JwtToken 을 생성
      */
-    public Tokens generateJwtTokens(String email, String pwd){
+    public Tokens generateJwtTokens(String email, String pwd) {
         // 1. email/pwd 를 기반으로 Authentication 객체 생성
         // 이때 authentication 은 인증 여부를 확인하는 authenticated 값이 false
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, pwd);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+            email, pwd);
 
         // 2. 실제 검증 (사용자 비밀번호 체크)
         // authenticate 메서드 실행 => CustomUserDetailsService 에서 만든 loadUserByUsername 메서드 실행
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        Authentication authentication = authenticationManagerBuilder.getObject()
+            .authenticate(authenticationToken);
 
         // 3. 인증 정보를 바탕으로 JWT 토큰 생성
         return jwtTokenProvider.generateTokens(authentication);
@@ -136,7 +129,7 @@ public class OauthService {
      */
     private void updateAppleUserEmail(User user, String email) {
 
-        if(isHideEmail(user.getEmail())&&!isHideEmail(email)){
+        if (isHideEmail(user.getEmail()) && !isHideEmail(email)) {
             user.updateEmail(email);
             userRepository.save(user);
         }
@@ -159,17 +152,17 @@ public class OauthService {
 
         // identityToken 에서 publicKey 서명을 통해 Claims 를 추출한다.
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(publicKey)
-                .build()
-                .parseClaimsJws(identityToken)
-                .getBody();
+            .setSigningKey(publicKey)
+            .build()
+            .parseClaimsJws(identityToken)
+            .getBody();
 
         //Claims 에서 email, providerId(사용자 식별값) 를 추출한다.
-        try{
+        try {
             String email = claims.get("email").toString();
             String providerId = claims.get("sub").toString();
-            return new OauthInfo(email,providerId);
-        }catch (ExpiredJwtException exception){
+            return new OauthInfo(email, providerId);
+        } catch (ExpiredJwtException exception) {
             throw new BaseException(INVALID_IDENTITY_TOKEN);
         }
     }
@@ -206,10 +199,10 @@ public class OauthService {
         RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(n, e);
 
         //PublicKeySpec 을 통해 PublicKey 를 생성한다.
-        try{
+        try {
             KeyFactory keyFactory = KeyFactory.getInstance(matchedKey.getKty());
             return keyFactory.generatePublic(publicKeySpec);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex){
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
             throw new BaseException(BaseResponseStatus.INVALID_IDENTITY_TOKEN);
         }
     }
@@ -225,15 +218,17 @@ public class OauthService {
 
         //decode 된 header 정보를 통해 정답키의 key id, algorithm 정보를 가져온다.
         Map<String, String> headerMap;
-        try{
-            headerMap = new ObjectMapper().readValue(decodedHeader, new TypeReference<Map<String,String>>(){});
+        try {
+            headerMap = new ObjectMapper().readValue(decodedHeader,
+	new TypeReference<Map<String, String>>() {
+	});
         } catch (JsonProcessingException e) {
             throw new BaseException(BaseResponseStatus.INVALID_IDENTITY_TOKEN);
         }
 
         //후보키 중에서 정답키를 찾아서 반환한다.
         return candidateKeys.findKeyBy(headerMap.get("kid"), headerMap.get("alg"))
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.INVALID_IDENTITY_TOKEN));
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.INVALID_IDENTITY_TOKEN));
     }
 
     /**
@@ -242,11 +237,11 @@ public class OauthService {
     private AppleKeys getAppleKeys() {
 
         URI uri = UriComponentsBuilder
-                .fromUriString("https://appleid.apple.com")
-                .path("/auth/keys")
-                .encode()
-                .build()
-                .toUri();
+            .fromUriString("https://appleid.apple.com")
+            .path("/auth/keys")
+            .encode()
+            .build()
+            .toUri();
 
         ResponseEntity<AppleKeys> response = restTemplate.getForEntity(uri, AppleKeys.class);
         return response.getBody();
@@ -255,10 +250,11 @@ public class OauthService {
     /**
      * 애플 로그인 - 이메일 가리기 여부 확인
      */
-    private boolean isHideEmail(String email){
-        if(email.length()>25){
-            return email.substring(email.length() - 25, email.length()).equals("@privaterelay.appleid.com");
-        }else{
+    private boolean isHideEmail(String email) {
+        if (email.length() > 25) {
+            return email.substring(email.length() - 25, email.length())
+	.equals("@privaterelay.appleid.com");
+        } else {
             return false;
         }
     }
