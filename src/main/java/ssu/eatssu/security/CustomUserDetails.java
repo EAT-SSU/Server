@@ -15,13 +15,13 @@ import java.util.Collection;
 public class CustomUserDetails implements UserDetails {
     private final Long Id;
     private final String email;
-    private final String pwd;
+    private final String credentials;
     private final GrantedAuthority role;
 
     public CustomUserDetails(User user){
         this.Id = user.getId();
         this.email = user.getEmail();
-        this.pwd = user.getPwd();
+        this.credentials = user.getCredentials();
         this.role = user.getRole();
     }
 
@@ -35,7 +35,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return pwd;
+        return credentials;
     }
 
     @Override

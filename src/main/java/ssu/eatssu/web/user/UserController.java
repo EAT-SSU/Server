@@ -34,26 +34,6 @@ public class UserController {
     private final SecurityUtil securityUtil;
 
     /**
-     * 회원가입
-     * <p>자체 회원가입</p>
-     *
-     * @deprecated 현재는 카카오, 애플 회원가입만 사용 중입니다.
-     */
-    @Deprecated(since = "개발 초기에 사용했지만 출시하면서 OAuth 만 사용하기로 기획이 변경됨")
-    @Operation(summary = "자체 회원가입", description = "자체 회원가입 API 입니다. \n 회원가입 후 자동 로그인됩니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "회원가입 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
-    @PostMapping("/join")
-    public BaseResponse<Tokens> join(@Valid @RequestBody Join join) throws JsonProcessingException {
-        Tokens tokens = userService.join(join.getEmail(), join.getPwd());
-        return BaseResponse.success(tokens);
-    }
-
-    /**
      * 이메일 중복 검사
      * <p>중복되지 않은 이메일인 경우 true 를 반환합니다.</p>
      */
@@ -73,24 +53,6 @@ public class UserController {
             //throw new BaseException(EMAIL_DUPLICATE);
             return BaseResponse.success(false);
         }
-    }
-
-    /**
-     * 로그인
-     * <p>자체 로그인</p>
-     *
-     * @deprecated 현재는 카카오, 애플 로그인만 사용 중입니다.
-     */
-    @Deprecated(since = "개발 초기에 사용했지만 출시하면서 OAuth 만 사용하기로 기획이 변경됨")
-    @Operation(summary = "자체 로그인", description = "자체 로그인 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
-    @PostMapping("/login")
-    public BaseResponse<Tokens> login(@Valid @RequestBody Login login) {
-        Tokens tokens = userService.login(login.getEmail(), login.getPwd());
-        return BaseResponse.success(tokens);
     }
 
     /**
@@ -129,23 +91,6 @@ public class UserController {
         } else {
             return BaseResponse.success(true);
         }
-    }
-
-    /**
-     * 비밀번호 변경
-     * <p>비밀번호를 변경합니다.</p>
-     *
-     * @deprecated 현재는 카카오, 애플 로그인만 사용 중입니다.
-     */
-    @Deprecated(since = "개발 초기에 사용했지만 출시하면서 OAuth 만 사용하기로 기획이 변경됨")
-    @Operation(summary = "비밀번호 변경", description = "비밀번호 변경 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "비밀번호 변경 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
-    @PatchMapping("/password")
-    public BaseResponse<?> updatePassword(@Valid @RequestBody PasswordChange passwordChange) {
-        userService.updatePassword(getLoginUserId(), passwordChange.getPwd());
-        return BaseResponse.success();
     }
 
     /**

@@ -25,6 +25,8 @@ public class QUser extends EntityPathBase<User> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
 
+    public final StringPath credentials = createString("credentials");
+
     public final StringPath email = createString("email");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
@@ -37,8 +39,6 @@ public class QUser extends EntityPathBase<User> {
     public final EnumPath<ssu.eatssu.domain.enums.OauthProvider> provider = createEnum("provider", ssu.eatssu.domain.enums.OauthProvider.class);
 
     public final StringPath providerId = createString("providerId");
-
-    public final StringPath pwd = createString("pwd");
 
     public final ListPath<ReviewReport, QReviewReport> reviewReports = this.<ReviewReport, QReviewReport>createList("reviewReports", ReviewReport.class, QReviewReport.class, PathInits.DIRECT2);
 
