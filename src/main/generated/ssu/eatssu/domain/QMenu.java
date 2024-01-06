@@ -22,11 +22,7 @@ public class QMenu extends EntityPathBase<Menu> {
 
     public static final QMenu menu = new QMenu("menu");
 
-    public final NumberPath<Double> amountRate = createNumber("amountRate", Double.class);
-
     public final NumberPath<Long> id = createNumber("id", Long.class);
-
-    public final NumberPath<Double> mainRate = createNumber("mainRate", Double.class);
 
     public final ListPath<MealMenu, QMealMenu> mealMenus = this.<MealMenu, QMealMenu>createList("mealMenus", MealMenu.class, QMealMenu.class, PathInits.DIRECT2);
 
@@ -36,17 +32,7 @@ public class QMenu extends EntityPathBase<Menu> {
 
     public final QRestaurant restaurant;
 
-    public final NumberPath<Integer> reviewCnt = createNumber("reviewCnt", Integer.class);
-
-    public final ListPath<Review, QReview> reviews = this.<Review, QReview>createList("reviews", Review.class, QReview.class, PathInits.DIRECT2);
-
-    public final NumberPath<Double> tasteRate = createNumber("tasteRate", Double.class);
-
-    public final NumberPath<Integer> totalAmountRate = createNumber("totalAmountRate", Integer.class);
-
-    public final NumberPath<Integer> totalMainRate = createNumber("totalMainRate", Integer.class);
-
-    public final NumberPath<Integer> totalTasteRate = createNumber("totalTasteRate", Integer.class);
+    public final ListPath<ssu.eatssu.domain.review.Review, ssu.eatssu.domain.review.QReview> reviews = this.<ssu.eatssu.domain.review.Review, ssu.eatssu.domain.review.QReview>createList("reviews", ssu.eatssu.domain.review.Review.class, ssu.eatssu.domain.review.QReview.class, PathInits.DIRECT2);
 
     public QMenu(String variable) {
         this(Menu.class, forVariable(variable), INITS);

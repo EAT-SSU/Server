@@ -2,6 +2,7 @@ package ssu.eatssu.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ssu.eatssu.domain.review.Review;
 
 @Entity
 @Getter

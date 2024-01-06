@@ -30,35 +30,36 @@ public class MenuResDto {
         @Schema(description = "식단 평점(평점이 없으면 null)", example = "4.4")
         private Double mainRate;
 
-        @Schema(description = "식단 속 메뉴 리스트")
-        private List<ChangeMenuInfo> changeMenuInfoList;
+        @Schema(description = "식단 속 메뉴 정보 리스트")
+        private List<MenuInfo> menuInfoList;
+
+        public static TodayMeal from(Meal meal, Double mainRate) {
+            if (!meal.getMealMenus().isEmpty()) {
+                List<MenuInfo> menuInfoList = meal.getMealMenus().stream()
+                        .map(MealMenu::getMenu)
+                        .map(MenuInfo::new).toList();
+
+                return new TodayMeal(meal.getId(), meal.getRestaurant().getRestaurantName().getPrice()
+                        , mainRate, menuInfoList);
+            } else {
+                return null;
+            }
+        }
 
         @Getter
         @NoArgsConstructor
-        @AllArgsConstructor
-        private static class ChangeMenuInfo {
+        private static class MenuInfo {
             @Schema(description = "메뉴 식별자", example = "2")
             private Long menuId;
 
             @Schema(description = "메뉴 이름", example = "돈까스")
             private String name;
 
-        }
-
-        public static TodayMeal from (Meal meal){
-            if(!meal.getMealMenus().isEmpty()){
-                List<MealMenu> mealMenuList = meal.getMealMenus();
-                List<ChangeMenuInfo> changeMenuList = new ArrayList<>();
-                for(MealMenu mealMenu : mealMenuList){
-                    Menu menu = mealMenu.getMenu();
-                    ChangeMenuInfo changeMenuInfo = new ChangeMenuInfo(menu.getId(), menu.getName());
-                    changeMenuList.add(changeMenuInfo);
-                }
-                return new TodayMeal(meal.getId(), meal.getRestaurant().getRestaurantName().getPrice()
-                        , meal.getRateMap().get("mainRate"), changeMenuList);
-            }else{
-                return null;
+            private MenuInfo(Menu menu) {
+                this.menuId = menu.getId();
+                this.name = menu.getName();
             }
+
         }
 
     }
@@ -66,32 +67,22 @@ public class MenuResDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class FixMenuList {
-        private List<FixMenuInfo> fixMenuInfoList;
-        @Getter
-        @NoArgsConstructor
-        @AllArgsConstructor
-        private static class FixMenuInfo{
-            @Schema(description = "메뉴 식별자", example = "2")
-            private Long menuId;
+    public static class FixMenuInfo {
 
-            @Schema(description = "메뉴 이름", example = "돈까스")
-            private String name;
+        @Schema(description = "메뉴 식별자", example = "2")
+        private Long menuId;
 
-            @Schema(description = "메뉴 평점(평점이 없으면 null)", example = "4.4")
-            private Double mainRate;
+        @Schema(description = "메뉴 이름", example = "돈까스")
+        private String name;
 
-            @Schema(description = "가격", example = "5000")
-            private Integer price;
-        }
+        @Schema(description = "메뉴 평점(평점이 없으면 null)", example = "4.4")
+        private Double mainRate;
 
-        public static FixMenuList from(List<Menu> menus){
-            List<FixMenuInfo> fixMenuList = new ArrayList<>();
-            for (Menu menu : menus) {
-                FixMenuInfo menuInfo = new FixMenuInfo(menu.getId(), menu.getName(), menu.getMainRate(), menu.getPrice());
-                fixMenuList.add(menuInfo);
-            }
-            return new FixMenuList(fixMenuList);
+        @Schema(description = "가격", example = "5000")
+        private Integer price;
+
+        public static FixMenuInfo from(Menu menu, Double mainRate) {
+            return new FixMenuInfo(menu.getId(), menu.getName(), mainRate, menu.getPrice());
         }
     }
 
@@ -101,29 +92,29 @@ public class MenuResDto {
     public static class MenuList {
         private List<MenuInfo> menuInfoList;
 
-        @Getter
-        @NoArgsConstructor
-        @AllArgsConstructor
-        private static class MenuInfo{
-            @Schema(description = "메뉴 식별자", example = "2")
-            private Long menuId;
-
-            @Schema(description = "메뉴 이름", example = "돈까스")
-            private String name;
-        }
-
-        public static MenuList from (Meal meal){
-            if(!meal.getMealMenus().isEmpty()){
+        public static MenuList from(Meal meal) {
+            if (!meal.getMealMenus().isEmpty()) {
                 List<MenuInfo> menuInfoList = new ArrayList<>();
-                for(MealMenu mealMenu : meal.getMealMenus()){
+                for (MealMenu mealMenu : meal.getMealMenus()) {
                     Menu menu = mealMenu.getMenu();
                     MenuInfo menuInfo = new MenuInfo(menu.getId(), menu.getName());
                     menuInfoList.add(menuInfo);
                 }
                 return new MenuList(menuInfoList);
-            }else{
+            } else {
                 return null;
             }
+        }
+
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        private static class MenuInfo {
+            @Schema(description = "메뉴 식별자", example = "2")
+            private Long menuId;
+
+            @Schema(description = "메뉴 이름", example = "돈까스")
+            private String name;
         }
     }
 

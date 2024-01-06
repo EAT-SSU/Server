@@ -5,7 +5,8 @@ import jakarta.validation.constraints.Max;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.Menu;
-import ssu.eatssu.domain.Review;
+import ssu.eatssu.domain.review.Rates;
+import ssu.eatssu.domain.review.Review;
 import ssu.eatssu.domain.User;
 
 @Schema(title = "리뷰 작성")
@@ -27,9 +28,10 @@ public class ReviewCreate {
     private String content;
 
     public Review toEntity(User user, Menu menu) {
+        Rates rates = new Rates(this.mainRate, this.amountRate, this.tasteRate);
         return Review.builder()
-                .user(user).content(this.content).mainRate(this.mainRate).amountRate(this.amountRate)
-                .tasteRate(this.tasteRate).menu(menu).build();
+                .user(user).content(this.content).rates(rates).menu(menu)
+                .build();
     }
 
 }

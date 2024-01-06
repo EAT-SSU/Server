@@ -7,8 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +24,7 @@ import ssu.eatssu.domain.repository.UserRepository;
 import ssu.eatssu.handler.response.BaseResponseStatus;
 import ssu.eatssu.jwt.JwtTokenProvider;
 import ssu.eatssu.handler.response.BaseException;
-import ssu.eatssu.service.vo.OauthInfo;
+import ssu.eatssu.service.vo.OauthInfoVo;
 import ssu.eatssu.web.oauth.dto.AppleKeys;
 import ssu.eatssu.web.user.dto.Tokens;
 
@@ -39,10 +37,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.Map;
-import java.util.Optional;
 
 import static ssu.eatssu.handler.response.BaseResponseStatus.INVALID_IDENTITY_TOKEN;
-import static ssu.eatssu.handler.response.BaseResponseStatus.INVALID_TOKEN;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -78,7 +74,7 @@ public class OauthService {
     public Tokens appleLogin(String identityToken) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
         //애플 유저 정보 조회
-        OauthInfo oauthInfo = getUserInfoFromApple(identityToken);
+        OauthInfoVo oauthInfo = getUserInfoFromApple(identityToken);
 
         //가입 안된 유저일 경우 회원가입 진행
         User user = userRepository.findByProviderId(oauthInfo.providerId())
@@ -149,7 +145,7 @@ public class OauthService {
     /**
      * 애플 로그인 - 유저 정보(providerId, email) 조회
      */
-    private OauthInfo getUserInfoFromApple(String identityToken) {
+    private OauthInfoVo getUserInfoFromApple(String identityToken) {
 
         PublicKey publicKey = generatePublicKey(identityToken);
 
@@ -159,7 +155,7 @@ public class OauthService {
     /**
      * 애플 로그인 - PublicKey 를 통해 유저 정보(providerId, email) 조회
      */
-    private OauthInfo getUserInfoByPublicKey(String identityToken, PublicKey publicKey) {
+    private OauthInfoVo getUserInfoByPublicKey(String identityToken, PublicKey publicKey) {
 
         // identityToken 에서 publicKey 서명을 통해 Claims 를 추출한다.
         Claims claims = Jwts.parserBuilder()
@@ -172,7 +168,7 @@ public class OauthService {
         try{
             String email = claims.get("email").toString();
             String providerId = claims.get("sub").toString();
-            return new OauthInfo(email,providerId);
+            return new OauthInfoVo(email,providerId);
         }catch (ExpiredJwtException exception){
             throw new BaseException(INVALID_IDENTITY_TOKEN);
         }

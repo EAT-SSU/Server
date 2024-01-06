@@ -36,7 +36,7 @@ public class QReviewReport extends EntityPathBase<ReviewReport> {
 
     public final EnumPath<ssu.eatssu.domain.enums.ReviewReportType> reportType = createEnum("reportType", ssu.eatssu.domain.enums.ReviewReportType.class);
 
-    public final QReview review;
+    public final ssu.eatssu.domain.review.QReview review;
 
     public final EnumPath<ssu.eatssu.domain.enums.ReportStatus> status = createEnum("status", ssu.eatssu.domain.enums.ReportStatus.class);
 
@@ -60,7 +60,7 @@ public class QReviewReport extends EntityPathBase<ReviewReport> {
 
     public QReviewReport(Class<? extends ReviewReport> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.review = inits.isInitialized("review") ? new QReview(forProperty("review"), inits.get("review")) : null;
+        this.review = inits.isInitialized("review") ? new ssu.eatssu.domain.review.QReview(forProperty("review"), inits.get("review")) : null;
         this.user = inits.isInitialized("user") ? new QUser(forProperty("user")) : null;
     }
 

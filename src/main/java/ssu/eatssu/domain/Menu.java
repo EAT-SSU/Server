@@ -1,9 +1,11 @@
 package ssu.eatssu.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.enums.MenuTypeGroup;
+import ssu.eatssu.domain.review.Review;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,31 +24,10 @@ public class Menu {
 
     private Integer price;
 
-    @ColumnDefault("0.0")
-    private Double mainRate = 0.0;
-
-    @ColumnDefault("0.0")
-    private Double amountRate = 0.0;
-
-    @ColumnDefault("0.0")
-    private Double tasteRate = 0.0;
-
-    @ColumnDefault("0")
-    private Integer totalMainRate = 0;
-
-    @ColumnDefault("0")
-    private Integer totalAmountRate = 0;
-
-    @ColumnDefault("0")
-    private Integer totalTasteRate = 0;
-
-    @ColumnDefault("0")
-    private Integer reviewCnt = 0;
-
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
     private List<MealMenu> mealMenus = new ArrayList<>();
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
@@ -66,7 +47,7 @@ public class Menu {
      */
     public static Menu createChangeMenu(String name, Restaurant restaurant) {
         int price = 0;
-        if(MenuTypeGroup.isChange(restaurant.getRestaurantName())){
+        if (MenuTypeGroup.isChange(restaurant.getRestaurantName())) {
             price = restaurant.getRestaurantName().getPrice();
         }
         return new Menu(name, restaurant, price);
@@ -78,56 +59,5 @@ public class Menu {
      */
     public static Menu createFixedMenu(String name, Restaurant restaurant, Integer price) {
         return new Menu(name, restaurant, price);
-    }
-
-    public void addReview(Integer mainRate, Integer tasteRate, Integer amountRate) {
-            this.reviewCnt++;
-            this.totalMainRate += mainRate;
-            this.totalTasteRate += tasteRate;
-            this.totalAmountRate += amountRate;
-            calculateRate();
-    }
-
-    public void deleteReview(){
-        refreshReview();
-    }
-
-    public void updateReview() {
-        refreshReview();
-    }
-
-    public void refreshReview(){
-        int totalMain = 0;
-        int totalTaste =0;
-        int totalAmount = 0;
-        for(Review review : this.reviews){
-            totalMain+=review.getMainRate();
-            totalTaste += review.getTasteRate();
-            totalAmount+=review.getAmountRate();
-        }
-        this.totalMainRate = totalMain;
-        this.totalTasteRate = totalTaste;
-        this.totalAmountRate = totalAmount;
-        this.reviewCnt = (int)reviews.stream().count();
-        calculateRate();
-    }
-
-    private void calculateRate(){ // 평점 계산 후 적용
-        if(this.reviewCnt==0){
-            rateReset();
-        }else{
-            this.mainRate = this.totalMainRate.doubleValue()/this.reviewCnt.doubleValue();
-            this.tasteRate = this.totalTasteRate.doubleValue()/this.reviewCnt.doubleValue();
-            this.amountRate = this.totalAmountRate.doubleValue()/this.reviewCnt.doubleValue();
-        }
-    }
-
-    private void rateReset(){ //평점 초기화
-        this.totalMainRate = 0;
-        this.totalTasteRate = 0;
-        this.totalAmountRate = 0;
-        this.mainRate = 0.0;
-        this.tasteRate = 0.0;
-        this.amountRate = 0.0;
     }
 }

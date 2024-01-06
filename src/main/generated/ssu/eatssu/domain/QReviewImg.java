@@ -26,7 +26,7 @@ public class QReviewImg extends EntityPathBase<ReviewImg> {
 
     public final StringPath imageUrl = createString("imageUrl");
 
-    public final QReview review;
+    public final ssu.eatssu.domain.review.QReview review;
 
     public QReviewImg(String variable) {
         this(ReviewImg.class, forVariable(variable), INITS);
@@ -46,7 +46,7 @@ public class QReviewImg extends EntityPathBase<ReviewImg> {
 
     public QReviewImg(Class<? extends ReviewImg> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.review = inits.isInitialized("review") ? new QReview(forProperty("review"), inits.get("review")) : null;
+        this.review = inits.isInitialized("review") ? new ssu.eatssu.domain.review.QReview(forProperty("review"), inits.get("review")) : null;
     }
 
 }

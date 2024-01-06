@@ -17,10 +17,13 @@ import ssu.eatssu.domain.repository.RestaurantRepository;
 import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.handler.response.BaseResponseStatus;
 import ssu.eatssu.utils.DateUtil;
+import ssu.eatssu.utils.RatesCalculator;
 import ssu.eatssu.web.menu.dto.MenuReqDto;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 import static ssu.eatssu.web.menu.dto.MenuResDto.*;
 
@@ -35,23 +38,28 @@ public class MenuService {
     private final MealMenuRepository mealMenuRepository;
     private final RestaurantRepository restaurantRepository;
 
+    private final RatesCalculator ratesCalculator;
+
     /**
      * 고정 메뉴 조회
      * <p>특정 식당에 해당하는 고정메뉴 목록을 조회합니다.</p>
      */
-    public FixMenuList findFixMenuList(RestaurantName restaurantName) {
+    public List<FixMenuInfo> findFixMenuList(RestaurantName restaurantName) {
 
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
 
-        return FixMenuList.from(menuRepository.findAllByRestaurant(restaurant));
+        List<Menu> menuList = menuRepository.findAllByRestaurant(restaurant);
+        return menuList.stream()
+                .map(menu -> FixMenuInfo.from(menu, ratesCalculator.menuAverageMainRate(menu)))
+                .toList();
     }
 
     /**
      * 식단 목록 조회
      * <p>변동메뉴 식당(학생식당, 도담, 기숙사 식당)의 특정날짜(yyyyMMdd), 특정시간대(아침/점심/저녁)에 해당하는 식단 목록을 조회한다.</p>
      */
-    public List<TodayMeal> findMealList(TimePart timePart, String date, RestaurantName restaurantName){
+    public List<TodayMeal> findMealList(TimePart timePart, String date, RestaurantName restaurantName) {
 
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
@@ -59,14 +67,17 @@ public class MenuService {
         List<Meal> mealList = mealRepository.findAllByDateAndTimePartAndRestaurant(toDate(date), timePart, restaurant);
 
         //mealList 를 TodayMeal 로 매핑 후 반환
-        return mealList.stream().map(TodayMeal::from).toList();
+        return mealList.stream()
+                .map(meal -> TodayMeal.from(meal, ratesCalculator.mealAverageMainRate(meal)))
+                .toList();
     }
 
 
     /**
      * 식단 등록
      */
-    public void createMeal(TimePart timePart, String date, RestaurantName restaurantName, MenuReqDto.AddTodayMenuList addTodayMenuList) {
+    public void createMeal(TimePart timePart, String date, RestaurantName restaurantName,
+                           MenuReqDto.AddTodayMenuList addTodayMenuList) {
 
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
@@ -83,8 +94,6 @@ public class MenuService {
         //식단에 메뉴 추가
         addMenu(newMeal, addTodayMenuList);
 
-        //식단 평점 업데이트
-        newMeal.caculateRate();
     }
 
     /**
@@ -95,11 +104,7 @@ public class MenuService {
         Restaurant restaurant = meal.getRestaurant();
 
         for (String addMenuName : addTodayMenuList.getTodayMenuList()) {
-            //메뉴 체크 (기존에 없던 새로운 메뉴 라면)
-            if (!menuRepository.existsByNameAndRestaurant(addMenuName, restaurant)) {
-                //메뉴 추가
-                menuRepository.save(Menu.createChangeMenu(addMenuName, restaurant));
-            }
+            checkAndCreateMenu(addMenuName, restaurant);
 
             //메뉴 찾아서
             Menu menu = menuRepository.findByNameAndRestaurant(addMenuName, restaurant)
@@ -112,22 +117,38 @@ public class MenuService {
     }
 
     /**
+     * 기존에 존재하는 메뉴인지 체크 후 없으면 메뉴 등록
+     */
+    private void checkAndCreateMenu(String menuName, Restaurant restaurant) {
+
+        //메뉴 체크 (기존에 없던 새로운 메뉴인지)
+        if (!menuRepository.existsByNameAndRestaurant(menuName, restaurant)) {
+            //메뉴 등록
+            menuRepository.save(Menu.createChangeMenu(menuName, restaurant));
+        }
+
+        //메뉴 등록
+        menuRepository.save(Menu.createChangeMenu(menuName, restaurant));
+    }
+
+    /**
      * 이미 존재하는 식단인지 확인
      */
-    public boolean isExistMeal(TimePart timePart, String date, Restaurant restaurant, MenuReqDto.AddTodayMenuList addTodayMenuList){
+    public boolean isExistMeal(TimePart timePart, String date, Restaurant restaurant,
+                               MenuReqDto.AddTodayMenuList addTodayMenuList) {
 
-        List<Meal> meals = mealRepository.findAllByDateAndTimePartAndRestaurant(toDate(date),timePart,restaurant);
+        List<Meal> meals = mealRepository.findAllByDateAndTimePartAndRestaurant(toDate(date), timePart, restaurant);
 
         //비교를 위한 정렬
         Collections.sort(addTodayMenuList.getTodayMenuList());
 
         //식단 목록을 돌면서 메뉴 목록을 정렬하고 비교
-        for(Meal meal : meals){
+        for (Meal meal : meals) {
             List<String> menuNameList = meal.getMenuNameList();
             Collections.sort(menuNameList);
 
             //메뉴 목록이 같다면 이미 존재하는 식단
-            if(menuNameList.equals(addTodayMenuList.getTodayMenuList())){
+            if (menuNameList.equals(addTodayMenuList.getTodayMenuList())) {
                 return true;
             }
         }
@@ -141,7 +162,7 @@ public class MenuService {
     public MenuList findMenuListInMeal(Long mealId) {
 
         Meal meal = mealRepository.findById(mealId)
-                        .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MEAL));
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MEAL));
 
         return MenuList.from(meal);
     }
@@ -171,8 +192,8 @@ public class MenuService {
      */
     public void cleanupGarbageMenu(List<Menu> menuList) {
 
-        for(Menu menu : menuList){
-            if(menu.getMealMenus().isEmpty()) {
+        for (Menu menu : menuList) {
+            if (menu.getMealMenus().isEmpty()) {
                 menuRepository.delete(menu);
             }
         }
@@ -183,7 +204,7 @@ public class MenuService {
      */
     public Date toDate(String date) throws BaseException {
 
-        try{
+        try {
             return DateUtil.toDate("yyyyMMdd", date);
         } catch (ParseException e) {
             throw new BaseException(BaseResponseStatus.INVALID_DATE);

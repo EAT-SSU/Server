@@ -9,6 +9,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 import ssu.eatssu.domain.*;
+import ssu.eatssu.domain.review.QReview;
+import ssu.eatssu.domain.review.Review;
 
 import java.util.ArrayList;
 import java.util.List;

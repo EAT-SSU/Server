@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import ssu.eatssu.domain.review.Rates;
 import ssu.eatssu.domain.enums.TimePart;
 
 import java.util.*;
@@ -31,13 +32,6 @@ public class Meal {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    private Double mainRate = 0.0;
-
-    private Double amountRate = 0.0;
-
-    private Double tasteRate = 0.0;
-
-
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
     private List<MealMenu> mealMenus = new ArrayList<>();
 
@@ -46,40 +40,6 @@ public class Meal {
         this.date = date;
         this.timePart = timePart;
         this.restaurant = restaurant;
-    }
-
-    public void caculateRate(){
-        if(!mealMenus.isEmpty()){
-            int totalReviewCnt = 0;
-            Double mainRateSum = 0.0;
-            Double amountRateSum = 0.0;
-            Double tasteRateSum = 0.0;
-            for(MealMenu mealMenu : mealMenus){
-                Menu menu = mealMenu.getMenu();
-                totalReviewCnt += menu.getReviewCnt();
-                mainRateSum += menu.getTotalMainRate();
-                amountRateSum += menu.getTotalAmountRate();
-                tasteRateSum += menu.getTotalTasteRate();
-            }
-            if(totalReviewCnt!=0){
-                this.mainRate = mainRateSum/totalReviewCnt;
-                this.amountRate = amountRateSum/totalReviewCnt;
-                this.tasteRate = tasteRateSum/totalReviewCnt;
-            }else{
-                this.mainRate = 0.0;
-                this.amountRate = 0.0;
-                this.tasteRate = 0.0;
-            }
-
-        }
-    }
-
-    public Map<String, Double> getRateMap() {
-        Map<String, Double> rateMap = new HashMap<>();
-        rateMap.put("mainRate", mainRate);
-        rateMap.put("amountRate", amountRate);
-        rateMap.put("tasteRate", tasteRate);
-        return rateMap;
     }
 
     public List<String> getMenuNameList(){
