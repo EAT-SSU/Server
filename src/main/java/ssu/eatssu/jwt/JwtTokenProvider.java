@@ -67,6 +67,14 @@ public class JwtTokenProvider {
                 .collect(Collectors.joining(","));
 
         UserPrincipalDto userPrincipalDto = UserPrincipalDto.from((CustomUserDetails) authentication.getPrincipal());
+
+        Claims claims = createClaims(userPrincipalDto, authorities);
+
+        return new Tokens(createAccessToken(claims), createRefreshToken(claims));
+    }
+
+    private Claims createClaims(UserPrincipalDto userPrincipalDto, String authorities) {
+
         String subject;
         try{
             subject = objectMapper.writeValueAsString(userPrincipalDto);
@@ -76,12 +84,11 @@ public class JwtTokenProvider {
             throw new BaseException(BaseResponseStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Claims claims = Jwts.claims();
-        claims.setSubject(subject);
+        Claims claims = Jwts.claims()
+                .setSubject(subject);
         claims.put(AUTHORITIES_KEY, authorities);
-        String accessToken = createAccessToken(claims);
-        String refreshToken = createRefreshToken(claims);
-        return new Tokens(accessToken, refreshToken);
+
+        return claims;
     }
 
     //accessToken 생성
@@ -108,25 +115,30 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    //token에서 Athentication 추출
+    //token 에서 Authentication 추출
     public Authentication getAuthentication(String token) throws JsonProcessingException {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        Claims claims = getClaims(token);
 
         List<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .toList();
 
-        String subject = claims.getSubject();
-        UserPrincipalDto userPrincipalDto = objectMapper.readValue(subject, UserPrincipalDto.class);
+
+        UserPrincipalDto userPrincipalDto = objectMapper.readValue(claims.getSubject(), UserPrincipalDto.class);
+
         CustomUserDetails principal = new CustomUserDetails(userPrincipalDto.getId(),userPrincipalDto.getEmail(),  "",
                 authorities.get(0));
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    }
+
+    private Claims getClaims(String token){
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     //토큰 유효성 검증
