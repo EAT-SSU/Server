@@ -8,6 +8,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.repository.UserRepository;
+import ssu.eatssu.handler.response.BaseException;
+import ssu.eatssu.handler.response.BaseResponseStatus;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -17,10 +21,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.info("CustomUserDetailService loadUserByUsername username : "+ username);
+    public UserDetails loadUserByUsername(String username) {
         User user = userRepository.findByEmail(username)
-                .orElseThrow(()-> new UsernameNotFoundException("Not Found User. Username = " + username));
+                .orElseThrow(()-> new BaseException(BaseResponseStatus.NOT_FOUND_USER));
         return new CustomUserDetails(user);
     }
 
