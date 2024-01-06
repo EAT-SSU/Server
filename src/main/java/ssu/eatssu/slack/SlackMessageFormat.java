@@ -1,7 +1,7 @@
 package ssu.eatssu.slack;
 
 import org.springframework.stereotype.Component;
-import ssu.eatssu.domain.Review;
+import ssu.eatssu.domain.review.Review;
 import ssu.eatssu.domain.ReviewReport;
 import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.UserInquiry;

@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import ssu.eatssu.domain.enums.OauthProvider;
 import ssu.eatssu.domain.enums.Role;
 import ssu.eatssu.domain.enums.UserStatus;
+import ssu.eatssu.domain.review.Review;
 
 import java.util.List;
 

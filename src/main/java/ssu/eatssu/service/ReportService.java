@@ -3,7 +3,7 @@ package ssu.eatssu.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ssu.eatssu.domain.Review;
+import ssu.eatssu.domain.review.Review;
 import ssu.eatssu.domain.ReviewReport;
 import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.enums.ReportStatus;

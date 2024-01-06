@@ -1,6 +1,5 @@
 package ssu.eatssu.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -8,7 +7,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ssu.eatssu.domain.Review;
+import ssu.eatssu.domain.review.Review;
 import ssu.eatssu.domain.ReviewReport;
 import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.repository.ReviewReportRepository;

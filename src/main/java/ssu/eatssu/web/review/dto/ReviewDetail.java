@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import ssu.eatssu.domain.Review;
-import ssu.eatssu.domain.enums.UserStatus;
+import ssu.eatssu.domain.ReviewImg;
+import ssu.eatssu.domain.review.Review;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -52,14 +52,18 @@ public class ReviewDetail {
 
     public static ReviewDetail from(Review review, Long userId) {
 
-        List<String> imgUrlList = new ArrayList<>();
-        review.getReviewImgs().forEach(i -> imgUrlList.add(i.getImageUrl()));
+        List<String> imgUrlList = review.getReviewImgs().stream()
+                .map(ReviewImg::getImageUrl).toList();
+
         if(review.getUser()== null){//탈퇴한 유저의 리뷰인 경우
             return ReviewDetail.builder()
                     .reviewId(review.getId())
                     .writerId(null).writerNickname("알 수 없음")
-                    .mainRate(review.getMainRate()).amountRate(review.getAmountRate()).tasteRate(review.getTasteRate())
-                    .writeDate(review.getCreatedDate().toLocalDate()).content(review.getContent())
+                    .mainRate(review.getRates().getMainRate())
+                    .amountRate(review.getRates().getAmountRate())
+                    .tasteRate(review.getRates().getTasteRate())
+                    .writeDate(review.getCreatedDate().toLocalDate())
+                    .content(review.getContent())
                     .isWriter(false).imgUrlList(imgUrlList).menu(review.getMenu().getName())
                     .build();
         }else{
@@ -67,7 +71,9 @@ public class ReviewDetail {
             return ReviewDetail.builder()
                     .reviewId(review.getId())
                     .writerId(review.getUser().getId()).writerNickname(review.getUser().getNickname())
-                    .mainRate(review.getMainRate()).amountRate(review.getAmountRate()).tasteRate(review.getTasteRate())
+                    .mainRate(review.getRates().getMainRate())
+                    .amountRate(review.getRates().getAmountRate())
+                    .tasteRate(review.getRates().getTasteRate())
                     .writeDate(review.getCreatedDate().toLocalDate()).content(review.getContent())
                     .isWriter(isWriter).imgUrlList(imgUrlList).menu(review.getMenu().getName())
                     .build();

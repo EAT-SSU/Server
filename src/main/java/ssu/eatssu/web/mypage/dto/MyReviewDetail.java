@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import ssu.eatssu.domain.Review;
+import ssu.eatssu.domain.review.Review;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,9 +46,14 @@ public class MyReviewDetail {
         review.getReviewImgs().forEach(i->imgUrlList.add(i.getImageUrl()));
 
         return MyReviewDetail.builder()
-                .reviewId(review.getId()).mainRate(review.getMainRate()).amountRate(review.getAmountRate())
-                .tasteRate(review.getTasteRate()).writeDate(review.getCreatedDate().toLocalDate())
-                .content(review.getContent()).imgUrlList(imgUrlList).menuName(review.getMenu().getName())
+                .reviewId(review.getId())
+                .mainRate(review.getRates().getMainRate())
+                .amountRate(review.getRates().getAmountRate())
+                .tasteRate(review.getRates().getTasteRate())
+                .writeDate(review.getCreatedDate().toLocalDate())
+                .content(review.getContent())
+                .imgUrlList(imgUrlList)
+                .menuName(review.getMenu().getName())
                 .build();
     }
 }
