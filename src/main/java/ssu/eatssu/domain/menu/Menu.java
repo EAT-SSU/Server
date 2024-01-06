@@ -68,7 +68,7 @@ public class Menu {
      */
     public static Menu createChangeMenu(String name, Restaurant restaurant) {
         int price = 0;
-        if (MenuTypeGroup.isChange(restaurant.getRestaurantName())) {
+        if (MenuType.isChanged(restaurant.getRestaurantName())) {
             price = restaurant.getRestaurantName().getPrice();
         }
         return new Menu(name, restaurant, price);

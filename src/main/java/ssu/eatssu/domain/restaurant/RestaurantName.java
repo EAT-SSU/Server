@@ -13,16 +13,16 @@ public enum RestaurantName {
     SNACK_CORNER("스낵 코너", 0),
     HAKSIK("학생 식당", 5000);
 
-    private String krName;
+    private String description;
     private Integer price;
 
     @JsonCreator
-    public static RestaurantName from(String s){
-        return RestaurantName.valueOf(s.toUpperCase(Locale.ROOT));
+    public static RestaurantName from(String description) {
+        return RestaurantName.valueOf(description.toUpperCase(Locale.ROOT));
     }
 
-    RestaurantName(String krName, Integer price) {
-        this.krName = krName;
+    RestaurantName(String description, Integer price) {
+        this.description = description;
         this.price = price;
     }
 

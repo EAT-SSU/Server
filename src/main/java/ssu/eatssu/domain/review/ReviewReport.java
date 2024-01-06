@@ -19,19 +19,19 @@ public class ReviewReport extends BaseTimeEntity {
     @Column(name = "review_report_id")
     private Long id;
 
-    @ManyToOne(fetch= FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id")
     private User user;
 
-    @ManyToOne(fetch= FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
     private Review review;
 
     @Enumerated(EnumType.STRING)
-    private ReviewReportType reportType;
+    private ReviewReportType reviewReportType;
 
     private String content;
 
     @Enumerated(EnumType.STRING)
-    private ReportStatus status;
+    private ReportStatus reportStatus;
 }

@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ssu.eatssu.domain.menu.MenuTypeGroup;
+import ssu.eatssu.domain.menu.MenuType;
 import ssu.eatssu.domain.restaurant.RestaurantName;
 import ssu.eatssu.domain.enums.TimePart;
 import ssu.eatssu.handler.response.BaseException;
@@ -54,7 +54,7 @@ public class MenuController {
                                                      @RequestParam("restaurant") RestaurantName restaurantName,
                                                      @Parameter(description = "시간대")
                                                      @RequestParam("time") TimePart timePart) {
-        if (MenuTypeGroup.isFix(restaurantName)) {
+        if (MenuType.isFixed(restaurantName)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
 
@@ -77,7 +77,7 @@ public class MenuController {
     @GetMapping("/fix-menu")
     public BaseResponse<FixMenuList> getFixMenuList(@Parameter(description = "식당이름")
                                                     @RequestParam("restaurant") RestaurantName restaurantName) {
-        if(MenuTypeGroup.isChange(restaurantName)) {
+        if(MenuType.isChanged(restaurantName)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
 
@@ -109,7 +109,7 @@ public class MenuController {
                                         @Parameter(description = "시간대")
                                         @RequestParam("time") TimePart timePart,
                                         @RequestBody AddTodayMenuList addTodayMenuList) {
-        if (MenuTypeGroup.isFix(restaurantName)) {
+        if (MenuType.isFixed(restaurantName)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
 

@@ -100,7 +100,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
 
-        if (review.isNotAuthor(user)) {
+        if (review.isDifferentUser(user)) {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
 
@@ -117,7 +117,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
 
-        if (review.isNotAuthor(user)) {
+        if (review.isDifferentUser(user)) {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
         reviewRepository.delete(review);

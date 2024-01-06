@@ -82,7 +82,7 @@ public class UserService {
 
         //작성한 리뷰 삭제
         for(Review review: user.getReviews()) {
-            review.signoutUser();
+            review.clearUser();
         }
         //작성한 신고 삭제
         for(ReviewReport report: user.getReviewReports()){

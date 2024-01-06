@@ -48,11 +48,11 @@ public class Review extends BaseTimeEntity {
         this.tasteRate = request.getTasteRate();
     }
 
-    public boolean isNotAuthor(User user) {
+    public boolean isDifferentUser(User user) {
         return !this.user.equals(user);
     }
 
-    public void signoutUser() {
+    public void clearUser() {
         this.user = null;
     }
 }

@@ -8,10 +8,10 @@ public enum DayType {
     WEEKDAY("주중"),
     HOLIDAY("주말, 공휴일");
 
-    private String krName;
+    private String description;
 
-    DayType(String krName) {
-        this.krName = krName;
+    DayType(String description) {
+        this.description = description;
     }
 
 }

@@ -1,6 +1,7 @@
 package ssu.eatssu.domain.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.Arrays;
 import lombok.Getter;
 
 import java.util.Locale;
@@ -11,14 +12,17 @@ public enum TimePart {
     LUNCH("중식"),
     DINNER("석식");
 
-    @JsonCreator
-    public static TimePart from(String s){
-        return TimePart.valueOf(s.toUpperCase(Locale.ROOT));
+    private String description;
+
+    TimePart(String description) {
+        this.description = description;
     }
 
-    private String krName;
-
-    TimePart(String krName){
-        this.krName = krName;
+    @JsonCreator
+    public static TimePart from(String description) {
+        return Arrays.stream(TimePart.values())
+            .filter(d -> d.getDescription().equals(description))
+            .findAny()
+            .orElseThrow(IllegalArgumentException::new);
     }
 }

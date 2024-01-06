@@ -17,7 +17,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ssu.eatssu.domain.menu.MenuTypeGroup;
+import ssu.eatssu.domain.menu.MenuType;
 import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.service.RefreshingService;
@@ -31,8 +31,8 @@ import ssu.eatssu.web.review.dto.UpdateReviewRequest;
 
 import java.util.List;
 
-import static ssu.eatssu.domain.menu.MenuTypeGroup.CHANGE;
-import static ssu.eatssu.domain.menu.MenuTypeGroup.FIX;
+import static ssu.eatssu.domain.menu.MenuType.CHANGED;
+import static ssu.eatssu.domain.menu.MenuType.FIXED;
 import static ssu.eatssu.handler.response.BaseResponseStatus.MISSING_REQUEST_PARAM;
 
 @Slf4j
@@ -50,23 +50,24 @@ public class ReviewController {
      * <p>메뉴식별자(menuId)에 해당하는 메뉴에 리뷰를 작성한다. 사진은 여러장 첨부 가능하다.</p>
      */
     @Operation(summary = "리뷰 작성", description = """
-            리뷰를 작성하는 API 입니다.<br><br>
-            reviewCreate는 application/json, multipartFileList는 multipart/form-data로 요청해주세요.<br><br>
-            사진은 여러장 첨부 가능합니다.(기획상으로는 한 장만 첨부하도록 제한이 있지만 API 스펙 자체는 여러 장 첨부 가능)
-            """)
+        리뷰를 작성하는 API 입니다.<br><br>
+        reviewCreate는 application/json, multipartFileList는 multipart/form-data로 요청해주세요.<br><br>
+        사진은 여러장 첨부 가능합니다.(기획상으로는 한 장만 첨부하도록 제한이 있지만 API 스펙 자체는 여러 장 첨부 가능)
+        """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "리뷰 작성 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "500", description = "이미지 업로드 실패", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+        @ApiResponse(responseCode = "200", description = "리뷰 작성 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "500", description = "이미지 업로드 실패", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping(value = "/{menuId}",
-            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE},
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse<?> writeReview(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
-                                            @RequestPart(value = "reviewCreate") CreateReviewRequest request,
-                                            @RequestPart(value = "multipartFileList", required = false)
-                                                    List<MultipartFile> multipartFileList) {
+        consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE},
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse<?> writeReview(
+        @Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
+        @RequestPart(value = "reviewCreate") CreateReviewRequest request,
+        @RequestPart(value = "multipartFileList", required = false)
+        List<MultipartFile> multipartFileList) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.write(userId, menuId, request, multipartFileList);
         return BaseResponse.success();
@@ -77,19 +78,19 @@ public class ReviewController {
      * <p>리뷰식별자(reviewId)에 해당하는 리뷰 속 글을 수정한다. 사진은 수정 X</p>
      */
     @Operation(summary = "리뷰 수정(글 수정)", description = """
-            리뷰 내용을 수정하는 API 입니다.<br><br>
-            글 수정만 가능하며 사진 수정은 지원하지 않습니다.
-            """)
+        리뷰 내용을 수정하는 API 입니다.<br><br>
+        글 수정만 가능하며 사진 수정은 지원하지 않습니다.
+        """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "리뷰 수정 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "403", description = "리뷰에 대한 권한이 없음", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 리뷰", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+        @ApiResponse(responseCode = "200", description = "리뷰 수정 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "403", description = "리뷰에 대한 권한이 없음", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 리뷰", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PatchMapping("/{reviewId}")
     public BaseResponse<?> updateReview(@Parameter(description = "reviewId")
-                                             @PathVariable("reviewId") Long reviewId,
-                                             @RequestBody UpdateReviewRequest reviewUpdate) {
+    @PathVariable("reviewId") Long reviewId,
+        @RequestBody UpdateReviewRequest reviewUpdate) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.update(userId, reviewId, reviewUpdate);
         return BaseResponse.success();
@@ -101,13 +102,14 @@ public class ReviewController {
      */
     @Operation(summary = "리뷰 삭제", description = "리뷰를 삭제하는 API 입니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "리뷰 삭제 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "403", description = "리뷰에 대한 권한이 없음", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 리뷰", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+        @ApiResponse(responseCode = "200", description = "리뷰 삭제 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "403", description = "리뷰에 대한 권한이 없음", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 리뷰", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @DeleteMapping("/{reviewId}")
-    public BaseResponse<?> deleteReview(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
+    public BaseResponse<?> deleteReview(
+        @Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
         Long userId = SecurityUtil.getLoginUserId();
         reviewService.delete(userId, reviewId);
         return BaseResponse.success();
@@ -126,30 +128,31 @@ public class ReviewController {
         식단(변동메뉴)리뷰 조회 시 <b>메뉴명 리스트</b>, 리뷰 수, 메인 평점, 양 평점, 맛 평점, 평점 별 개수를 조회합니다.<br><br>
         """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "리뷰 정보 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+        @ApiResponse(responseCode = "200", description = "리뷰 정보 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/info")
-    public BaseResponse<MenuReviewInformationResponse> getMenuReviewInfo(@Parameter(description = "타입(변동메뉴(식단)/고정메뉴)")
-                                                          @RequestParam("menuType") MenuTypeGroup menuTypeGroup,
-                                                          @Parameter(description = "menuId(고정메뉴)")
-                                                          @RequestParam(value = "menuId", required = false) Long menuId,
-                                                          @Parameter(description = "mealId(고정메뉴)")
-                                                          @RequestParam(value = "mealId", required = false) Long mealId) {
+    public BaseResponse<MenuReviewInformationResponse> getMenuReviewInfo(
+        @Parameter(description = "타입(변동메뉴(식단)/고정메뉴)")
+        @RequestParam("menuType") MenuType menuTypeGroup,
+        @Parameter(description = "menuId(고정메뉴)")
+        @RequestParam(value = "menuId", required = false) Long menuId,
+        @Parameter(description = "mealId(고정메뉴)")
+        @RequestParam(value = "mealId", required = false) Long mealId) {
         MenuReviewInformationResponse menuReviewInfo;
-        if (menuTypeGroup == FIX) {
+        if (menuTypeGroup == FIXED) {
             if (menuId == null) {
-                throw new BaseException(MISSING_REQUEST_PARAM);
+	throw new BaseException(MISSING_REQUEST_PARAM);
             } else {
-                menuReviewInfo = reviewService.findReviewInformationByMenuId(menuId);
+	menuReviewInfo = reviewService.findReviewInformationByMenuId(menuId);
             }
-        } else if (menuTypeGroup == CHANGE) {
+        } else if (menuTypeGroup == CHANGED) {
             if (mealId == null) {
-                throw new BaseException(MISSING_REQUEST_PARAM);
+	throw new BaseException(MISSING_REQUEST_PARAM);
             } else {
-                menuReviewInfo = reviewService.findReviewInformationByMealId(mealId);
+	menuReviewInfo = reviewService.findReviewInformationByMealId(mealId);
             }
         } else {
             throw new BaseException(MISSING_REQUEST_PARAM);
@@ -163,38 +166,38 @@ public class ReviewController {
      * pageable default={size=20, sort=date, direction=desc}</p>
      */
     @Operation(summary = "리뷰 리스트 조회", description = """
-         리뷰 리스트를 조회하는 API 입니다.<br><br>
-         menuType=FIX 의 경우 menuId 파라미터를 넣어주세요.<br><br>
-         menuType=CHANGE 의 경우 mealId 파라미터를 넣어주세요.<br><br>
-         커서 기반 페이지네이션으로 리뷰 리스트를 조회합니다.<br><br>
-         페이징 기본 값 = {size=20, sort=date, direction=desc}<br><br>
-         """)
+        리뷰 리스트를 조회하는 API 입니다.<br><br>
+        menuType=FIX 의 경우 menuId 파라미터를 넣어주세요.<br><br>
+        menuType=CHANGE 의 경우 mealId 파라미터를 넣어주세요.<br><br>
+        커서 기반 페이지네이션으로 리뷰 리스트를 조회합니다.<br><br>
+        페이징 기본 값 = {size=20, sort=date, direction=desc}<br><br>
+        """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "리뷰 리스트 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+        @ApiResponse(responseCode = "200", description = "리뷰 리스트 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/list")
     public BaseResponse<SliceDto<ReviewDetail>> getReviewList(
-            @Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType") MenuTypeGroup menuTypeGroup,
-            @Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false) Long menuId,
-            @Parameter(description = "mealId(변동메뉴)") @RequestParam(value = "mealId", required = false) Long mealId,
-            @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY)
-            @RequestParam(value = "lastReviewId", required = false) Long lastReviewId,
-            @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable) {
+        @Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType") MenuType menuTypeGroup,
+        @Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false) Long menuId,
+        @Parameter(description = "mealId(변동메뉴)") @RequestParam(value = "mealId", required = false) Long mealId,
+        @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY)
+        @RequestParam(value = "lastReviewId", required = false) Long lastReviewId,
+        @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable) {
         SliceDto<ReviewDetail> reviewList;
-        if (menuTypeGroup == FIX) {
+        if (menuTypeGroup == FIXED) {
             if (menuId == null) {
-                throw new BaseException(MISSING_REQUEST_PARAM);
+	throw new BaseException(MISSING_REQUEST_PARAM);
             } else {
-                reviewList = reviewService.findReviewListByMenuId(menuId, pageable, lastReviewId);
+	reviewList = reviewService.findReviewListByMenuId(menuId, pageable, lastReviewId);
             }
-        } else if (menuTypeGroup == CHANGE) {
+        } else if (menuTypeGroup == CHANGED) {
             if (mealId == null) {
-                throw new BaseException(MISSING_REQUEST_PARAM);
+	throw new BaseException(MISSING_REQUEST_PARAM);
             } else {
-                reviewList = reviewService.findReviewListByMealId(mealId, pageable, lastReviewId);
+	reviewList = reviewService.findReviewListByMealId(mealId, pageable, lastReviewId);
             }
         } else {
             throw new BaseException(MISSING_REQUEST_PARAM);

@@ -37,7 +37,7 @@ public class SlackMessageFormat {
         );
         Object[] args = {reporter.getId(), reporter.getNickname(), review.getId(), review.getUser().getId()
                 , review.getUser().getNickname(), review.getMenu().getName(), review.getContent(),
-                review.getModifiedDate().toString(), report.getReportType().getKrName(), report.getCreatedDate()};
+                review.getModifiedDate().toString(), report.getReportType().getDescription(), report.getCreatedDate()};
         return messageFormat.format(args);
     }
 
