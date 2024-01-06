@@ -29,14 +29,14 @@ public class User extends BaseTimeEntity {
     @Column(unique = true)
     private String email;
 
-    private String password;
-
     private String nickname;
 
     @Enumerated(EnumType.STRING)
     private OauthProvider provider;
 
     private String providerId;
+
+    private String credentials;
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;
@@ -52,43 +52,32 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
     private List<UserInquiry> userInquiry;
 
-    private User(String email, String password) {
+    /**
+     * Oauth 회원가입 용 생성자
+     */
+    private User(@NotNull String email, @NotNull Role role, @NotNull OauthProvider provider,
+                 @NotNull String providerId, @NotNull UserStatus status, @NotNull String credentials){
         this.email = email;
-        this.password = password;
-        this.role = Role.USER;
-        this.provider = OauthProvider.EATSSU;
-        this.status = UserStatus.ACTIVE;
-    }
-
-    private User(String email,OauthProvider provider, String providerId) {
-        this.email = email;
-        this.role = Role.USER;
+        this.role = role;
         this.provider = provider;
         this.providerId = providerId;
-        this.status = UserStatus.ACTIVE;
+        this.status = status;
+        this.credentials = credentials;
     }
 
-    public static User oAuthJoin(@NotNull String email,
-        @NotNull OauthProvider provider,
-        String providerId) {
-        return new User(email, provider, providerId);
-    }
-
-
-    public static User join(@NotNull String email, @NotNull String password) {
-        return new User(email, password);
+    /**
+     * <--Static Factory Method-->
+     * Oauth 회원가입
+     */
+    public static User oAuthJoin(@NotNull String email, @NotNull OauthProvider provider, String providerId,
+                                 String credentials) {
+        return new User(email, Role.USER,  provider, providerId, UserStatus.ACTIVE, credentials);
     }
 
     public void updateNickname(@NotNull String nickname) {
         this.nickname = nickname;
     }
 
-    public void changePassword(String newPassword) {
-        this.password = newPassword;
-    }
-
-    public void updateEmail(String email) {
-        this.email = email;
-    }
+    public void updateEmail(String email) { this.email = email; }
 
 }

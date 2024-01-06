@@ -10,9 +10,7 @@ import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +19,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.enums.OauthProvider;
 import ssu.eatssu.domain.repository.UserRepository;
+import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.handler.response.BaseResponseStatus;
 import ssu.eatssu.jwt.JwtTokenProvider;
-import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.service.vo.OauthInfo;
 import ssu.eatssu.web.oauth.dto.AppleKeys;
 import ssu.eatssu.web.user.dto.Tokens;
@@ -49,8 +47,6 @@ public class OauthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final JwtTokenProvider jwtTokenProvider;
     private final RestTemplate restTemplate;
 
     /**
@@ -60,68 +56,52 @@ public class OauthService {
 
         //가입 안된 유저일 경우 회원가입 진행
         User user = userRepository.findByProviderId(providerId)
-            .orElse(join(email, providerId, OauthProvider.KAKAO));
+                .orElseGet(() -> join(email, OauthProvider.KAKAO, providerId));
 
-        //OAuth 유저 용 비밀번호 생성
-        String pwd = createOAuthUserPassword(OauthProvider.KAKAO, providerId);
-
-        return userService.generateJwtTokens(user.getEmail(), pwd);
+        // return Tokens
+        return userService.generateOauthJwtTokens(user.getEmail(), OauthProvider.KAKAO, providerId);
     }
 
     /**
      * 애플 로그인
      */
-    public Tokens appleLogin(String identityToken)
-        throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+    public Tokens appleLogin(String identityToken) {
 
         //애플 유저 정보 조회
         OauthInfo oauthInfo = getUserInfoFromApple(identityToken);
 
+
         //가입 안된 유저일 경우 회원가입 진행
         User user = userRepository.findByProviderId(oauthInfo.providerId())
-            .orElse(join(oauthInfo.email(), oauthInfo.providerId(), OauthProvider.APPLE));
+                .orElseGet(() -> join(oauthInfo.email(), OauthProvider.APPLE, oauthInfo.providerId()));
+
 
         //이메일 갱신
         updateAppleUserEmail(user, oauthInfo.email());
 
-        //OAuth 유저 용 비밀번호 생성
-        String pwd = createOAuthUserPassword(OauthProvider.APPLE, oauthInfo.providerId());
-
-        return userService.generateJwtTokens(user.getEmail(), pwd);
+        // return Tokens
+        return userService.generateOauthJwtTokens(user.getEmail(), OauthProvider.APPLE, oauthInfo.providerId());
     }
 
     /**
      * 회원가입
      */
-    private User join(String email, String providerId, OauthProvider provider) {
-        return userRepository.save(User.oAuthJoin(email, provider, providerId));
+
+    private User join(String email, OauthProvider provider, String providerId) {
+        String credentials = createCredentials(provider, providerId);
+
+        //회원가입
+        User user = User.oAuthJoin(email, provider, providerId, credentials);
+        return userRepository.save(user);
     }
 
     /**
-     * OAuth 유저용 Password 생성
-     * todo 자체회원가입 안써서 password 컬럼이 필요없는데 삭제?
+     * Credentials 생성
      */
-    private String createOAuthUserPassword(OauthProvider provider, String providerId) {
 
-        return provider.toString() + providerId;
-    }
-
-    /**
-     * email, pwd 를 통해 JwtToken 을 생성
-     */
-    public Tokens generateJwtTokens(String email, String pwd) {
-        // 1. email/pwd 를 기반으로 Authentication 객체 생성
-        // 이때 authentication 은 인증 여부를 확인하는 authenticated 값이 false
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-            email, pwd);
-
-        // 2. 실제 검증 (사용자 비밀번호 체크)
-        // authenticate 메서드 실행 => CustomUserDetailsService 에서 만든 loadUserByUsername 메서드 실행
-        Authentication authentication = authenticationManagerBuilder.getObject()
-            .authenticate(authenticationToken);
-
-        // 3. 인증 정보를 바탕으로 JWT 토큰 생성
-        return jwtTokenProvider.generateTokens(authentication);
+    private String createCredentials(OauthProvider provider, String providerId) {
+        return passwordEncoder.encode(provider + "_" + providerId);
     }
 
     /**
@@ -219,9 +199,8 @@ public class OauthService {
         //decode 된 header 정보를 통해 정답키의 key id, algorithm 정보를 가져온다.
         Map<String, String> headerMap;
         try {
-            headerMap = new ObjectMapper().readValue(decodedHeader,
-	new TypeReference<Map<String, String>>() {
-	});
+            headerMap = new ObjectMapper().readValue(decodedHeader, new TypeReference<Map<String, String>>() {
+            });
         } catch (JsonProcessingException e) {
             throw new BaseException(BaseResponseStatus.INVALID_IDENTITY_TOKEN);
         }
@@ -252,8 +231,7 @@ public class OauthService {
      */
     private boolean isHideEmail(String email) {
         if (email.length() > 25) {
-            return email.substring(email.length() - 25, email.length())
-	.equals("@privaterelay.appleid.com");
+            return email.startsWith("@privaterelay.appleid.com", email.length() - 25);
         } else {
             return false;
         }
