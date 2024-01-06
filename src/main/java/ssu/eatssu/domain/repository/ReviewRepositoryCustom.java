@@ -4,7 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import ssu.eatssu.domain.Meal;
 import ssu.eatssu.domain.Menu;
-import ssu.eatssu.domain.Review;
+import ssu.eatssu.domain.review.Review;
 import ssu.eatssu.domain.User;
 
 public interface ReviewRepositoryCustom {

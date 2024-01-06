@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import ssu.eatssu.domain.enums.ReportStatus;
 import ssu.eatssu.domain.enums.ReviewReportType;
+import ssu.eatssu.domain.review.Review;
 
 @Builder
 @Entity

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import ssu.eatssu.domain.Review;
+import ssu.eatssu.domain.review.Review;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class MyReviewDetail {
     public static MyReviewDetail from(Review review){
 
         List<String> imgUrlList = new ArrayList<>();
-        review.getReviewImgs().forEach(i->imgUrlList.add(i.getImageUrl()));
+        review.getReviewImages().forEach(i->imgUrlList.add(i.getImageUrl()));
 
         return MyReviewDetail.builder()
                 .reviewId(review.getId()).mainRate(review.getMainRate()).amountRate(review.getAmountRate())

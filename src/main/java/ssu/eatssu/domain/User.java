@@ -11,6 +11,7 @@ import ssu.eatssu.domain.enums.Role;
 import ssu.eatssu.domain.enums.UserStatus;
 
 import java.util.List;
+import ssu.eatssu.domain.review.Review;
 
 @Entity
 @Getter

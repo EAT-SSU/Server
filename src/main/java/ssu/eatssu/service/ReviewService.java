@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ssu.eatssu.domain.*;
 import ssu.eatssu.domain.repository.*;
+import ssu.eatssu.domain.review.Review;
 import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.utils.S3Uploader;
 import ssu.eatssu.utils.SecurityUtil;
@@ -17,10 +18,10 @@ import ssu.eatssu.web.review.dto.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import ssu.eatssu.web.review.dto.MenuReviewInformationResponse.ReviewRateCount;
 
 import static ssu.eatssu.handler.response.BaseResponseStatus.*;
 
@@ -39,7 +40,7 @@ public class ReviewService {
     /**
      * 리뷰 작성
      */
-    public void createReview(Long userId, Long menuId, CreateReviewRequest request,
+    public void write(Long userId, Long menuId, CreateReviewRequest request,
         List<MultipartFile> images) {
 
         User user = userRepository.findById(userId)
@@ -49,15 +50,23 @@ public class ReviewService {
             .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
 
         Review review = request.toEntity(user, menu);
+
         reviewRepository.save(review);
-        menu.addReview(request.getMainRate(), request.getTasteRate(),
-            request.getAmountRate());
+
+        // 이거 addReview 하면 자동으로 repository에 저장되지 않나?
+        menu.addReview(review);
+
         menuRepository.save(menu);
 
-        if (images != null && !images.isEmpty()) {
-            for (MultipartFile img : images) {
-	addReviewImage(review, img);
-            }
+        processReviewImages(images, review);
+    }
+
+    public void processReviewImages(List<MultipartFile> images, Review review) {
+        if (images == null || !images.isEmpty()) {
+            return;
+        }
+        for (MultipartFile image : images) {
+            addReviewImage(review, image);
         }
     }
 
@@ -81,109 +90,97 @@ public class ReviewService {
     /**
      * 리뷰 문장 수정
      */
-    public void updateReviewContent(Long userId, Long reviewId, UpdateReviewRequest request) {
+    public void update(Long userId, Long reviewId, UpdateReviewRequest request) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
 
-        // if-else
-        if (isWriterOrAdmin(review, user)) {
-            // 디미터 법칙 위반
-            review.update(request.getContent(),
-	request.getMainRate(),
-	request.getAmountRate()
-	, request.getTasteRate());
-            review.getMenu().updateReview();
-        } else {
+        if (review.isNotAuthor(user)) {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
+
+        review.update(request);
     }
 
     /**
      * 리뷰 삭제
      */
-    public void deleteReview(Long userId, Long reviewId) {
+    public void delete(Long userId, Long reviewId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
 
-        if (isWriterOrAdmin(review, user)) {
-            reviewRepository.delete(review);
-            reviewRepository.flush();
-            review.getMenu().deleteReview();
-        } else {
+        if (review.isNotAuthor(user)) {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
+        reviewRepository.delete(review);
+        reviewRepository.flush();
     }
 
-    /**
-     * 리뷰 작성자/관리자 인지 확인 //todo 관리자인지는 빼도 될듯
-     */
-    public boolean isWriterOrAdmin(Review review, User user) {
-        return review.getUser() == user;
-    }
+//    /**
+//     * 리뷰 작성자/관리자 인지 확인 //todo 관리자인지는 빼도 될듯
+//     */
+//    public boolean isWriterOrAdmin(Review review, User user) {
+//        return review.getUser() == user;
+//    }
 
     /**
      * 고정메뉴 - 리뷰 정보 조회
      */
-    public MenuReviewInformation findReviewInformationByMenuId(Long menuId) {
+    public MenuReviewInformationResponse findReviewInformationByMenuId(Long menuId) {
         Menu menu = menuRepository.findById(menuId)
             .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
-        List<String> reviewMenuList = new ArrayList<>();
-        reviewMenuList.add(menu.getName());
 
-        return MenuReviewInformation.builder()
-            .menuName(reviewMenuList).mainRate(menu.getMainRate()).tasteRate(menu.getTasteRate())
-            .amountRate(menu.getAmountRate()).totalReviewCount(menu.getReviewCnt())
-            .reviewRateCnt(MenuReviewInformation.ReviewRateCnt.fromMap(getReviewRateCnt(menu)))
+        List<String> reviewNames = new ArrayList<>();
+        reviewNames.add(menu.getName());
+
+        return MenuReviewInformationResponse.builder()
+            .menuNames(reviewNames)
+            .mainRate(menu.getMainRate())
+            .tasteRate(menu.getTasteRate())
+            .amountRate(menu.getAmountRate())
+            .totalReviewCount(menu.getReviewCount())
+            .reviewRateCount(ReviewRateCount.from(getReviewCount(menu)))
             .build();
     }
 
     /**
      * 변동메뉴 - 리뷰 정보 조회
      */
-    public MenuReviewInformation findReviewInformationByMealId(Long mealId) {
+    public MenuReviewInformationResponse findReviewInformationByMealId(Long mealId) {
         Meal meal = mealRepository.findById(mealId)
             .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
-        List<Menu> menuList = new ArrayList<>();
-        meal.getMealMenus().forEach(mealMenu -> menuList.add(mealMenu.getMenu()));
-        List<String> reviewMenuList = new ArrayList<>();
-        menuList.forEach(menu -> reviewMenuList.add(menu.getName()));
+
+        List<Menu> reviewMenus = meal.getMenus();
+        List<String> reviewMenuNames = meal.getMenuNames();
+
         List<Map<Integer, Long>> rateCntMapList =
-            menuList.stream().map(this::getReviewRateCnt).toList();
+            reviewMenus.stream().map(this::getReviewCount).toList();
+
         Map<Integer, Long> totalRateCntMap = rateCntMapList.stream()
             .flatMap(m -> m.entrySet().stream())
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Long::sum));
         meal.caculateRate();
-        return MenuReviewInformation.builder()
-            .menuName(reviewMenuList).mainRate(meal.getMainRate()).tasteRate(meal.getTasteRate())
+
+        return MenuReviewInformationResponse.builder()
+            .menuNames(reviewMenuNames)
+            .mainRate(meal.getMainRate())
+            .tasteRate(meal.getTasteRate())
             .amountRate(meal.getAmountRate())
-            .totalReviewCount(menuList.stream().mapToInt(Menu::getReviewCnt).sum())
-            .reviewRateCnt(MenuReviewInformation.ReviewRateCnt.fromMap(totalRateCntMap))
+            .totalReviewCount(reviewMenus.stream().mapToInt(Menu::getReviewCount).sum())
+            .reviewRateCount(ReviewRateCount.from(totalRateCntMap))
             .build();
     }
 
     /**
      * 메뉴의 리뷰 평점별 개수 조회
      */
-    public Map<Integer, Long> getReviewRateCnt(Menu menu) {
-        List<Review> reviewList = menu.getReviews();
-        long oneCnt = reviewList.stream().filter(r -> r.getMainRate() == 1).count();
-        long twoCnt = reviewList.stream().filter(r -> r.getMainRate() == 2).count();
-        long threeCnt = reviewList.stream().filter(r -> r.getMainRate() == 3).count();
-        long fourCnt = reviewList.stream().filter(r -> r.getMainRate() == 4).count();
-        long fiveCnt = reviewList.stream().filter(r -> r.getMainRate() == 5).count();
-        Map<Integer, Long> reviewRateCntMap = new HashMap<>();
-        reviewRateCntMap.put(1, oneCnt);
-        reviewRateCntMap.put(2, twoCnt);
-        reviewRateCntMap.put(3, threeCnt);
-        reviewRateCntMap.put(4, fourCnt);
-        reviewRateCntMap.put(5, fiveCnt);
-        return reviewRateCntMap;
+    public Map<Integer, Long> getReviewCount(Menu menu) {
+        return menu.getReviews().countMap();
     }
 
     /**
