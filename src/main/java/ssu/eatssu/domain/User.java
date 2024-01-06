@@ -17,7 +17,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
@@ -39,8 +40,9 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.DETACH,CascadeType.MERGE
-            ,CascadeType.REFRESH})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.DETACH,
+        CascadeType.MERGE
+        , CascadeType.REFRESH})
     private List<Review> reviews;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
@@ -49,25 +51,33 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
     private List<UserInquiry> userInquiry;
 
-    public static User join(@NotNull String email, @NotNull String pwd) {
-        User user = new User();
-        user.email = email;
-        user.password = pwd;
-        user.role = Role.USER;
-        user.provider = OauthProvider.EATSSU;
-        user.status = UserStatus.ACTIVE;
-        return user;
+    private User(String email, String password) {
+        this.email = email;
+        this.password = password;
+        this.role = Role.USER;
+        this.provider = OauthProvider.EATSSU;
+        this.status = UserStatus.ACTIVE;
     }
-    public static User oAuthJoin(@NotNull String email, @NotNull String pwd, @NotNull OauthProvider provider,
-                                 String providerId) {
-        User user = new User();
-        user.email = email;
-        user.password = pwd;
-        user.role = Role.USER;
-        user.provider = provider;
-        user.providerId = providerId;
-        user.status = UserStatus.ACTIVE;
-        return user;
+
+    private User(String email, String password, OauthProvider provider, String providerId) {
+        this.email = email;
+        this.password = password;
+        this.role = Role.USER;
+        this.provider = provider;
+        this.providerId = providerId;
+        this.status = UserStatus.ACTIVE;
+    }
+
+
+    public static User join(@NotNull String email, @NotNull String password) {
+        return new User(email, password);
+    }
+
+    public static User oAuthJoin(@NotNull String email,
+        @NotNull String password,
+        @NotNull OauthProvider provider,
+        String providerId) {
+        return new User(email, password, provider, providerId);
     }
 
     public void updateNickname(@NotNull String nickname) {
@@ -78,6 +88,8 @@ public class User extends BaseTimeEntity {
         this.password = newPwd;
     }
 
-    public void updateEmail(String email) { this.email = email; }
+    public void updateEmail(String email) {
+        this.email = email;
+    }
 
 }

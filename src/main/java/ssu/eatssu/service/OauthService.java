@@ -7,8 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -39,10 +37,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.Map;
-import java.util.Optional;
 
 import static ssu.eatssu.handler.response.BaseResponseStatus.INVALID_IDENTITY_TOKEN;
-import static ssu.eatssu.handler.response.BaseResponseStatus.INVALID_TOKEN;
 
 @Slf4j
 @RequiredArgsConstructor

@@ -21,7 +21,7 @@ public class CustomUserDetails implements UserDetails {
     public CustomUserDetails(User user){
         this.Id = user.getId();
         this.email = user.getEmail();
-        this.pwd = user.getPwd();
+        this.pwd = user.getPassword();
         this.role = user.getRole();
     }
 
