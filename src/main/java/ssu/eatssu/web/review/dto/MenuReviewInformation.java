@@ -12,7 +12,7 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 @Builder
-public class MenuReviewInfo {
+public class MenuReviewInformation {
     @Schema(description = "메뉴 리스트", example = "[\"고구마치즈돈까스\", \"막국수\", \"미니밥\", \"단무지\", \"요구르트\"]")
     private List<String> menuName;
 
