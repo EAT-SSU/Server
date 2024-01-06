@@ -65,6 +65,7 @@ public class OauthService {
     /**
      * 애플 로그인
      */
+
     public Tokens appleLogin(String identityToken) {
 
         //애플 유저 정보 조회
@@ -74,6 +75,7 @@ public class OauthService {
         //가입 안된 유저일 경우 회원가입 진행
         User user = userRepository.findByProviderId(oauthInfo.providerId())
                 .orElseGet(() -> join(oauthInfo.email(), OauthProvider.APPLE, oauthInfo.providerId()));
+
 
         //이메일 갱신
         updateAppleUserEmail(user, oauthInfo.email());
@@ -85,8 +87,8 @@ public class OauthService {
     /**
      * 회원가입
      */
-    private User join(String email, OauthProvider provider, String providerId) {
 
+    private User join(String email, OauthProvider provider, String providerId) {
         String credentials = createCredentials(provider, providerId);
 
         //회원가입
@@ -97,6 +99,7 @@ public class OauthService {
     /**
      * Credentials 생성
      */
+
     private String createCredentials(OauthProvider provider, String providerId) {
         return passwordEncoder.encode(provider + "_" + providerId);
     }
@@ -129,10 +132,10 @@ public class OauthService {
 
         // identityToken 에서 publicKey 서명을 통해 Claims 를 추출한다.
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(publicKey)
-                .build()
-                .parseClaimsJws(identityToken)
-                .getBody();
+            .setSigningKey(publicKey)
+            .build()
+            .parseClaimsJws(identityToken)
+            .getBody();
 
         //Claims 에서 email, providerId(사용자 식별값) 를 추출한다.
         try {
@@ -204,7 +207,7 @@ public class OauthService {
 
         //후보키 중에서 정답키를 찾아서 반환한다.
         return candidateKeys.findKeyBy(headerMap.get("kid"), headerMap.get("alg"))
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.INVALID_IDENTITY_TOKEN));
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.INVALID_IDENTITY_TOKEN));
     }
 
     /**
@@ -213,11 +216,11 @@ public class OauthService {
     private AppleKeys getAppleKeys() {
 
         URI uri = UriComponentsBuilder
-                .fromUriString("https://appleid.apple.com")
-                .path("/auth/keys")
-                .encode()
-                .build()
-                .toUri();
+            .fromUriString("https://appleid.apple.com")
+            .path("/auth/keys")
+            .encode()
+            .build()
+            .toUri();
 
         ResponseEntity<AppleKeys> response = restTemplate.getForEntity(uri, AppleKeys.class);
         return response.getBody();

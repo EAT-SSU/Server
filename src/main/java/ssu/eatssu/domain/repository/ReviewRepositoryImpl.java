@@ -12,6 +12,7 @@ import ssu.eatssu.domain.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import ssu.eatssu.domain.review.Review;
 
 @Repository
 @RequiredArgsConstructor

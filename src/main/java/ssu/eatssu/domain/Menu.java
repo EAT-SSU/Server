@@ -7,6 +7,8 @@ import ssu.eatssu.domain.enums.MenuTypeGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+import ssu.eatssu.domain.review.Review;
+import ssu.eatssu.domain.review.Reviews;
 
 @Entity
 @Getter
@@ -41,17 +43,17 @@ public class Menu {
     private Integer totalTasteRate = 0;
 
     @ColumnDefault("0")
-    private Integer reviewCnt = 0;
+    private Integer reviewCount = 0;
 
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
     private List<MealMenu> mealMenus = new ArrayList<>();
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
-    private List<Review> reviews = new ArrayList<>();
+    @Embedded
+    private Reviews reviews = new Reviews();
 
     //정적 팩토리 메서드
     private Menu(String name, Restaurant restaurant, Integer price) {
@@ -66,7 +68,7 @@ public class Menu {
      */
     public static Menu createChangeMenu(String name, Restaurant restaurant) {
         int price = 0;
-        if(MenuTypeGroup.isChange(restaurant.getRestaurantName())){
+        if (MenuTypeGroup.isChange(restaurant.getRestaurantName())) {
             price = restaurant.getRestaurantName().getPrice();
         }
         return new Menu(name, restaurant, price);
@@ -80,54 +82,58 @@ public class Menu {
         return new Menu(name, restaurant, price);
     }
 
-    public void addReview(Integer mainRate, Integer tasteRate, Integer amountRate) {
-            this.reviewCnt++;
-            this.totalMainRate += mainRate;
-            this.totalTasteRate += tasteRate;
-            this.totalAmountRate += amountRate;
-            calculateRate();
+    public void addReview(Review review) {
+        reviews.add(review);
     }
-
-    public void deleteReview(){
-        refreshReview();
-    }
-
-    public void updateReview() {
-        refreshReview();
-    }
-
-    public void refreshReview(){
-        int totalMain = 0;
-        int totalTaste =0;
-        int totalAmount = 0;
-        for(Review review : this.reviews){
-            totalMain+=review.getMainRate();
-            totalTaste += review.getTasteRate();
-            totalAmount+=review.getAmountRate();
-        }
-        this.totalMainRate = totalMain;
-        this.totalTasteRate = totalTaste;
-        this.totalAmountRate = totalAmount;
-        this.reviewCnt = (int)reviews.stream().count();
-        calculateRate();
-    }
-
-    private void calculateRate(){ // 평점 계산 후 적용
-        if(this.reviewCnt==0){
-            rateReset();
-        }else{
-            this.mainRate = this.totalMainRate.doubleValue()/this.reviewCnt.doubleValue();
-            this.tasteRate = this.totalTasteRate.doubleValue()/this.reviewCnt.doubleValue();
-            this.amountRate = this.totalAmountRate.doubleValue()/this.reviewCnt.doubleValue();
-        }
-    }
-
-    private void rateReset(){ //평점 초기화
-        this.totalMainRate = 0;
-        this.totalTasteRate = 0;
-        this.totalAmountRate = 0;
-        this.mainRate = 0.0;
-        this.tasteRate = 0.0;
-        this.amountRate = 0.0;
-    }
+//
+//    public void addReview(Integer mainRate, Integer tasteRate, Integer amountRate) {
+//        this.reviewCount++;
+//        this.totalMainRate += mainRate;
+//        this.totalTasteRate += tasteRate;
+//        this.totalAmountRate += amountRate;
+//        calculateRate();
+//    }
+//
+//    public void deleteReview() {
+//        refreshReview();
+//    }
+//
+//    public void updateReview() {
+//        refreshReview();
+//    }
+//
+//    public void refreshReview() {
+//        int totalMain = 0;
+//        int totalTaste = 0;
+//        int totalAmount = 0;
+//        for (Review review : this.reviews) {
+//            totalMain += review.getMainRate();
+//            totalTaste += review.getTasteRate();
+//            totalAmount += review.getAmountRate();
+//        }
+//        this.totalMainRate = totalMain;
+//        this.totalTasteRate = totalTaste;
+//        this.totalAmountRate = totalAmount;
+//        this.reviewCount = (int) reviews.stream().count();
+//        calculateRate();
+//    }
+//
+//    private void calculateRate() { // 평점 계산 후 적용
+//        if (this.reviewCount == 0) {
+//            rateReset();
+//        } else {
+//            this.mainRate = this.totalMainRate.doubleValue() / this.reviewCount.doubleValue();
+//            this.tasteRate = this.totalTasteRate.doubleValue() / this.reviewCount.doubleValue();
+//            this.amountRate = this.totalAmountRate.doubleValue() / this.reviewCount.doubleValue();
+//        }
+//    }
+//
+//    private void rateReset() { //평점 초기화
+//        this.totalMainRate = 0;
+//        this.totalTasteRate = 0;
+//        this.totalAmountRate = 0;
+//        this.mainRate = 0.0;
+//        this.tasteRate = 0.0;
+//        this.amountRate = 0.0;
+//    }
 }

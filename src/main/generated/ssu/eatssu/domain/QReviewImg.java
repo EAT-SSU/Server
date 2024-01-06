@@ -11,7 +11,7 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QReviewImg is a Querydsl query type for ReviewImg
+ * QReviewImg is a Querydsl query type for ReviewImage
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QReviewImg extends EntityPathBase<ReviewImg> {

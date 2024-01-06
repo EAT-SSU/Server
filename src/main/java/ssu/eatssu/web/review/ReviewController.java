@@ -24,10 +24,10 @@ import ssu.eatssu.service.RefreshingService;
 import ssu.eatssu.service.ReviewService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.SliceDto;
-import ssu.eatssu.web.review.dto.MenuReviewInfo;
-import ssu.eatssu.web.review.dto.ReviewCreate;
+import ssu.eatssu.web.review.dto.MenuReviewInformationResponse;
+import ssu.eatssu.web.review.dto.CreateReviewRequest;
 import ssu.eatssu.web.review.dto.ReviewDetail;
-import ssu.eatssu.web.review.dto.ReviewUpdate;
+import ssu.eatssu.web.review.dto.UpdateReviewRequest;
 
 import java.util.List;
 
@@ -64,11 +64,11 @@ public class ReviewController {
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<?> writeReview(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
-                                            @RequestPart(value = "reviewCreate") ReviewCreate reviewCreate,
+                                            @RequestPart(value = "reviewCreate") CreateReviewRequest request,
                                             @RequestPart(value = "multipartFileList", required = false)
                                                     List<MultipartFile> multipartFileList) {
         Long userId = SecurityUtil.getLoginUserId();
-        reviewService.createReview(userId, menuId, reviewCreate, multipartFileList);
+        reviewService.write(userId, menuId, request, multipartFileList);
         return BaseResponse.success();
     }
 
@@ -89,9 +89,9 @@ public class ReviewController {
     @PatchMapping("/{reviewId}")
     public BaseResponse<?> updateReview(@Parameter(description = "reviewId")
                                              @PathVariable("reviewId") Long reviewId,
-                                             @RequestBody ReviewUpdate reviewUpdate) {
+                                             @RequestBody UpdateReviewRequest reviewUpdate) {
         Long userId = SecurityUtil.getLoginUserId();
-        reviewService.updateReviewContent(userId, reviewId, reviewUpdate);
+        reviewService.update(userId, reviewId, reviewUpdate);
         return BaseResponse.success();
     }
 
@@ -109,7 +109,7 @@ public class ReviewController {
     @DeleteMapping("/{reviewId}")
     public BaseResponse<?> deleteReview(@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId) {
         Long userId = SecurityUtil.getLoginUserId();
-        reviewService.deleteReview(userId, reviewId);
+        reviewService.delete(userId, reviewId);
         return BaseResponse.success();
     }
 
@@ -132,24 +132,24 @@ public class ReviewController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/info")
-    public BaseResponse<MenuReviewInfo> getMenuReviewInfo(@Parameter(description = "타입(변동메뉴(식단)/고정메뉴)")
+    public BaseResponse<MenuReviewInformationResponse> getMenuReviewInfo(@Parameter(description = "타입(변동메뉴(식단)/고정메뉴)")
                                                           @RequestParam("menuType") MenuTypeGroup menuTypeGroup,
                                                           @Parameter(description = "menuId(고정메뉴)")
                                                           @RequestParam(value = "menuId", required = false) Long menuId,
                                                           @Parameter(description = "mealId(고정메뉴)")
                                                           @RequestParam(value = "mealId", required = false) Long mealId) {
-        MenuReviewInfo menuReviewInfo;
+        MenuReviewInformationResponse menuReviewInfo;
         if (menuTypeGroup == FIX) {
             if (menuId == null) {
                 throw new BaseException(MISSING_REQUEST_PARAM);
             } else {
-                menuReviewInfo = reviewService.findReviewInfoByMenuId(menuId);
+                menuReviewInfo = reviewService.findReviewInformationByMenuId(menuId);
             }
         } else if (menuTypeGroup == CHANGE) {
             if (mealId == null) {
                 throw new BaseException(MISSING_REQUEST_PARAM);
             } else {
-                menuReviewInfo = reviewService.findReviewInfoByMealId(mealId);
+                menuReviewInfo = reviewService.findReviewInformationByMealId(mealId);
             }
         } else {
             throw new BaseException(MISSING_REQUEST_PARAM);

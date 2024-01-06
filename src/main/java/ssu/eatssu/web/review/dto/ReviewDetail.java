@@ -4,8 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import ssu.eatssu.domain.Review;
-import ssu.eatssu.domain.enums.UserStatus;
+import ssu.eatssu.domain.review.Review;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public class ReviewDetail {
     public static ReviewDetail from(Review review, Long userId) {
 
         List<String> imgUrlList = new ArrayList<>();
-        review.getReviewImgs().forEach(i -> imgUrlList.add(i.getImageUrl()));
+        review.getReviewImages().forEach(i -> imgUrlList.add(i.getImageUrl()));
         if(review.getUser()== null){//탈퇴한 유저의 리뷰인 경우
             return ReviewDetail.builder()
                     .reviewId(review.getId())

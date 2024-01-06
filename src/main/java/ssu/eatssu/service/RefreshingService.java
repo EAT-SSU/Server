@@ -18,7 +18,7 @@ import java.util.List;
 public class RefreshingService {
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
-    private final ReviewImgRepository reviewImgRepository;
+    private final ReviewImageRepository reviewImgRepository;
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
 

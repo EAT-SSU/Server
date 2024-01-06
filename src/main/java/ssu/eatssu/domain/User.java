@@ -11,13 +11,15 @@ import ssu.eatssu.domain.enums.Role;
 import ssu.eatssu.domain.enums.UserStatus;
 
 import java.util.List;
+import ssu.eatssu.domain.review.Review;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
@@ -39,8 +41,9 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.DETACH,CascadeType.MERGE
-            ,CascadeType.REFRESH})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.DETACH,
+        CascadeType.MERGE
+        , CascadeType.REFRESH})
     private List<Review> reviews;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
@@ -48,7 +51,6 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
     private List<UserInquiry> userInquiry;
-
 
     /**
      * Oauth 회원가입 용 생성자

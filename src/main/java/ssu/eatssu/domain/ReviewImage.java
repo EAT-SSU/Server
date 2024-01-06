@@ -2,13 +2,14 @@ package ssu.eatssu.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ssu.eatssu.domain.review.Review;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-public class ReviewImg {
+public class ReviewImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
