@@ -85,9 +85,9 @@ public class RatesCalculator {
 
     // 식단 총 리뷰 개수
     public int mealTotalReviewCount(Meal meal) {
-        return (int) meal.getMealMenus().stream()
+        return meal.getMealMenus().stream()
                 .map(MealMenu::getMenu)
-                .map(Menu::getReviews).count();
+                .mapToInt(menu -> menu.getReviews().size()).sum();
     }
 
     // 평균 평점 계산
@@ -104,8 +104,8 @@ public class RatesCalculator {
                 .map(MealMenu::getMenu)
                 .map(menu -> menu.getReviews().stream()
                         .map(review -> review.getRates().getMainRate())
-                        .reduce(null, Integer::sum))
-                .reduce(null, Integer::sum);
+                        .reduce(null, this::sum))
+                .reduce(null, this::sum);
     }
 
     // 식단 양 평점 총합
@@ -114,8 +114,8 @@ public class RatesCalculator {
                 .map(MealMenu::getMenu)
                 .map(menu -> menu.getReviews().stream()
                         .map(review -> review.getRates().getAmountRate())
-                        .reduce(null, Integer::sum))
-                .reduce(null, Integer::sum);
+                        .reduce(null, this::sum))
+                .reduce(null, this::sum);
     }
 
     // 식단 맛 평점 총합
@@ -124,29 +124,35 @@ public class RatesCalculator {
                 .map(MealMenu::getMenu)
                 .map(menu -> menu.getReviews().stream()
                         .map(review -> review.getRates().getTasteRate())
-                        .reduce(null, Integer::sum))
-                .reduce(null, Integer::sum);
+                        .reduce(null, this::sum))
+                .reduce(null, this::sum);
     }
 
     // 메뉴 메인 평점 총합
     private Integer menuTotalMainRate(Menu menu) {
         return menu.getReviews().stream()
                 .map(review -> review.getRates().getMainRate())
-                .reduce(null, Integer::sum);
+                .reduce(null, this::sum);
     }
 
     // 메뉴 양 평점 총합
     private Integer menuTotalAmountRate(Menu menu) {
         return menu.getReviews().stream()
                 .map(review -> review.getRates().getAmountRate())
-                .reduce(null, Integer::sum);
+                .reduce(null, this::sum);
     }
 
     // 메뉴 맛 평점 총합
     private Integer menuTotalTasteRate(Menu menu) {
         return menu.getReviews().stream()
                 .map(review -> review.getRates().getTasteRate())
-                .reduce(null, Integer::sum);
+                .reduce(null, this::sum);
+    }
+
+    private Integer sum(Integer a, Integer b) {
+        if (a == null) return b;
+        if (b == null) return a;
+        return a + b;
     }
 
 }
