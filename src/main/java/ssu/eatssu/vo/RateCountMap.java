@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RateCountMap {
-    private Map<Integer, Integer> rateCountMap = new HashMap<>();
+    private Map<Integer, Integer> rateCountMap;
 
-    public RateCountMap(Map<Integer, Integer> rateCountMap) {
-        // TODO: key 값이 1~5가 아닌 경우 예외처리
-        this.rateCountMap = rateCountMap;
+    public RateCountMap(Map<Integer, Integer> map) {
+        this();
+        map.forEach((key, value) -> rateCountMap.merge(key, value, Integer::sum));
     }
 
     public RateCountMap() {
