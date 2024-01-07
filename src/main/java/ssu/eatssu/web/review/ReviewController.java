@@ -20,13 +20,12 @@ import org.springframework.web.multipart.MultipartFile;
 import ssu.eatssu.domain.menu.MenuType;
 import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.handler.response.BaseResponse;
-import ssu.eatssu.service.RefreshingService;
 import ssu.eatssu.service.ReviewService;
 import ssu.eatssu.utils.SecurityUtil;
 import ssu.eatssu.web.SliceDto;
-import ssu.eatssu.web.review.dto.MenuReviewInformationResponse;
 import ssu.eatssu.web.review.dto.CreateReviewRequest;
 import ssu.eatssu.web.review.dto.ReviewDetail;
+import ssu.eatssu.web.review.dto.ReviewInformationResponse;
 import ssu.eatssu.web.review.dto.UpdateReviewRequest;
 
 import java.util.List;
@@ -43,7 +42,6 @@ import static ssu.eatssu.handler.response.BaseResponseStatus.MISSING_REQUEST_PAR
 public class ReviewController {
 
     private final ReviewService reviewService;
-    private final RefreshingService refreshingService;
 
     /**
      * 리뷰 작성
@@ -134,30 +132,30 @@ public class ReviewController {
         @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/info")
-    public BaseResponse<MenuReviewInformationResponse> getMenuReviewInfo(
+    public BaseResponse<ReviewInformationResponse> getMenuReviewInfo(
         @Parameter(description = "타입(변동메뉴(식단)/고정메뉴)")
         @RequestParam("menuType") MenuType menuTypeGroup,
         @Parameter(description = "menuId(고정메뉴)")
         @RequestParam(value = "menuId", required = false) Long menuId,
         @Parameter(description = "mealId(고정메뉴)")
         @RequestParam(value = "mealId", required = false) Long mealId) {
-        MenuReviewInformationResponse menuReviewInfo;
+        ReviewInformationResponse response;
         if (menuTypeGroup == FIXED) {
             if (menuId == null) {
 	throw new BaseException(MISSING_REQUEST_PARAM);
             } else {
-	menuReviewInfo = reviewService.findReviewInformationByMenuId(menuId);
+	response = reviewService.findReviewInformationByMenuId(menuId);
             }
         } else if (menuTypeGroup == CHANGED) {
             if (mealId == null) {
 	throw new BaseException(MISSING_REQUEST_PARAM);
             } else {
-	menuReviewInfo = reviewService.findReviewInformationByMealId(mealId);
+	response = reviewService.findReviewInformationByMealId(mealId);
             }
         } else {
             throw new BaseException(MISSING_REQUEST_PARAM);
         }
-        return BaseResponse.success(menuReviewInfo);
+        return BaseResponse.success(response);
     }
 
     /**
@@ -211,7 +209,7 @@ public class ReviewController {
      */
     @GetMapping("/refresh")
     public BaseResponse<?> refreshReviewInfo() {
-        refreshingService.refreshAllReviews();
+//        refreshingService.refreshAllReviews();
         return BaseResponse.success();
     }
 

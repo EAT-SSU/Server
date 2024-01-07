@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ssu.eatssu.domain.menu.Meal;
 import ssu.eatssu.domain.menu.Menu;
+import ssu.eatssu.domain.rate.RateCalculator;
 import ssu.eatssu.domain.repository.*;
 import ssu.eatssu.domain.review.Review;
 import ssu.eatssu.domain.review.ReviewImage;
@@ -22,9 +23,6 @@ import ssu.eatssu.web.review.dto.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import ssu.eatssu.web.review.dto.MenuReviewInformationResponse.ReviewRateCount;
 
 import static ssu.eatssu.handler.response.BaseResponseStatus.*;
 
@@ -39,6 +37,7 @@ public class ReviewService {
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
     private final S3Uploader s3Uploader;
+    private final RateCalculator rateCalculator;
 
     /**
      * 리뷰 작성
@@ -54,14 +53,9 @@ public class ReviewService {
 
         Review review = request.toEntity(user, menu);
 
-        reviewRepository.save(review);
-
-        // 이거 addReview 하면 자동으로 repository에 저장되지 않나?
         menu.addReview(review);
-
-        menuRepository.save(menu);
-
         processReviewImages(images, review);
+        reviewRepository.save(review);
     }
 
     public void processReviewImages(List<MultipartFile> images, Review review) {
@@ -124,13 +118,6 @@ public class ReviewService {
         reviewRepository.flush();
     }
 
-//    /**
-//     * 리뷰 작성자/관리자 인지 확인 //todo 관리자인지는 빼도 될듯
-//     */
-//    public boolean isWriterOrAdmin(Review review, User user) {
-//        return review.getUser() == user;
-//    }
-
     /**
      * 고정메뉴 - 리뷰 정보 조회
      */
@@ -138,52 +125,23 @@ public class ReviewService {
         Menu menu = menuRepository.findById(menuId)
             .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
 
-        List<String> reviewNames = new ArrayList<>();
-        reviewNames.add(menu.getName());
-
-        return MenuReviewInformationResponse.builder()
-            .menuNames(reviewNames)
-            .mainRate(menu.getMainRate())
-            .tasteRate(menu.getTasteRate())
-            .amountRate(menu.getAmountRate())
-            .totalReviewCount(menu.getReviewCount())
-            .reviewRateCount(ReviewRateCount.from(getReviewCount(menu)))
-            .build();
+        AverageReviewRateResponse averageReviewRate = rateCalculator.menuAverageRate(menu);
+        ReviewRateCountResponse reviewRateCount = rateCalculator.menuRateCount(menu);
+        return MenuReviewInformationResponse.of(menu, averageReviewRate, reviewRateCount);
     }
 
     /**
      * 변동메뉴 - 리뷰 정보 조회
      */
-    public MenuReviewInformationResponse findReviewInformationByMealId(Long mealId) {
+    public MealReviewInformationResponse findReviewInformationByMealId(Long mealId) {
         Meal meal = mealRepository.findById(mealId)
             .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
 
-        List<Menu> reviewMenus = meal.getMenus();
-        List<String> reviewMenuNames = meal.getMenuNames();
+        AverageReviewRateResponse averageReviewRate = rateCalculator.mealAverageRate(meal);
+        ReviewRateCountResponse reviewRateCount = rateCalculator.mealRateCount(meal);
 
-        List<Map<Integer, Long>> rateCntMapList =
-            reviewMenus.stream().map(this::getReviewCount).toList();
-
-        Map<Integer, Long> totalRateCntMap = rateCntMapList.stream()
-            .flatMap(m -> m.entrySet().stream())
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Long::sum));
-        meal.caculateRate();
-
-        return MenuReviewInformationResponse.builder()
-            .menuNames(reviewMenuNames)
-            .mainRate(meal.getMainRate())
-            .tasteRate(meal.getTasteRate())
-            .amountRate(meal.getAmountRate())
-            .totalReviewCount(reviewMenus.stream().mapToInt(Menu::getReviewCount).sum())
-            .reviewRateCount(ReviewRateCount.from(totalRateCntMap))
-            .build();
-    }
-
-    /**
-     * 메뉴의 리뷰 평점별 개수 조회
-     */
-    public Map<Integer, Long> getReviewCount(Menu menu) {
-        return menu.getReviews().countMap();
+        return MealReviewInformationResponse.of(meal, meal.getMenuNameList(), averageReviewRate,
+            reviewRateCount);
     }
 
     /**

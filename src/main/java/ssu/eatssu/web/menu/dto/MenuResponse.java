@@ -10,10 +10,11 @@ import ssu.eatssu.domain.menu.Menu;
 
 import java.util.ArrayList;
 import java.util.List;
+import ssu.eatssu.domain.rate.RateCalculator;
 
-public class MenuResDto {
+public class MenuResponse {
 
-    private MenuResDto() {
+    private MenuResponse() {
     }
 
     @Schema(title = "오늘의 식단 리스트 조회 Res")

@@ -1,6 +1,6 @@
 package ssu.eatssu.domain.rate;
 
-import ssu.eatssu.web.review.dto.ReviewRateResponse;
+import ssu.eatssu.web.review.dto.ReviewRateCountResponse;
 
 public enum ReviewRate {
     RATE_1(1),
@@ -44,8 +44,8 @@ public enum ReviewRate {
         throw new IllegalArgumentException("Invalid rate value: " + value);
     }
 
-    public static ReviewRateResponse toResponse() {
-        return new ReviewRateResponse(
+    public static ReviewRateCountResponse toResponse() {
+        return new ReviewRateCountResponse(
             RATE_1.getCount(),
             RATE_2.getCount(),
             RATE_3.getCount(),

@@ -47,7 +47,6 @@ public class Meal {
             .sum();
     }
 
-
     public List<Menu> getMenus() {
         List<Menu> menus = new ArrayList<>();
         for (MealMenu mealMenu : mealMenus) {

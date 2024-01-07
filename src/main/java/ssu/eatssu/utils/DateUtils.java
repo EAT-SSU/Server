@@ -9,13 +9,11 @@ import ssu.eatssu.handler.response.BaseResponseStatus;
 public class DateUtils {
 
     public static Date toDate(String date) throws BaseException {
-
         try {
             return DateUtils.toDate("yyyyMMdd", date);
         } catch (ParseException e) {
             throw new BaseException(BaseResponseStatus.INVALID_DATE);
         }
-
     }
 
     public static Date toDate(String dateFormat, String dateString) throws ParseException {

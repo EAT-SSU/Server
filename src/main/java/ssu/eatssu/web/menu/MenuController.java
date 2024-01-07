@@ -21,7 +21,7 @@ import ssu.eatssu.web.menu.dto.MenuReqDto.AddTodayMenuList;
 import java.util.List;
 
 import static ssu.eatssu.handler.response.BaseResponseStatus.NOT_SUPPORT_RESTAURANT;
-import static ssu.eatssu.web.menu.dto.MenuResDto.*;
+import static ssu.eatssu.web.menu.dto.MenuResponse.*;
 
 @Slf4j
 @RestController
