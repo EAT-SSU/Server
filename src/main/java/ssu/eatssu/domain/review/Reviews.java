@@ -5,11 +5,10 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ssu.eatssu.domain.rate.ReviewRate;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -27,9 +26,23 @@ public class Reviews {
         return reviews.size();
     }
 
-    public Map<Integer, Long> countMap() {
-        return this.reviews.stream()
-            .collect(Collectors.groupingBy(Review::getMainRate, Collectors.counting()));
+    public void calculateReviewRates() {
+        this.reviews.forEach(review -> {
+            int rateValue = review.getRate().getMainRate();
+            ReviewRate.fromValue(rateValue).incrementCount();
+        });
+    }
+
+    public int getTotalMainRate() {
+        return this.reviews.stream().mapToInt(review -> review.getRate().getMainRate()).sum();
+    }
+
+    public int getTotalAmountRate() {
+        return this.reviews.stream().mapToInt(review -> review.getRate().getAmountRate()).sum();
+    }
+
+    public int getTotalTasteRate() {
+        return this.reviews.stream().mapToInt(review -> review.getRate().getTasteRate()).sum();
     }
 }
 

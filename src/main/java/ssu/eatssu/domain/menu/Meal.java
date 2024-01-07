@@ -21,7 +21,6 @@ public class Meal {
     @Column(name = "meal_id")
     private Long id;
 
-    //    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss", timezone="Asia/Seoul")
     @DateTimeFormat(pattern = "yyyyMMdd")
     @Temporal(TemporalType.DATE)
     private Date date;
@@ -33,13 +32,6 @@ public class Meal {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    private Double mainRate = 0.0;
-
-    private Double amountRate = 0.0;
-
-    private Double tasteRate = 0.0;
-
-
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
     private List<MealMenu> mealMenus = new ArrayList<>();
 
@@ -50,31 +42,11 @@ public class Meal {
         this.restaurant = restaurant;
     }
 
-    public void caculateRate() {
-        if (!mealMenus.isEmpty()) {
-            int totalReviewCnt = 0;
-            Double mainRateSum = 0.0;
-            Double amountRateSum = 0.0;
-            Double tasteRateSum = 0.0;
-            for (MealMenu mealMenu : mealMenus) {
-	Menu menu = mealMenu.getMenu();
-	totalReviewCnt += menu.getReviewCount();
-	mainRateSum += menu.getTotalMainRate();
-	amountRateSum += menu.getTotalAmountRate();
-	tasteRateSum += menu.getTotalTasteRate();
-            }
-            if (totalReviewCnt != 0) {
-	this.mainRate = mainRateSum / totalReviewCnt;
-	this.amountRate = amountRateSum / totalReviewCnt;
-	this.tasteRate = tasteRateSum / totalReviewCnt;
-            } else {
-	this.mainRate = 0.0;
-	this.amountRate = 0.0;
-	this.tasteRate = 0.0;
-            }
-
-        }
+    public int getTotalReviewCount() {
+        return mealMenus.stream().mapToInt(mealMenu -> mealMenu.getMenu().getTotalReviewCount())
+            .sum();
     }
+
 
     public List<Menu> getMenus() {
         List<Menu> menus = new ArrayList<>();
@@ -90,14 +62,6 @@ public class Meal {
             menuNames.add(mealMenu.getMenu().getName());
         }
         return menuNames;
-    }
-
-    public Map<String, Double> getRateMap() {
-        Map<String, Double> rateMap = new HashMap<>();
-        rateMap.put("mainRate", mainRate);
-        rateMap.put("amountRate", amountRate);
-        rateMap.put("tasteRate", tasteRate);
-        return rateMap;
     }
 
     public List<String> getMenuNameList() {

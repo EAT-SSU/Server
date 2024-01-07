@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import ssu.eatssu.domain.rate.Rate;
 import ssu.eatssu.domain.user.BaseTimeEntity;
 import ssu.eatssu.domain.menu.Menu;
 import ssu.eatssu.domain.user.User;
@@ -24,11 +25,8 @@ public class Review extends BaseTimeEntity {
 
     private String content;
 
-    private Integer mainRate;
-
-    private Integer amountRate;
-
-    private Integer tasteRate;
+    @Embedded
+    private Rate rate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -43,9 +41,7 @@ public class Review extends BaseTimeEntity {
 
     public void update(UpdateReviewRequest request) {
         this.content = request.getContent();
-        this.mainRate = request.getMainRate();
-        this.amountRate = request.getAmountRate();
-        this.tasteRate = request.getTasteRate();
+        this.rate = Rate.of(request.getMainRate(), request.getAmountRate(), request.getTasteRate());
     }
 
     public boolean isDifferentUser(User user) {

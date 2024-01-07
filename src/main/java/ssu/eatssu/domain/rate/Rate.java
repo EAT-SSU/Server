@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.review;
+package ssu.eatssu.domain.rate;
 
 import io.jsonwebtoken.lang.Assert;
 import jakarta.persistence.Embeddable;
