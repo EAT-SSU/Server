@@ -10,7 +10,6 @@ import ssu.eatssu.domain.menu.Menu;
 
 import java.util.ArrayList;
 import java.util.List;
-import ssu.eatssu.domain.rate.RateCalculator;
 
 public class MenuResponse {
 
@@ -22,6 +21,7 @@ public class MenuResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TodayMeal {
+
         @Schema(description = "식단 식별자 mealId", example = "12")
         private Long mealId;
 
@@ -38,6 +38,7 @@ public class MenuResponse {
         @NoArgsConstructor
         @AllArgsConstructor
         private static class ChangeMenuInfo {
+
             @Schema(description = "메뉴 식별자", example = "2")
             private Long menuId;
 
@@ -46,19 +47,24 @@ public class MenuResponse {
 
         }
 
-        public static TodayMeal from (Meal meal){
-            if(!meal.getMealMenus().isEmpty()){
-                List<MealMenu> mealMenuList = meal.getMealMenus();
-                List<ChangeMenuInfo> changeMenuList = new ArrayList<>();
-                for(MealMenu mealMenu : mealMenuList){
-                    Menu menu = mealMenu.getMenu();
-                    ChangeMenuInfo changeMenuInfo = new ChangeMenuInfo(menu.getId(), menu.getName());
-                    changeMenuList.add(changeMenuInfo);
-                }
-                return new TodayMeal(meal.getId(), meal.getRestaurant().getRestaurantName().getPrice()
-                        , meal.getRateMap().get("mainRate"), changeMenuList);
-            }else{
-                return null;
+        public static TodayMeal from(Meal meal) {
+            if (!meal.getMealMenus().isEmpty()) {
+	List<MealMenu> mealMenuList = meal.getMealMenus();
+	List<ChangeMenuInfo> changeMenuList = new ArrayList<>();
+	for (MealMenu mealMenu : mealMenuList) {
+	    Menu menu = mealMenu.getMenu();
+	    ChangeMenuInfo changeMenuInfo = new ChangeMenuInfo(menu.getId(),
+	        menu.getName());
+	    changeMenuList.add(changeMenuInfo);
+	}
+	return new TodayMeal(meal.getId(),
+	    meal.getRestaurant().getRestaurantName().getPrice()
+	    , meal.getMenus().stream()
+	    .mapToDouble(menu -> menu.getReviews().getTotalMainRate()
+	        / (double) menu.getTotalReviewCount())
+	    .sum() / meal.getMenus().size(), changeMenuList);
+            } else {
+	return null;
             }
         }
 
@@ -68,11 +74,14 @@ public class MenuResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class FixMenuList {
+
         private List<FixMenuInfo> fixMenuInfoList;
+
         @Getter
         @NoArgsConstructor
         @AllArgsConstructor
-        private static class FixMenuInfo{
+        private static class FixMenuInfo {
+
             @Schema(description = "메뉴 식별자", example = "2")
             private Long menuId;
 
@@ -86,11 +95,13 @@ public class MenuResponse {
             private Integer price;
         }
 
-        public static FixMenuList from(List<Menu> menus){
+        public static FixMenuList from(List<Menu> menus) {
             List<FixMenuInfo> fixMenuList = new ArrayList<>();
             for (Menu menu : menus) {
-                FixMenuInfo menuInfo = new FixMenuInfo(menu.getId(), menu.getName(), menu.getMainRate(), menu.getPrice());
-                fixMenuList.add(menuInfo);
+	FixMenuInfo menuInfo = new FixMenuInfo(menu.getId(), menu.getName(),
+	    (double) menu.getReviews().getTotalMainRate() / menu.getTotalReviewCount(),
+	    menu.getPrice());
+	fixMenuList.add(menuInfo);
             }
             return new FixMenuList(fixMenuList);
         }
@@ -100,12 +111,14 @@ public class MenuResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MenuList {
+
         private List<MenuInfo> menuInfoList;
 
         @Getter
         @NoArgsConstructor
         @AllArgsConstructor
-        private static class MenuInfo{
+        private static class MenuInfo {
+
             @Schema(description = "메뉴 식별자", example = "2")
             private Long menuId;
 
@@ -113,17 +126,17 @@ public class MenuResponse {
             private String name;
         }
 
-        public static MenuList from (Meal meal){
-            if(!meal.getMealMenus().isEmpty()){
-                List<MenuInfo> menuInfoList = new ArrayList<>();
-                for(MealMenu mealMenu : meal.getMealMenus()){
-                    Menu menu = mealMenu.getMenu();
-                    MenuInfo menuInfo = new MenuInfo(menu.getId(), menu.getName());
-                    menuInfoList.add(menuInfo);
-                }
-                return new MenuList(menuInfoList);
-            }else{
-                return null;
+        public static MenuList from(Meal meal) {
+            if (!meal.getMealMenus().isEmpty()) {
+	List<MenuInfo> menuInfoList = new ArrayList<>();
+	for (MealMenu mealMenu : meal.getMealMenus()) {
+	    Menu menu = mealMenu.getMenu();
+	    MenuInfo menuInfo = new MenuInfo(menu.getId(), menu.getName());
+	    menuInfoList.add(menuInfo);
+	}
+	return new MenuList(menuInfoList);
+            } else {
+	return null;
             }
         }
     }

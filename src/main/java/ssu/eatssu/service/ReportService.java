@@ -33,8 +33,8 @@ public class ReportService {
         Review review = reviewRepository.findById(reviewReportCreate.getReviewId())
                 .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
         ReviewReport reviewReport = ReviewReport.builder()
-                .review(review).user(user).reportType(reviewReportCreate.getReportType())
-                .content(reviewReportCreate.getContent()).status(ReportStatus.PENDING)
+                .review(review).user(user).reviewReportType(reviewReportCreate.getReportType())
+                .content(reviewReportCreate.getContent()).reportStatus(ReportStatus.PENDING)
                 .build();
         return reviewReportRepository.save(reviewReport);
     }

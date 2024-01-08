@@ -40,15 +40,19 @@ public class MyReviewDetail {
     @Schema(description = "리뷰 이미지 url 리스트", example = "[\"imgurl1\", \"imgurl2\"]")
     private List<String> imgUrlList;
 
-    public static MyReviewDetail from(Review review){
+    public static MyReviewDetail from(Review review) {
 
         List<String> imgUrlList = new ArrayList<>();
-        review.getReviewImages().forEach(i->imgUrlList.add(i.getImageUrl()));
+        review.getReviewImages().forEach(i -> imgUrlList.add(i.getImageUrl()));
 
         return MyReviewDetail.builder()
-                .reviewId(review.getId()).mainRate(review.getMainRate()).amountRate(review.getAmountRate())
-                .tasteRate(review.getTasteRate()).writeDate(review.getCreatedDate().toLocalDate())
-                .content(review.getContent()).imgUrlList(imgUrlList).menuName(review.getMenu().getName())
-                .build();
+            .reviewId(review.getId()).mainRate(review.getRate().getMainRate())
+            .amountRate(review.getRate()
+	.getAmountRate())
+            .tasteRate(review.getRate().getTasteRate())
+            .writeDate(review.getCreatedDate().toLocalDate())
+            .content(review.getContent()).imgUrlList(imgUrlList)
+            .menuName(review.getMenu().getName())
+            .build();
     }
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
 import ssu.eatssu.domain.menu.Menu;
+import ssu.eatssu.domain.rate.Rate;
 import ssu.eatssu.domain.review.Review;
 import ssu.eatssu.domain.user.User;
 
@@ -40,8 +41,11 @@ public class CreateReviewRequest {
 
     public Review toEntity(User user, Menu menu) {
         return Review.builder()
-            .user(user).content(this.content).mainRate(this.mainRate).amountRate(this.amountRate)
-            .tasteRate(this.tasteRate).menu(menu).build();
+            .user(user)
+            .content(this.content)
+            .rate(Rate.of(mainRate, amountRate, tasteRate))
+            .menu(menu)
+            .build();
     }
 
 }

@@ -8,12 +8,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
-import ssu.eatssu.domain.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import ssu.eatssu.domain.menu.Meal;
 import ssu.eatssu.domain.menu.Menu;
+import ssu.eatssu.domain.review.QReview;
 import ssu.eatssu.domain.review.Review;
 import ssu.eatssu.domain.user.User;
 

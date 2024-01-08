@@ -53,23 +53,27 @@ public class ReviewDetail {
 
         List<String> imgUrlList = new ArrayList<>();
         review.getReviewImages().forEach(i -> imgUrlList.add(i.getImageUrl()));
-        if(review.getUser()== null){//탈퇴한 유저의 리뷰인 경우
+        if (review.getUser() == null) {//탈퇴한 유저의 리뷰인 경우
             return ReviewDetail.builder()
-                    .reviewId(review.getId())
-                    .writerId(null).writerNickname("알 수 없음")
-                    .mainRate(review.getMainRate()).amountRate(review.getAmountRate()).tasteRate(review.getTasteRate())
-                    .writeDate(review.getCreatedDate().toLocalDate()).content(review.getContent())
-                    .isWriter(false).imgUrlList(imgUrlList).menu(review.getMenu().getName())
-                    .build();
-        }else{
+	.reviewId(review.getId())
+	.writerId(null).writerNickname("알 수 없음")
+	.mainRate(review.getRate().getMainRate())
+	.amountRate(review.getRate().getAmountRate())
+	.tasteRate(review.getRate().getTasteRate())
+	.writeDate(review.getCreatedDate().toLocalDate()).content(review.getContent())
+	.isWriter(false).imgUrlList(imgUrlList).menu(review.getMenu().getName())
+	.build();
+        } else {
             boolean isWriter = review.getUser().getId().equals(userId);
             return ReviewDetail.builder()
-                    .reviewId(review.getId())
-                    .writerId(review.getUser().getId()).writerNickname(review.getUser().getNickname())
-                    .mainRate(review.getMainRate()).amountRate(review.getAmountRate()).tasteRate(review.getTasteRate())
-                    .writeDate(review.getCreatedDate().toLocalDate()).content(review.getContent())
-                    .isWriter(isWriter).imgUrlList(imgUrlList).menu(review.getMenu().getName())
-                    .build();
+	.reviewId(review.getId())
+	.writerId(review.getUser().getId()).writerNickname(review.getUser().getNickname())
+	.mainRate(review.getRate().getMainRate())
+	.amountRate(review.getRate().getAmountRate())
+	.tasteRate(review.getRate().getTasteRate())
+	.writeDate(review.getCreatedDate().toLocalDate()).content(review.getContent())
+	.isWriter(isWriter).imgUrlList(imgUrlList).menu(review.getMenu().getName())
+	.build();
         }
 
     }
