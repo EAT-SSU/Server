@@ -2,10 +2,11 @@ package ssu.eatssu.domain.repository;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import ssu.eatssu.domain.Meal;
-import ssu.eatssu.domain.Menu;
 import ssu.eatssu.domain.review.Review;
-import ssu.eatssu.domain.User;
+import ssu.eatssu.domain.menu.Meal;
+import ssu.eatssu.domain.menu.Menu;
+import ssu.eatssu.domain.review.Review;
+import ssu.eatssu.domain.user.User;
 
 public interface ReviewRepositoryCustom {
     //특정 메뉴 리뷰 - 최신순 정렬

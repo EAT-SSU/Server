@@ -79,7 +79,7 @@ public enum BaseResponseStatus {
      * 500 INTERNAL_SERVER_ERROR 서버 내부 에러
      */
     INTERNAL_SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 500, "서버 내부 에러입니다"),
-    FAIL_IMG_UPLOAD(false, HttpStatus.INTERNAL_SERVER_ERROR, 50001, "이미지 업로드에 실패했습니다."),
+    FAIL_IMAGE_UPLOAD(false, HttpStatus.INTERNAL_SERVER_ERROR, 50001, "이미지 업로드에 실패했습니다."),
 
     /**
      * 503 SERVICE_UNAVAILABLE 서버 내부 에러

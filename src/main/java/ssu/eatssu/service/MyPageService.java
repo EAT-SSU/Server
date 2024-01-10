@@ -7,7 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.review.Review;
-import ssu.eatssu.domain.User;
+import ssu.eatssu.domain.user.User;
 import ssu.eatssu.domain.repository.ReviewRepository;
 import ssu.eatssu.domain.repository.UserRepository;
 import ssu.eatssu.handler.response.BaseException;

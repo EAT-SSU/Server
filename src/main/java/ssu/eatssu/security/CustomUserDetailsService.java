@@ -4,14 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-import ssu.eatssu.domain.User;
+import ssu.eatssu.domain.user.User;
 import ssu.eatssu.domain.repository.UserRepository;
 import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.handler.response.BaseResponseStatus;
-
-import java.util.List;
 
 @Slf4j
 @Component

@@ -4,11 +4,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ssu.eatssu.domain.Meal;
-import ssu.eatssu.domain.MealMenu;
-import ssu.eatssu.domain.Menu;
-import ssu.eatssu.domain.Restaurant;
-import ssu.eatssu.domain.enums.RestaurantName;
+import ssu.eatssu.domain.menu.Meal;
+import ssu.eatssu.domain.menu.MealMenu;
+import ssu.eatssu.domain.menu.Menu;
+import ssu.eatssu.domain.rating.RatingCalculatorImpl;
+import ssu.eatssu.domain.restaurant.Restaurant;
+import ssu.eatssu.domain.restaurant.RestaurantName;
 import ssu.eatssu.domain.enums.TimePart;
 import ssu.eatssu.domain.repository.MealMenuRepository;
 import ssu.eatssu.domain.repository.MealRepository;
@@ -16,16 +17,14 @@ import ssu.eatssu.domain.repository.MenuRepository;
 import ssu.eatssu.domain.repository.RestaurantRepository;
 import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.handler.response.BaseResponseStatus;
-import ssu.eatssu.utils.DateUtil;
-import ssu.eatssu.utils.RatesCalculator;
+import ssu.eatssu.utils.validators.MenuValidator;
 import ssu.eatssu.web.menu.dto.MenuReqDto;
 
-import java.text.ParseException;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
-import static ssu.eatssu.web.menu.dto.MenuResDto.*;
+import static ssu.eatssu.utils.DateUtils.toDate;
+import static ssu.eatssu.web.menu.dto.MenuResponse.*;
 
 @Slf4j
 @Service
@@ -38,7 +37,7 @@ public class MenuService {
     private final MealMenuRepository mealMenuRepository;
     private final RestaurantRepository restaurantRepository;
 
-    private final RatesCalculator ratesCalculator;
+    private final RatingCalculatorImpl ratingCalculator;
 
     /**
      * 고정 메뉴 조회
@@ -51,7 +50,7 @@ public class MenuService {
 
         List<Menu> menuList = menuRepository.findAllByRestaurant(restaurant);
         return menuList.stream()
-                .map(menu -> FixMenuInfo.from(menu, ratesCalculator.menuAverageMainRate(menu)))
+                .map(menu -> FixMenuInfo.from(menu, ratingCalculator.menuAverageMainRating(menu)))
                 .toList();
     }
 
@@ -68,7 +67,7 @@ public class MenuService {
 
         //mealList 를 TodayMeal 로 매핑 후 반환
         return mealList.stream()
-                .map(meal -> TodayMeal.from(meal, ratesCalculator.mealAverageMainRate(meal)))
+                .map(meal -> TodayMeal.from(meal, ratingCalculator.mealAverageMainRating(meal)))
                 .toList();
     }
 
@@ -80,30 +79,33 @@ public class MenuService {
                            MenuReqDto.AddTodayMenuList addTodayMenuList) {
 
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
 
-        //이미 추가된 식단이면 생성하지 않음
-        if (isExistMeal(timePart, date, restaurant, addTodayMenuList)) {
+        List<Meal> meals = mealRepository.findAllByDateAndTimePartAndRestaurant(toDate(date),
+            timePart, restaurant);
+
+        if (MenuValidator.validateExistedMeal(meals, timePart, date, restaurant,
+            addTodayMenuList)) {
             return;
         }
 
         //식단 생성
-        Meal newMeal = Meal.builder().date(toDate(date)).restaurant(restaurant).timePart(timePart).build();
+        Meal newMeal = Meal.builder().date(toDate(date)).restaurant(restaurant).timePart(timePart)
+            .build();
         mealRepository.save(newMeal);
 
         //식단에 메뉴 추가
         addMenu(newMeal, addTodayMenuList);
-
     }
 
     /**
      * 식단에 메뉴 추가
      */
     private void addMenu(Meal meal, MenuReqDto.AddTodayMenuList addTodayMenuList) {
-
         Restaurant restaurant = meal.getRestaurant();
 
         for (String addMenuName : addTodayMenuList.getTodayMenuList()) {
+            //메뉴 체크 (기존에 없던 새로운 메뉴라면 생성)
             checkAndCreateMenu(addMenuName, restaurant);
 
             //메뉴 찾아서
@@ -144,7 +146,7 @@ public class MenuService {
 
         //식단 목록을 돌면서 메뉴 목록을 정렬하고 비교
         for (Meal meal : meals) {
-            List<String> menuNameList = meal.getMenuNameList();
+            List<String> menuNameList = meal.getMenuNames();
             Collections.sort(menuNameList);
 
             //메뉴 목록이 같다면 이미 존재하는 식단
@@ -162,7 +164,7 @@ public class MenuService {
     public MenuList findMenuListInMeal(Long mealId) {
 
         Meal meal = mealRepository.findById(mealId)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MEAL));
+                        .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MEAL));
 
         return MenuList.from(meal);
     }
@@ -192,24 +194,10 @@ public class MenuService {
      */
     public void cleanupGarbageMenu(List<Menu> menuList) {
 
-        for (Menu menu : menuList) {
-            if (menu.getMealMenus().isEmpty()) {
+        for(Menu menu : menuList){
+            if(menu.getMealMenus().isEmpty()) {
                 menuRepository.delete(menu);
             }
         }
     }
-
-    /**
-     * yyyyMMdd -> Date 형 변환
-     */
-    public Date toDate(String date) throws BaseException {
-
-        try {
-            return DateUtil.toDate("yyyyMMdd", date);
-        } catch (ParseException e) {
-            throw new BaseException(BaseResponseStatus.INVALID_DATE);
-        }
-
-    }
-
 }

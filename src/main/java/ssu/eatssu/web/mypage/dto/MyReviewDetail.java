@@ -20,13 +20,13 @@ public class MyReviewDetail {
     Long reviewId;
 
     @Schema(description = "평점-메인", example = "4")
-    private Integer mainRate;
+    private Integer mainRating;
 
     @Schema(description = "평점-양", example = "4")
-    private Integer amountRate;
+    private Integer amountRating;
 
     @Schema(description = "평점-맛", example = "4")
-    private Integer tasteRate;
+    private Integer tasteRating;
 
     @Schema(description = "리뷰 작성 날짜(format = yyyyMMdd)", example = "20230407")
     private LocalDate writeDate;
@@ -43,13 +43,13 @@ public class MyReviewDetail {
     public static MyReviewDetail from(Review review){
 
         List<String> imgUrlList = new ArrayList<>();
-        review.getReviewImgs().forEach(i->imgUrlList.add(i.getImageUrl()));
+        review.getReviewImages().forEach(i->imgUrlList.add(i.getImageUrl()));
 
         return MyReviewDetail.builder()
                 .reviewId(review.getId())
-                .mainRate(review.getRates().getMainRate())
-                .amountRate(review.getRates().getAmountRate())
-                .tasteRate(review.getRates().getTasteRate())
+                .mainRating(review.getRatings().getMainRating())
+                .amountRating(review.getRatings().getAmountRating())
+                .tasteRating(review.getRatings().getTasteRating())
                 .writeDate(review.getCreatedDate().toLocalDate())
                 .content(review.getContent())
                 .imgUrlList(imgUrlList)

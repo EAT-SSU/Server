@@ -1,6 +1,5 @@
 package ssu.eatssu.web.report.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ssu.eatssu.domain.enums.ReviewReportType;
 
@@ -11,6 +10,6 @@ public class ReviewReportTypeInfo {
 
     public ReviewReportTypeInfo(ReviewReportType reportType) {
         this.reportType = reportType;
-        this.typeDescription = reportType.getKrName();
+        this.typeDescription = reportType.getDescription();
     }
 }

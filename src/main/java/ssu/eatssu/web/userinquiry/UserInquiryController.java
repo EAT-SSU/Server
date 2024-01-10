@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ssu.eatssu.domain.UserInquiry;
+import ssu.eatssu.domain.user.UserInquiry;
 import ssu.eatssu.domain.repository.UserInquiryRepository;
 import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.handler.response.BaseResponse;

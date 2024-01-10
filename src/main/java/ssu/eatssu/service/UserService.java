@@ -8,18 +8,18 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ssu.eatssu.domain.review.Review;
-import ssu.eatssu.domain.ReviewReport;
-import ssu.eatssu.domain.User;
-import ssu.eatssu.domain.enums.OauthProvider;
 import ssu.eatssu.domain.repository.ReviewReportRepository;
 import ssu.eatssu.domain.repository.UserRepository;
+import ssu.eatssu.domain.review.Review;
+import ssu.eatssu.domain.review.ReviewReport;
+import ssu.eatssu.domain.user.OauthProvider;
+import ssu.eatssu.domain.user.User;
+import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.handler.response.BaseResponseStatus;
 import ssu.eatssu.jwt.JwtTokenProvider;
-import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.web.user.dto.Tokens;
 
-import static ssu.eatssu.handler.response.BaseResponseStatus.*;
+import static ssu.eatssu.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
 @Slf4j
 @Service
@@ -38,7 +38,7 @@ public class UserService {
     public void updateNickname(Long userId, String nickname) {
 
         User user = userRepository.findById(userId)
-                        .orElseThrow(()-> new BaseException(BaseResponseStatus.NOT_FOUND_USER));
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_USER));
 
         user.updateNickname(nickname);
         userRepository.save(user);
@@ -64,7 +64,7 @@ public class UserService {
     }
 
     private String makeOauthCredentials(OauthProvider provider, String providerId) {
-        return provider+"_"+providerId;
+        return provider + "_" + providerId;
     }
 
     /**
@@ -77,15 +77,15 @@ public class UserService {
     /**
      * 유저 탈퇴
      */
-    public void signout (Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(()-> new BaseException(NOT_FOUND_USER));
+    public void signout(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         //작성한 리뷰 삭제
-        for(Review review: user.getReviews()) {
-            review.signoutUser();
+        for (Review review : user.getReviews()) {
+            review.clearUser();
         }
         //작성한 신고 삭제
-        for(ReviewReport report: user.getReviewReports()){
+        for (ReviewReport report : user.getReviewReports()) {
             reviewReportRepository.delete(report);
         }
         /*

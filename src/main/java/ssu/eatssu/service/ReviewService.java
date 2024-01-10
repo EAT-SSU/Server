@@ -7,18 +7,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ssu.eatssu.domain.Meal;
-import ssu.eatssu.domain.Menu;
-import ssu.eatssu.domain.ReviewImg;
-import ssu.eatssu.domain.User;
+import ssu.eatssu.domain.menu.Meal;
+import ssu.eatssu.domain.menu.Menu;
+import ssu.eatssu.domain.rating.RatingCalculator;
 import ssu.eatssu.domain.repository.*;
 import ssu.eatssu.domain.review.Review;
+import ssu.eatssu.domain.review.ReviewImage;
+import ssu.eatssu.domain.user.User;
 import ssu.eatssu.handler.response.BaseException;
-import ssu.eatssu.utils.RatesCalculator;
 import ssu.eatssu.utils.S3Uploader;
 import ssu.eatssu.utils.SecurityUtil;
-import ssu.eatssu.vo.AverageRates;
-import ssu.eatssu.vo.RateCountMap;
 import ssu.eatssu.web.SliceDto;
 import ssu.eatssu.web.review.dto.*;
 
@@ -35,44 +33,56 @@ public class ReviewService {
 
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
-    private final ReviewImgRepository reviewImgRepository;
+    private final ReviewImageRepository reviewImageRepository;
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
 
+    private final RatingCalculator ratingCalculator;
+
     private final S3Uploader s3Uploader;
-    private final RatesCalculator ratesCalculator;
 
     /**
      * 리뷰 작성
      */
-    public void createReview(Long userId, Long menuId, ReviewCreate reviewCreate, List<MultipartFile> imgList) {
+    public void write(Long userId, Long menuId, CreateReviewRequest request,
+                      List<MultipartFile> images) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
 
-        Review review = reviewCreate.toEntity(user, menu);
-        reviewRepository.save(review);
+        Review review = request.toEntity(user, menu);
 
-        if (imgList != null && !imgList.isEmpty()) {
-            for (MultipartFile img : imgList) {
-                addReviewImg(review, img);
-            }
+        menu.addReview(review);
+        processReviewImages(images, review);
+
+        reviewRepository.save(review);
+    }
+
+    public void processReviewImages(List<MultipartFile> images, Review review) {
+        if (images == null || !images.isEmpty()) {
+            return;
+        }
+        for (MultipartFile image : images) {
+            addReviewImage(review, image);
         }
     }
 
     /**
      * 리뷰 이미지 추가
      */
-    public void addReviewImg(Review review, MultipartFile image) {
+    public void addReviewImage(Review review, MultipartFile image) {
         if (!image.isEmpty()) {
             try {
-                String reviewImgUrl = s3Uploader.upload(image, "reviewImg");
-                ReviewImg reviewImg = ReviewImg.builder().review(review).imageUrl(reviewImgUrl).build();
-                reviewImgRepository.save(reviewImg);
+                String reviewImageUrl = s3Uploader.upload(image, "reviewImg");
+                ReviewImage reviewImage = ReviewImage.builder().review(review)
+                        .imageUrl(reviewImageUrl)
+                        .build();
+                reviewImageRepository.save(reviewImage);
             } catch (IOException e) {
-                throw new BaseException(FAIL_IMG_UPLOAD);
+                throw new BaseException(FAIL_IMAGE_UPLOAD);
             }
         }
     }
@@ -80,77 +90,65 @@ public class ReviewService {
     /**
      * 리뷰 문장 및 별점 수정
      */
-    public void updateReviewContent(Long userId, Long reviewId, ReviewUpdate reviewUpdate) {
+    public void update(Long userId, Long reviewId, UpdateReviewRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
 
-        if (isWriterOrAdmin(review, user)) {
-            review.update(reviewUpdate.getContent()
-                    , reviewUpdate.getMainRate(), reviewUpdate.getAmountRate(), reviewUpdate.getTasteRate());
-        } else {
+        if (review.isDifferentUser(user)) {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
+
+        review.update(request.getContent(), request.getMainRate(), request.getAmountRate(), request.getTasteRate());
     }
 
     /**
      * 리뷰 삭제
      */
-    public void deleteReview(Long userId, Long reviewId) {
+    public void delete(Long userId, Long reviewId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
 
-        if (isWriterOrAdmin(review, user)) {
-            reviewRepository.delete(review);
-            reviewRepository.flush();
-        } else {
+        if (review.isDifferentUser(user)) {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
-    }
-
-    /**
-     * 리뷰 작성자/관리자 인지 확인 //todo 관리자인지는 빼도 될듯
-     */
-    public boolean isWriterOrAdmin(Review review, User user) {
-        return review.getUser() == user;
+        reviewRepository.delete(review);
+        reviewRepository.flush();
     }
 
     /**
      * 고정메뉴 - 리뷰 정보 조회
      */
-    public MenuReviewInfo findReviewInfoByMenuId(Long menuId) {
+    public MenuReviewInformationResponse findReviewInformationByMenuId(Long menuId) {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
 
-        AverageRates averageRate = ratesCalculator.menuAverageRates(menu);
+        RatingAverages ratingAverages = ratingCalculator.menuAverageRatings(menu);
+        ReviewRatingCount ratingCount = ratingCalculator.menuRatingCount(menu);
 
-        RateCountMap rateCountMap = ratesCalculator.menuRateCountMap(menu);
-
-        return MenuReviewInfo.of(menu, averageRate, rateCountMap);
+        return MenuReviewInformationResponse.of(menu, ratingAverages, ratingCount);
 
     }
 
     /**
      * 변동메뉴 - 리뷰 정보 조회
      */
-    public MealReviewInfo findReviewInfoByMealId(Long mealId) {
+    public MealReviewInformationResponse findReviewInformationByMealId(Long mealId) {
         Meal meal = mealRepository.findById(mealId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
 
-        int reviewCount = ratesCalculator.mealTotalReviewCount(meal);
+        int reviewCount = ratingCalculator.mealTotalReviewCount(meal);
 
-        AverageRates averageRate = ratesCalculator.mealAverageRates(meal);
+        RatingAverages averageRating = ratingCalculator.mealAverageRatings(meal);
+        ReviewRatingCount ratingCountMap = ratingCalculator.mealRatingCount(meal);
 
-        RateCountMap rateCountMap = ratesCalculator.mealRateCountMap(meal);
-
-        return MealReviewInfo.of(meal.getMenuNameList(), reviewCount, averageRate, rateCountMap);
+        return MealReviewInformationResponse.of(reviewCount, meal.getMenuNames(), averageRating, ratingCountMap);
     }
-
 
     /**
      * Slice<Review>를 Slice<ReviewDetail>로 변환
@@ -169,13 +167,15 @@ public class ReviewService {
     /**
      * 고정메뉴 - 리뷰 목록 조회
      */
-    public SliceDto<ReviewDetail> findReviewListByMenuId(Long menuId, Pageable pageable, Long lastReviewId) {
+    public SliceDto<ReviewDetail> findReviewListByMenuId(Long menuId, Pageable pageable,
+                                                         Long lastReviewId) {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
         //pageable에서 sort값 가져옴
         String sortBy = pageable.getSort().get().findFirst().orElseThrow().getProperty();
         //pageable에서 direction값 가져옴
-        Sort.Direction direction = pageable.getSort().get().findFirst().orElseThrow().getDirection();
+        Sort.Direction direction = pageable.getSort().get().findFirst().orElseThrow()
+                .getDirection();
         Slice<Review> sliceReviewList;
         if (sortBy.equals("date")) { //리뷰 날짜가 기준
             if (direction.isDescending()) { //최신순 정렬

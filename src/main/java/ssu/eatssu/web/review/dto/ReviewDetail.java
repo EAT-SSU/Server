@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import ssu.eatssu.domain.ReviewImg;
 import ssu.eatssu.domain.review.Review;
 
 import java.time.LocalDate;
@@ -33,13 +32,13 @@ public class ReviewDetail {
     private String writerNickname;
 
     @Schema(description = "평점-메인", example = "4")
-    private Integer mainRate;
+    private Integer mainRating;
 
     @Schema(description = "평점-양", example = "4")
-    private Integer amountRate;
+    private Integer amountRating;
 
     @Schema(description = "평점-맛", example = "4")
-    private Integer tasteRate;
+    private Integer tasteRating;
 
     @Schema(description = "리뷰 작성 날짜(format = yyyy-MM-dd)", example = "2023-04-07")
     private LocalDate writeDate;
@@ -52,32 +51,35 @@ public class ReviewDetail {
 
     public static ReviewDetail from(Review review, Long userId) {
 
-        List<String> imgUrlList = review.getReviewImgs().stream()
-                .map(ReviewImg::getImageUrl).toList();
-
+        List<String> imgUrlList = new ArrayList<>();
+        review.getReviewImages().forEach(i -> imgUrlList.add(i.getImageUrl()));
         if(review.getUser()== null){//탈퇴한 유저의 리뷰인 경우
             return ReviewDetail.builder()
                     .reviewId(review.getId())
                     .writerId(null).writerNickname("알 수 없음")
-                    .mainRate(review.getRates().getMainRate())
-                    .amountRate(review.getRates().getAmountRate())
-                    .tasteRate(review.getRates().getTasteRate())
+                    .mainRating(review.getRatings().getMainRating())
+                    .amountRating(review.getRatings().getAmountRating())
+                    .tasteRating(review.getRatings().getTasteRating())
                     .writeDate(review.getCreatedDate().toLocalDate())
                     .content(review.getContent())
-                    .isWriter(false).imgUrlList(imgUrlList).menu(review.getMenu().getName())
+                    .isWriter(false)
+                    .imgUrlList(imgUrlList)
+                    .menu(review.getMenu().getName())
                     .build();
         }else{
             boolean isWriter = review.getUser().getId().equals(userId);
             return ReviewDetail.builder()
                     .reviewId(review.getId())
                     .writerId(review.getUser().getId()).writerNickname(review.getUser().getNickname())
-                    .mainRate(review.getRates().getMainRate())
-                    .amountRate(review.getRates().getAmountRate())
-                    .tasteRate(review.getRates().getTasteRate())
-                    .writeDate(review.getCreatedDate().toLocalDate()).content(review.getContent())
+                    .mainRating(review.getRatings().getMainRating())
+                    .amountRating(review.getRatings().getAmountRating())
+                    .tasteRating(review.getRatings().getTasteRating())
+                    .writeDate(review.getCreatedDate().toLocalDate())
+                    .content(review.getContent())
                     .isWriter(isWriter).imgUrlList(imgUrlList).menu(review.getMenu().getName())
                     .build();
         }
 
     }
+    
 }

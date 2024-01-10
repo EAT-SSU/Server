@@ -2,10 +2,10 @@ package ssu.eatssu.domain.review;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ssu.eatssu.domain.BaseTimeEntity;
-import ssu.eatssu.domain.Menu;
-import ssu.eatssu.domain.ReviewImg;
-import ssu.eatssu.domain.User;
+import ssu.eatssu.domain.menu.Menu;
+import ssu.eatssu.domain.rating.Ratings;
+import ssu.eatssu.domain.user.BaseTimeEntity;
+import ssu.eatssu.domain.user.User;
 
 import java.util.List;
 
@@ -24,6 +24,9 @@ public class Review extends BaseTimeEntity {
 
     private String content;
 
+    @Embedded
+    private Ratings ratings;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -32,18 +35,27 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "menu_id")
     private Menu menu;
 
-    @Embedded
-    private Rates rates;
-
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
-    private List<ReviewImg> reviewImgs;
+    private List<ReviewImage> reviewImages;
 
+    //Entity -> Dto 방향 의존관계 제거
     public void update(String content, Integer mainRate, Integer amountRate, Integer tasteRate) {
         this.content = content;
-        this.rates = new Rates(mainRate, amountRate, tasteRate);
+        this.ratings = Ratings.of(mainRate, amountRate, tasteRate);
     }
 
-    public void signoutUser() {
+    /*
+    public void update(UpdateReviewRequest request) {
+        this.content = request.getContent();
+        this.ratings = Ratings.of(request.getMainRate(), request.getAmountRate(), request.getTasteRate());
+    }
+    */
+
+    public boolean isDifferentUser(User user) {
+        return !this.user.equals(user);
+    }
+
+    public void clearUser() {
         this.user = null;
     }
 

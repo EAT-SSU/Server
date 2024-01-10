@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ssu.eatssu.domain.User;
+import ssu.eatssu.domain.user.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,13 +13,13 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @Getter
 public class CustomUserDetails implements UserDetails {
-    private final Long Id;
+    private final Long id;
     private final String email;
     private final String credentials;
     private final GrantedAuthority role;
 
     public CustomUserDetails(User user){
-        this.Id = user.getId();
+        this.id = user.getId();
         this.email = user.getEmail();
         this.credentials = user.getCredentials();
         this.role = user.getRole();
