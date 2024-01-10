@@ -1,6 +1,7 @@
 package ssu.eatssu.domain.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.Arrays;
 import lombok.Getter;
 
 import java.util.Locale;
@@ -14,14 +15,17 @@ public enum ReviewReportType {
     COPYRIGHT("저작권 도용 의심(사진 등)"),
     ETC("기타 (하단 내용 작성)");
 
-    private final String krName;
+    private final String description;
 
-    ReviewReportType(String krName){
-        this.krName = krName;
+    ReviewReportType(String description) {
+        this.description = description;
     }
 
     @JsonCreator
-    public static ReviewReportType from(String s){
-        return ReviewReportType.valueOf(s.toUpperCase(Locale.ROOT));
+    public static ReviewReportType from(final String description) {
+        return Arrays.stream(ReviewReportType.values())
+            .filter(v -> v.getDescription().equals(description))
+            .findAny()
+            .orElseThrow(IllegalArgumentException::new);
     }
 }

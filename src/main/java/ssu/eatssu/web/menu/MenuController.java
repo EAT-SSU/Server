@@ -10,8 +10,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ssu.eatssu.domain.enums.MenuTypeGroup;
-import ssu.eatssu.domain.enums.RestaurantName;
+import ssu.eatssu.domain.menu.MenuType;
+import ssu.eatssu.domain.restaurant.RestaurantName;
 import ssu.eatssu.domain.enums.TimePart;
 import ssu.eatssu.handler.response.BaseException;
 import ssu.eatssu.handler.response.BaseResponse;
@@ -21,7 +21,7 @@ import ssu.eatssu.web.menu.dto.MenuReqDto.AddTodayMenuList;
 import java.util.List;
 
 import static ssu.eatssu.handler.response.BaseResponseStatus.NOT_SUPPORT_RESTAURANT;
-import static ssu.eatssu.web.menu.dto.MenuResDto.*;
+import static ssu.eatssu.web.menu.dto.MenuResponse.*;
 
 @Slf4j
 @RestController
@@ -43,12 +43,9 @@ public class MenuController {
             일반적으로 학생식당과 도담의 경우 식단 여러개가 조회되고 기숙사식당은 한개만 조회됩니다.)
             """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "식단 리스트 조회 성공", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "지원하지 않는 식당(고정메뉴 식당)", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class)))
+            @ApiResponse(responseCode = "200", description = "식단 리스트 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "지원하지 않는 식당(고정메뉴 식당)", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/today-meal") //todo today-meal은 아닌것 같음
     public BaseResponse<List<TodayMeal>> getMealList(@Parameter(description = "날짜(yyyyMMdd)")
@@ -57,7 +54,7 @@ public class MenuController {
                                                      @RequestParam("restaurant") RestaurantName restaurantName,
                                                      @Parameter(description = "시간대")
                                                      @RequestParam("time") TimePart timePart) {
-        if (MenuTypeGroup.isFix(restaurantName)) {
+        if (MenuType.isFixed(restaurantName)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
 
@@ -73,17 +70,14 @@ public class MenuController {
             메뉴가 고정된 식당(푸드코트, 스낵코너, <s>더 키친</s>)의 메뉴 리스트를 조회합니다.
             """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "메뉴 리스트 조회 성공", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "지원하지 않는 식당(변동 메뉴 식당)", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class)))
+            @ApiResponse(responseCode = "200", description = "메뉴 리스트 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "지원하지 않는 식당(변동 메뉴 식당)", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/fix-menu")
     public BaseResponse<List<FixMenuInfo>> getFixMenuList(@Parameter(description = "식당이름")
                                                     @RequestParam("restaurant") RestaurantName restaurantName) {
-        if (MenuTypeGroup.isChange(restaurantName)) {
+        if(MenuType.isChanged(restaurantName)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
 
@@ -102,24 +96,20 @@ public class MenuController {
             이미 존재하는 식단일 경우 중복저장 되지 않도록 처리합니다.(별도의 ErrorResponse 응답 X)
             """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "식단 추가 성공", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "지원하지 않는 식당(고정 메뉴 식당)", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 날짜형식", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class)))
+            @ApiResponse(responseCode = "200", description = "식단 추가 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "지원하지 않는 식당(고정 메뉴 식당)", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 날짜형식", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/")
     public BaseResponse<?> addMeal(@Parameter(description = "날짜(yyyyMMdd)")
-                                   @RequestParam("date") String date,
-                                   @Parameter(description = "식당이름")
-                                   @RequestParam("restaurant") RestaurantName restaurantName,
-                                   @Parameter(description = "시간대")
-                                   @RequestParam("time") TimePart timePart,
-                                   @RequestBody AddTodayMenuList addTodayMenuList) {
-        if (MenuTypeGroup.isFix(restaurantName)) {
+                                        @RequestParam("date") String date,
+                                        @Parameter(description = "식당이름")
+                                        @RequestParam("restaurant") RestaurantName restaurantName,
+                                        @Parameter(description = "시간대")
+                                        @RequestParam("time") TimePart timePart,
+                                        @RequestBody AddTodayMenuList addTodayMenuList) {
+        if (MenuType.isFixed(restaurantName)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
 
@@ -136,10 +126,8 @@ public class MenuController {
             식단식별자(mealId)로 해당 식단에 속하는 메뉴 정보 목록을 조회합니다.")
             """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "메뉴 정보 리스트 조회 성공", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class)))
+            @ApiResponse(responseCode = "200", description = "메뉴 정보 리스트 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/menus")
     public BaseResponse<MenuList> getMenuListInMeal(@Parameter(description = "mealId")
@@ -153,10 +141,8 @@ public class MenuController {
      */
     @Operation(summary = "식단 삭제", description = "식단을 삭제하는 API 입니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "식단 삭제 성공", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class)))
+            @ApiResponse(responseCode = "200", description = "식단 삭제 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @DeleteMapping("/meal/{mealId}")
     public BaseResponse<?> deleteMeal(@Parameter(description = "mealId") @PathVariable("mealId") Long mealId) {

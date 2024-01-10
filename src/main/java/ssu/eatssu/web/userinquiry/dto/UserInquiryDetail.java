@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import ssu.eatssu.domain.UserInquiry;
+import ssu.eatssu.domain.user.UserInquiry;
 
 @AllArgsConstructor
 @Builder
