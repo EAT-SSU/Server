@@ -7,8 +7,11 @@ import ssu.eatssu.domain.menu.Menu;
 import ssu.eatssu.web.review.dto.RatingAverages;
 import ssu.eatssu.web.review.dto.ReviewRatingCount;
 
+/**
+ * JPA 의 OneToMany객체참조를 이용하여 구현한 클래스입니다.
+ */
 @Component
-public class RatingCalculatorImpl implements RatingCalculator {
+public class JpaLoadCollectionRatingCalculator implements RatingCalculator {
 
     // 식단에 포함된 메뉴들의 평점 별 리뷰 개수 계산
     public ReviewRatingCount mealRatingCount(Meal meal) {
@@ -70,7 +73,7 @@ public class RatingCalculatorImpl implements RatingCalculator {
 
     // 메뉴 메인 평점 평균 계산
     public Double menuAverageMainRating(Menu menu) {
-        if (menu.getReviews().size()==0) {
+        if (menu.getReviews().size() == 0) {
             return null;
         }
 
