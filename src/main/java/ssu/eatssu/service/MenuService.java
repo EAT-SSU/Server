@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.menu.Meal;
 import ssu.eatssu.domain.menu.MealMenu;
 import ssu.eatssu.domain.menu.Menu;
-import ssu.eatssu.domain.rating.RatingCalculatorImpl;
+import ssu.eatssu.domain.rating.RatingCalculator;
 import ssu.eatssu.domain.restaurant.Restaurant;
 import ssu.eatssu.domain.restaurant.RestaurantName;
 import ssu.eatssu.domain.enums.TimePart;
@@ -37,7 +37,7 @@ public class MenuService {
     private final MealMenuRepository mealMenuRepository;
     private final RestaurantRepository restaurantRepository;
 
-    private final RatingCalculatorImpl ratingCalculator;
+    private final RatingCalculator ratingCalculator;
 
     /**
      * 고정 메뉴 조회
