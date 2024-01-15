@@ -9,8 +9,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ssu.eatssu.domain.enums.TimePart;
 import ssu.eatssu.domain.menu.dto.MenuRequest.CreateMealRequest;
-import ssu.eatssu.domain.menu.dto.MenuResponse.TodayMeal;
+import ssu.eatssu.domain.menu.dto.MenuResponse.MealInformationResponse;
 import ssu.eatssu.domain.menu.service.MenuService;
 import ssu.eatssu.domain.restaurant.RestaurantName;
 import ssu.eatssu.global.handler.response.BaseException;
@@ -48,7 +50,7 @@ public class MealController {
     })
     @PostMapping("/create")
     public BaseResponse<?> createMeal(
-        @Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date") String date,
+        @Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
         @Parameter(description = "식당이름") @RequestParam("restaurant") RestaurantName restaurantName,
         @Parameter(description = "시간대") @RequestParam("time") TimePart timePart,
         @RequestBody CreateMealRequest createMealRequest) {
@@ -56,7 +58,7 @@ public class MealController {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
 
-        menuService.createMeal(timePart, date, restaurantName, createMealRequest);
+        menuService.createMeal(date, restaurantName, timePart, createMealRequest);
         return BaseResponse.success();
     }
 
@@ -71,8 +73,8 @@ public class MealController {
         @ApiResponse(responseCode = "404", description = "존재 하지 않는 식당", content = @Content(schema = @Schema(implementation = ssu.eatssu.handler.response.BaseResponse.class)))
     })
     @GetMapping("/list")
-    public BaseResponse<List<TodayMeal>> getMeal(
-        @Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date") String date,
+    public BaseResponse<List<MealInformationResponse>> getMeal(
+        @Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
         @Parameter(description = "식당 이름") @RequestParam("restaurant") RestaurantName restaurantName,
         @Parameter(description = "시간대") @RequestParam("time") TimePart timePart) {
         if (RestaurantName.isFixed(restaurantName)) {
@@ -80,7 +82,7 @@ public class MealController {
         }
 
         return BaseResponse.success(
-            menuService.findMeal(timePart, date, restaurantName));
+            menuService.findSpecificMeals(date, restaurantName, timePart));
     }
 
     @Operation(summary = "식단 삭제", description = "식단을 삭제하는 API 입니다.")

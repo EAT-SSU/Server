@@ -19,7 +19,8 @@ public class MenuResponse {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class TodayMeal {
+    public static class MealInformationResponse {
+
         @Schema(description = "식단 식별자 mealId", example = "12")
         private Long mealId;
 
@@ -27,46 +28,31 @@ public class MenuResponse {
         private Integer price;
 
         @Schema(description = "식단 평점(평점이 없으면 null)", example = "4.4")
-        private Double mainRate;
+        private Double mainRating;
 
         @Schema(description = "식단 속 메뉴 정보 리스트")
-        private List<MenuInfo> menuInfoList;
+        private List<BreifMenuInformation> menusInformation;
 
-        public static TodayMeal from(Meal meal, Double mainRate) {
+
+        public static MealInformationResponse from(Meal meal) {
             if (!meal.getMealMenus().isEmpty()) {
-                List<MenuInfo> menuInfoList = meal.getMealMenus().stream()
-                        .map(MealMenu::getMenu)
-                        .map(MenuInfo::new).toList();
+	List<BreifMenuInformation> menusInformation = meal.getMealMenus().stream()
+	    .map(MealMenu::getMenu)
+	    .map(BreifMenuInformation::new).toList();
 
-                return new TodayMeal(meal.getId(), meal.getRestaurant().getRestaurantName().getPrice()
-                        , mainRate, menuInfoList);
+	return new MealInformationResponse(meal.getId(),
+	    meal.getRestaurant().getRestaurantName().getPrice(),
+	    meal.getAverateMainRating(), menusInformation);
             } else {
-                return null;
+	return null;
             }
         }
-
-        @Getter
-        @NoArgsConstructor
-        private static class MenuInfo {
-            @Schema(description = "메뉴 식별자", example = "2")
-            private Long menuId;
-
-            @Schema(description = "메뉴 이름", example = "돈까스")
-            private String name;
-
-            private MenuInfo(Menu menu) {
-                this.menuId = menu.getId();
-                this.name = menu.getName();
-            }
-
-        }
-
     }
 
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class FixMenuInfo {
+    public static class MenuInformationResponse {
 
         @Schema(description = "메뉴 식별자", example = "2")
         private Long menuId;
@@ -74,47 +60,51 @@ public class MenuResponse {
         @Schema(description = "메뉴 이름", example = "돈까스")
         private String name;
 
-        @Schema(description = "메뉴 평점(평점이 없으면 null)", example = "4.4")
-        private Double mainRate;
-
         @Schema(description = "가격", example = "5000")
         private Integer price;
 
-        public static FixMenuInfo from(Menu menu, Double mainRate) {
-            return new FixMenuInfo(menu.getId(), menu.getName(), mainRate, menu.getPrice());
+        @Schema(description = "메뉴 평점(평점이 없으면 null)", example = "4.4")
+        private Double mainRating;
+
+
+        public static MenuInformationResponse from(Menu menu) {
+            return new MenuInformationResponse(menu.getId(), menu.getName(),
+	menu.getPrice(), menu.getReviews().getAverageMainRating());
         }
     }
 
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class MenuList {
-        private List<MenuInfo> menuInfoList;
+    public static class MenusInformationResponse {
 
-        public static MenuList from(Meal meal) {
+        private List<BreifMenuInformation> menusInformation;
+
+        public static MenusInformationResponse from(Meal meal) {
             if (!meal.getMealMenus().isEmpty()) {
-                List<MenuInfo> menuInfoList = new ArrayList<>();
-                for (MealMenu mealMenu : meal.getMealMenus()) {
-                    Menu menu = mealMenu.getMenu();
-                    MenuInfo menuInfo = new MenuInfo(menu.getId(), menu.getName());
-                    menuInfoList.add(menuInfo);
-                }
-                return new MenuList(menuInfoList);
+	List<BreifMenuInformation> menusInformation = meal.getMealMenus().stream()
+	    .map(MealMenu::getMenu)
+	    .map(BreifMenuInformation::new).toList();
+	return new MenusInformationResponse(menusInformation);
             } else {
-                return null;
+	return null;
             }
-        }
-
-        @Getter
-        @NoArgsConstructor
-        @AllArgsConstructor
-        private static class MenuInfo {
-            @Schema(description = "메뉴 식별자", example = "2")
-            private Long menuId;
-
-            @Schema(description = "메뉴 이름", example = "돈까스")
-            private String name;
         }
     }
 
+    @Getter
+    @NoArgsConstructor
+    private static class BreifMenuInformation {
+
+        @Schema(description = "메뉴 식별자", example = "2")
+        private Long menuId;
+
+        @Schema(description = "메뉴 이름", example = "돈까스")
+        private String name;
+
+        private BreifMenuInformation(Menu menu) {
+            this.menuId = menu.getId();
+            this.name = menu.getName();
+        }
+    }
 }
