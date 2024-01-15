@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import ssu.eatssu.domain.menu.Meal;
-import ssu.eatssu.domain.menu.Menu;
+import ssu.eatssu.domain.menu.entity.Meal;
+import ssu.eatssu.domain.menu.entity.Menu;
 
 @Entity
 @Getter
