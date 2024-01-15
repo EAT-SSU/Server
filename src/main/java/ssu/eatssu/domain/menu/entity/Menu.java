@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.menu;
+package ssu.eatssu.domain.menu.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

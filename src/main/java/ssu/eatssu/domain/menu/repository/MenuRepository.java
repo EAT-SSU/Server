@@ -1,7 +1,7 @@
-package ssu.eatssu.domain.repository;
+package ssu.eatssu.domain.menu.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ssu.eatssu.domain.menu.Menu;
+import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.restaurant.Restaurant;
 
 import java.util.List;

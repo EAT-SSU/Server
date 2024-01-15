@@ -1,7 +1,7 @@
-package ssu.eatssu.domain.repository;
+package ssu.eatssu.domain.menu.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ssu.eatssu.domain.menu.Meal;
+import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.restaurant.Restaurant;
 import ssu.eatssu.domain.enums.TimePart;
 
