@@ -42,17 +42,13 @@ public class Meal {
         this.restaurant = restaurant;
     }
 
-
-    public List<Menu> getMenus() {
-        List<Menu> menus = new ArrayList<>();
-        for (MealMenu mealMenu : mealMenus) {
-            menus.add(mealMenu.getMenu());
-        }
-        return menus;
-    }
-
     public List<String> getMenuNames() {
         return mealMenus.stream().map(mealMenu -> mealMenu.getMenu().getName()).toList();
     }
 
+    public Double getAverateMainRating() {
+        return mealMenus.stream()
+            .mapToDouble(mealMenu -> mealMenu.getMenu().getReviews().getAverageMainRating())
+            .average().orElse(0);
+    }
 }

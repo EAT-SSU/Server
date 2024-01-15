@@ -9,8 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ssu.eatssu.domain.menu.dto.MenuResponse.FixMenuInfo;
-import ssu.eatssu.domain.menu.dto.MenuResponse.MenuList;
+import ssu.eatssu.domain.menu.dto.MenuResponse.MenuInformationResponse;
+import ssu.eatssu.domain.menu.dto.MenuResponse.MenusInformationResponse;
 import ssu.eatssu.domain.restaurant.RestaurantName;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.handler.response.BaseResponse;
@@ -38,12 +38,12 @@ public class MenuController {
         @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/list")
-    public BaseResponse<List<FixMenuInfo>> getMenus(
+    public BaseResponse<List<MenuInformationResponse>> getMenus(
         @RequestParam("restaurant") RestaurantName restaurantName) {
         if (RestaurantName.isVariable(restaurantName)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
-        return BaseResponse.success(menuService.findMenus(restaurantName));
+        return BaseResponse.success(menuService.findMenusByRestaurant(restaurantName));
     }
 
     @Operation(summary = "메뉴 정보 리스트 조회", description = """
@@ -55,7 +55,7 @@ public class MenuController {
         @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/in-meal")
-    public BaseResponse<MenuList> getMenusInMeal(@Parameter(description = "mealId")
+    public BaseResponse<MenusInformationResponse> getMenusInMeal(@Parameter(description = "mealId")
     @RequestParam("mealId") Long mealId) {
         return BaseResponse.success(menuService.findMenusInMeal(mealId));
     }
