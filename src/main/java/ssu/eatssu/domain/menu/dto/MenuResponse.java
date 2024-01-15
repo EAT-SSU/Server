@@ -1,15 +1,14 @@
-package ssu.eatssu.web.menu.dto;
+package ssu.eatssu.domain.menu.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ssu.eatssu.domain.menu.Meal;
-import ssu.eatssu.domain.menu.MealMenu;
-import ssu.eatssu.domain.menu.Menu;
-
-import java.util.ArrayList;
-import java.util.List;
+import ssu.eatssu.domain.menu.entity.Meal;
+import ssu.eatssu.domain.menu.entity.MealMenu;
+import ssu.eatssu.domain.menu.entity.Menu;
 
 public class MenuResponse {
 
