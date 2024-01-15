@@ -57,6 +57,6 @@ public class MenuController {
     @GetMapping("/in-meal")
     public BaseResponse<MenuList> getMenusInMeal(@Parameter(description = "mealId")
     @RequestParam("mealId") Long mealId) {
-        return BaseResponse.success(menuService.findMenuListInMeal(mealId));
+        return BaseResponse.success(menuService.findMenusInMeal(mealId));
     }
 }
