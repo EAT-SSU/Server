@@ -2,12 +2,12 @@ package ssu.eatssu.domain.menu.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ssu.eatssu.domain.restaurant.Restaurant;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 
 import java.util.ArrayList;
 import java.util.List;
-import ssu.eatssu.domain.review.Review;
-import ssu.eatssu.domain.review.Reviews;
+import ssu.eatssu.domain.review.entity.Review;
+import ssu.eatssu.domain.review.entity.Reviews;
 
 @Entity
 @Getter

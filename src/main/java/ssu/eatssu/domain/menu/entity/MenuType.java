@@ -5,9 +5,9 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
-import ssu.eatssu.domain.restaurant.RestaurantName;
+import ssu.eatssu.domain.restaurant.entity.RestaurantName;
 
-import static ssu.eatssu.domain.restaurant.RestaurantName.*;
+import static ssu.eatssu.domain.restaurant.entity.RestaurantName.*;
 
 
 @Getter

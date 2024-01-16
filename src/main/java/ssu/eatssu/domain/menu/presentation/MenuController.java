@@ -1,5 +1,7 @@
 package ssu.eatssu.domain.menu.presentation;
 
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_SUPPORT_RESTAURANT;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,14 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.menu.dto.MenuResponse.MenuInformationResponse;
 import ssu.eatssu.domain.menu.dto.MenuResponse.MenusInformationResponse;
-import ssu.eatssu.domain.restaurant.RestaurantName;
+import ssu.eatssu.domain.restaurant.entity.RestaurantName;
 import ssu.eatssu.global.handler.response.BaseException;
-import ssu.eatssu.handler.response.BaseResponse;
 import ssu.eatssu.domain.menu.service.MenuService;
 
 import java.util.List;
-
-import static ssu.eatssu.handler.response.BaseResponseStatus.NOT_SUPPORT_RESTAURANT;
+import ssu.eatssu.global.handler.response.BaseResponse;
 
 @RestController
 @RequiredArgsConstructor

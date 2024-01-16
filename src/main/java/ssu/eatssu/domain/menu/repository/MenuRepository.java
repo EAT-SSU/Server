@@ -2,7 +2,7 @@ package ssu.eatssu.domain.menu.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import ssu.eatssu.domain.menu.entity.Menu;
-import ssu.eatssu.domain.restaurant.Restaurant;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 
 import java.util.List;
 import java.util.Optional;
