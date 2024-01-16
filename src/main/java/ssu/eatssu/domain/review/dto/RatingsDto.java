@@ -1,7 +1,7 @@
-package ssu.eatssu.domain.repository.dto;
+package ssu.eatssu.domain.review.dto;
 
 
-import ssu.eatssu.domain.rating.Ratings;
+import ssu.eatssu.domain.rating.entity.Ratings;
 public record RatingsDto (Ratings ratings){
 
     public Integer getMainRating() {

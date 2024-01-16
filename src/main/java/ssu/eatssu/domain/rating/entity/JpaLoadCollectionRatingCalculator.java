@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.rating;
+package ssu.eatssu.domain.rating.entity;
 
 import org.springframework.stereotype.Component;
 import ssu.eatssu.domain.menu.entity.Meal;

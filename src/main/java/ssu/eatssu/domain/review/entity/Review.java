@@ -3,7 +3,7 @@ package ssu.eatssu.domain.review.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import ssu.eatssu.domain.menu.entity.Menu;
-import ssu.eatssu.domain.rating.Ratings;
+import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.user.entity.BaseTimeEntity;
 import ssu.eatssu.domain.user.entity.User;
 

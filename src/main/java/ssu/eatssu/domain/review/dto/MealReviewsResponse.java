@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @Builder
-public class MealReviewInformationResponse implements ReviewInformationResponse {
+public class MealReviewsResponse implements ReviewInformationResponse {
 
     @Schema(description = "메뉴명 리스트", example = "[\"고구마치즈돈까스\", \"막국수\", \"미니밥\", \"단무지\", \"요구르트\"]")
     private List<String> menuNames;
@@ -30,10 +30,10 @@ public class MealReviewInformationResponse implements ReviewInformationResponse 
 
     private ReviewRatingCount reviewRatingCount;
 
-    public static MealReviewInformationResponse of(Integer totalReviewCount, List<String> menuNames,
+    public static MealReviewsResponse of(Integer totalReviewCount, List<String> menuNames,
         RatingAverages ratingAverages, ReviewRatingCount reviewRatingCount) {
 
-        return MealReviewInformationResponse.builder()
+        return MealReviewsResponse.builder()
             .menuNames(menuNames)
             .mainRating(ratingAverages.mainRating())
             .amountRating(ratingAverages.amountRating())

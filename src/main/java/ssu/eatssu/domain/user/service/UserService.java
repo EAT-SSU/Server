@@ -8,11 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.auth.entity.CustomUserDetails;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
-import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.user.dto.UpdateNicknameRequest;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.review.entity.Review;
@@ -29,8 +27,6 @@ import ssu.eatssu.global.handler.response.BaseException;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final ReviewRepository reviewRepository;
-    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -40,6 +36,30 @@ public class UserService {
 
         user.updateNickname(request.nickname());
         userRepository.save(user);
+    }
+
+    public MyPageResponse findMyPage(CustomUserDetails userDetails) {
+        User user = userRepository.findById(userDetails.getId())
+            .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        return new MyPageResponse(user.getNickname(), user.getProvider());
+    }
+
+    public boolean withdraw(CustomUserDetails userDetails) {
+        User user = userRepository.findById(userDetails.getId())
+            .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        user.getReviews().forEach(Review::clearUser);
+        userRepository.delete(user);
+
+        return true;
+    }
+
+    public Boolean validateDuplicatedEmail(String email) {
+        return !userRepository.existsByEmail(email);
+    }
+
+    public Boolean validateDuplicatedNickname(String nickname) {
+        return !userRepository.existsByNickname(nickname);
     }
 
     /**
@@ -72,21 +92,5 @@ public class UserService {
      */
     public Tokens refreshTokens(Authentication authentication) {
         return jwtTokenProvider.generateTokens(authentication);
-    }
-
-    public boolean withdraw(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-            .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-
-        user.getReviews().forEach(Review::clearUser);
-        userRepository.delete(user);
-
-        return true;
-    }
-
-    public MyPageResponse findMyPageInfo(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-            .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        return new MyPageResponse(user.getNickname(), user.getProvider());
     }
 }

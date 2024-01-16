@@ -8,7 +8,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ssu.eatssu.domain.rating.ReviewRating;
+import ssu.eatssu.domain.rating.entity.ReviewRating;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PUBLIC)

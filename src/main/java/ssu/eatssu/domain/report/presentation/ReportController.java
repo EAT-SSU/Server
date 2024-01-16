@@ -17,7 +17,7 @@ import ssu.eatssu.domain.slack.entity.SlackMessageFormat;
 import ssu.eatssu.domain.report.dto.CreateReportRequest;
 import ssu.eatssu.domain.report.dto.ReportTypeResponse;
 
-import ssu.eatssu.domain.slack.entity.SlackService;
+import ssu.eatssu.domain.slack.service.SlackService;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 @RestController

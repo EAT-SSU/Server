@@ -41,45 +41,48 @@ public class ReviewDetail {
     private Integer tasteRating;
 
     @Schema(description = "리뷰 작성 날짜(format = yyyy-MM-dd)", example = "2023-04-07")
-    private LocalDate writeDate;
+    private LocalDate writedAt;
 
     @Schema(description = "리뷰 내용", example = "맛있습니당")
     private String content;
 
     @Schema(description = "리뷰 이미지 url 리스트", example = "[\"imgurl1\", \"imgurl2\"]")
-    private List<String> imgUrlList;
+    private List<String> imageUrls;
 
     public static ReviewDetail from(Review review, Long userId) {
+        List<String> imageUrls = new ArrayList<>();
+        review.getReviewImages().forEach(i -> imageUrls.add(i.getImageUrl()));
 
-        List<String> imgUrlList = new ArrayList<>();
-        review.getReviewImages().forEach(i -> imgUrlList.add(i.getImageUrl()));
-        if(review.getUser()== null){//탈퇴한 유저의 리뷰인 경우
-            return ReviewDetail.builder()
-                    .reviewId(review.getId())
-                    .writerId(null).writerNickname("알 수 없음")
-                    .mainRating(review.getRatings().getMainRating())
-                    .amountRating(review.getRatings().getAmountRating())
-                    .tasteRating(review.getRatings().getTasteRating())
-                    .writeDate(review.getCreatedDate().toLocalDate())
-                    .content(review.getContent())
-                    .isWriter(false)
-                    .imgUrlList(imgUrlList)
-                    .menu(review.getMenu().getName())
-                    .build();
-        }else{
-            boolean isWriter = review.getUser().getId().equals(userId);
-            return ReviewDetail.builder()
-                    .reviewId(review.getId())
-                    .writerId(review.getUser().getId()).writerNickname(review.getUser().getNickname())
-                    .mainRating(review.getRatings().getMainRating())
-                    .amountRating(review.getRatings().getAmountRating())
-                    .tasteRating(review.getRatings().getTasteRating())
-                    .writeDate(review.getCreatedDate().toLocalDate())
-                    .content(review.getContent())
-                    .isWriter(isWriter).imgUrlList(imgUrlList).menu(review.getMenu().getName())
-                    .build();
+        ReviewDetailBuilder builder = ReviewDetail.builder()
+            .reviewId(review.getId())
+            .mainRating(review.getRatings().getMainRating())
+            .amountRating(review.getRatings().getAmountRating())
+            .tasteRating(review.getRatings().getTasteRating())
+            .writedAt(review.getCreatedDate().toLocalDate())
+            .content(review.getContent())
+            .imageUrls(imageUrls)
+            .menu(review.getMenu().getName());
+
+        if (review.getUser() == null) {
+            return builder
+	.writerId(null)
+	.writerNickname("알 수 없음")
+	.isWriter(false)
+	.build();
         }
 
+        if (review.getUser().getId().equals(userId)) {
+            return builder
+	.writerId(review.getUser().getId())
+	.writerNickname(review.getUser().getNickname())
+	.isWriter(true)
+	.build();
+        }
+
+        return builder
+            .writerId(review.getUser().getId())
+            .writerNickname(review.getUser().getNickname())
+            .isWriter(false)
+            .build();
     }
-    
 }

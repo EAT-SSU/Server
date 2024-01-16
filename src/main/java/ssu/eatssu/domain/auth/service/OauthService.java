@@ -1,6 +1,8 @@
 package ssu.eatssu.domain.auth.service;
 
 
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.INVALID_IDENTITY_TOKEN;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,11 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ssu.eatssu.domain.user.entity.User;
-import ssu.eatssu.domain.user.entity.OauthProvider;
-import ssu.eatssu.domain.repository.UserRepository;
+import ssu.eatssu.domain.auth.entity.OauthProvider;
+import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.user.service.UserService;
-import ssu.eatssu.handler.response.BaseException;
-import ssu.eatssu.handler.response.BaseResponseStatus;
 import ssu.eatssu.domain.auth.dto.OauthInfo;
 import ssu.eatssu.domain.auth.dto.AppleKeys;
 import ssu.eatssu.domain.user.dto.Tokens;
@@ -34,8 +34,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.Map;
+import ssu.eatssu.global.handler.response.BaseException;
 
-import static ssu.eatssu.handler.response.BaseResponseStatus.INVALID_IDENTITY_TOKEN;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -182,7 +182,7 @@ public class OauthService {
             KeyFactory keyFactory = KeyFactory.getInstance(matchedKey.getKty());
             return keyFactory.generatePublic(publicKeySpec);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-            throw new BaseException(BaseResponseStatus.INVALID_IDENTITY_TOKEN);
+            throw new BaseException(INVALID_IDENTITY_TOKEN);
         }
     }
 
@@ -201,12 +201,12 @@ public class OauthService {
             headerMap = new ObjectMapper().readValue(decodedHeader, new TypeReference<Map<String, String>>() {
             });
         } catch (JsonProcessingException e) {
-            throw new BaseException(BaseResponseStatus.INVALID_IDENTITY_TOKEN);
+            throw new BaseException(INVALID_IDENTITY_TOKEN);
         }
 
         //후보키 중에서 정답키를 찾아서 반환한다.
         return candidateKeys.findKeyBy(headerMap.get("kid"), headerMap.get("alg"))
-            .orElseThrow(() -> new BaseException(BaseResponseStatus.INVALID_IDENTITY_TOKEN));
+            .orElseThrow(() -> new BaseException(INVALID_IDENTITY_TOKEN));
     }
 
     /**
