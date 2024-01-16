@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
-public class SliceDto<D> {
+public class SliceResponse<D> {
     @Schema(description = "현재 넘겨준 페이지에 넘어간 개수(마지막 페이지일시, size 보다 작을 수 있음)", example = "20")
     private int numberOfElements;
 

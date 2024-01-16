@@ -2,12 +2,15 @@ package ssu.eatssu.domain.user.entity;
 
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import ssu.eatssu.domain.auth.entity.OauthProvider;
+import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.review.entity.Review;
-import ssu.eatssu.domain.review.entity.ReviewReport;
+import ssu.eatssu.domain.review.entity.Report;
 
 import java.util.List;
 
@@ -41,13 +44,13 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE
             , CascadeType.REFRESH})
-    private List<Review> reviews;
+    private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
-    private List<ReviewReport> reviewReports;
+    private List<Report> reviewReports = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
-    private List<UserInquiry> userInquiry;
+    private List<Inquiry> userInquiries = new ArrayList<>();
 
     /**
      * Oauth 회원가입 용 생성자
