@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.repository;
+package ssu.eatssu.domain.user.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import ssu.eatssu.domain.user.entity.User;

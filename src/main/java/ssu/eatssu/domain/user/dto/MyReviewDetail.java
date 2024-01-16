@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.page.dto;
+package ssu.eatssu.domain.user.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

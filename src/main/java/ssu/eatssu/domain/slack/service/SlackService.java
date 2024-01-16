@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.slack.entity;
+package ssu.eatssu.domain.slack.service;
 
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import ssu.eatssu.domain.slack.entity.SlackChannel;
 
 @Slf4j
 @Service

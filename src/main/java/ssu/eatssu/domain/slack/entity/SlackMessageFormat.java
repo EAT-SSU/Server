@@ -1,10 +1,10 @@
 package ssu.eatssu.domain.slack.entity;
 
 import org.springframework.stereotype.Component;
+import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.review.entity.Review;
-import ssu.eatssu.domain.review.entity.ReviewReport;
+import ssu.eatssu.domain.review.entity.Report;
 import ssu.eatssu.domain.user.entity.User;
-import ssu.eatssu.domain.user.entity.UserInquiry;
 
 import java.text.MessageFormat;
 
@@ -13,7 +13,7 @@ public class SlackMessageFormat {
 
     private SlackMessageFormat(){}
 
-    public static String sendReport(ReviewReport report) {
+    public static String sendReport(Report report) {
         User reporter = report.getUser();
         Review review = report.getReview();
         MessageFormat messageFormat = new MessageFormat(
@@ -41,7 +41,7 @@ public class SlackMessageFormat {
         return messageFormat.format(args);
     }
 
-    public static String sendUserInquiry(UserInquiry inquiry) {
+    public static String sendUserInquiry(Inquiry inquiry) {
         MessageFormat messageFormat = new MessageFormat(
                 """
                 ===================
