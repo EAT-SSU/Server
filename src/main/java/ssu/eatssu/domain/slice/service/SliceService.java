@@ -1,5 +1,6 @@
 package ssu.eatssu.domain.slice.service;
 
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
 import java.util.List;
@@ -9,6 +10,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.auth.entity.CustomUserDetails;
+import ssu.eatssu.domain.menu.entity.Meal;
+import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.menu.entity.MenuType;
+import ssu.eatssu.domain.menu.repository.MealRepository;
+import ssu.eatssu.domain.menu.repository.MenuRepository;
+import ssu.eatssu.domain.review.dto.ReviewDetail;
 import ssu.eatssu.domain.user.dto.MyReviewDetail;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
@@ -23,6 +30,8 @@ public class SliceService {
 
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
+    private final MenuRepository menuRepository;
+    private final MealRepository mealRepository;
 
     public SliceResponse<MyReviewDetail> findMyReviews(
         CustomUserDetails userDetails,
@@ -36,6 +45,43 @@ public class SliceService {
             pageable);
 
         return convertToMyReviewDetail(sliceReviews);
+    }
+
+    public SliceResponse<ReviewDetail> findReviews(MenuType menuType,
+        Long menuId,
+        Long mealId,
+        Pageable pageable,
+        Long lastReviewId,
+        CustomUserDetails userDetails) {
+        Slice<Review> sliceReviews = null;
+        if (menuType == MenuType.FIXED) {
+            Menu menu = menuRepository.findById(menuId)
+	.orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+            sliceReviews = reviewRepository.findAllByMenuOrderByIdDesc(menu, lastReviewId,
+	pageable);
+        }
+
+        if (menuType == MenuType.VARIABLE) {
+            Meal meal = mealRepository.findById(mealId)
+	.orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+            sliceReviews = reviewRepository.findAllByMealOrderByIdDesc(meal, lastReviewId,
+	pageable);
+        }
+
+        return convertToReviewDetail(sliceReviews, userDetails.getId());
+    }
+
+    private SliceResponse<ReviewDetail> convertToReviewDetail(Slice<Review> sliceReviews,
+        Long userId) {
+        List<ReviewDetail> reviewDetails = sliceReviews.getContent().stream()
+            .map(review -> ReviewDetail.from(review, userId))
+            .collect(Collectors.toList());
+
+        return SliceResponse.<ReviewDetail>builder()
+            .numberOfElements(sliceReviews.getNumberOfElements())
+            .hasNext(sliceReviews.hasNext())
+            .dataList(reviewDetails)
+            .build();
     }
 
     private SliceResponse<MyReviewDetail> convertToMyReviewDetail(Slice<Review> sliceReviews) {

@@ -1,13 +1,13 @@
-package ssu.eatssu.domain.rating;
+package ssu.eatssu.domain.rating.entity;
 
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 
 public enum ReviewRating {
-    RATING_1(1),
-    RATING_2(2),
-    RATING_3(3),
-    RATING_4(4),
-    RATING_5(5);
+    RATING_ONE(1),
+    RATING_TWO(2),
+    RATING_THREE(3),
+    RATING_FOUR(4),
+    RATING_FIVE(5);
 
     private final int value;
     private int count;
@@ -26,7 +26,7 @@ public enum ReviewRating {
     public static ReviewRating fromValue(int value) {
         for (ReviewRating RATING : ReviewRating.values()) {
             if (RATING.value == value) {
-                return RATING;
+	return RATING;
             }
         }
         throw new IllegalArgumentException("Invalid ratings value: " + value);
@@ -34,11 +34,11 @@ public enum ReviewRating {
 
     public static ReviewRatingCount toResponse() {
         return new ReviewRatingCount(
-                RATING_1.getCount(),
-                RATING_2.getCount(),
-                RATING_3.getCount(),
-                RATING_4.getCount(),
-                RATING_5.getCount()
+            RATING_ONE.getCount(),
+            RATING_TWO.getCount(),
+            RATING_THREE.getCount(),
+            RATING_FOUR.getCount(),
+            RATING_FIVE.getCount()
         );
     }
 

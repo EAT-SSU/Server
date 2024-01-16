@@ -13,7 +13,7 @@ import static ssu.eatssu.domain.restaurant.entity.RestaurantName.*;
 @Getter
 public enum MenuType {
     FIXED("고정 메뉴", Arrays.asList(FOOD_COURT, SNACK_CORNER)),
-    CHANGED("변동 메뉴", Arrays.asList(DODAM, DORMITORY, HAKSIK));
+    VARIABLE("변동 메뉴", Arrays.asList(DODAM, DORMITORY, HAKSIK));
 
     private final String description;
     private final List<RestaurantName> restaurants;
@@ -28,7 +28,7 @@ public enum MenuType {
     }
 
     public static boolean isChanged(RestaurantName restaurant) {
-        return CHANGED.getRestaurants().contains(restaurant);
+        return VARIABLE.getRestaurants().contains(restaurant);
     }
 
     @JsonCreator

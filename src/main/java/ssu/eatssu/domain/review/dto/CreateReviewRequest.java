@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
 import ssu.eatssu.domain.menu.entity.Menu;
-import ssu.eatssu.domain.rating.Ratings;
+import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.entity.User;
 

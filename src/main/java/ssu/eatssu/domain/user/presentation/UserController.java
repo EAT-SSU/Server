@@ -21,10 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.auth.entity.CustomUserDetails;
 import ssu.eatssu.domain.user.dto.MyReviewDetail;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
-import ssu.eatssu.domain.page.service.MyPageService;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.slice.service.SliceService;
-import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.user.dto.UpdateNicknameRequest;
 import ssu.eatssu.domain.user.dto.Tokens;
 import ssu.eatssu.domain.user.service.UserService;
@@ -37,10 +35,7 @@ import ssu.eatssu.global.handler.response.BaseResponse;
 public class UserController {
 
     private final UserService userService;
-    private final MyPageService myPageService;
-    private final UserRepository userRepository;
     private final SliceService sliceService;
-
 
     @Operation(summary = "이메일 중복 체크", description = """
         이메일 중복 체크 API 입니다.<br><br>
@@ -49,15 +44,10 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "중복되지 않은 이메일", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    @PostMapping("/user-emails/{email}/exist") //todo: 중복인 경우 error throw, 중복 아니면 ApiReposne return
-    public BaseResponse<Boolean> checkEmailDuplicate(
+    @PostMapping("/validate/email/{email}") //todo: 중복인 경우 error throw, 중복 아니면 ApiReposne return
+    public BaseResponse<Boolean> validateDuplicatedEmail(
         @Parameter(description = "이메일") @PathVariable String email) {
-        boolean duplicated = userRepository.existsByEmail(email);
-        if (!duplicated) {
-            return BaseResponse.success(true);
-        } else {
-            return BaseResponse.success(false);
-        }
+        return BaseResponse.success(userService.validateDuplicatedEmail(email));
     }
 
     @Operation(summary = "닉네임 중복 체크", description = """
@@ -67,15 +57,10 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "중복되지 않은 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    @GetMapping("/check-nickname")
-    public BaseResponse<Boolean> checkNicknameDuplicate(@Parameter(description = "닉네임")
+    @GetMapping("/validate/nickname")
+    public BaseResponse<Boolean> validateDuplicatedNickname(@Parameter(description = "닉네임")
     @RequestParam(value = "nickname") String nickname) {
-        boolean duplicated = userRepository.existsByNickname(nickname);
-        if (duplicated) {
-            return BaseResponse.success(false);
-        } else {
-            return BaseResponse.success(true);
-        }
+        return BaseResponse.success(userService.validateDuplicatedNickname(nickname));
     }
 
     @Operation(summary = "닉네임 수정", description = "닉네임 수정 API 입니다.")
@@ -99,16 +84,6 @@ public class UserController {
     @DeleteMapping("/withdraw")
     public BaseResponse<Boolean> withdraw(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(userService.withdraw(userDetails));
-    }
-
-    @Operation(summary = "토큰 재발급", description = "accessToken, refreshToken 재발급 API 입니다.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "토큰 재발급 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
-    @PostMapping("/token/reissue")
-    public BaseResponse<Tokens> refreshToken() {
-        Tokens tokens = userService.refreshTokens(getLoginUser());
-        return BaseResponse.success(tokens);
     }
 
     @Operation(summary = "내가 쓴 리뷰 리스트 조회", description = "내가 쓴 리뷰 리스트를 조회하는 API 입니다.")
@@ -135,6 +110,16 @@ public class UserController {
     @GetMapping("/my-page")
     public BaseResponse<MyPageResponse> getMyPage(
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        return BaseResponse.success(userService.findMyPageInfo(customUserDetails));
+        return BaseResponse.success(userService.findMyPage(customUserDetails));
+    }
+
+    @Operation(summary = "토큰 재발급", description = "accessToken, refreshToken 재발급 API 입니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "토큰 재발급 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @PostMapping("/token/reissue")
+    public BaseResponse<Tokens> refreshToken() {
+        Tokens tokens = userService.refreshTokens(getLoginUser());
+        return BaseResponse.success(tokens);
     }
 }

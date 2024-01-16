@@ -12,7 +12,7 @@ import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.Report;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.report.entity.ReportStatus;
-import ssu.eatssu.domain.review.repository.ReviewReportRepository;
+import ssu.eatssu.domain.report.repository.ReportRepository;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.report.dto.CreateReportRequest;
@@ -26,7 +26,7 @@ public class ReportService {
 
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
-    private final ReviewReportRepository reviewReportRepository;
+    private final ReportRepository reviewReportRepository;
 
     public Report report(CustomUserDetails userDetails, CreateReportRequest reviewReportCreate) {
         User user = userRepository.findById(userDetails.getId())
