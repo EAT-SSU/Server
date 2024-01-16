@@ -7,8 +7,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ssu.eatssu.domain.auth.infrastructure.SecurityUtil;
+import ssu.eatssu.domain.auth.entity.CustomUserDetails;
 import ssu.eatssu.domain.review.entity.Report;
 import ssu.eatssu.domain.report.service.ReportService;
 import ssu.eatssu.domain.slack.entity.SlackChannel;
@@ -43,9 +44,9 @@ public class ReportController {
         @ApiResponse(responseCode = "200", description = "리뷰 신고 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
         @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    public BaseResponse<?> reportReview(@RequestBody CreateReportRequest reviewReportCreate) {
-        Long userId = SecurityUtil.getLoginUserId();
-        Report report = reportService.reportReview(userId, reviewReportCreate);
+    public BaseResponse<Void> reportReview(@RequestBody CreateReportRequest createReportRequest,
+        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Report report = reportService.report(customUserDetails, createReportRequest);
         slackService.sendSlackMessage(SlackMessageFormat.sendReport(report),
             SlackChannel.REPORT_CHANNEL);
         return BaseResponse.success();
