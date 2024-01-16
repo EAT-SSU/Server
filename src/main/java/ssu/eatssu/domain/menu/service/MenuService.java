@@ -1,7 +1,5 @@
 package ssu.eatssu.domain.menu.service;
 
-import static ssu.eatssu.global.util.DateUtils.toDate;
-
 import jakarta.transaction.Transactional;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
@@ -15,18 +13,18 @@ import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.MealMenu;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.exception.RestaurantNotFoundException;
-import ssu.eatssu.domain.restaurant.Restaurant;
-import ssu.eatssu.domain.restaurant.RestaurantName;
-import ssu.eatssu.domain.enums.TimePart;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
+import ssu.eatssu.domain.restaurant.entity.RestaurantName;
+import ssu.eatssu.domain.menu.entity.TimePart;
 import ssu.eatssu.domain.menu.repository.MealMenuRepository;
 import ssu.eatssu.domain.menu.repository.MealRepository;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
-import ssu.eatssu.domain.repository.RestaurantRepository;
+import ssu.eatssu.domain.restaurant.repository.RestaurantRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 
 import java.util.List;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
-import ssu.eatssu.global.util.validator.MenuValidator;
+import ssu.eatssu.domain.menu.util.MenuValidator;
 
 
 @Slf4j
@@ -65,7 +63,7 @@ public class MenuService {
         Restaurant restaurant = getRestaurant(restaurantName);
         List<Meal> meals = getMeals(date, timePart, restaurant);
 
-        if (MenuValidator.validateExistedMeal(meals, timePart, date, restaurant,
+        if (MenuValidator.validateExistedMeal(meals,
             request)) {
             return;
         }
@@ -80,9 +78,6 @@ public class MenuService {
         addMenu(newMeal, request);
     }
 
-    /**
-     * 식단에 메뉴 추가
-     */
     private void addMenu(Meal meal, CreateMealRequest request) {
         Restaurant restaurant = meal.getRestaurant();
 

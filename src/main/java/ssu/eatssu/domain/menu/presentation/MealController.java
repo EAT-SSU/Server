@@ -1,6 +1,7 @@
 package ssu.eatssu.domain.menu.presentation;
 
-import static ssu.eatssu.handler.response.BaseResponseStatus.NOT_SUPPORT_RESTAURANT;
+
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_SUPPORT_RESTAURANT;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,13 +22,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ssu.eatssu.domain.enums.TimePart;
+import ssu.eatssu.domain.menu.entity.TimePart;
 import ssu.eatssu.domain.menu.dto.MenuRequest.CreateMealRequest;
 import ssu.eatssu.domain.menu.dto.MenuResponse.MealInformationResponse;
 import ssu.eatssu.domain.menu.service.MenuService;
-import ssu.eatssu.domain.restaurant.RestaurantName;
+import ssu.eatssu.domain.restaurant.entity.RestaurantName;
 import ssu.eatssu.global.handler.response.BaseException;
-import ssu.eatssu.handler.response.BaseResponse;
+import ssu.eatssu.global.handler.response.BaseResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -68,9 +69,9 @@ public class MealController {
         일반적으로 학생식당과 도담의 경우 식단 여러개가 조회되고 기숙사식당은 한개만 조회됩니다.)
         """)
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "식단 리스트 조회 성공", content = @Content(schema = @Schema(implementation = ssu.eatssu.handler.response.BaseResponse.class))),
-        @ApiResponse(responseCode = "400", description = "지원 하지 않는 식당 (고정 메뉴 식당)", content = @Content(schema = @Schema(implementation = ssu.eatssu.handler.response.BaseResponse.class))),
-        @ApiResponse(responseCode = "404", description = "존재 하지 않는 식당", content = @Content(schema = @Schema(implementation = ssu.eatssu.handler.response.BaseResponse.class)))
+        @ApiResponse(responseCode = "200", description = "식단 리스트 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "400", description = "지원 하지 않는 식당 (고정 메뉴 식당)", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "404", description = "존재 하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/list")
     public BaseResponse<List<MealInformationResponse>> getMeal(

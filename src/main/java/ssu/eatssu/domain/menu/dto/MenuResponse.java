@@ -1,7 +1,6 @@
 package ssu.eatssu.domain.menu.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,14 +30,14 @@ public class MenuResponse {
         private Double mainRating;
 
         @Schema(description = "식단 속 메뉴 정보 리스트")
-        private List<BreifMenuInformation> menusInformation;
+        private List<BriefMenuInformation> menusInformation;
 
 
         public static MealInformationResponse from(Meal meal) {
             if (!meal.getMealMenus().isEmpty()) {
-	List<BreifMenuInformation> menusInformation = meal.getMealMenus().stream()
+	List<BriefMenuInformation> menusInformation = meal.getMealMenus().stream()
 	    .map(MealMenu::getMenu)
-	    .map(BreifMenuInformation::new).toList();
+	    .map(BriefMenuInformation::new).toList();
 
 	return new MealInformationResponse(meal.getId(),
 	    meal.getRestaurant().getRestaurantName().getPrice(),
@@ -78,13 +77,13 @@ public class MenuResponse {
     @AllArgsConstructor
     public static class MenusInformationResponse {
 
-        private List<BreifMenuInformation> menusInformation;
+        private List<BriefMenuInformation> menusInformation;
 
         public static MenusInformationResponse from(Meal meal) {
             if (!meal.getMealMenus().isEmpty()) {
-	List<BreifMenuInformation> menusInformation = meal.getMealMenus().stream()
+	List<BriefMenuInformation> menusInformation = meal.getMealMenus().stream()
 	    .map(MealMenu::getMenu)
-	    .map(BreifMenuInformation::new).toList();
+	    .map(BriefMenuInformation::new).toList();
 	return new MenusInformationResponse(menusInformation);
             } else {
 	return null;
@@ -94,7 +93,7 @@ public class MenuResponse {
 
     @Getter
     @NoArgsConstructor
-    private static class BreifMenuInformation {
+    private static class BriefMenuInformation {
 
         @Schema(description = "메뉴 식별자", example = "2")
         private Long menuId;
@@ -102,7 +101,7 @@ public class MenuResponse {
         @Schema(description = "메뉴 이름", example = "돈까스")
         private String name;
 
-        private BreifMenuInformation(Menu menu) {
+        private BriefMenuInformation(Menu menu) {
             this.menuId = menu.getId();
             this.name = menu.getName();
         }
