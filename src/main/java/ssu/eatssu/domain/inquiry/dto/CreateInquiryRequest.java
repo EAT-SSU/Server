@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Schema(title = "문의 남기기")
 @NoArgsConstructor
 @Getter
-public class UserInquiryCreate {
+public class CreateInquiryRequest {
     @Schema(description = "문의 내용", example = "어쩌고 저쩌고 문의 남깁니다")
     private String content;
 }
