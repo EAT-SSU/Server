@@ -1,11 +1,11 @@
 package ssu.eatssu.domain.rating;
 
 import org.springframework.stereotype.Component;
-import ssu.eatssu.domain.menu.Meal;
-import ssu.eatssu.domain.menu.MealMenu;
-import ssu.eatssu.domain.menu.Menu;
-import ssu.eatssu.web.review.dto.RatingAverages;
-import ssu.eatssu.web.review.dto.ReviewRatingCount;
+import ssu.eatssu.domain.menu.entity.Meal;
+import ssu.eatssu.domain.menu.entity.MealMenu;
+import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.review.dto.RatingAverages;
+import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 
 /**
  * JPA 의 OneToMany객체참조를 이용하여 구현한 클래스입니다.

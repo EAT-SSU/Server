@@ -1,6 +1,6 @@
 package ssu.eatssu.domain.rating;
 
-import ssu.eatssu.web.review.dto.ReviewRatingCount;
+import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 
 public enum ReviewRating {
     RATING_1(1),
