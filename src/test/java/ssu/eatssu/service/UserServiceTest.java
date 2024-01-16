@@ -9,6 +9,7 @@ import ssu.eatssu.domain.User;
 import ssu.eatssu.domain.repository.UserRepository;
 
 import java.util.Optional;
+import ssu.eatssu.domain.user.service.UserService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

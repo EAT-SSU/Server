@@ -1,9 +1,9 @@
 package ssu.eatssu.domain.rating;
 
-import ssu.eatssu.domain.menu.Meal;
-import ssu.eatssu.domain.menu.Menu;
-import ssu.eatssu.web.review.dto.RatingAverages;
-import ssu.eatssu.web.review.dto.ReviewRatingCount;
+import ssu.eatssu.domain.menu.entity.Meal;
+import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.review.dto.RatingAverages;
+import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 
 public interface RatingCalculator {
 
