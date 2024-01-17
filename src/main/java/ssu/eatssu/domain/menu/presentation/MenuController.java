@@ -37,7 +37,7 @@ public class MenuController {
         @ApiResponse(responseCode = "400", description = "지원하지 않는 식당(변동 메뉴 식당)", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
         @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    @GetMapping("/list")
+    @GetMapping("")
     public BaseResponse<List<MenuInformationResponse>> getMenus(
         @RequestParam("restaurant") RestaurantName restaurantName) {
         if (RestaurantName.isVariable(restaurantName)) {

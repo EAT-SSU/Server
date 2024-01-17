@@ -22,11 +22,10 @@ import ssu.eatssu.domain.user.dto.Tokens;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import ssu.eatssu.domain.auth.infrastructure.SecurityUtil;
 
 @Slf4j
 @RestController
-@RequestMapping("/oauth")
+@RequestMapping("/oauths")
 @RequiredArgsConstructor
 @Tag(name = "Oauth", description = "Oauth API")
 public class OauthController {

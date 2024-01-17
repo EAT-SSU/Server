@@ -40,6 +40,34 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final SliceService sliceService;
 
+    @Operation(summary = "리뷰 리스트 조회", description = """
+        리뷰 리스트를 조회하는 API 입니다.<br><br>
+        menuType=FIX 의 경우 menuId 파라미터를 넣어주세요.<br><br>
+        menuType=CHANGE 의 경우 mealId 파라미터를 넣어주세요.<br><br>
+        커서 기반 페이지네이션으로 리뷰 리스트를 조회합니다.<br><br>
+        페이징 기본 값 = {size=20, sort=date, direction=desc}<br><br>
+        """)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "리뷰 리스트 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @GetMapping("")
+    public BaseResponse<SliceResponse<ReviewDetail>> getReviews(
+        @Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType") MenuType menuType,
+        @Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false) Long menuId,
+        @Parameter(description = "mealId(변동메뉴)") @RequestParam(value = "mealId", required = false) Long mealId,
+        @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY)
+        @RequestParam(value = "lastReviewId", required = false) Long lastReviewId,
+        @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
+        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        SliceResponse<ReviewDetail> myReviews = sliceService.findReviews(menuType, menuId, mealId,
+            pageable, lastReviewId, customUserDetails);
+
+        return BaseResponse.success(myReviews);
+    }
+
     @Operation(summary = "리뷰 작성", description = """
         리뷰를 작성하는 API 입니다.<br><br>
         reviewCreate는 application/json, multipartFileList는 multipart/form-data로 요청해주세요.<br><br>
@@ -111,7 +139,7 @@ public class ReviewController {
         @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema =
         @Schema(implementation = BaseResponse.class)))
     })
-    @GetMapping("/meal")
+    @GetMapping("/meals/{mealId}")
     public BaseResponse<MealReviewsResponse> getMealReviews(
         @Parameter(description = "mealId")
         @RequestParam(value = "mealId") Long mealId) {
@@ -130,39 +158,11 @@ public class ReviewController {
         @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema =
         @Schema(implementation = BaseResponse.class)))
     })
-    @GetMapping("/menu")
+    @GetMapping("/menus/{menuId}")
     public BaseResponse<MainReviewsResponse> getMainReviews(
         @Parameter(description = "menuId")
         @RequestParam(value = "menuId") Long menuId) {
         return BaseResponse.success(reviewService.findMenuReviews(menuId));
-    }
-
-    @Operation(summary = "리뷰 리스트 조회", description = """
-        리뷰 리스트를 조회하는 API 입니다.<br><br>
-        menuType=FIX 의 경우 menuId 파라미터를 넣어주세요.<br><br>
-        menuType=CHANGE 의 경우 mealId 파라미터를 넣어주세요.<br><br>
-        커서 기반 페이지네이션으로 리뷰 리스트를 조회합니다.<br><br>
-        페이징 기본 값 = {size=20, sort=date, direction=desc}<br><br>
-        """)
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "리뷰 리스트 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-        @ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
-    @GetMapping("/list")
-    public BaseResponse<SliceResponse<ReviewDetail>> getReviews(
-        @Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType") MenuType menuType,
-        @Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false) Long menuId,
-        @Parameter(description = "mealId(변동메뉴)") @RequestParam(value = "mealId", required = false) Long mealId,
-        @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY)
-        @RequestParam(value = "lastReviewId", required = false) Long lastReviewId,
-        @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
-        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        SliceResponse<ReviewDetail> myReviews = sliceService.findReviews(menuType, menuId, mealId,
-            pageable, lastReviewId, customUserDetails);
-
-        return BaseResponse.success(myReviews);
     }
 
 }

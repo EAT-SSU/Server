@@ -81,7 +81,7 @@ public class UserController {
         @ApiResponse(responseCode = "200", description = "유저 탈퇴 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
         @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    @DeleteMapping("/withdraw")
+    @DeleteMapping("")
     public BaseResponse<Boolean> withdraw(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(userService.withdraw(userDetails));
     }
@@ -91,7 +91,7 @@ public class UserController {
         @ApiResponse(responseCode = "200", description = "내가 쓴 리뷰 리스트 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
         @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    @GetMapping("/my-reviews")
+    @GetMapping("/reviews")
     public BaseResponse<SliceResponse<MyReviewDetail>> getMyReviewList(
         @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY) @RequestParam(required = false) Long lastReviewId,
         @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
@@ -107,7 +107,7 @@ public class UserController {
         @ApiResponse(responseCode = "200", description = "마이페이지 정보 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
         @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    @GetMapping("/my-page")
+    @GetMapping("/mypage")
     public BaseResponse<MyPageResponse> getMyPage(
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return BaseResponse.success(userService.findMyPage(customUserDetails));
