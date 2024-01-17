@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
-import ssu.eatssu.domain.review.QReview;
+import ssu.eatssu.domain.review.entity.QReview;
 import ssu.eatssu.domain.review.entity.Review;
 
 import java.util.ArrayList;
