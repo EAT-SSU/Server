@@ -84,8 +84,7 @@ public class MenuService {
         for (String addMenuName : request.getMenuNames()) {
             checkAndCreateMenu(addMenuName, restaurant);
 
-            Menu menu = menuRepository.findByNameAndRestaurant(addMenuName, restaurant)
-	.orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MENU));
+            Menu menu = getMenu(addMenuName, restaurant);
 
             MealMenu mealMenu = MealMenu.builder()
 	.menu(menu)
@@ -106,11 +105,6 @@ public class MenuService {
     public MenusInformationResponse findMenusInMeal(Long mealId) {
         Meal meal = getMeal(mealId);
         return MenusInformationResponse.from(meal);
-    }
-
-    private Meal getMeal(Long mealId) {
-        Meal meal = getMeal(mealId);
-        return meal;
     }
 
     public void deleteMeal(Long mealId) {
@@ -134,15 +128,27 @@ public class MenuService {
         }
     }
 
-    private Restaurant getRestaurant(RestaurantName restaurantName) {
-        Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
-            .orElseThrow(() -> new RestaurantNotFoundException());
-        return restaurant;
+    private Menu getMenu(String addMenuName, Restaurant restaurant) {
+        Menu menu = menuRepository.findByNameAndRestaurant(addMenuName, restaurant)
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MENU));
+        return menu;
+    }
+
+    private Meal getMeal(Long mealId) {
+        Meal meal = mealRepository.findById(mealId)
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MEAL));
+        return meal;
     }
 
     private List<Meal> getMeals(Date date, TimePart timePart, Restaurant restaurant) {
         List<Meal> meals = mealRepository.findAllByDateAndTimePartAndRestaurant(date,
             timePart, restaurant);
         return meals;
+    }
+
+    private Restaurant getRestaurant(RestaurantName restaurantName) {
+        Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
+            .orElseThrow(() -> new RestaurantNotFoundException());
+        return restaurant;
     }
 }

@@ -30,10 +30,10 @@ import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
-import ssu.eatssu.utils.S3Uploader;
 
 import java.io.IOException;
 import java.util.List;
+import ssu.eatssu.global.util.S3Uploader;
 
 @RequiredArgsConstructor
 @Service
@@ -96,7 +96,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
 
-        if (review.isDifferentUser(user)) {
+        if (review.isNotWrittenBy(user)) {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
 
@@ -112,7 +112,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
 
-        if (review.isDifferentUser(user)) {
+        if (review.isNotWrittenBy(user)) {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
         reviewRepository.delete(review);

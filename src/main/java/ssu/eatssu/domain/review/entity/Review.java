@@ -51,7 +51,7 @@ public class Review extends BaseTimeEntity {
     }
     */
 
-    public boolean isDifferentUser(User user) {
+    public boolean isNotWrittenBy(User user) {
         return !this.user.equals(user);
     }
 

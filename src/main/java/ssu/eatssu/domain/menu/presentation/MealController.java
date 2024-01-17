@@ -49,7 +49,7 @@ public class MealController {
         @ApiResponse(responseCode = "400", description = "잘못된 날짜형식", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
         @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    @PostMapping("/create")
+    @PostMapping("")
     public BaseResponse<?> createMeal(
         @Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
         @Parameter(description = "식당이름") @RequestParam("restaurant") RestaurantName restaurantName,
@@ -73,7 +73,7 @@ public class MealController {
         @ApiResponse(responseCode = "400", description = "지원 하지 않는 식당 (고정 메뉴 식당)", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
         @ApiResponse(responseCode = "404", description = "존재 하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    @GetMapping("/list")
+    @GetMapping("")
     public BaseResponse<List<MealInformationResponse>> getMeal(
         @Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
         @Parameter(description = "식당 이름") @RequestParam("restaurant") RestaurantName restaurantName,
