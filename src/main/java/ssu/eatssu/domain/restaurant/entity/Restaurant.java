@@ -7,6 +7,7 @@ import lombok.Getter;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
+
 @Getter
 public enum Restaurant {
     DODAM(RestaurantType.VARIABLE, "도담 식당", 6000),
@@ -17,7 +18,7 @@ public enum Restaurant {
 
     private RestaurantType restaurantType;
     private String restaurantName;
-    private Integer price;
+    private Integer restaurantPrice;
 
     @JsonCreator
     public static Restaurant from(String restaurantName) {
@@ -30,7 +31,7 @@ public enum Restaurant {
     Restaurant(RestaurantType restaurantType, String description, Integer price) {
         this.restaurantType = restaurantType;
         this.restaurantName = description;
-        this.price = price;
+        this.restaurantPrice = price;
     }
 
     public boolean isFixed() {
