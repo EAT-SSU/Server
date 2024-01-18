@@ -69,7 +69,7 @@ public class User extends BaseTimeEntity {
      * <--Static Factory Method-->
      * Oauth 회원가입
      */
-    public static User oAuthJoin(@NotNull String email, @NotNull OAuthProvider provider, String providerId,
+    public static User create(@NotNull String email, @NotNull OAuthProvider provider, String providerId,
                                  String credentials) {
         return new User(email, Role.USER, provider, providerId, UserStatus.ACTIVE, credentials);
     }
