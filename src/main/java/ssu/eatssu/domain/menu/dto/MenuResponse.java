@@ -40,7 +40,7 @@ public class MenuResponse {
 	    .map(BriefMenuInformation::new).toList();
 
 	return new MealInformationResponse(meal.getId(),
-	    meal.getRestaurant().getRestaurantName().getPrice(),
+	    meal.getRestaurant().getRestaurantPrice(),
 	    meal.getAverateMainRating(), menusInformation);
             } else {
 	return null;

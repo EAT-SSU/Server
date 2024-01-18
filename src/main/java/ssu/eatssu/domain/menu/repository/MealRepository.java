@@ -3,7 +3,6 @@ package ssu.eatssu.domain.menu.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-import ssu.eatssu.domain.restaurant.entity.TemporalRestaurant;
 import ssu.eatssu.domain.menu.entity.TimePart;
 
 import java.util.Date;
