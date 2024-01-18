@@ -6,9 +6,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ssu.eatssu.domain.auth.dto.AppleLoginRequest;
 import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
+import ssu.eatssu.domain.auth.entity.JwtTokenProvider;
 import ssu.eatssu.domain.auth.infrastructure.TestAppleAuthenticator;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
@@ -27,12 +29,16 @@ class OauthServiceTest {
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private AuthenticationManagerBuilder authenticationManagerBuilder;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
 
     @BeforeEach
     void setUp() {
-        oauthService = new OAuthService(userService, userRepository, passwordEncoder,
-            new TestAppleAuthenticator());
+        oauthService = new OAuthService(userService, userRepository,
+            new TestAppleAuthenticator(), authenticationManagerBuilder, jwtTokenProvider);
         userRepository.deleteAll();
     }
 
@@ -43,9 +49,9 @@ class OauthServiceTest {
 
         // when
         oauthService.kakaoLogin(request);
-        User user = userRepository.findByProviderId(request.providerId()).get();
 
         // then
+        User user = userRepository.findByProviderId(request.providerId()).get();
         assertThat(userRepository.findAll()).hasSize(1);
         assertThat(user.getEmail()).isEqualTo(request.email());
         assertThat(user.getProviderId()).isEqualTo(request.providerId());
@@ -58,9 +64,9 @@ class OauthServiceTest {
 
         // when
         oauthService.appleLogin(request);
-        User user = userRepository.findByProviderId("1234567890").get();
 
         // then
+        User user = userRepository.findByProviderId("1234567890").get();
         assertThat(userRepository.findAll()).hasSize(1);
         assertThat(user.getEmail()).isEqualTo("test@test.com");
         assertThat(user.getProviderId()).isEqualTo("1234567890");
