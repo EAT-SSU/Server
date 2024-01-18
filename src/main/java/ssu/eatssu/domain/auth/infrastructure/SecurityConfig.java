@@ -27,6 +27,10 @@ public class SecurityConfig {
             "/inquiries/list"
     };
 
+    private static final String[] ADMIN_PAGE_LIST = {
+            "/admin/**"
+    };
+
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -44,6 +48,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .shouldFilterAllDispatcherTypes(false)
                         .requestMatchers(AUTH_WHITELIST).permitAll()
+                        .requestMatchers(ADMIN_PAGE_LIST).hasRole("ADMIN")
                         .anyRequest().authenticated()
                         .and().addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
                                 UsernamePasswordAuthenticationFilter.class))
