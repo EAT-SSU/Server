@@ -64,6 +64,18 @@ class UserServiceTest {
         assertThat(userRepository.findAll()).hasSize(0);
     }
 
+    @Test
+    void 중복_이메일을_확인한다() {
+        // given
+        User user = 회원가입_요청();
+
+        // when
+        boolean isDuplicated = userService.validateDuplicatedEmail(user.getEmail());
+
+        // then
+        assertThat(isDuplicated).isFalse();
+    }
+
     private User 회원가입_요청() {
         return userService.join("test@test.com", OAuthProvider.EATSSU, "1234");
     }
