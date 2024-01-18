@@ -3,7 +3,6 @@ package ssu.eatssu.domain.menu.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-import ssu.eatssu.domain.restaurant.entity.TemporalRestaurant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +23,12 @@ public class Menu {
 
     private Integer price;
 
-    @Enumerated(EnumType.STRING)
-    private MenuType menuType;
+//    @Enumerated(EnumType.STRING)
+//    private MenuType menuType;
 
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
     private List<MealMenu> mealMenus = new ArrayList<>();
 
-    @Embedded
     private Restaurant restaurant;
 
     @Embedded
@@ -42,27 +40,14 @@ public class Menu {
         this.price = price;
     }
 
-    private Menu(String name, Integer price) {
-        this.name = name;
-        this.price = price;
-    }
-
-    /**
-     * 변동 메뉴를 생성합니다.
-     * todo: 변동메뉴 식당이 아니라 고정 메뉴 식당으로 잘못 들어온다면 어떻게 처리?
-     */
     public static Menu createVariable(String name, Restaurant restaurant) {
         int price = 0;
         if (restaurant.isVariable()) {
-            price = restaurant.getPrice();
+            price = restaurant.getRestaurantPrice();
         }
         return new Menu(name, restaurant, price);
     }
 
-    /**
-     * 고정 메뉴를 생성합니다.
-     * todo: 고정메뉴 식당이 아니라 변동 메뉴 식당으로 잘못 들어온다면 어떻게 처리?
-     */
     public static Menu createFixed(String name, Restaurant restaurant, Integer price) {
         return new Menu(name, restaurant, price);
     }
