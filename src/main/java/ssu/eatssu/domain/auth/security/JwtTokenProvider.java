@@ -146,25 +146,4 @@ public class JwtTokenProvider {
         return true;
     }
 
-    // 토큰 만료 시간 확인(밀리세컨드)
-    public Long getExpiration(String accessToken) {
-        Date expiration = Jwts
-                .parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(accessToken)
-                .getBody()
-                .getExpiration();
-
-        Long now = new Date().getTime();
-
-        return (expiration.getTime() - now);
-    }
-
-
-
-
-
-
-
 }
