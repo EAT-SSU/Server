@@ -12,7 +12,6 @@ import ssu.eatssu.domain.menu.dto.MenuResponse.MealInformationResponse;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.MealMenu;
 import ssu.eatssu.domain.menu.entity.Menu;
-import ssu.eatssu.domain.menu.exception.RestaurantNotFoundException;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantName;
 import ssu.eatssu.domain.menu.entity.TimePart;
@@ -148,7 +147,7 @@ public class MenuService {
 
     private Restaurant getRestaurant(RestaurantName restaurantName) {
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
-            .orElseThrow(() -> new RestaurantNotFoundException());
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
         return restaurant;
     }
 }
