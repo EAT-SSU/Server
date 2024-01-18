@@ -142,7 +142,7 @@ public class ReviewController {
     @GetMapping("/meals/{mealId}")
     public BaseResponse<MealReviewsResponse> getMealReviews(
         @Parameter(description = "mealId")
-        @RequestParam(value = "mealId") Long mealId) {
+        @PathVariable(value = "mealId") Long mealId) {
         return BaseResponse.success(reviewService.findMealReviews(mealId));
     }
 
@@ -161,7 +161,7 @@ public class ReviewController {
     @GetMapping("/menus/{menuId}")
     public BaseResponse<MainReviewsResponse> getMainReviews(
         @Parameter(description = "menuId")
-        @RequestParam(value = "menuId") Long menuId) {
+        @PathVariable(value = "menuId") Long menuId) {
         return BaseResponse.success(reviewService.findMenuReviews(menuId));
     }
 
