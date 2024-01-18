@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
+import ssu.eatssu.domain.restaurant.entity.TemporalRestaurant;
 
 import java.util.*;
 
@@ -27,8 +28,7 @@ public class Meal {
     @Enumerated(EnumType.STRING)
     private TimePart timePart;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id")
+    @Embedded
     private Restaurant restaurant;
 
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)

@@ -13,7 +13,7 @@ import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.MealMenu;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-import ssu.eatssu.domain.restaurant.entity.RestaurantName;
+import ssu.eatssu.domain.restaurant.entity.TemporalRestaurant;
 import ssu.eatssu.domain.menu.entity.TimePart;
 import ssu.eatssu.domain.menu.repository.MealMenuRepository;
 import ssu.eatssu.domain.menu.repository.MealRepository;
@@ -35,10 +35,8 @@ public class MenuService {
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
     private final MealMenuRepository mealMenuRepository;
-    private final RestaurantRepository restaurantRepository;
 
-    public List<MenuInformationResponse> findMenusByRestaurant(RestaurantName restaurantName) {
-        Restaurant restaurant = getRestaurant(restaurantName);
+    public List<MenuInformationResponse> findMenusByRestaurant(Restaurant restaurant) {
         List<Menu> menus = menuRepository.findAllByRestaurant(restaurant);
 
         return menus.stream()
@@ -47,9 +45,8 @@ public class MenuService {
     }
 
     public List<MealInformationResponse> findSpecificMeals(Date date,
-        RestaurantName restaurantName,
+        Restaurant restaurant,
         TimePart timePart) {
-        Restaurant restaurant = getRestaurant(restaurantName);
         List<Meal> meals = getMeals(date, timePart, restaurant);
 
         return meals.stream()
@@ -57,9 +54,8 @@ public class MenuService {
             .toList();
     }
 
-    public void createMeal(Date date, RestaurantName restaurantName, TimePart timePart,
+    public void createMeal(Date date, Restaurant restaurant, TimePart timePart,
         CreateMealRequest request) {
-        Restaurant restaurant = getRestaurant(restaurantName);
         List<Meal> meals = getMeals(date, timePart, restaurant);
 
         if (MenuValidator.validateExistedMeal(meals,
@@ -95,10 +91,10 @@ public class MenuService {
 
     private void checkAndCreateMenu(String menuName, Restaurant restaurant) {
         if (!menuRepository.existsByNameAndRestaurant(menuName, restaurant)) {
-            menuRepository.save(Menu.createChangeMenu(menuName, restaurant));
+            menuRepository.save(Menu.createVariable(menuName, restaurant));
         }
 
-        menuRepository.save(Menu.createChangeMenu(menuName, restaurant));
+        menuRepository.save(Menu.createVariable(menuName, restaurant));
     }
 
     public MenusInformationResponse findMenusInMeal(Long mealId) {
@@ -119,7 +115,7 @@ public class MenuService {
         cleanupGarbageMenu(menus);
     }
 
-    public void cleanupGarbageMenu(List<Menu> menuList) {
+    private void cleanupGarbageMenu(List<Menu> menuList) {
         for (Menu menu : menuList) {
             if (menu.getMealMenus().isEmpty()) {
 	menuRepository.delete(menu);
@@ -143,11 +139,5 @@ public class MenuService {
         List<Meal> meals = mealRepository.findAllByDateAndTimePartAndRestaurant(date,
             timePart, restaurant);
         return meals;
-    }
-
-    private Restaurant getRestaurant(RestaurantName restaurantName) {
-        Restaurant restaurant = restaurantRepository.findByRestaurantName(restaurantName)
-            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
-        return restaurant;
     }
 }

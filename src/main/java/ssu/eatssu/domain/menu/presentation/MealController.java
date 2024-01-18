@@ -26,7 +26,7 @@ import ssu.eatssu.domain.menu.entity.TimePart;
 import ssu.eatssu.domain.menu.dto.MenuRequest.CreateMealRequest;
 import ssu.eatssu.domain.menu.dto.MenuResponse.MealInformationResponse;
 import ssu.eatssu.domain.menu.service.MenuService;
-import ssu.eatssu.domain.restaurant.entity.RestaurantName;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
@@ -52,10 +52,10 @@ public class MealController {
     @PostMapping("")
     public BaseResponse<?> createMeal(
         @Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
-        @Parameter(description = "식당이름") @RequestParam("restaurant") RestaurantName restaurantName,
+        @Parameter(description = "식당이름") @RequestParam("restaurant") Restaurant restaurantName,
         @Parameter(description = "시간대") @RequestParam("time") TimePart timePart,
         @RequestBody CreateMealRequest createMealRequest) {
-        if (RestaurantName.isFixed(restaurantName)) {
+        if (restaurantName.isFixed()) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
 
@@ -76,9 +76,9 @@ public class MealController {
     @GetMapping("")
     public BaseResponse<List<MealInformationResponse>> getMeal(
         @Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
-        @Parameter(description = "식당 이름") @RequestParam("restaurant") RestaurantName restaurantName,
+        @Parameter(description = "식당 이름") @RequestParam("restaurant") Restaurant restaurantName,
         @Parameter(description = "시간대") @RequestParam("time") TimePart timePart) {
-        if (RestaurantName.isFixed(restaurantName)) {
+        if (restaurantName.isFixed()) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
 
