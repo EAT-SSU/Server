@@ -13,11 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.auth.service.OauthService;
 import ssu.eatssu.global.handler.response.BaseResponse;
 import ssu.eatssu.domain.auth.dto.AppleLogin;
-import ssu.eatssu.domain.auth.dto.KakaoLogin;
+import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
 import ssu.eatssu.domain.user.dto.Tokens;
 
 import java.security.NoSuchAlgorithmException;
@@ -43,8 +42,8 @@ public class OauthController {
         @ApiResponse(responseCode = "200", description = "카카오 회원가입/로그인 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/kakao")
-    public BaseResponse<Tokens> kakaoLogin(@Valid @RequestBody KakaoLogin login) {
-        Tokens tokens = oauthService.kakaoLogin(login.getEmail(), login.getProviderId());
+    public BaseResponse<Tokens> kakaoLogin(@Valid @RequestBody KakaoLoginRequest request) {
+        Tokens tokens = oauthService.kakaoLogin(request);
         return BaseResponse.success(tokens);
     }
 

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.auth.entity.OauthProvider;
 import ssu.eatssu.domain.user.repository.UserRepository;
@@ -43,54 +44,40 @@ import ssu.eatssu.global.handler.response.BaseException;
 @Transactional
 public class OauthService {
 
+    private final UserService userService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserService userService;
     private final RestTemplate restTemplate;
 
-    /**
-     * 카카오 로그인
-     */
-    public Tokens kakaoLogin(String email, String providerId) {
-
-        //가입 안된 유저일 경우 회원가입 진행
-        User user = userRepository.findByProviderId(providerId)
-                .orElseGet(() -> join(email, OauthProvider.KAKAO, providerId));
+    public Tokens kakaoLogin(KakaoLoginRequest request) {
+        User user = userRepository.findByProviderId(request.providerId())
+            .orElseGet(() -> join(request.email(), OauthProvider.KAKAO, request.providerId()));
 
         // return Tokens
-        return userService.generateOauthJwtTokens(user.getEmail(), OauthProvider.KAKAO, providerId);
+        return userService.generateOauthJwtTokens(user.getEmail(), OauthProvider.KAKAO,
+            request.providerId());
     }
-
-    /**
-     * 애플 로그인
-     */
 
     public Tokens appleLogin(String identityToken) {
 
         //애플 유저 정보 조회
         OauthInfo oauthInfo = getUserInfoFromApple(identityToken);
 
-
         //가입 안된 유저일 경우 회원가입 진행
         User user = userRepository.findByProviderId(oauthInfo.providerId())
-                .orElseGet(() -> join(oauthInfo.email(), OauthProvider.APPLE, oauthInfo.providerId()));
-
+            .orElseGet(() -> join(oauthInfo.email(), OauthProvider.APPLE, oauthInfo.providerId()));
 
         //이메일 갱신
         updateAppleUserEmail(user, oauthInfo.email());
 
         // return Tokens
-        return userService.generateOauthJwtTokens(user.getEmail(), OauthProvider.APPLE, oauthInfo.providerId());
+        return userService.generateOauthJwtTokens(user.getEmail(), OauthProvider.APPLE,
+            oauthInfo.providerId());
     }
-
-    /**
-     * 회원가입
-     */
 
     private User join(String email, OauthProvider provider, String providerId) {
         String credentials = createCredentials(provider, providerId);
 
-        //회원가입
         User user = User.oAuthJoin(email, provider, providerId, credentials);
         return userRepository.save(user);
     }
@@ -107,7 +94,6 @@ public class OauthService {
      * 애플 유저 private email -> 찐 email 로 갱신
      */
     private void updateAppleUserEmail(User user, String email) {
-
         if (isHideEmail(user.getEmail()) && !isHideEmail(email)) {
             user.updateEmail(email);
             userRepository.save(user);
@@ -198,8 +184,9 @@ public class OauthService {
         //decode 된 header 정보를 통해 정답키의 key id, algorithm 정보를 가져온다.
         Map<String, String> headerMap;
         try {
-            headerMap = new ObjectMapper().readValue(decodedHeader, new TypeReference<Map<String, String>>() {
-            });
+            headerMap = new ObjectMapper().readValue(decodedHeader,
+	new TypeReference<Map<String, String>>() {
+	});
         } catch (JsonProcessingException e) {
             throw new BaseException(INVALID_IDENTITY_TOKEN);
         }
