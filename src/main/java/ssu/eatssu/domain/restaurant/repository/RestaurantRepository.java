@@ -2,12 +2,12 @@ package ssu.eatssu.domain.restaurant.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-import ssu.eatssu.domain.restaurant.entity.RestaurantName;
+import ssu.eatssu.domain.restaurant.entity.TemporalRestaurant;
 
 import java.util.Optional;
 
-public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
+public interface RestaurantRepository extends JpaRepository<TemporalRestaurant, Long> {
 
-    Optional<Restaurant> findByRestaurantName(RestaurantName restaurantName);
+    Optional<TemporalRestaurant> findByRestaurantName(Restaurant restaurantName);
 
 }

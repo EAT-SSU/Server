@@ -5,9 +5,9 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
-import ssu.eatssu.domain.restaurant.entity.RestaurantName;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 
-import static ssu.eatssu.domain.restaurant.entity.RestaurantName.*;
+import static ssu.eatssu.domain.restaurant.entity.Restaurant.*;
 
 
 @Getter
@@ -16,19 +16,11 @@ public enum MenuType {
     VARIABLE("변동 메뉴", Arrays.asList(DODAM, DORMITORY, HAKSIK));
 
     private final String description;
-    private final List<RestaurantName> restaurants;
+    private final List<Restaurant> restaurants;
 
-    MenuType(String description, List<RestaurantName> restaurants) {
+    MenuType(String description, List<Restaurant> restaurants) {
         this.description = description;
         this.restaurants = restaurants;
-    }
-
-    public static boolean isFixed(RestaurantName restaurant) {
-        return FIXED.getRestaurants().contains(restaurant);
-    }
-
-    public static boolean isChanged(RestaurantName restaurant) {
-        return VARIABLE.getRestaurants().contains(restaurant);
     }
 
     @JsonCreator
