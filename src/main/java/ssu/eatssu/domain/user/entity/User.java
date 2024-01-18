@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import ssu.eatssu.domain.auth.entity.OauthProvider;
+import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.Report;
@@ -33,7 +33,7 @@ public class User extends BaseTimeEntity {
     private String nickname;
 
     @Enumerated(EnumType.STRING)
-    private OauthProvider provider;
+    private OAuthProvider provider;
 
     private String providerId;
 
@@ -55,7 +55,7 @@ public class User extends BaseTimeEntity {
     /**
      * Oauth 회원가입 용 생성자
      */
-    private User(@NotNull String email, @NotNull Role role, @NotNull OauthProvider provider,
+    private User(@NotNull String email, @NotNull Role role, @NotNull OAuthProvider provider,
                  @NotNull String providerId, @NotNull UserStatus status, @NotNull String credentials) {
         this.email = email;
         this.role = role;
@@ -69,7 +69,7 @@ public class User extends BaseTimeEntity {
      * <--Static Factory Method-->
      * Oauth 회원가입
      */
-    public static User oAuthJoin(@NotNull String email, @NotNull OauthProvider provider, String providerId,
+    public static User oAuthJoin(@NotNull String email, @NotNull OAuthProvider provider, String providerId,
                                  String credentials) {
         return new User(email, Role.USER, provider, providerId, UserStatus.ACTIVE, credentials);
     }

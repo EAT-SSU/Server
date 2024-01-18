@@ -10,11 +10,11 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.auth.entity.CustomUserDetails;
+import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.UpdateNicknameRequest;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.review.entity.Review;
-import ssu.eatssu.domain.auth.entity.OauthProvider;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.auth.entity.JwtTokenProvider;
 import ssu.eatssu.domain.user.dto.Tokens;
@@ -66,7 +66,7 @@ public class UserService {
      * Oauth 회원 - email, providerId 를 통해 JwtToken 을 생성
      * todo: 같은 이메일로 카카오, 애플 등 여러 회원가입을 한 회원 처리 필요
      */
-    public Tokens generateOauthJwtTokens(String email, OauthProvider provider, String providerId) {
+    public Tokens generateOauthJwtTokens(String email, OAuthProvider provider, String providerId) {
 
         // email, credentials 를 기반으로 Authentication 객체 생성
         // 이때 authentication 은 인증 여부를 확인하는 authenticated 값이 false
@@ -83,7 +83,7 @@ public class UserService {
         return jwtTokenProvider.generateTokens(authentication);
     }
 
-    private String makeOauthCredentials(OauthProvider provider, String providerId) {
+    private String makeOauthCredentials(OAuthProvider provider, String providerId) {
         return provider + "_" + providerId;
     }
 
