@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.auth.entity;
+package ssu.eatssu.domain.auth.infrastructure;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
+import ssu.eatssu.domain.auth.entity.JwtTokenProvider;
 
 @Slf4j
 @RequiredArgsConstructor
