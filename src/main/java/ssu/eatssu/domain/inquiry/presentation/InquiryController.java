@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ssu.eatssu.domain.auth.entity.CustomUserDetails;
+import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.inquiry.service.InquiryService;
 import ssu.eatssu.global.handler.response.BaseResponse;

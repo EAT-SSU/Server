@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.auth.entity;
+package ssu.eatssu.domain.auth.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

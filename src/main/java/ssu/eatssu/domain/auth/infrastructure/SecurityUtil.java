@@ -5,8 +5,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import ssu.eatssu.domain.auth.entity.CustomUserDetails;
-import ssu.eatssu.domain.auth.dto.UserPrincipalDto;
+import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.domain.auth.security.UserPrincipalDto;
 
 @Component
 public class SecurityUtil {
