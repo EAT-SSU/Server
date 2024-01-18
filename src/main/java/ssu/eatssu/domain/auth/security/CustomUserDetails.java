@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.auth.entity;
+package ssu.eatssu.domain.auth.security;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

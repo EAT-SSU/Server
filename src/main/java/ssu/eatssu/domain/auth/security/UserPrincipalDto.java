@@ -1,10 +1,9 @@
-package ssu.eatssu.domain.auth.dto;
+package ssu.eatssu.domain.auth.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ssu.eatssu.domain.auth.entity.CustomUserDetails;
 
 @Getter
 @Builder

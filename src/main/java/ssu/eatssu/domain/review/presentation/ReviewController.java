@@ -17,7 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ssu.eatssu.domain.auth.entity.CustomUserDetails;
+import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.menu.entity.MenuType;
 import ssu.eatssu.domain.review.dto.CreateReviewRequest;
 import ssu.eatssu.domain.review.dto.MealReviewsResponse;

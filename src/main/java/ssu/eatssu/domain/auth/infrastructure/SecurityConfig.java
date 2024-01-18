@@ -9,8 +9,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import ssu.eatssu.domain.auth.entity.JwtAuthenticationFilter;
-import ssu.eatssu.domain.auth.entity.JwtTokenProvider;
+import ssu.eatssu.domain.auth.security.JwtAuthenticationFilter;
+import ssu.eatssu.domain.auth.security.JwtTokenProvider;
 import ssu.eatssu.global.handler.JwtAccessDeniedHandler;
 import ssu.eatssu.global.handler.JwtAuthenticationEntryPoint;
 

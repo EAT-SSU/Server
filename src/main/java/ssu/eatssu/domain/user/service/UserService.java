@@ -9,14 +9,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import ssu.eatssu.domain.auth.entity.CustomUserDetails;
+import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.UpdateNicknameRequest;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.auth.entity.OauthProvider;
 import ssu.eatssu.domain.user.entity.User;
-import ssu.eatssu.domain.auth.entity.JwtTokenProvider;
+import ssu.eatssu.domain.auth.security.JwtTokenProvider;
 import ssu.eatssu.domain.user.dto.Tokens;
 import ssu.eatssu.global.handler.response.BaseException;
 

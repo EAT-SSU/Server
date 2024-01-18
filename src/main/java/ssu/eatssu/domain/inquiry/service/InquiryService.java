@@ -6,7 +6,7 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_US
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ssu.eatssu.domain.auth.entity.CustomUserDetails;
+import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.inquiry.dto.CreateInquiryRequest;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.inquiry.entity.Inquiry;

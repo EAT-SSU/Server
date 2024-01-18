@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.auth.entity;
+package ssu.eatssu.domain.auth.security;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import ssu.eatssu.domain.auth.dto.UserPrincipalDto;
 import ssu.eatssu.domain.user.dto.Tokens;
 
 import java.security.Key;
