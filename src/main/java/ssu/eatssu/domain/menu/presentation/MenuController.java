@@ -39,11 +39,11 @@ public class MenuController {
     })
     @GetMapping("")
     public BaseResponse<List<MenuInformationResponse>> getMenus(
-        @RequestParam("restaurant") Restaurant restaurantName) {
-        if (restaurantName.isVariable()) {
+        @RequestParam("restaurant") Restaurant restaurant) {
+        if (restaurant.isVariable()) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
-        return BaseResponse.success(menuService.findMenusByRestaurant(restaurantName));
+        return BaseResponse.success(menuService.findMenusByRestaurant(restaurant));
     }
 
     @Operation(summary = "메뉴 정보 리스트 조회", description = """

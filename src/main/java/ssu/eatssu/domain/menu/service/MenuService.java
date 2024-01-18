@@ -13,12 +13,10 @@ import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.MealMenu;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-import ssu.eatssu.domain.restaurant.entity.TemporalRestaurant;
 import ssu.eatssu.domain.menu.entity.TimePart;
 import ssu.eatssu.domain.menu.repository.MealMenuRepository;
 import ssu.eatssu.domain.menu.repository.MealRepository;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
-import ssu.eatssu.domain.restaurant.repository.RestaurantRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 
 import java.util.List;
