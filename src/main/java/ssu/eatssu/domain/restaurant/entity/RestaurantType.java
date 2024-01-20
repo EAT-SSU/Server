@@ -22,7 +22,7 @@ public enum RestaurantType {
         return FIXED.restaurants.contains(restaurantName);
     }
 
-    public static boolean isVARIABLEType(RestaurantName restaurantName) {
+    public static boolean isVariableType(RestaurantName restaurantName) {
         return VARIABLE.restaurants.contains(restaurantName);
     }
 }
