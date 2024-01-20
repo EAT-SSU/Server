@@ -91,4 +91,8 @@ public class ManageFixMenuService {
 
         return RestaurantType.isVariableType(restaurant.getRestaurantName());
     }
+
+    public void delete(Long menuId) {
+        manageMenuRepository.deleteById(menuId);
+    }
 }
