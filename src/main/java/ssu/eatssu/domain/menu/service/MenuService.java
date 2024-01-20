@@ -70,6 +70,24 @@ public class MenuService {
         addMenusToMeal(newMeal, restaurant, request);
     }
 
+    public MenusInformationResponse findMenusInMeal(Long mealId) {
+        Meal meal = getMeal(mealId);
+        return MenusInformationResponse.from(meal);
+    }
+
+    public void deleteMeal(Long mealId) {
+        Meal meal = getMeal(mealId);
+
+        List<Menu> menus = meal.getMealMenus().stream()
+            .map(MealMenu::getMenu)
+            .toList();
+
+        mealRepository.delete(meal);
+        mealRepository.flush();
+
+        deleteUnusedMenus(menus);
+    }
+
     private void addMenusToMeal(Meal meal, Restaurant restaurant, MealCreateRequest request) {
         for (String menuName : request.getMenuNames()) {
             Menu menu = createMenuIfNotExists(menuName, restaurant);
@@ -109,29 +127,9 @@ public class MenuService {
         return meals;
     }
 
-    public MenusInformationResponse findMenusInMeal(Long mealId) {
-        Meal meal = getMeal(mealId);
-        return MenusInformationResponse.from(meal);
-    }
-
-    public void deleteMeal(Long mealId) {
-        Meal meal = getMeal(mealId);
-
-        List<Menu> menus = meal.getMealMenus().stream()
-            .map(MealMenu::getMenu)
-            .toList();
-
-        mealRepository.delete(meal);
-        mealRepository.flush();
-
-        cleanupGarbageMenu(menus);
-    }
-
-    private void cleanupGarbageMenu(List<Menu> menuList) {
-        for (Menu menu : menuList) {
-            if (menu.getMealMenus().isEmpty()) {
-	menuRepository.delete(menu);
-            }
-        }
+    private void deleteUnusedMenus(List<Menu> menus) {
+        menus.stream()
+            .filter(menu -> menu.getMealMenus().isEmpty())
+            .forEach(menuRepository::delete);
     }
 }
