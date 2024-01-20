@@ -38,6 +38,10 @@ public class Menu {
     @Embedded
     private Reviews reviews = new Reviews();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "menu_category_id")
+    private MenuCategory category;
+
     private Menu(String name, Restaurant restaurant, Integer price) {
         this.name = name;
         this.restaurant = restaurant;

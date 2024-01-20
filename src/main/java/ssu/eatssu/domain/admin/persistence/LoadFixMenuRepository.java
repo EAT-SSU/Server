@@ -6,7 +6,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ssu.eatssu.domain.admin.dto.BriefMenu;
+import ssu.eatssu.domain.menu.entity.MenuCategory;
 import ssu.eatssu.domain.menu.entity.QMenu;
+import ssu.eatssu.domain.menu.entity.QMenuCategory;
 import ssu.eatssu.domain.restaurant.entity.QRestaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantName;
 
@@ -18,17 +20,18 @@ public class LoadFixMenuRepository {
     private final JPAQueryFactory queryFactory;
     private final QMenu menu = QMenu.menu;
     private final QRestaurant restaurant = QRestaurant.restaurant;
+    private final QMenuCategory category = QMenuCategory.menuCategory;
 
-    public List<BriefMenu> findBriefMenusByRestaurantName(RestaurantName restaurantName) {
+    public List<BriefMenu> findBriefMenusByCategoryId(Long categoryId) {
         return queryFactory
                 .select(Projections.constructor(BriefMenu.class,
                         menu.id,
                         menu.name,
                         menu.price))
                 .from(menu)
-                .join(menu.restaurant, restaurant)
+                .join(menu.category, category)
                 .where(
-                        restaurantNameEq(restaurantName)
+                        menuCategoryIdEq(categoryId)
                 )
                 .orderBy(menu.name.asc())
                 .fetch();
@@ -71,16 +74,31 @@ public class LoadFixMenuRepository {
                 .fetchFirst();
     }
 
-    private BooleanExpression menuNameEq(String name) {
-        return menu.name.eq(name);
+    public List<MenuCategory> findMenuCategoriesByRestaurant(RestaurantName restaurant) {
+        return queryFactory
+                .selectFrom(category)
+                .where(
+                        categoryRestaurantNameEq(restaurant)
+                ).fetch();
     }
 
-    private BooleanExpression restaurantNameEq(RestaurantName name) {
-        return restaurant.restaurantName.eq(name);
+    private BooleanExpression menuNameEq(String MenuName) {
+        return menu.name.eq(MenuName);
+    }
+
+    private BooleanExpression restaurantNameEq(RestaurantName restaurantName) {
+        return restaurant.restaurantName.eq(restaurantName);
     }
 
     private BooleanExpression restaurantIdEq(Long restaurantId) {
         return restaurant.id.eq(restaurantId);
     }
 
+    private BooleanExpression categoryRestaurantNameEq(RestaurantName restaurantName) {
+        return category.restaurantName.eq(restaurantName);
+    }
+
+    private BooleanExpression menuCategoryIdEq(Long categoryId) {
+        return category.id.eq(categoryId);
+    }
 }

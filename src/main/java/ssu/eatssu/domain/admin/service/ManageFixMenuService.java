@@ -9,6 +9,7 @@ import ssu.eatssu.domain.admin.persistence.FixMenuRatingRepository;
 import ssu.eatssu.domain.admin.persistence.LoadFixMenuRepository;
 import ssu.eatssu.domain.admin.persistence.ManageMenuRepository;
 import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.menu.entity.MenuCategory;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantName;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
@@ -31,26 +32,40 @@ public class ManageFixMenuService {
         MenuBoards menuBoards = new MenuBoards();
 
         RestaurantType.FIXED.getRestaurants()
-                .forEach(restaurant -> menuBoards.add(getRestaurantMenuBoard(restaurant)));
+                .forEach(restaurant -> menuBoards.add(getMenuBoard(restaurant)));
 
         return menuBoards;
     }
 
-    private RestaurantMenuBoard getRestaurantMenuBoard(RestaurantName restaurant) {
-        FixMenuBoard menuBoard = new FixMenuBoard(restaurant.getDescription());
+    private MenuBoard getMenuBoard(RestaurantName restaurant) {
+        MenuBoard menuBoard = new MenuBoard(restaurant.getDescription());
 
-        List<BriefMenu> briefMenus = loadMenuRepository.findBriefMenusByRestaurantName(restaurant);
+        getMenuSections(restaurant).forEach(menuBoard::addMenuSection);
+
+        return menuBoard;
+    }
+
+    private List<MenuSection> getMenuSections(RestaurantName restaurant) {
+        List<MenuCategory> menuCategories = loadMenuRepository.findMenuCategoriesByRestaurant(restaurant);
+        return menuCategories.stream()
+                .map(this::getMenuSection)
+                .toList();
+    }
+
+    private MenuSection getMenuSection(MenuCategory category) {
+        MenuSection menuSection = new MenuSection(category.getName());
+
+        List<BriefMenu> briefMenus = loadMenuRepository.findBriefMenusByCategoryId(category.getId());
 
         briefMenus.forEach(briefMenu ->
-                menuBoard.addMenu(new MenuLine(
+                menuSection.addMenuLine(new MenuLine(
                         briefMenu.id(),
                         briefMenu.name(),
                         briefMenu.price(),
                         fixMenuRatingRepository.getMainRatingAverage(briefMenu.id())
                 ))
         );
-
-        return menuBoard;
+        return menuSection;
     }
 
     public void register(RestaurantName restaurantName, RegisterFixMenuRequest request) {
