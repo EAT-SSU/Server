@@ -5,7 +5,7 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ssu.eatssu.domain.menu.dto.MenuRequest.CreateMealRequest;
+import ssu.eatssu.domain.menu.dto.MenuRequest.MealCreateRequest;
 import ssu.eatssu.domain.menu.dto.MenuResponse.MenuInformationResponse;
 import ssu.eatssu.domain.menu.dto.MenuResponse.MenusInformationResponse;
 import ssu.eatssu.domain.menu.dto.MenuResponse.MealInformationResponse;
@@ -53,11 +53,10 @@ public class MenuService {
     }
 
     public void createMeal(Date date, Restaurant restaurant, TimePart timePart,
-        CreateMealRequest request) {
+        MealCreateRequest request) {
         List<Meal> meals = getMeals(date, timePart, restaurant);
 
-        if (MenuValidator.validateExistedMeal(meals,
-            request)) {
+        if (MenuValidator.validateExistedMeal(meals, request)) {
             return;
         }
 
@@ -68,31 +67,46 @@ public class MenuService {
             .build();
         mealRepository.save(newMeal);
 
-        addMenu(newMeal, request);
+        addMenusToMeal(newMeal, restaurant, request);
     }
 
-    private void addMenu(Meal meal, CreateMealRequest request) {
-        Restaurant restaurant = meal.getRestaurant();
-
-        for (String addMenuName : request.getMenuNames()) {
-            checkAndCreateMenu(addMenuName, restaurant);
-
-            Menu menu = getMenu(addMenuName, restaurant);
-
-            MealMenu mealMenu = MealMenu.builder()
-	.menu(menu)
-	.meal(meal)
-	.build();
-            mealMenuRepository.save(mealMenu);
+    private void addMenusToMeal(Meal meal, Restaurant restaurant, MealCreateRequest request) {
+        for (String menuName : request.getMenuNames()) {
+            Menu menu = createMenuIfNotExists(menuName, restaurant);
+            createMealMenu(meal, menu);
         }
     }
 
-    private void checkAndCreateMenu(String menuName, Restaurant restaurant) {
-        if (!menuRepository.existsByNameAndRestaurant(menuName, restaurant)) {
+    private Menu createMenuIfNotExists(String menuName, Restaurant restaurant) {
+        return menuRepository.existsByNameAndRestaurant(menuName, restaurant) ?
+            getMenu(menuName, restaurant) :
             menuRepository.save(Menu.createVariable(menuName, restaurant));
-        }
+    }
 
-        menuRepository.save(Menu.createVariable(menuName, restaurant));
+    private void createMealMenu(Meal meal, Menu menu) {
+        MealMenu mealMenu = MealMenu.builder()
+            .menu(menu)
+            .meal(meal)
+            .build();
+        mealMenuRepository.save(mealMenu);
+    }
+
+    private Menu getMenu(String addMenuName, Restaurant restaurant) {
+        Menu menu = menuRepository.findByNameAndRestaurant(addMenuName, restaurant)
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MENU));
+        return menu;
+    }
+
+    private Meal getMeal(Long mealId) {
+        Meal meal = mealRepository.findById(mealId)
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MEAL));
+        return meal;
+    }
+
+    private List<Meal> getMeals(Date date, TimePart timePart, Restaurant restaurant) {
+        List<Meal> meals = mealRepository.findAllByDateAndTimePartAndRestaurant(date,
+            timePart, restaurant);
+        return meals;
     }
 
     public MenusInformationResponse findMenusInMeal(Long mealId) {
@@ -119,23 +133,5 @@ public class MenuService {
 	menuRepository.delete(menu);
             }
         }
-    }
-
-    private Menu getMenu(String addMenuName, Restaurant restaurant) {
-        Menu menu = menuRepository.findByNameAndRestaurant(addMenuName, restaurant)
-            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MENU));
-        return menu;
-    }
-
-    private Meal getMeal(Long mealId) {
-        Meal meal = mealRepository.findById(mealId)
-            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MEAL));
-        return meal;
-    }
-
-    private List<Meal> getMeals(Date date, TimePart timePart, Restaurant restaurant) {
-        List<Meal> meals = mealRepository.findAllByDateAndTimePartAndRestaurant(date,
-            timePart, restaurant);
-        return meals;
     }
 }

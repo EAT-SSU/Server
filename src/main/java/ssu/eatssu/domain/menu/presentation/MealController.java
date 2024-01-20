@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ssu.eatssu.domain.menu.entity.TimePart;
-import ssu.eatssu.domain.menu.dto.MenuRequest.CreateMealRequest;
+import ssu.eatssu.domain.menu.dto.MenuRequest.MealCreateRequest;
 import ssu.eatssu.domain.menu.dto.MenuResponse.MealInformationResponse;
 import ssu.eatssu.domain.menu.service.MenuService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
@@ -54,7 +54,7 @@ public class MealController {
         @Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
         @Parameter(description = "식당이름") @RequestParam("restaurant") Restaurant restaurantName,
         @Parameter(description = "시간대") @RequestParam("time") TimePart timePart,
-        @RequestBody CreateMealRequest createMealRequest) {
+        @RequestBody MealCreateRequest createMealRequest) {
         if (restaurantName.isFixed()) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
