@@ -53,12 +53,42 @@ public class ManageFixMenuService {
         return menuBoard;
     }
 
-    public void registerFixMenu(RestaurantName restaurantName, RegisterMenuRequest request) {
+    public void register(RestaurantName restaurantName, RegisterFixMenuRequest request) {
         if (loadMenuRepository.existsMenu(request.name(), restaurantName)) {
             throw new BaseException(BaseResponseStatus.CONFLICT);
         }
         Restaurant restaurant = findRestaurantRepository.findByRestaurantName(restaurantName);
 
         manageMenuRepository.save(Menu.createFixMenu(request.name(), restaurant, request.price()));
+    }
+
+    public void updateMenu(Long menuId, UpdateFixMenuRequest request) {
+        if (isVariableMenu(menuId)) {
+            throw new BaseException(BaseResponseStatus.NOT_SUPPORT_RESTAURANT);
+        }
+
+        Long restaurantId = loadMenuRepository.getRestaurantId(menuId);
+
+        duplicateCheck(request.name(), restaurantId);
+
+        Menu menu = manageMenuRepository.findById(menuId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MENU));
+        menu.update(request.name(), request.price());
+
+        manageMenuRepository.save(menu);
+    }
+
+    private void duplicateCheck(String name, Long restaurantId) {
+        if (loadMenuRepository.existsMenu(name, restaurantId)) {
+            throw new BaseException(BaseResponseStatus.CONFLICT);
+        }
+    }
+
+    private boolean isVariableMenu(Long menuId) {
+        Long restaurantId = loadMenuRepository.getRestaurantId(menuId);
+        Restaurant restaurant = findRestaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
+
+        return RestaurantType.isVariableType(restaurant.getRestaurantName());
     }
 }

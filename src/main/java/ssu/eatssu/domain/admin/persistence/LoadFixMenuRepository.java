@@ -46,12 +46,41 @@ public class LoadFixMenuRepository {
                 .fetchFirst() != null;
     }
 
+    /**
+     * 오버 로딩
+     */
+    public boolean existsMenu(String name, Long restaurantId) {
+        return queryFactory
+                .select(menu.name)
+                .from(menu)
+                .join(menu.restaurant, restaurant)
+                .where(
+                        menuNameEq(name),
+                        restaurantIdEq(restaurantId)
+                )
+                .fetchFirst() != null;
+    }
+
+    public long getRestaurantId(Long menuId) {
+        return queryFactory
+                .select(menu.restaurant.id)
+                .from(menu)
+                .where(
+                        menu.id.eq(menuId)
+                )
+                .fetchFirst();
+    }
+
     private BooleanExpression menuNameEq(String name) {
         return menu.name.eq(name);
     }
 
     private BooleanExpression restaurantNameEq(RestaurantName name) {
         return restaurant.restaurantName.eq(name);
+    }
+
+    private BooleanExpression restaurantIdEq(Long restaurantId) {
+        return restaurant.id.eq(restaurantId);
     }
 
 }
