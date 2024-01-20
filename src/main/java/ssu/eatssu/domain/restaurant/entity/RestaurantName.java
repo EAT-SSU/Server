@@ -9,13 +9,12 @@ import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
 @Getter
 public enum RestaurantName {
-    DODAM(RestaurantType.VARIABLE, "도담 식당", 6000),
-    DORMITORY(RestaurantType.VARIABLE, "기숙사 식당", 5000),
-    FOOD_COURT(RestaurantType.FIXED, "푸드 코트", null),
-    SNACK_CORNER(RestaurantType.FIXED, "스낵 코너", null),
-    HAKSIK(RestaurantType.VARIABLE, "학생 식당", 5000);
+    DODAM("도담 식당", 6000),
+    DORMITORY( "기숙사 식당", 5000),
+    FOOD_COURT( "푸드 코트", null),
+    SNACK_CORNER( "스낵 코너", null),
+    HAKSIK( "학생 식당", 5000);
 
-    private RestaurantType restaurantType;
     private String description;
     private Integer price;
 
@@ -27,8 +26,7 @@ public enum RestaurantName {
             .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
     }
 
-    RestaurantName(RestaurantType restaurantType, String description, Integer price) {
-        this.restaurantType = restaurantType;
+    RestaurantName(String description, Integer price) {
         this.description = description;
         this.price = price;
     }
