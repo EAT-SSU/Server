@@ -8,6 +8,8 @@ import ssu.eatssu.domain.restaurant.entity.QRestaurant;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantName;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class FindRestaurantRepository {
@@ -27,4 +29,12 @@ public class FindRestaurantRepository {
         return restaurant.restaurantName.eq(name);
     }
 
+    public Optional<Restaurant> findById(Long restaurantId) {
+        return Optional.ofNullable(queryFactory
+                .selectFrom(restaurant)
+                .where(
+                        restaurant.id.eq(restaurantId)
+                )
+                .fetchOne());
+    }
 }

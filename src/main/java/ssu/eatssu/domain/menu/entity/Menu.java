@@ -1,13 +1,15 @@
 package ssu.eatssu.domain.menu.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
+import ssu.eatssu.domain.review.entity.Review;
+import ssu.eatssu.domain.review.entity.Reviews;
 
 import java.util.ArrayList;
 import java.util.List;
-import ssu.eatssu.domain.review.entity.Review;
-import ssu.eatssu.domain.review.entity.Reviews;
 
 @Entity
 @Getter
@@ -73,5 +75,10 @@ public class Menu {
 
     public int getTotalReviewCount() {
         return reviews.size();
+    }
+
+    public void update(String name, Integer price) {
+        this.name = name;
+        this.price = price;
     }
 }

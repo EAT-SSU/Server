@@ -5,7 +5,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.admin.dto.MenuBoards;
-import ssu.eatssu.domain.admin.dto.RegisterMenuRequest;
+import ssu.eatssu.domain.admin.dto.RegisterFixMenuRequest;
+import ssu.eatssu.domain.admin.dto.UpdateFixMenuRequest;
 import ssu.eatssu.domain.admin.service.ManageFixMenuService;
 import ssu.eatssu.domain.restaurant.entity.RestaurantName;
 import ssu.eatssu.global.handler.response.BaseResponse;
@@ -28,9 +29,17 @@ public class ManageFixMenuController {
     //TODO ResponseBody 해제
     @ResponseBody
     @PostMapping("")
-    public String registerFixMenu(@RequestParam RestaurantName restaurantName,
-                                  @RequestBody RegisterMenuRequest request) {
-        manageFixMenuService.registerFixMenu(restaurantName, request);
+    public String register(@RequestParam RestaurantName restaurantName,
+                           @RequestBody RegisterFixMenuRequest request) {
+        manageFixMenuService.register(restaurantName, request);
+        return "redirect:/admin/menu/fix-menu";
+    }
+
+    @ResponseBody
+    @PatchMapping("{menuId}")
+    public String update(@PathVariable Long menuId,
+                         @RequestBody UpdateFixMenuRequest request) {
+        manageFixMenuService.updateMenu(menuId, request);
         return "redirect:/admin/menu/fix-menu";
     }
 
