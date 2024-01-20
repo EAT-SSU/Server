@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ssu.eatssu.domain.admin.service.ManageFixMenuService;
 
 @Controller
-@RequestMapping("/manage/menu/fix-menu")
+@RequestMapping("/admin/menu/fix-menu")
 @RequiredArgsConstructor
 public class ManageFixMenuController {
 
