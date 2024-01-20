@@ -74,6 +74,15 @@ public class User extends BaseTimeEntity {
         return new User(email, Role.USER, provider, providerId, UserStatus.ACTIVE, credentials);
     }
 
+    /**
+     * <--Static Factory Method-->
+     * admin 회원가입
+     * Role 은 다른 방법으로 세팅할 예정
+     */
+    public static User adminJoin(@NotNull String loginId, @NotNull String credentials) {
+        return new User(loginId, Role.USER, OauthProvider.EATSSU, loginId, UserStatus.INACTIVE, credentials);
+    }
+
     public void updateNickname(@NotNull String nickname) {
         this.nickname = nickname;
     }

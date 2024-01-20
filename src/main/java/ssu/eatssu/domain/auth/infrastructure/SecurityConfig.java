@@ -19,12 +19,15 @@ import ssu.eatssu.global.handler.JwtAuthenticationEntryPoint;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private static final String[] RESOURCE_LIST = {
+        "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**","/admin/img/**","/css/**", "/js/**",
+            "/favicon.ico", "/error/**", "/webjars/**", "/h2-console/**"
+    };
 
     private static final String[] AUTH_WHITELIST = {
-            "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**",
             "/", "/user/join", "/user/login", "/user/user-emails/{email}/exist", "/user/check-nickname",
             "/menu/**", "/restaurants/**", "/review/info","/review/list", "/oauth/**", "/inquiries/{userInquiriesId}",
-            "/inquiries/list"
+            "/inquiries/list", "/admin/login"
     };
 
     private static final String[] ADMIN_PAGE_LIST = {
@@ -48,6 +51,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .shouldFilterAllDispatcherTypes(false)
                         .requestMatchers(AUTH_WHITELIST).permitAll()
+                        .requestMatchers(RESOURCE_LIST).permitAll()
                         .requestMatchers(ADMIN_PAGE_LIST).hasRole("ADMIN")
                         .anyRequest().authenticated()
                         .and().addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
