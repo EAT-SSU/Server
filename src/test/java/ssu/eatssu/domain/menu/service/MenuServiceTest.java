@@ -1,13 +1,20 @@
 package ssu.eatssu.domain.menu.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static ssu.eatssu.domain.menu.entity.TimePart.LUNCH;
+
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import ssu.eatssu.domain.menu.dto.MenuRequest.MealCreateRequest;
 import ssu.eatssu.domain.menu.dto.MenuResponse.MenuInformationResponse;
 import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.menu.repository.MealRepository;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 
@@ -20,6 +27,15 @@ class MenuServiceTest {
     @Autowired
     private MenuRepository menuRepository;
 
+    @Autowired
+    private MealRepository mealRepository;
+
+    @BeforeEach
+    void setUp() {
+        menuRepository.deleteAll();
+        mealRepository.deleteAll();
+    }
+
     @Test
     void 식당_이름으로_고정_메뉴를_조회한다() {
         // given
@@ -31,8 +47,26 @@ class MenuServiceTest {
         menuRepository.saveAll(menus);
 
         // when & then
-        Assertions.assertThat(menuService.findMenusByRestaurant(foodCourt))
+        assertThat(menuService.findMenusByRestaurant(foodCourt))
             .extracting(MenuInformationResponse::getName)
             .containsExactly("라면", "떡볶이", "짜게치");
+    }
+
+    @Test
+    void 식단을_생성한다() {
+        // given
+        Date date = Date.valueOf("2024-01-03");
+        Restaurant haksik = Restaurant.from("학생 식당");
+        MealCreateRequest request = new MealCreateRequest(List.of("돈까스", "샐러드", "김치"));
+
+        // when
+        menuService.createMeal(date, haksik, LUNCH, request);
+
+        // then
+        assertThat(mealRepository.findAll()).hasSize(1);
+        assertThat(menuRepository.findAll()).hasSize(3);
+        assertThat(menuRepository.findAll())
+            .extracting(Menu::getName)
+            .containsExactly("돈까스", "샐러드", "김치");
     }
 }
