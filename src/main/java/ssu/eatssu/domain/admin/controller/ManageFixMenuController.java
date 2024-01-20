@@ -43,4 +43,11 @@ public class ManageFixMenuController {
         return "redirect:/admin/menu/fix-menu";
     }
 
+    @ResponseBody
+    @DeleteMapping("{menuId}")
+    public String delete(@PathVariable Long menuId) {
+        manageFixMenuService.delete(menuId);
+        return "redirect:/admin/menu/fix-menu";
+    }
+
 }
