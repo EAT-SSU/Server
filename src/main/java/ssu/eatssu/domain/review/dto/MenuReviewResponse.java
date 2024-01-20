@@ -11,7 +11,7 @@ import ssu.eatssu.domain.menu.entity.Menu;
 @Getter
 @AllArgsConstructor
 @Builder
-public class MainReviewsResponse implements ReviewInformationResponse {
+public class MenuReviewResponse implements ReviewInformationResponse {
 
     @Schema(description = "메뉴 리스트", example = "[\"고구마치즈돈까스\", \"막국수\", \"미니밥\", \"단무지\", \"요구르트\"]")
     private String menuName;
@@ -29,10 +29,10 @@ public class MainReviewsResponse implements ReviewInformationResponse {
     private Double tasteRating;
     private ReviewRatingCount reviewRatingCount;
 
-    public static MainReviewsResponse of(Menu menu,
+    public static MenuReviewResponse of(Menu menu,
         RatingAverages ratingAverages,
         ReviewRatingCount reviewRatingCount) {
-        return MainReviewsResponse.builder()
+        return MenuReviewResponse.builder()
             .menuName(menu.getName())
             .totalReviewCount(menu.getTotalReviewCount())
             .mainRating(ratingAverages.mainRating())

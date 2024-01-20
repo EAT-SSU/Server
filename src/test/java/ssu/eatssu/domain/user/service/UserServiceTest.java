@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ssu.eatssu.domain.auth.entity.CustomUserDetails;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
+import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
@@ -21,11 +22,13 @@ class UserServiceTest {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @BeforeEach
     void setUp() {
+        reviewRepository.deleteAll();
         userRepository.deleteAll();
-        userRepository.flush();
     }
 
     @Test
