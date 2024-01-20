@@ -12,6 +12,7 @@ import ssu.eatssu.domain.auth.dto.AppleLoginRequest;
 import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
 import ssu.eatssu.domain.auth.entity.JwtTokenProvider;
 import ssu.eatssu.domain.auth.infrastructure.TestAppleAuthenticator;
+import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.user.service.UserService;
@@ -34,12 +35,16 @@ class OauthServiceTest {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    private ReviewRepository reviewRepository;
+
 
     @BeforeEach
     void setUp() {
+        reviewRepository.deleteAll();
+        userRepository.deleteAll();
         oauthService = new OAuthService(userService, userRepository,
             new TestAppleAuthenticator(), authenticationManagerBuilder, jwtTokenProvider);
-        userRepository.deleteAll();
     }
 
     @Test
