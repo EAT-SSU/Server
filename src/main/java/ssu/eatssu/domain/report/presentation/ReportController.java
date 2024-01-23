@@ -14,7 +14,7 @@ import ssu.eatssu.domain.review.entity.Report;
 import ssu.eatssu.domain.report.service.ReportService;
 import ssu.eatssu.domain.slack.entity.SlackChannel;
 import ssu.eatssu.domain.slack.entity.SlackMessageFormat;
-import ssu.eatssu.domain.report.dto.CreateReportRequest;
+import ssu.eatssu.domain.report.dto.ReportCreateRequest;
 import ssu.eatssu.domain.report.dto.ReportTypeResponse;
 
 import ssu.eatssu.domain.slack.service.SlackService;
@@ -44,9 +44,9 @@ public class ReportController {
         @ApiResponse(responseCode = "200", description = "리뷰 신고 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
         @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
-    public BaseResponse<Void> reportReview(@RequestBody CreateReportRequest createReportRequest,
+    public BaseResponse<Void> reportReview(@RequestBody ReportCreateRequest createReportRequest,
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        Report report = reportService.report(customUserDetails, createReportRequest);
+        Report report = reportService.reportReview(customUserDetails, createReportRequest);
         slackService.sendSlackMessage(SlackMessageFormat.sendReport(report),
             SlackChannel.REPORT_CHANNEL);
         return BaseResponse.success();
