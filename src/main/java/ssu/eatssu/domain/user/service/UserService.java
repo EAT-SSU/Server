@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.auth.entity.CustomUserDetails;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
@@ -20,6 +21,7 @@ import ssu.eatssu.global.handler.response.BaseException;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Component
 public class UserService {
 
     private final UserRepository userRepository;

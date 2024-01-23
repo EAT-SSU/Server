@@ -15,7 +15,7 @@ import ssu.eatssu.domain.report.entity.ReportStatus;
 import ssu.eatssu.domain.report.repository.ReportRepository;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.user.repository.UserRepository;
-import ssu.eatssu.domain.report.dto.CreateReportRequest;
+import ssu.eatssu.domain.report.dto.ReportCreateRequest;
 import ssu.eatssu.global.handler.response.BaseException;
 
 
@@ -26,17 +26,17 @@ public class ReportService {
 
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
-    private final ReportRepository reviewReportRepository;
+    private final ReportRepository reportRepository;
 
-    public Report report(CustomUserDetails userDetails, CreateReportRequest reviewReportCreate) {
+    public Report reportReview(CustomUserDetails userDetails, ReportCreateRequest request) {
         User user = userRepository.findById(userDetails.getId())
             .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-        Review review = reviewRepository.findById(reviewReportCreate.getReviewId())
+        Review review = reviewRepository.findById(request.reviewId())
             .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
 
-        Report report = Report.create(user, review, reviewReportCreate, ReportStatus.PENDING);
-        return reviewReportRepository.save(report);
+        Report report = Report.create(user, review, request, ReportStatus.PENDING);
+        return reportRepository.save(report);
     }
 
     public ReportTypeResponse getReportType() {
