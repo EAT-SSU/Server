@@ -31,24 +31,13 @@ public class Meal {
     @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
 
-    private String title;
-
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
     private List<MealMenu> mealMenus = new ArrayList<>();
 
-    private Meal(Date date, TimePart timePart, Restaurant restaurant, String title) {
+    public Meal(Date date, TimePart timePart, Restaurant restaurant) {
         this.date = date;
         this.timePart = timePart;
         this.restaurant = restaurant;
-        this.title = title;
-    }
-
-    public static Meal withTitle(Date date, TimePart timePart, Restaurant restaurant, String title) {
-        return new Meal(date, timePart, restaurant, title);
-    }
-
-    public static Meal withoutTitle(Date date, TimePart timePart, Restaurant restaurant) {
-        return new Meal(date, timePart, restaurant, null);
     }
 
     public List<String> getMenuNames() {

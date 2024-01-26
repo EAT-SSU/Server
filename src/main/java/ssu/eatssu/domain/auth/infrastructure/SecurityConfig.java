@@ -25,7 +25,7 @@ public class SecurityConfig {
     };
 
     private static final String[] AUTH_WHITELIST = {
-            "/", "/user/join", "/user/login", "/user/user-emails/{email}/exist", "/user/check-nickname",
+            "/","/oauths/**", "/user/join", "/user/login", "/user/user-emails/{email}/exist", "/user/check-nickname",
             "/menu/**", "/restaurants/**", "/review/info","/review/list", "/oauth/**", "/inquiries/{userInquiriesId}",
             "/inquiries/list", "/admin/login"
     };
