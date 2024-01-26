@@ -77,6 +77,13 @@ public class LoadMealRepository {
                 .fetchFirst();
     }
 
+    public List<Long> getAllMenuIds(Long mealId) {
+        return queryFactory.select(mealMenu.menu.id)
+                .from(mealMenu)
+                .where(mealIdEq(mealId))
+                .fetch();
+    }
+
     private BooleanExpression mealIdEq(Long mealId) {
         return meal.id.eq(mealId);
     }
@@ -101,5 +108,9 @@ public class LoadMealRepository {
         return menu.name.eq(menuName);
     }
 
-
+    public int countMealMenuByMenuId(Long menuId) {
+        return (int) queryFactory.selectFrom(mealMenu)
+                .where(mealMenu.menu.id.eq(menuId))
+                .fetchCount();
+    }
 }
