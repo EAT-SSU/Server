@@ -2,7 +2,6 @@ package ssu.eatssu.domain.menu.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -32,14 +31,24 @@ public class Meal {
     @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
 
+    private String title;
+
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
     private List<MealMenu> mealMenus = new ArrayList<>();
 
-    @Builder
-    public Meal(Date date, TimePart timePart, Restaurant restaurant) {
+    private Meal(Date date, TimePart timePart, Restaurant restaurant, String title) {
         this.date = date;
         this.timePart = timePart;
         this.restaurant = restaurant;
+        this.title = title;
+    }
+
+    public static Meal withTitle(Date date, TimePart timePart, Restaurant restaurant, String title) {
+        return new Meal(date, timePart, restaurant, title);
+    }
+
+    public static Meal withoutTitle(Date date, TimePart timePart, Restaurant restaurant) {
+        return new Meal(date, timePart, restaurant, null);
     }
 
     public List<String> getMenuNames() {
