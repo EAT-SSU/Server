@@ -59,15 +59,17 @@ public class MenuService {
         if (MenuValidator.validateExistedMeal(meals, request)) {
             return;
         }
+        Meal meal;
 
-        Meal newMeal = Meal.builder()
-                .date(date)
-                .restaurant(restaurant)
-                .timePart(timePart)
-                .build();
-        mealRepository.save(newMeal);
+        if(request.getTitle() == null){
+            meal = Meal.withoutTitle(date, timePart, restaurant);
+        } else{
+            meal = Meal.withTitle(date, timePart, restaurant, request.getTitle());
+        }
 
-        addMenusToMeal(newMeal, restaurant, request);
+        mealRepository.save(meal);
+
+        addMenusToMeal(meal, restaurant, request.getMenuNames());
     }
 
     public MenusInformationResponse findMenusInMeal(Long mealId) {
@@ -88,8 +90,8 @@ public class MenuService {
         deleteUnusedMenus(menus);
     }
 
-    private void addMenusToMeal(Meal meal, Restaurant restaurant, MealCreateRequest request) {
-        for (String menuName : request.getMenuNames()) {
+    private void addMenusToMeal(Meal meal, Restaurant restaurant, List<String> menuNames) {
+        for (String menuName : menuNames) {
             Menu menu = createMenuIfNotExists(menuName, restaurant);
             createMealMenu(meal, menu);
         }

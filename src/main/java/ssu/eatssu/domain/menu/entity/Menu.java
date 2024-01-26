@@ -26,13 +26,14 @@ public class Menu {
 
     private Integer price;
 
-    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
-    private List<MealMenu> mealMenus = new ArrayList<>();
-
+    @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
 
     @Embedded
     private Reviews reviews = new Reviews();
+
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
+    private List<MealMenu> mealMenus = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_category_id")
