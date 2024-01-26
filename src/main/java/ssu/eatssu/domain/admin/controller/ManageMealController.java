@@ -42,4 +42,6 @@ public class ManageMealController {
         manageMealService.register(mealInfo, request);
         return BaseResponse.success();
     }
+
+
 }

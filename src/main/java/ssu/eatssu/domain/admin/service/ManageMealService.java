@@ -37,24 +37,24 @@ public class ManageMealService {
     private MenuBoard getMealBoard(MealInfo mealInfo) {
         MenuBoard menuBoard = new MenuBoard(mealInfo.restaurant().getDescription());
 
-        getMenuSections(mealInfo).forEach(menuBoard::addMenuSection);
+        getMenuSections(mealInfo).forEach(menuBoard::addSection);
 
         return menuBoard;
     }
 
-    private List<MenuSection> getMenuSections(MealInfo mealInfo) {
+    private List<MealSection> getMenuSections(MealInfo mealInfo) {
         List<Long> mealIds = loadMealRepository.getAllMealIdsByInfo(mealInfo);
 
         return mealIds.stream().map(this::getMenuSection).toList();
     }
 
-    private MenuSection getMenuSection(Long mealId) {
-        MenuSection menuSection = new MenuSection();
+    private MealSection getMenuSection(Long mealId) {
+        MealSection mealSection = new MealSection(mealId);
 
         List<BriefMenu> briefMenus = loadMealRepository.findBriefMenusByMealId(mealId);
 
         briefMenus.forEach(briefMenu ->
-                menuSection.addMenuLine(new MenuLine(
+                mealSection.addMenuLine(new MenuLine(
                         briefMenu.id(),
                         briefMenu.name(),
                         briefMenu.price(),
@@ -62,7 +62,7 @@ public class ManageMealService {
                 ))
         );
 
-        return menuSection;
+        return mealSection;
     }
 
     public void register(MealInfo mealInfo, RegisterMealRequest request) {
