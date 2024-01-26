@@ -7,22 +7,22 @@ import java.util.List;
 
 @Getter
 public enum RestaurantType {
-    FIXED("고정메뉴 식당", Arrays.asList(RestaurantName.FOOD_COURT, RestaurantName.SNACK_CORNER)),
-    VARIABLE("변동메뉴 식당", Arrays.asList(RestaurantName.DODAM, RestaurantName.DORMITORY, RestaurantName.HAKSIK));
+    FIXED("고정메뉴 식당", Arrays.asList(Restaurant.FOOD_COURT, Restaurant.SNACK_CORNER)),
+    VARIABLE("변동메뉴 식당", Arrays.asList(Restaurant.DODAM, Restaurant.DORMITORY, Restaurant.HAKSIK));
 
     private String description;
-    private List<RestaurantName> restaurants;
+    private List<Restaurant> restaurants;
 
-    RestaurantType(String description, List<RestaurantName> restaurants) {
+    RestaurantType(String description, List<Restaurant> restaurants) {
         this.description = description;
         this.restaurants = restaurants;
     }
 
-    public static boolean isFixedType(RestaurantName restaurantName) {
-        return FIXED.restaurants.contains(restaurantName);
+    public static boolean isFixedType(Restaurant restaurant) {
+        return FIXED.restaurants.contains(restaurant);
     }
 
-    public static boolean isVariableType(RestaurantName restaurantName) {
-        return VARIABLE.restaurants.contains(restaurantName);
+    public static boolean isVariableType(Restaurant restaurant) {
+        return VARIABLE.restaurants.contains(restaurant);
     }
 }

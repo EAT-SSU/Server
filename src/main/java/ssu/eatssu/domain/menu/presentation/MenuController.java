@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.menu.dto.MenuResponse.MenuInformationResponse;
 import ssu.eatssu.domain.menu.dto.MenuResponse.MenusInformationResponse;
-import ssu.eatssu.domain.restaurant.entity.RestaurantName;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.domain.menu.service.MenuService;
@@ -40,11 +40,11 @@ public class MenuController {
     })
     @GetMapping("")
     public BaseResponse<List<MenuInformationResponse>> getMenus(
-        @RequestParam("restaurant") RestaurantName restaurantName) {
-        if(RestaurantType.isVariableType(restaurantName)){
+        @RequestParam("restaurant") Restaurant restaurant) {
+        if(RestaurantType.isVariableType(restaurant)){
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
-        return BaseResponse.success(menuService.findMenusByRestaurant(restaurantName));
+        return BaseResponse.success(menuService.findMenusByRestaurant(restaurant));
     }
 
     @Operation(summary = "메뉴 정보 리스트 조회", description = """

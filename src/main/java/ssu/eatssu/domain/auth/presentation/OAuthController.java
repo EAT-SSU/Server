@@ -1,5 +1,7 @@
 package ssu.eatssu.domain.auth.presentation;
 
+import static ssu.eatssu.domain.auth.infrastructure.SecurityUtil.getLoginUser;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,28 +15,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ssu.eatssu.domain.user.repository.UserRepository;
-import ssu.eatssu.domain.auth.service.OauthService;
+import ssu.eatssu.domain.auth.service.OAuthService;
 import ssu.eatssu.global.handler.response.BaseResponse;
-import ssu.eatssu.domain.auth.dto.AppleLogin;
-import ssu.eatssu.domain.auth.dto.KakaoLogin;
+import ssu.eatssu.domain.auth.dto.AppleLoginRequest;
+import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
 import ssu.eatssu.domain.user.dto.Tokens;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 
 @Slf4j
 @RestController
 @RequestMapping("/oauths")
 @RequiredArgsConstructor
 @Tag(name = "Oauth", description = "Oauth API")
-public class OauthController {
+public class OAuthController {
 
-    private final OauthService oauthService;
+    private final OAuthService oauthService;
 
-    /**
-     * 카카오 회원가입, 로그인
-     */
     @Operation(summary = "카카오 회원가입, 로그인", description = """
         카카오 회원가입, 로그인 API 입니다.<br><br>
         가입된 회원일 경우 카카오 로그인, 미가입 회원일 경우 회원가입 후 자동 로그인됩니다.
@@ -43,14 +38,11 @@ public class OauthController {
         @ApiResponse(responseCode = "200", description = "카카오 회원가입/로그인 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/kakao")
-    public BaseResponse<Tokens> kakaoLogin(@Valid @RequestBody KakaoLogin login) {
-        Tokens tokens = oauthService.kakaoLogin(login.getEmail(), login.getProviderId());
+    public BaseResponse<Tokens> kakaoLogin(@Valid @RequestBody KakaoLoginRequest request) {
+        Tokens tokens = oauthService.kakaoLogin(request);
         return BaseResponse.success(tokens);
     }
 
-    /**
-     * 애플 회원가입, 로그인
-     */
     @Operation(summary = "애플 회원가입, 로그인", description = """
         애플 로그인, 회원가입 API 입니다.<br><br>
         가입된 회원일 경우 카카오 로그인, 미가입 회원일 경우 회원가입 후 자동 로그인됩니다.
@@ -60,10 +52,18 @@ public class OauthController {
         @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/apple")
-    public BaseResponse<Tokens> appleLogin(@Valid @RequestBody AppleLogin login)
-        throws NoSuchAlgorithmException,
-        InvalidKeySpecException {
-        Tokens tokens = oauthService.appleLogin(login.getIdentityToken());
+    public BaseResponse<Tokens> appleLogin(@Valid @RequestBody AppleLoginRequest request) {
+        Tokens tokens = oauthService.appleLogin(request);
+        return BaseResponse.success(tokens);
+    }
+
+    @Operation(summary = "토큰 재발급", description = "accessToken, refreshToken 재발급 API 입니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "토큰 재발급 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @PostMapping("/reissue/token")
+    public BaseResponse<Tokens> refreshToken() {
+        Tokens tokens = oauthService.refreshTokens(getLoginUser());
         return BaseResponse.success(tokens);
     }
 

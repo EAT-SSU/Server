@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import ssu.eatssu.domain.auth.entity.OauthProvider;
+import ssu.eatssu.domain.auth.entity.OAuthProvider;
 
 @AllArgsConstructor
 @Builder
@@ -15,5 +15,5 @@ public class MyPageResponse {
     private String nickname;
 
     @Schema(description = "연결 계정 정보", example = "피치푸치")
-    private OauthProvider provider;
+    private OAuthProvider provider;
 }

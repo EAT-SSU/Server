@@ -4,14 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.admin.dto.*;
-import ssu.eatssu.domain.admin.persistence.FindRestaurantRepository;
 import ssu.eatssu.domain.admin.persistence.FixMenuRatingRepository;
 import ssu.eatssu.domain.admin.persistence.LoadFixMenuRepository;
 import ssu.eatssu.domain.admin.persistence.ManageMenuRepository;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.entity.MenuCategory;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-import ssu.eatssu.domain.restaurant.entity.RestaurantName;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
@@ -26,7 +24,6 @@ public class ManageFixMenuService {
     private final LoadFixMenuRepository loadMenuRepository;
     private final ManageMenuRepository manageMenuRepository;
     private final FixMenuRatingRepository fixMenuRatingRepository;
-    private final FindRestaurantRepository findRestaurantRepository;
 
     public MenuBoards getMenuBoards() {
         MenuBoards menuBoards = new MenuBoards();
@@ -37,7 +34,7 @@ public class ManageFixMenuService {
         return menuBoards;
     }
 
-    private MenuBoard getMenuBoard(RestaurantName restaurant) {
+    private MenuBoard getMenuBoard(Restaurant restaurant) {
         MenuBoard menuBoard = new MenuBoard(restaurant.getDescription());
 
         getMenuSections(restaurant).forEach(menuBoard::addMenuSection);
@@ -45,7 +42,7 @@ public class ManageFixMenuService {
         return menuBoard;
     }
 
-    private List<MenuSection> getMenuSections(RestaurantName restaurant) {
+    private List<MenuSection> getMenuSections(Restaurant restaurant) {
         List<MenuCategory> menuCategories = loadMenuRepository.findMenuCategoriesByRestaurant(restaurant);
         return menuCategories.stream()
                 .map(this::getMenuSection)
@@ -68,23 +65,22 @@ public class ManageFixMenuService {
         return menuSection;
     }
 
-    public void register(RestaurantName restaurantName, RegisterFixMenuRequest request) {
-        if (loadMenuRepository.existsMenu(request.name(), restaurantName)) {
+    public void register(Restaurant restaurant, RegisterFixMenuRequest request) {
+        if (loadMenuRepository.existsMenu(request.name(), restaurant)) {
             throw new BaseException(BaseResponseStatus.CONFLICT);
         }
-        Restaurant restaurant = findRestaurantRepository.findByRestaurantName(restaurantName);
 
-        manageMenuRepository.save(Menu.createFixMenu(request.name(), restaurant, request.price()));
+        manageMenuRepository.save(Menu.createFixed(request.name(), restaurant, request.price()));
     }
 
     public void updateMenu(Long menuId, UpdateFixMenuRequest request) {
-        if (isVariableMenu(menuId)) {
+        if (isFixedMenu(menuId)) {
             throw new BaseException(BaseResponseStatus.NOT_SUPPORT_RESTAURANT);
         }
 
-        Long restaurantId = loadMenuRepository.getRestaurantId(menuId);
+        Restaurant restaurant = loadMenuRepository.getRestaurant(menuId);
 
-        duplicateCheck(request.name(), restaurantId);
+        duplicateCheck(request.name(), restaurant);
 
         Menu menu = manageMenuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MENU));
@@ -93,18 +89,15 @@ public class ManageFixMenuService {
         manageMenuRepository.save(menu);
     }
 
-    private void duplicateCheck(String name, Long restaurantId) {
-        if (loadMenuRepository.existsMenu(name, restaurantId)) {
+    private void duplicateCheck(String name, Restaurant restaurant) {
+        if (loadMenuRepository.existsMenu(name, restaurant)) {
             throw new BaseException(BaseResponseStatus.CONFLICT);
         }
     }
 
-    private boolean isVariableMenu(Long menuId) {
-        Long restaurantId = loadMenuRepository.getRestaurantId(menuId);
-        Restaurant restaurant = findRestaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
-
-        return RestaurantType.isVariableType(restaurant.getRestaurantName());
+    private boolean isFixedMenu(Long menuId) {
+        Restaurant restaurant = loadMenuRepository.getRestaurant(menuId);
+        return RestaurantType.isVariableType(restaurant);
     }
 
     public void delete(Long menuId) {

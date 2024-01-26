@@ -8,7 +8,7 @@ import ssu.eatssu.domain.admin.dto.MenuBoards;
 import ssu.eatssu.domain.admin.dto.RegisterFixMenuRequest;
 import ssu.eatssu.domain.admin.dto.UpdateFixMenuRequest;
 import ssu.eatssu.domain.admin.service.ManageFixMenuService;
-import ssu.eatssu.domain.restaurant.entity.RestaurantName;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 @Controller
@@ -29,9 +29,9 @@ public class ManageFixMenuController {
     //TODO ResponseBody 해제
     @ResponseBody
     @PostMapping("")
-    public String register(@RequestParam RestaurantName restaurantName,
+    public String register(@RequestParam Restaurant restaurant,
                            @RequestBody RegisterFixMenuRequest request) {
-        manageFixMenuService.register(restaurantName, request);
+        manageFixMenuService.register(restaurant, request);
         return "redirect:/admin/menu/fix-menu";
     }
 

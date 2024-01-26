@@ -2,7 +2,7 @@ package ssu.eatssu.domain.review.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ssu.eatssu.domain.report.dto.CreateReportRequest;
+import ssu.eatssu.domain.report.dto.ReportCreateRequest;
 import ssu.eatssu.domain.report.entity.ReportType;
 import ssu.eatssu.domain.user.entity.BaseTimeEntity;
 import ssu.eatssu.domain.user.entity.User;
@@ -36,13 +36,13 @@ public class Report extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ReportStatus status;
 
-    public static Report create(User user, Review review, CreateReportRequest request,
+    public static Report create(User user, Review review, ReportCreateRequest request,
         ReportStatus status) {
         return Report.builder()
             .user(user)
             .review(review)
-            .reportType(request.getReportType())
-            .content(request.getContent())
+            .reportType(request.reportType())
+            .content(request.content())
             .status(status)
             .build();
     }

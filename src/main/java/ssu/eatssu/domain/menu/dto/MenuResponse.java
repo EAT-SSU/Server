@@ -1,13 +1,14 @@
 package ssu.eatssu.domain.menu.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.MealMenu;
 import ssu.eatssu.domain.menu.entity.Menu;
+
+import java.util.List;
 
 public class MenuResponse {
 
@@ -35,15 +36,15 @@ public class MenuResponse {
 
         public static MealInformationResponse from(Meal meal) {
             if (!meal.getMealMenus().isEmpty()) {
-	List<BriefMenuInformation> menusInformation = meal.getMealMenus().stream()
-	    .map(MealMenu::getMenu)
-	    .map(BriefMenuInformation::new).toList();
+                List<BriefMenuInformation> menusInformation = meal.getMealMenus().stream()
+                        .map(MealMenu::getMenu)
+                        .map(BriefMenuInformation::new).toList();
 
-	return new MealInformationResponse(meal.getId(),
-	    meal.getRestaurant().getRestaurantName().getPrice(),
-	    meal.getAverateMainRating(), menusInformation);
+                return new MealInformationResponse(meal.getId(),
+                        meal.getRestaurant().getPrice(),
+                        meal.getAverateMainRating(), menusInformation);
             } else {
-	return null;
+                return null;
             }
         }
     }
@@ -68,7 +69,7 @@ public class MenuResponse {
 
         public static MenuInformationResponse from(Menu menu) {
             return new MenuInformationResponse(menu.getId(), menu.getName(),
-	menu.getPrice(), menu.getReviews().getAverageMainRating());
+                    menu.getPrice(), menu.getReviews().getAverageMainRating());
         }
     }
 
@@ -81,12 +82,12 @@ public class MenuResponse {
 
         public static MenusInformationResponse from(Meal meal) {
             if (!meal.getMealMenus().isEmpty()) {
-	List<BriefMenuInformation> menusInformation = meal.getMealMenus().stream()
-	    .map(MealMenu::getMenu)
-	    .map(BriefMenuInformation::new).toList();
-	return new MenusInformationResponse(menusInformation);
+                List<BriefMenuInformation> menusInformation = meal.getMealMenus().stream()
+                        .map(MealMenu::getMenu)
+                        .map(BriefMenuInformation::new).toList();
+                return new MenusInformationResponse(menusInformation);
             } else {
-	return null;
+                return null;
             }
         }
     }

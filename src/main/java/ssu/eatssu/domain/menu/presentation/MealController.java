@@ -11,11 +11,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-import ssu.eatssu.domain.menu.dto.MenuRequest.CreateMealRequest;
+import ssu.eatssu.domain.menu.dto.MenuRequest;
 import ssu.eatssu.domain.menu.dto.MenuResponse.MealInformationResponse;
 import ssu.eatssu.domain.menu.entity.TimePart;
 import ssu.eatssu.domain.menu.service.MenuService;
-import ssu.eatssu.domain.restaurant.entity.RestaurantName;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponse;
@@ -47,14 +47,14 @@ public class MealController {
     @PostMapping("")
     public BaseResponse<?> createMeal(
             @Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
-            @Parameter(description = "식당이름") @RequestParam("restaurant") RestaurantName restaurantName,
+            @Parameter(description = "식당이름") @RequestParam("restaurant") Restaurant restaurant,
             @Parameter(description = "시간대") @RequestParam("time") TimePart timePart,
-            @RequestBody CreateMealRequest createMealRequest) {
-        if (RestaurantType.isFixedType(restaurantName)) {
+            @RequestBody MenuRequest.MealCreateRequest mealCreateRequest) {
+        if (RestaurantType.isFixedType(restaurant)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
 
-        menuService.createMeal(date, restaurantName, timePart, createMealRequest);
+        menuService.createMeal(date, restaurant, timePart, mealCreateRequest);
         return BaseResponse.success();
     }
 
@@ -71,14 +71,14 @@ public class MealController {
     @GetMapping("")
     public BaseResponse<List<MealInformationResponse>> getMeal(
             @Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
-            @Parameter(description = "식당 이름") @RequestParam("restaurant") RestaurantName restaurantName,
+            @Parameter(description = "식당 이름") @RequestParam("restaurant") Restaurant restaurant,
             @Parameter(description = "시간대") @RequestParam("time") TimePart timePart) {
-        if (RestaurantType.isFixedType(restaurantName)) {
+        if (RestaurantType.isFixedType(restaurant)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
 
         return BaseResponse.success(
-                menuService.findSpecificMeals(date, restaurantName, timePart));
+                menuService.findSpecificMeals(date, restaurant, timePart));
     }
 
     @Operation(summary = "식단 삭제", description = "식단을 삭제하는 API 입니다.")

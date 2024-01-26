@@ -1,5 +1,5 @@
 package ssu.eatssu.domain.auth.entity;
 
-public enum OauthProvider {
+public enum OAuthProvider {
     EATSSU, KAKAO, APPLE;
 }

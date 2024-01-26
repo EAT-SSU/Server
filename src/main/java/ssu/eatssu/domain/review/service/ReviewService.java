@@ -17,12 +17,12 @@ import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.repository.MealRepository;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
 import ssu.eatssu.domain.rating.entity.JpaProjectionRatingCalculator;
-import ssu.eatssu.domain.review.dto.CreateReviewRequest;
+import ssu.eatssu.domain.review.dto.ReviewCreateRequest;
 import ssu.eatssu.domain.review.dto.MealReviewsResponse;
-import ssu.eatssu.domain.review.dto.MainReviewsResponse;
+import ssu.eatssu.domain.review.dto.MenuReviewResponse;
 import ssu.eatssu.domain.review.dto.RatingAverages;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
-import ssu.eatssu.domain.review.dto.UpdateReviewRequest;
+import ssu.eatssu.domain.review.dto.ReviewUpdateRequest;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewImage;
 import ssu.eatssu.domain.review.repository.ReviewImageRepository;
@@ -48,7 +48,7 @@ public class ReviewService {
     private final JpaProjectionRatingCalculator ratingCalculator;
     private final S3Uploader s3Uploader;
 
-    public void writeReview(CustomUserDetails userDetails, Long menuId, CreateReviewRequest request,
+    public Review createReview(CustomUserDetails userDetails, Long menuId, ReviewCreateRequest request,
         List<MultipartFile> images) {
 
         User user = userRepository.findById(userDetails.getId())
@@ -62,10 +62,10 @@ public class ReviewService {
         menu.addReview(review);
         processReviewImages(images, review);
 
-        reviewRepository.save(review);
+        return reviewRepository.save(review);
     }
 
-    public void processReviewImages(List<MultipartFile> images, Review review) {
+    private void processReviewImages(List<MultipartFile> images, Review review) {
         if (images == null || !images.isEmpty()) {
             return;
         }
@@ -74,7 +74,7 @@ public class ReviewService {
         }
     }
 
-    public void addReviewImage(Review review, MultipartFile image) {
+    private void addReviewImage(Review review, MultipartFile image) {
         if (!image.isEmpty()) {
             try {
 	String reviewImageUrl = s3Uploader.upload(image, "reviewImg");
@@ -89,7 +89,7 @@ public class ReviewService {
     }
 
     public void updateReview(CustomUserDetails userDetails, Long reviewId,
-        UpdateReviewRequest request) {
+        ReviewUpdateRequest request) {
         User user = userRepository.findById(userDetails.getId())
             .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
@@ -100,8 +100,8 @@ public class ReviewService {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
 
-        review.update(request.getContent(), request.getMainRate(), request.getAmountRate(),
-            request.getTasteRate());
+        review.update(request.content(), request.mainRate(), request.amountRate(),
+            request.tasteRate());
     }
 
 
@@ -119,14 +119,14 @@ public class ReviewService {
         reviewRepository.flush();
     }
 
-    public MainReviewsResponse findMenuReviews(Long menuId) {
+    public MenuReviewResponse findMenuReviews(Long menuId) {
         Menu menu = menuRepository.findById(menuId)
             .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
 
         RatingAverages ratingAverages = ratingCalculator.menuAverageRatings(menu);
         ReviewRatingCount ratingCount = ratingCalculator.menuRatingCount(menu);
 
-        return MainReviewsResponse.of(menu, ratingAverages, ratingCount);
+        return MenuReviewResponse.of(menu, ratingAverages, ratingCount);
 
     }
 

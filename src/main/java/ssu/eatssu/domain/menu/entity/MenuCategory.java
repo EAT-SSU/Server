@@ -2,7 +2,7 @@ package ssu.eatssu.domain.menu.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ssu.eatssu.domain.restaurant.entity.RestaurantName;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 
 @Entity
 @Getter
@@ -19,6 +19,6 @@ public class MenuCategory {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    private RestaurantName restaurantName;
+    private Restaurant restaurant;
 
 }
