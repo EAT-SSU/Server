@@ -70,7 +70,16 @@ public class ManageFixMenuService {
             throw new BaseException(BaseResponseStatus.CONFLICT);
         }
 
-        manageMenuRepository.save(Menu.createFixed(request.name(), restaurant, request.price()));
+        /**
+         * 해당 식당의 메뉴카테고리들 중에 요청받은 카테고리가 존재하는지 확인
+         */
+        List<MenuCategory> menuCategories = loadMenuRepository.findMenuCategoriesByRestaurant(restaurant);
+        MenuCategory category = menuCategories.stream()
+                .filter(menuCategory -> menuCategory.getId().equals(request.categoryId()))
+                .findFirst()
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.BAD_REQUEST));
+
+        manageMenuRepository.save(Menu.createFixed(request.name(), restaurant, request.price(), category));
     }
 
     public void updateMenu(Long menuId, UpdateFixMenuRequest request) {
@@ -78,12 +87,14 @@ public class ManageFixMenuService {
             throw new BaseException(BaseResponseStatus.NOT_SUPPORT_RESTAURANT);
         }
 
-        Restaurant restaurant = loadMenuRepository.getRestaurant(menuId);
-
-        duplicateCheck(request.name(), restaurant);
-
         Menu menu = manageMenuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MENU));
+
+        /**
+         * 식당에 같은 이름의 메뉴가 있는 지 확인
+         */
+        Restaurant restaurant = loadMenuRepository.getRestaurant(menuId);
+        duplicateCheck(request.name(), restaurant);
         menu.update(request.name(), request.price());
 
         manageMenuRepository.save(menu);

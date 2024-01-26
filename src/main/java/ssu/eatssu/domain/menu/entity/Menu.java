@@ -39,10 +39,11 @@ public class Menu {
     @JoinColumn(name = "menu_category_id")
     private MenuCategory category;
 
-    private Menu(String name, Restaurant restaurant, Integer price) {
+    private Menu(String name, Restaurant restaurant, Integer price, MenuCategory category) {
         this.name = name;
         this.restaurant = restaurant;
         this.price = price;
+        this.category = category;
     }
 
     public static Menu createVariable(String name, Restaurant restaurant) {
@@ -50,7 +51,7 @@ public class Menu {
         if (RestaurantType.isVariableType(restaurant)) {
             price = restaurant.getPrice();
         }
-        return new Menu(name, restaurant, price);
+        return new Menu(name, restaurant, price,null);
     }
 
     /**
@@ -58,8 +59,8 @@ public class Menu {
      * todo: 고정메뉴 식당이 아니라 변동 메뉴 식당으로 잘못 들어온다면 어떻게 처리?
      */
 
-    public static Menu createFixed(String name, Restaurant restaurant, Integer price) {
-        return new Menu(name, restaurant, price);
+    public static Menu createFixed(String name, Restaurant restaurant, Integer price, MenuCategory category) {
+        return new Menu(name, restaurant, price, category);
     }
 
     // COMMENT: CASCADE.PERSIST 를 사용하면, Menu 를 저장할 때 Review 도 같이 저장된다.
