@@ -43,5 +43,12 @@ public class ManageMealController {
         return BaseResponse.success();
     }
 
+    @ResponseBody
+    @DeleteMapping("/{mealId}")
+    public BaseResponse delete(@PathVariable Long mealId) {
+        manageMealService.delete(mealId);
+        return BaseResponse.success();
+    }
+
 
 }

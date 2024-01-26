@@ -108,4 +108,18 @@ public class ManageMealService {
          */
         return menuNamesInMeal.equals(menuNames);
     }
+
+    public void delete(Long mealId) {
+        List<Long> menuIds = loadMealRepository.getAllMenuIds(mealId);
+        manageMealRepository.deleteById(mealId);
+        deleteUnusedMenus(menuIds);
+    }
+
+    private void deleteUnusedMenus(List<Long> menuIds) {
+        menuIds.forEach(menuId -> {
+            if(loadMealRepository.countMealMenuByMenuId(menuId)==0){
+                manageMenuRepository.deleteById(menuId);
+            }
+        });
+    }
 }
