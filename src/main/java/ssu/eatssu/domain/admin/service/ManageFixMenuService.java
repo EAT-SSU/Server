@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.admin.dto.*;
-import ssu.eatssu.domain.admin.persistence.FixMenuRatingRepository;
+import ssu.eatssu.domain.admin.persistence.MenuRatingRepository;
 import ssu.eatssu.domain.admin.persistence.LoadFixMenuRepository;
 import ssu.eatssu.domain.admin.persistence.ManageMenuRepository;
 import ssu.eatssu.domain.menu.entity.Menu;
@@ -23,7 +23,7 @@ public class ManageFixMenuService {
 
     private final LoadFixMenuRepository loadMenuRepository;
     private final ManageMenuRepository manageMenuRepository;
-    private final FixMenuRatingRepository fixMenuRatingRepository;
+    private final MenuRatingRepository menuRatingRepository;
 
     public MenuBoards getMenuBoards() {
         MenuBoards menuBoards = new MenuBoards();
@@ -59,7 +59,7 @@ public class ManageFixMenuService {
                         briefMenu.id(),
                         briefMenu.name(),
                         briefMenu.price(),
-                        fixMenuRatingRepository.getMainRatingAverage(briefMenu.id())
+                        menuRatingRepository.getMainRatingAverage(briefMenu.id())
                 ))
         );
         return menuSection;

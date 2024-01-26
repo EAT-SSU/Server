@@ -9,7 +9,7 @@ import ssu.eatssu.domain.review.entity.QReview;
 
 @Repository
 @RequiredArgsConstructor
-public class FixMenuRatingRepository {
+public class MenuRatingRepository {
     private final JPAQueryFactory queryFactory;
     private final QMenu menu = QMenu.menu;
     private final QReview review = QReview.review;
