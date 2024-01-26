@@ -59,13 +59,7 @@ public class MenuService {
         if (MenuValidator.validateExistedMeal(meals, request)) {
             return;
         }
-        Meal meal;
-
-        if(request.getTitle() == null){
-            meal = Meal.withoutTitle(date, timePart, restaurant);
-        } else{
-            meal = Meal.withTitle(date, timePart, restaurant, request.getTitle());
-        }
+        Meal meal = new Meal(date, timePart, restaurant);
 
         mealRepository.save(meal);
 
