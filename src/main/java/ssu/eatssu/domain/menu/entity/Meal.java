@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,8 +29,7 @@ public class Meal {
     @Enumerated(EnumType.STRING)
     private TimePart timePart;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id")
+    @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
 
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
@@ -47,7 +48,7 @@ public class Meal {
 
     public Double getAverateMainRating() {
         return mealMenus.stream()
-            .mapToDouble(mealMenu -> mealMenu.getMenu().getReviews().getAverageMainRating())
-            .average().orElse(0);
+                .mapToDouble(mealMenu -> mealMenu.getMenu().getReviews().getAverageMainRating())
+                .average().orElse(0);
     }
 }

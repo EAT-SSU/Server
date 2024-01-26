@@ -15,7 +15,7 @@ public class MenuRequest {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateMealRequest {
+    public static class MealCreateRequest {
 
         @Schema(description = "메뉴명 리스트", example = "[\"돈까스\", \"샐러드\", \"김치\"]")
         private List<String> menuNames;

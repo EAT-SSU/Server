@@ -1,7 +1,5 @@
 package ssu.eatssu.domain.user.presentation;
 
-import static ssu.eatssu.domain.auth.infrastructure.SecurityUtil.getLoginUser;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -23,8 +21,7 @@ import ssu.eatssu.domain.user.dto.MyReviewDetail;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.slice.service.SliceService;
-import ssu.eatssu.domain.user.dto.UpdateNicknameRequest;
-import ssu.eatssu.domain.user.dto.Tokens;
+import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
 import ssu.eatssu.domain.user.service.UserService;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
@@ -70,7 +67,7 @@ public class UserController {
     })
     @PatchMapping("/nickname")
     public BaseResponse<?> updateNickname(
-        @Valid @RequestBody UpdateNicknameRequest updateNicknameRequest,
+        @Valid @RequestBody NicknameUpdateRequest updateNicknameRequest,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         userService.updateNickname(userDetails, updateNicknameRequest);
         return BaseResponse.success();
@@ -111,15 +108,5 @@ public class UserController {
     public BaseResponse<MyPageResponse> getMyPage(
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return BaseResponse.success(userService.findMyPage(customUserDetails));
-    }
-
-    @Operation(summary = "토큰 재발급", description = "accessToken, refreshToken 재발급 API 입니다.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "토큰 재발급 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
-    @PostMapping("/token/reissue")
-    public BaseResponse<Tokens> refreshToken() {
-        Tokens tokens = userService.refreshTokens(getLoginUser());
-        return BaseResponse.success(tokens);
     }
 }

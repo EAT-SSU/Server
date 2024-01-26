@@ -45,7 +45,7 @@ public class Review extends BaseTimeEntity {
     }
 
     /*
-    public void update(UpdateReviewRequest request) {
+    public void update(ReviewUpdateRequest request) {
         this.content = request.getContent();
         this.ratings = Ratings.of(request.getMainRate(), request.getAmountRate(), request.getTasteRate());
     }

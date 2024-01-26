@@ -9,8 +9,7 @@ import ssu.eatssu.domain.admin.dto.BriefMenu;
 import ssu.eatssu.domain.menu.entity.MenuCategory;
 import ssu.eatssu.domain.menu.entity.QMenu;
 import ssu.eatssu.domain.menu.entity.QMenuCategory;
-import ssu.eatssu.domain.restaurant.entity.QRestaurant;
-import ssu.eatssu.domain.restaurant.entity.RestaurantName;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 
 import java.util.List;
 
@@ -19,7 +18,6 @@ import java.util.List;
 public class LoadFixMenuRepository {
     private final JPAQueryFactory queryFactory;
     private final QMenu menu = QMenu.menu;
-    private final QRestaurant restaurant = QRestaurant.restaurant;
     private final QMenuCategory category = QMenuCategory.menuCategory;
 
     public List<BriefMenu> findBriefMenusByCategoryId(Long categoryId) {
@@ -37,36 +35,20 @@ public class LoadFixMenuRepository {
                 .fetch();
     }
 
-    public boolean existsMenu(String name, RestaurantName restaurantName) {
+    public boolean existsMenu(String name, Restaurant restaurant) {
         return queryFactory
                 .select(menu.id)
                 .from(menu)
-                .join(menu.restaurant, restaurant)
                 .where(
                         menuNameEq(name),
-                        restaurantNameEq(restaurantName)
+                        restaurantNameEq(restaurant)
                 )
                 .fetchFirst() != null;
     }
 
-    /**
-     * 오버 로딩
-     */
-    public boolean existsMenu(String name, Long restaurantId) {
+    public Restaurant getRestaurant(Long menuId) {
         return queryFactory
-                .select(menu.name)
-                .from(menu)
-                .join(menu.restaurant, restaurant)
-                .where(
-                        menuNameEq(name),
-                        restaurantIdEq(restaurantId)
-                )
-                .fetchFirst() != null;
-    }
-
-    public long getRestaurantId(Long menuId) {
-        return queryFactory
-                .select(menu.restaurant.id)
+                .select(menu.restaurant)
                 .from(menu)
                 .where(
                         menu.id.eq(menuId)
@@ -74,7 +56,7 @@ public class LoadFixMenuRepository {
                 .fetchFirst();
     }
 
-    public List<MenuCategory> findMenuCategoriesByRestaurant(RestaurantName restaurant) {
+    public List<MenuCategory> findMenuCategoriesByRestaurant(Restaurant restaurant) {
         return queryFactory
                 .selectFrom(category)
                 .where(
@@ -82,20 +64,16 @@ public class LoadFixMenuRepository {
                 ).fetch();
     }
 
-    private BooleanExpression menuNameEq(String MenuName) {
-        return menu.name.eq(MenuName);
+    private BooleanExpression menuNameEq(String menuName) {
+        return menu.name.eq(menuName);
     }
 
-    private BooleanExpression restaurantNameEq(RestaurantName restaurantName) {
-        return restaurant.restaurantName.eq(restaurantName);
+    private BooleanExpression restaurantNameEq(Restaurant restaurant) {
+        return menu.restaurant.eq(restaurant);
     }
 
-    private BooleanExpression restaurantIdEq(Long restaurantId) {
-        return restaurant.id.eq(restaurantId);
-    }
-
-    private BooleanExpression categoryRestaurantNameEq(RestaurantName restaurantName) {
-        return category.restaurantName.eq(restaurantName);
+    private BooleanExpression categoryRestaurantNameEq(Restaurant restaurant) {
+        return category.restaurant.eq(restaurant);
     }
 
     private BooleanExpression menuCategoryIdEq(Long categoryId) {

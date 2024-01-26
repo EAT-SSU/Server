@@ -13,7 +13,7 @@ import ssu.eatssu.domain.user.entity.User;
 @Schema(title = "리뷰 작성")
 @NoArgsConstructor
 @Getter
-public class CreateReviewRequest {
+public class ReviewCreateRequest {
 
     @Schema(description = "평점-메인", example = "4")
     private Integer mainRating;
@@ -28,7 +28,7 @@ public class CreateReviewRequest {
     @Schema(description = "한줄평", example = "맛있어용")
     private String content;
 
-    public CreateReviewRequest(int mainRating, int amountRating, int tasteRating, String content) {
+    public ReviewCreateRequest(int mainRating, int amountRating, int tasteRating, String content) {
         Assert.isTrue(mainRating >= 1 && mainRating <= 5, "평점은 1에서 5 사이 여야 합니다.");
         Assert.isTrue(amountRating >= 1 && amountRating <= 5, "평점은 1에서 5 사이 여야 합니다.");
         Assert.isTrue(tasteRating >= 1 && tasteRating <= 5, "평점은 1에서 5 사이 여야 합니다.");
