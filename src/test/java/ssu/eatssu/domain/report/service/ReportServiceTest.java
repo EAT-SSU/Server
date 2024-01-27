@@ -1,6 +1,5 @@
 package ssu.eatssu.domain.report.service;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
@@ -8,8 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ssu.eatssu.domain.auth.entity.CustomUserDetails;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
+import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.report.dto.ReportCreateRequest;
 import ssu.eatssu.domain.report.entity.ReportType;
 import ssu.eatssu.domain.report.repository.ReportRepository;
@@ -37,6 +36,7 @@ class ReportServiceTest {
     @BeforeEach
     void setUp() {
         reportRepository.deleteAll();
+        reviewRepository.deleteAll();
         userRepository.deleteAll();
     }
 

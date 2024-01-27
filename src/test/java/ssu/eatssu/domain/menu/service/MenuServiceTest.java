@@ -17,6 +17,7 @@ import ssu.eatssu.domain.menu.dto.MenuResponse.MenusInformationResponse;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.repository.MealRepository;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 
 @SpringBootTest
 class MenuServiceTest {
@@ -41,9 +42,9 @@ class MenuServiceTest {
         // given
         List<Menu> menus = new ArrayList<>();
         Restaurant foodCourt = Restaurant.from("푸드 코트");
-        menus.add(Menu.createFixed("라면", foodCourt, 3000));
-        menus.add(Menu.createFixed("떡볶이", foodCourt, 5000));
-        menus.add(Menu.createFixed("짜게치", foodCourt, 4000));
+        menus.add(Menu.createFixed("라면", foodCourt, 3000, null));
+        menus.add(Menu.createFixed("떡볶이", foodCourt, 5000, null));
+        menus.add(Menu.createFixed("짜게치", foodCourt, 4000, null));
         menuRepository.saveAll(menus);
 
         // when & then
