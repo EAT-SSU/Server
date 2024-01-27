@@ -28,7 +28,7 @@ public class ManageMealService {
     }
 
     private MenuBoard getMealBoard(MealInfo mealInfo) {
-        MenuBoard menuBoard = new MenuBoard(mealInfo.restaurant().getDescription());
+        MenuBoard menuBoard = new MenuBoard(mealInfo.restaurant().getRestaurantName());
 
         getMenuSections(mealInfo).forEach(menuBoard::addMenuSection);
 

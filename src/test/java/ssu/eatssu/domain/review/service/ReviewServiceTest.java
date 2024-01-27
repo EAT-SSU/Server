@@ -6,10 +6,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ssu.eatssu.domain.auth.entity.CustomUserDetails;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
+import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.ReviewCreateRequest;
 import ssu.eatssu.domain.review.dto.ReviewUpdateRequest;
 import ssu.eatssu.domain.review.entity.Review;
@@ -103,7 +104,7 @@ class ReviewServiceTest {
     }
 
     private Menu createMenu() {
-        Menu menu = Menu.createFixed("라면", Restaurant.FOOD_COURT, 3000);
+        Menu menu = Menu.createFixed("라면", Restaurant.FOOD_COURT, 3000, null);
         return menuRepository.save(menu);
     }
 }

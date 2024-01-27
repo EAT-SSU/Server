@@ -35,7 +35,7 @@ public class ManageFixMenuService {
     }
 
     private MenuBoard getMenuBoard(Restaurant restaurant) {
-        MenuBoard menuBoard = new MenuBoard(restaurant.getDescription());
+        MenuBoard menuBoard = new MenuBoard(restaurant.getRestaurantName());
 
         getMenuSections(restaurant).forEach(menuBoard::addMenuSection);
 
