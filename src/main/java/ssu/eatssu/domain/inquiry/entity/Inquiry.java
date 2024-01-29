@@ -22,4 +22,17 @@ public class Inquiry extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    private String email;
+
+    @Enumerated(EnumType.STRING)
+    private InquiryStatus status;
+
+    public Inquiry(String content, User user, String email) {
+        this.content = content;
+        this.user = user;
+        this.email = email;
+        this.status = InquiryStatus.WAITING;
+    }
+
 }
