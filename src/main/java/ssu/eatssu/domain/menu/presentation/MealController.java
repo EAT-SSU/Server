@@ -46,7 +46,7 @@ public class MealController {
     })
     @PostMapping("")
     public BaseResponse<?> createMeal(
-        @Parameter(schema = @Schema(type="string" ,format = "date", example = "20240101")) @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
+            @Parameter(schema = @Schema(type = "string", format = "date", example = "20240101")) @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
             @Parameter(description = "식당이름") @RequestParam("restaurant") Restaurant restaurant,
             @Parameter(description = "시간대") @RequestParam("time") TimePart timePart,
             @RequestBody MenuRequest.MealCreateRequest mealCreateRequest) {
@@ -70,7 +70,7 @@ public class MealController {
     })
     @GetMapping("")
     public BaseResponse<List<MealInformationResponse>> getMeal(
-        @Parameter(schema = @Schema(type="string" ,format = "date", example = "20240101")) @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
+            @Parameter(description = "날짜(yyyyMMdd)") @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
             @Parameter(description = "식당 이름") @RequestParam("restaurant") Restaurant restaurant,
             @Parameter(description = "시간대") @RequestParam("time") TimePart timePart) {
         if (RestaurantType.isFixedType(restaurant)) {
