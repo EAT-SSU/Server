@@ -2,8 +2,10 @@ package ssu.eatssu.domain.review.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.util.Assert;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.rating.entity.Ratings;
@@ -11,8 +13,9 @@ import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.entity.User;
 
 @Schema(title = "리뷰 작성")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Setter
 public class ReviewCreateRequest {
 
     @Schema(description = "평점-메인", example = "4")
@@ -42,8 +45,11 @@ public class ReviewCreateRequest {
     public Review toEntity(User user, Menu menu) {
         Ratings ratings = Ratings.of(this.mainRating, this.amountRating, this.tasteRating);
         return Review.builder()
-                .user(user).content(this.content).ratings(ratings).menu(menu)
-                .build();
+            .user(user)
+            .content(this.content)
+            .ratings(ratings)
+            .menu(menu)
+            .build();
     }
 
 }
