@@ -26,7 +26,6 @@ public class Menu {
 
     private Integer price;
 
-    @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
 
     @Embedded
@@ -49,9 +48,9 @@ public class Menu {
     public static Menu createVariable(String name, Restaurant restaurant) {
         int price = 0;
         if (RestaurantType.isVariableType(restaurant)) {
-            price = restaurant.getPrice();
+            price = restaurant.getRestaurantPrice();
         }
-        return new Menu(name, restaurant, price,null);
+        return new Menu(name, restaurant, price, null);
     }
 
     /**
@@ -59,7 +58,8 @@ public class Menu {
      * todo: 고정메뉴 식당이 아니라 변동 메뉴 식당으로 잘못 들어온다면 어떻게 처리?
      */
 
-    public static Menu createFixed(String name, Restaurant restaurant, Integer price, MenuCategory category) {
+    public static Menu createFixed(String name, Restaurant restaurant, Integer price,
+        MenuCategory category) {
         return new Menu(name, restaurant, price, category);
     }
 
@@ -71,6 +71,7 @@ public class Menu {
     public int getTotalReviewCount() {
         return reviews.size();
     }
+
     public void update(String name, Integer price) {
         this.name = name;
         this.price = price;
