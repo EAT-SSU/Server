@@ -28,7 +28,6 @@ public class Meal {
     @Enumerated(EnumType.STRING)
     private TimePart timePart;
 
-    @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
 
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)

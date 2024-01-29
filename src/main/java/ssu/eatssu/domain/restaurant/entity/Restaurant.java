@@ -1,33 +1,44 @@
 package ssu.eatssu.domain.restaurant.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.Arrays;
 import lombok.Getter;
+
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
-import java.util.Arrays;
 
 @Getter
 public enum Restaurant {
-    DODAM("도담 식당", 6000),
-    DORMITORY("기숙사 식당", 5000),
-    FOOD_COURT("푸드 코트", null),
-    SNACK_CORNER("스낵 코너", null),
-    HAKSIK("학생 식당", 5000);
+    DODAM(RestaurantType.VARIABLE, "도담 식당", 6000),
+    DORMITORY(RestaurantType.VARIABLE, "기숙사 식당", 5000),
+    FOOD_COURT(RestaurantType.FIXED, "푸드 코트", null),
+    SNACK_CORNER(RestaurantType.FIXED, "스낵 코너", null),
+    HAKSIK(RestaurantType.VARIABLE, "학생 식당", 5000);
 
-    private String description;
-    private Integer price;
-
-    Restaurant(String description, Integer price) {
-        this.description = description;
-        this.price = price;
-    }
+    private RestaurantType restaurantType;
+    private String restaurantName;
+    private Integer restaurantPrice;
 
     @JsonCreator
-    public static Restaurant from(String description) {
+    public static Restaurant from(String restaurantName) {
         return Arrays.stream(Restaurant.values())
-                .filter(d -> d.getDescription().equals(description))
-                .findAny()
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
+            .filter(r -> r.getRestaurantName().equals(restaurantName))
+            .findAny()
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
+    }
+
+    Restaurant(RestaurantType restaurantType, String description, Integer price) {
+        this.restaurantType = restaurantType;
+        this.restaurantName = description;
+        this.restaurantPrice = price;
+    }
+
+    public boolean isFixed() {
+        return this.restaurantType == RestaurantType.FIXED;
+    }
+
+    public boolean isVariable() {
+        return this.restaurantType == RestaurantType.VARIABLE;
     }
 }
