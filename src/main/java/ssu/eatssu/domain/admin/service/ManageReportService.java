@@ -9,6 +9,8 @@ import ssu.eatssu.domain.admin.dto.ReportLine;
 import ssu.eatssu.domain.admin.persistence.LoadReportRepository;
 import ssu.eatssu.domain.admin.persistence.ManageReportRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ManageReportService {
@@ -23,5 +25,10 @@ public class ManageReportService {
 
     public void delete(Long reportId) {
         manageReportRepository.deleteById(reportId);
+    }
+
+    public void deleteAllByReviewId(Long reviewId) {
+        List<Long> reportIds = loadReportRepository.findAllByReviewId(reviewId);
+        manageReportRepository.deleteAllByIdInBatch(reportIds);
     }
 }
