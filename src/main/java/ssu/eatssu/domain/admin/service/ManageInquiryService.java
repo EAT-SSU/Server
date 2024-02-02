@@ -31,4 +31,8 @@ public class ManageInquiryService {
         inquiry.updateStatus(request.status());
         manageInquiryRepository.save(inquiry);
     }
+
+    public void delete(Long inquiryId) {
+        manageInquiryRepository.deleteById(inquiryId);
+    }
 }
