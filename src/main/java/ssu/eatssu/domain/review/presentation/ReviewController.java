@@ -84,7 +84,7 @@ public class ReviewController {
         produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<?> writeReview(
         @Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
-        @RequestBody ReviewCreateRequest createReviewRequest,
+        @RequestPart ReviewCreateRequest createReviewRequest,
         @RequestPart(value = "multipartFileList", required = false) List<MultipartFile> multipartFileList,
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         reviewService.createReview(customUserDetails, menuId, createReviewRequest,
