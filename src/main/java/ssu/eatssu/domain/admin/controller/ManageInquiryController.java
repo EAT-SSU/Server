@@ -13,7 +13,7 @@ import ssu.eatssu.domain.admin.service.ManageInquiryService;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 @Controller
-@RequestMapping("/admin/inquiry")
+@RequestMapping("/admin/inquiries")
 @RequiredArgsConstructor
 public class ManageInquiryController {
     private final ManageInquiryService manageInquiryService;
