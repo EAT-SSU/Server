@@ -12,7 +12,7 @@ import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 @Controller
-@RequestMapping("/admin/menu/fix-menu")
+@RequestMapping("/admin/menu/fix-menus")
 @RequiredArgsConstructor
 public class ManageFixMenuController {
 

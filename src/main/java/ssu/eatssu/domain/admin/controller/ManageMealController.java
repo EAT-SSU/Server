@@ -16,7 +16,7 @@ import ssu.eatssu.global.handler.response.BaseResponse;
 import java.util.Date;
 
 @Controller
-@RequestMapping("/admin/meal")
+@RequestMapping("/admin/meals")
 @RequiredArgsConstructor
 public class ManageMealController {
 
