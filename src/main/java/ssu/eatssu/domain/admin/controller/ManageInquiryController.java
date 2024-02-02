@@ -32,4 +32,11 @@ public class ManageInquiryController {
         manageInquiryService.updateStatus(inquiryId, request);
         return BaseResponse.success();
     }
+
+    @ResponseBody
+    @DeleteMapping("{inquiryId}")
+    public BaseResponse<?> delete(@PathVariable Long inquiryId) {
+        manageInquiryService.delete(inquiryId);
+        return BaseResponse.success();
+    }
 }
