@@ -5,11 +5,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.admin.dto.InquiryLine;
 import ssu.eatssu.domain.admin.dto.PageWrapper;
+import ssu.eatssu.domain.admin.dto.UpdateStatusRequest;
 import ssu.eatssu.domain.admin.service.ManageInquiryService;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
@@ -25,5 +24,12 @@ public class ManageInquiryController {
                                                               Model model) {
         PageWrapper<InquiryLine> inquiryLinePage = manageInquiryService.getInquiryBoard(pageable);
         return BaseResponse.success(inquiryLinePage);
+    }
+
+    @ResponseBody
+    @PatchMapping("{inquiryId}/status")
+    public BaseResponse<?> updateStatus(@PathVariable Long inquiryId, @RequestBody UpdateStatusRequest request) {
+        manageInquiryService.updateStatus(inquiryId, request);
+        return BaseResponse.success();
     }
 }

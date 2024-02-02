@@ -35,4 +35,8 @@ public class Inquiry extends BaseTimeEntity {
         this.status = InquiryStatus.WAITING;
     }
 
+    public void updateStatus(InquiryStatus status) {
+        this.status = status;
+    }
+
 }
