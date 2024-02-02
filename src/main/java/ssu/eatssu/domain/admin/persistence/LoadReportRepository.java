@@ -42,4 +42,12 @@ public class LoadReportRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
     }
+
+    public List<Long> findAllByReviewId(Long reviewId) {
+        return queryFactory
+                .select(report.id)
+                .from(report)
+                .where(report.review.id.eq(reviewId))
+                .fetch();
+    }
 }
