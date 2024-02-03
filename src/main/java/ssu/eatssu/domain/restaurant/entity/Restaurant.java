@@ -1,29 +1,35 @@
 package ssu.eatssu.domain.restaurant.entity;
 
-import jakarta.persistence.*;
-import lombok.AccessLevel;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.Arrays;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-import java.util.List;
-import ssu.eatssu.domain.menu.entity.Meal;
-import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.global.handler.response.BaseException;
+import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
-@Entity
+
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Restaurant {
+public enum Restaurant {
+    DODAM("도담 식당", 6000),
+    DORMITORY("기숙사 식당", 5000),
+    FOOD_COURT( "푸드 코트", null),
+    SNACK_CORNER( "스낵 코너", null),
+    HAKSIK("학생 식당", 5000);
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "restaurant_id")
-    private Long id;
+    private String restaurantName;
+    private Integer restaurantPrice;
 
-    @Enumerated(EnumType.STRING)
-    private RestaurantName restaurantName;
 
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
-    private List<Menu> menus;
+    @JsonCreator
+    public static Restaurant from(String restaurantName) {
+        return Arrays.stream(Restaurant.values())
+            .filter(r -> r.getRestaurantName().equals(restaurantName))
+            .findAny()
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
+    }
 
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
-    private List<Meal> meals;
+    Restaurant(String restaurantName, Integer price) {
+        this.restaurantName = restaurantName;
+        this.restaurantPrice = price;
+    }
 }

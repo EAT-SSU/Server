@@ -1,0 +1,18 @@
+{{> layout/header}}
+<div class="onboarding-page">
+    <div class="logo">
+        <img class="image" src="img/cutlery.png"/>
+        <h1 class="main-logo"> EAT-SSU </h1>
+        <h6> 숭실대에서 먹자 </h6>
+    </div>
+    <div class="text-wrapper">EAT-SSU 관리자 페이지</div>
+    <div class="overlap-group">
+        <form class="input-password-form", name="send-password", method="post", action="/admin/login">
+            <div class="rectangle">
+                <input type="password" id="password" required placeholder="비밀번호를 입력해주세요."/>
+            </div>
+        </form>
+    </div>
+</div>
+{{> layout/footer}}
+

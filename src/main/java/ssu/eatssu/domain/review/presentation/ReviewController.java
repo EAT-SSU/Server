@@ -17,13 +17,13 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ssu.eatssu.domain.auth.entity.CustomUserDetails;
+import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.menu.entity.MenuType;
-import ssu.eatssu.domain.review.dto.CreateReviewRequest;
+import ssu.eatssu.domain.review.dto.ReviewCreateRequest;
 import ssu.eatssu.domain.review.dto.MealReviewsResponse;
-import ssu.eatssu.domain.review.dto.MainReviewsResponse;
+import ssu.eatssu.domain.review.dto.MenuReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewDetail;
-import ssu.eatssu.domain.review.dto.UpdateReviewRequest;
+import ssu.eatssu.domain.review.dto.ReviewUpdateRequest;
 import ssu.eatssu.domain.slice.service.SliceService;
 import ssu.eatssu.domain.review.service.ReviewService;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
@@ -84,10 +84,10 @@ public class ReviewController {
         produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<?> writeReview(
         @Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
-        @RequestPart(value = "reviewCreate") CreateReviewRequest createReviewRequest,
+        @RequestPart ReviewCreateRequest createReviewRequest,
         @RequestPart(value = "multipartFileList", required = false) List<MultipartFile> multipartFileList,
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        reviewService.writeReview(customUserDetails, menuId, createReviewRequest,
+        reviewService.createReview(customUserDetails, menuId, createReviewRequest,
             multipartFileList);
         return BaseResponse.success();
     }
@@ -105,7 +105,7 @@ public class ReviewController {
     @PatchMapping("/{reviewId}")
     public BaseResponse<?> updateReview(@Parameter(description = "reviewId")
     @PathVariable("reviewId") Long reviewId,
-        @RequestBody UpdateReviewRequest request,
+        @RequestBody ReviewUpdateRequest request,
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         reviewService.updateReview(customUserDetails, reviewId, request);
         return BaseResponse.success();
@@ -142,7 +142,7 @@ public class ReviewController {
     @GetMapping("/meals/{mealId}")
     public BaseResponse<MealReviewsResponse> getMealReviews(
         @Parameter(description = "mealId")
-        @RequestParam(value = "mealId") Long mealId) {
+        @PathVariable(value = "mealId") Long mealId) {
         return BaseResponse.success(reviewService.findMealReviews(mealId));
     }
 
@@ -159,9 +159,9 @@ public class ReviewController {
         @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/menus/{menuId}")
-    public BaseResponse<MainReviewsResponse> getMainReviews(
+    public BaseResponse<MenuReviewResponse> getMainReviews(
         @Parameter(description = "menuId")
-        @RequestParam(value = "menuId") Long menuId) {
+        @PathVariable(value = "menuId") Long menuId) {
         return BaseResponse.success(reviewService.findMenuReviews(menuId));
     }
 
