@@ -33,6 +33,7 @@ import ssu.eatssu.global.handler.response.BaseException;
 
 import java.io.IOException;
 import java.util.List;
+
 import ssu.eatssu.global.util.S3Uploader;
 
 @RequiredArgsConstructor
@@ -49,13 +50,13 @@ public class ReviewService {
     private final S3Uploader s3Uploader;
 
     public Review createReview(CustomUserDetails userDetails, Long menuId, ReviewCreateRequest request,
-        List<MultipartFile> images) {
+                               List<MultipartFile> images) {
 
         User user = userRepository.findById(userDetails.getId())
-            .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
 
         Review review = request.toEntity(user, menu);
 
@@ -66,7 +67,7 @@ public class ReviewService {
     }
 
     private void processReviewImages(List<MultipartFile> images, Review review) {
-        if (images == null || !images.isEmpty()) {
+        if (images == null || images.isEmpty()) {
             return;
         }
         for (MultipartFile image : images) {
@@ -77,40 +78,40 @@ public class ReviewService {
     private void addReviewImage(Review review, MultipartFile image) {
         if (!image.isEmpty()) {
             try {
-	String reviewImageUrl = s3Uploader.upload(image, "reviewImg");
-	ReviewImage reviewImage = ReviewImage.builder().review(review)
-	    .imageUrl(reviewImageUrl)
-	    .build();
-	reviewImageRepository.save(reviewImage);
+                String reviewImageUrl = s3Uploader.upload(image, "reviewImg");
+                ReviewImage reviewImage = ReviewImage.builder().review(review)
+                        .imageUrl(reviewImageUrl)
+                        .build();
+                reviewImageRepository.save(reviewImage);
             } catch (IOException e) {
-	throw new BaseException(FAIL_IMAGE_UPLOAD);
+                throw new BaseException(FAIL_IMAGE_UPLOAD);
             }
         }
     }
 
     public void updateReview(CustomUserDetails userDetails, Long reviewId,
-        ReviewUpdateRequest request) {
+                             ReviewUpdateRequest request) {
         User user = userRepository.findById(userDetails.getId())
-            .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         Review review = reviewRepository.findById(reviewId)
-            .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
 
         if (review.isNotWrittenBy(user)) {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
 
         review.update(request.content(), request.mainRate(), request.amountRate(),
-            request.tasteRate());
+                request.tasteRate());
     }
 
 
     public void deleteReview(CustomUserDetails userDetails, Long reviewId) {
         User user = userRepository.findById(userDetails.getId())
-            .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         Review review = reviewRepository.findById(reviewId)
-            .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
 
         if (review.isNotWrittenBy(user)) {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
@@ -121,7 +122,7 @@ public class ReviewService {
 
     public MenuReviewResponse findMenuReviews(Long menuId) {
         Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
 
         RatingAverages ratingAverages = ratingCalculator.menuAverageRatings(menu);
         ReviewRatingCount ratingCount = ratingCalculator.menuRatingCount(menu);
@@ -132,7 +133,7 @@ public class ReviewService {
 
     public MealReviewsResponse findMealReviews(Long mealId) {
         Meal meal = mealRepository.findById(mealId)
-            .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
 
         int reviewCount = ratingCalculator.mealTotalReviewCount(meal);
 
@@ -140,6 +141,6 @@ public class ReviewService {
         ReviewRatingCount ratingCountMap = ratingCalculator.mealRatingCount(meal);
 
         return MealReviewsResponse.of(reviewCount, meal.getMenuNames(), averageRating,
-            ratingCountMap);
+                ratingCountMap);
     }
 }
