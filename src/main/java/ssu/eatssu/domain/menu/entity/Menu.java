@@ -28,6 +28,8 @@ public class Menu {
 
     private Restaurant restaurant;
 
+    private boolean isDiscontinued = false;
+
     @Embedded
     private Reviews reviews = new Reviews();
 
