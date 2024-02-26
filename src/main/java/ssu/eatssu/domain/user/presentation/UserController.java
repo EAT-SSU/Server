@@ -39,7 +39,7 @@ public class UserController {
         중복되지 않은 이메일이면 true 를 반환합니다
         """)
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "중복되지 않은 이메일", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+        @ApiResponse(responseCode = "200", description = "중복되지 않은 이메일")
     })
     @PostMapping("/validate/email/{email}") //todo: 중복인 경우 error throw, 중복 아니면 ApiReposne return
     public BaseResponse<Boolean> validateDuplicatedEmail(
@@ -52,7 +52,7 @@ public class UserController {
         중복되지 않은 닉네임이면 true 를 반환합니다
         """)
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "중복되지 않은 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+        @ApiResponse(responseCode = "200", description = "중복되지 않은 닉네임")
     })
     @GetMapping("/validate/nickname")
     public BaseResponse<Boolean> validateDuplicatedNickname(@Parameter(description = "닉네임")
@@ -62,7 +62,7 @@ public class UserController {
 
     @Operation(summary = "닉네임 수정", description = "닉네임 수정 API 입니다.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "닉네임 수정 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "200", description = "닉네임 수정 성공"),
         @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PatchMapping("/nickname")
@@ -75,7 +75,7 @@ public class UserController {
 
     @Operation(summary = "유저 탈퇴", description = "유저 탈퇴 API 입니다.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "유저 탈퇴 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "200", description = "유저 탈퇴 성공"),
         @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @DeleteMapping("")
@@ -85,7 +85,7 @@ public class UserController {
 
     @Operation(summary = "내가 쓴 리뷰 리스트 조회", description = "내가 쓴 리뷰 리스트를 조회하는 API 입니다.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "내가 쓴 리뷰 리스트 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "200", description = "내가 쓴 리뷰 리스트 조회 성공"),
         @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/reviews")
@@ -101,7 +101,7 @@ public class UserController {
 
     @Operation(summary = "마이페이지 정보 조회", description = "마이페이지 정보를 조회하는 API 입니다.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "마이페이지 정보 조회 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+        @ApiResponse(responseCode = "200", description = "마이페이지 정보 조회 성공"),
         @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/mypage")
