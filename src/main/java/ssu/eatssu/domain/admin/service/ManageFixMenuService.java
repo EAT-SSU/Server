@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.admin.dto.*;
-import ssu.eatssu.domain.admin.persistence.MenuRatingRepository;
 import ssu.eatssu.domain.admin.persistence.LoadFixMenuRepository;
 import ssu.eatssu.domain.admin.persistence.ManageMenuRepository;
+import ssu.eatssu.domain.admin.persistence.MenuRatingRepository;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.entity.MenuCategory;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
@@ -37,7 +37,7 @@ public class ManageFixMenuService {
     private MenuBoard getMenuBoard(Restaurant restaurant) {
         MenuBoard menuBoard = new MenuBoard(restaurant.getRestaurantName());
 
-        getMenuSections(restaurant).forEach(menuBoard::addMenuSection);
+        getMenuSections(restaurant).forEach(menuBoard::addSection);
 
         return menuBoard;
     }
