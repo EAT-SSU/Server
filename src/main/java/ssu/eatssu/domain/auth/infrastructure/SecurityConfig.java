@@ -27,7 +27,7 @@ public class SecurityConfig {
     private static final String[] AUTH_WHITELIST = {
             "/","/oauths/**", "/users/**",
             "/menus/**", "/meals/**", "/restaurants/**", "/reviews/**", "/oauth/**", "/inquiries/{userInquiriesId}",
-            "/inquiries/list", "/admin/login"
+            "/inquiries/list", "/admin/login",
     };
 
     private static final String[] ADMIN_PAGE_LIST = {
