@@ -1,8 +1,9 @@
 package ssu.eatssu.domain.report.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.Arrays;
 import lombok.Getter;
+
+import java.util.Locale;
 
 @Getter
 public enum ReportType {
@@ -20,10 +21,7 @@ public enum ReportType {
     }
 
     @JsonCreator
-    public static ReportType from(final String description) {
-        return Arrays.stream(ReportType.values())
-            .filter(v -> v.getDescription().equals(description))
-            .findAny()
-            .orElseThrow(IllegalArgumentException::new);
+    public static ReportType from(final String name) {
+        return ReportType.valueOf(name.toUpperCase(Locale.ROOT));
     }
 }

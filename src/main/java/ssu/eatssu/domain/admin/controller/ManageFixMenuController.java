@@ -12,7 +12,7 @@ import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 @Controller
-@RequestMapping("/admin/menu/fix-menu")
+@RequestMapping("/admin/menu/fix-menus")
 @RequiredArgsConstructor
 public class ManageFixMenuController {
 
@@ -36,7 +36,7 @@ public class ManageFixMenuController {
     }
 
     @ResponseBody
-    @PatchMapping("{menuId}")
+    @PatchMapping("/{menuId}")
     public String update(@PathVariable Long menuId,
                          @RequestBody UpdateFixMenuRequest request) {
         manageFixMenuService.updateMenu(menuId, request);
@@ -44,7 +44,7 @@ public class ManageFixMenuController {
     }
 
     @ResponseBody
-    @DeleteMapping("{menuId}")
+    @DeleteMapping("/{menuId}")
     public String delete(@PathVariable Long menuId) {
         manageFixMenuService.delete(menuId);
         return "redirect:/admin/menu/fix-menu";
