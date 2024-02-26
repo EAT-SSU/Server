@@ -26,9 +26,10 @@ public class Meal {
     private Date date;
 
     @Enumerated(EnumType.STRING)
-    private TimePart timePart;
-
     private Restaurant restaurant;
+
+    @Enumerated(EnumType.STRING)
+    private TimePart timePart;
 
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
     private List<MealMenu> mealMenus = new ArrayList<>();
