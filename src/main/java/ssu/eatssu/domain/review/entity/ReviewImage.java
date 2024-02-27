@@ -20,4 +20,10 @@ public class ReviewImage {
     private Review review;
 
     private String imageUrl;
+
+
+    public ReviewImage(Review review, String imageUrl) {
+        this.review = review;
+        this.imageUrl = imageUrl;
+    }
 }
