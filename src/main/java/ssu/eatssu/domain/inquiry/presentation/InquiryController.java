@@ -32,7 +32,7 @@ public class InquiryController {
 
     @Operation(summary = "문의 작성", description = "문의를 작성하는 API 입니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "문의 작성 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "200", description = "문의 작성 성공"),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PostMapping("/")

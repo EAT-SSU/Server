@@ -13,7 +13,7 @@ import ssu.eatssu.domain.menu.entity.Menu;
 @Builder
 public class MenuReviewResponse implements ReviewInformationResponse {
 
-    @Schema(description = "메뉴 리스트", example = "[\"고구마치즈돈까스\", \"막국수\", \"미니밥\", \"단무지\", \"요구르트\"]")
+    @Schema(description = "메뉴 이름", example = "바질토마토베이글")
     private String menuName;
 
     @Schema(description = "리뷰 개수", example = "15")
@@ -27,6 +27,8 @@ public class MenuReviewResponse implements ReviewInformationResponse {
 
     @Schema(description = "평점-맛", example = "4.4")
     private Double tasteRating;
+
+    @Schema(description = "평점 별 갯수")
     private ReviewRatingCount reviewRatingCount;
 
     public static MenuReviewResponse of(Menu menu,

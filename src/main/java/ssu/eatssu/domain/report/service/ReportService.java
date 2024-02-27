@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
-import ssu.eatssu.domain.report.dto.ReportTypeResponse;
+import ssu.eatssu.domain.report.dto.ReportTypeList;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.Report;
 import ssu.eatssu.domain.user.entity.User;
@@ -39,7 +39,7 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
-    public ReportTypeResponse getReportType() {
-        return ReportTypeResponse.get();
+    public ReportTypeList getReportType() {
+        return ReportTypeList.get();
     }
 }
