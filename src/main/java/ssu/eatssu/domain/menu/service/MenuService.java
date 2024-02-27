@@ -1,27 +1,25 @@
 package ssu.eatssu.domain.menu.service;
 
 import jakarta.transaction.Transactional;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ssu.eatssu.domain.menu.dto.MenuRequest.MealCreateRequest;
-import ssu.eatssu.domain.menu.dto.MenuResponse.MenuInformationResponse;
-import ssu.eatssu.domain.menu.dto.MenuResponse.MenusInformationResponse;
-import ssu.eatssu.domain.menu.dto.MenuResponse.MealInformationResponse;
+import ssu.eatssu.domain.menu.dto.*;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.MealMenu;
 import ssu.eatssu.domain.menu.entity.Menu;
-import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.menu.entity.TimePart;
 import ssu.eatssu.domain.menu.repository.MealMenuRepository;
 import ssu.eatssu.domain.menu.repository.MealRepository;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
-import ssu.eatssu.global.handler.response.BaseException;
-
-import java.util.List;
-import ssu.eatssu.global.handler.response.BaseResponseStatus;
 import ssu.eatssu.domain.menu.util.MenuValidator;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
+import ssu.eatssu.global.handler.response.BaseException;
+import ssu.eatssu.global.handler.response.BaseResponseStatus;
+
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -34,12 +32,14 @@ public class MenuService {
     private final MealRepository mealRepository;
     private final MealMenuRepository mealMenuRepository;
 
-    public List<MenuInformationResponse> findMenusByRestaurant(Restaurant restaurant) {
+    public MenuInformationListResponse findMenusByRestaurant(Restaurant restaurant) {
         List<Menu> menus = menuRepository.findAllByRestaurant(restaurant);
 
-        return menus.stream()
-                .map(menu -> MenuInformationResponse.from(menu))
-                .toList();
+        List<MenuInformation> menuInformationList = menus.stream()
+                .map(MenuInformation::from)
+                .collect(Collectors.toList());
+
+        return new MenuInformationListResponse(menuInformationList);
     }
 
     public List<MealInformationResponse> findSpecificMeals(Date date,
@@ -48,7 +48,7 @@ public class MenuService {
         List<Meal> meals = getMeals(date, timePart, restaurant);
 
         return meals.stream()
-                .map(meal -> MealInformationResponse.from(meal))
+                .map(MealInformationResponse::from)
                 .toList();
     }
 
@@ -63,7 +63,7 @@ public class MenuService {
 
         mealRepository.save(meal);
 
-        addMenusToMeal(meal, restaurant, request.getMenuNames());
+        addMenusToMeal(meal, restaurant, request.menuNames());
     }
 
     public MenusInformationResponse findMenusInMeal(Long mealId) {

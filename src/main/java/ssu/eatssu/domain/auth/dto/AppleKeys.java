@@ -13,7 +13,7 @@ public class AppleKeys {
 
     @Getter
     @NoArgsConstructor
-    public static class Key{
+    public static class Key {
         private String kty;
         private String kid;
         private String use;
@@ -22,6 +22,7 @@ public class AppleKeys {
         private String e;
 
     }
+
     public Optional<Key> findKeyBy(String kid, String alg) {
         return this.keys.stream()
                 .filter(key -> key.getKid().equals(kid) && key.getAlg().equals(alg))

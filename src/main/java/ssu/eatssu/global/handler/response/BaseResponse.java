@@ -2,6 +2,7 @@ package ssu.eatssu.global.handler.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,10 +11,12 @@ import lombok.Getter;
 @JsonPropertyOrder({"isSuccess", "code", "message", "result"})
 public class BaseResponse<T> {
 
+    @Schema(description = "성공 여부")
     private final Boolean isSuccess;
     private final String message;
     private final int code;
 
+    @Schema(description = "결과 값")
     @JsonInclude(JsonInclude.Include.NON_NULL) //Json으로 응답이 나갈 때 null인 경우 포함되지 않음
     private T result;
 
