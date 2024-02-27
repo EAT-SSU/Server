@@ -9,6 +9,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ssu.eatssu.domain.auth.security.JwtAuthenticationFilter;
 import ssu.eatssu.domain.auth.security.JwtTokenProvider;
 import ssu.eatssu.global.handler.JwtAccessDeniedHandler;
@@ -20,12 +23,12 @@ import ssu.eatssu.global.handler.JwtAuthenticationEntryPoint;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] RESOURCE_LIST = {
-        "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**","/admin/img/**","/css/**", "/js/**",
+            "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/admin/img/**", "/css/**", "/js/**",
             "/favicon.ico", "/error/**", "/webjars/**", "/h2-console/**"
     };
 
     private static final String[] AUTH_WHITELIST = {
-            "/","/oauths/**", "/users/**",
+            "/", "/oauths/**", "/users/**",
             "/menus/**", "/meals/**", "/restaurants/**", "/reviews/**", "/oauth/**", "/inquiries/{userInquiriesId}",
             "/inquiries/list", "/admin/login",
     };
@@ -59,7 +62,24 @@ public class SecurityConfig {
                 .exceptionHandling()
                 .accessDeniedHandler(jwtAccessDeniedHandler)
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint);
+
+        http
+                .cors().configurationSource(corsConfigurationSource());
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.addAllowedOriginPattern("*");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
 }
