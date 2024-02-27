@@ -41,7 +41,7 @@ class MenuServiceTest {
     void 식당_이름으로_고정_메뉴를_조회한다() {
         // given
         List<Menu> menus = new ArrayList<>();
-        Restaurant foodCourt = Restaurant.from("푸드 코트");
+        Restaurant foodCourt = Restaurant.from("FOOD_COURT");
         menus.add(Menu.createFixed("라면", foodCourt, 3000, null));
         menus.add(Menu.createFixed("떡볶이", foodCourt, 5000, null));
         menus.add(Menu.createFixed("짜게치", foodCourt, 4000, null));
@@ -68,7 +68,7 @@ class MenuServiceTest {
     private Long 식단_생성_요청() {
         // given
         Date date = Date.valueOf("2024-01-03");
-        Restaurant haksik = Restaurant.from("학생 식당");
+        Restaurant haksik = Restaurant.from("HAKSIK");
         MealCreateRequest request = new MealCreateRequest(List.of("돈까스", "샐러드", "김치"));
 
         // when
