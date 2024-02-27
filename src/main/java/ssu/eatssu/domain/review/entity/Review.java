@@ -7,6 +7,7 @@ import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.user.entity.BaseTimeEntity;
 import ssu.eatssu.domain.user.entity.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -36,20 +37,13 @@ public class Review extends BaseTimeEntity {
     private Menu menu;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
-    private List<ReviewImage> reviewImages;
+    private List<ReviewImage> reviewImages = new ArrayList<>();
 
     //Entity -> Dto 방향 의존관계 제거
     public void update(String content, Integer mainRate, Integer amountRate, Integer tasteRate) {
         this.content = content;
         this.ratings = Ratings.of(mainRate, amountRate, tasteRate);
     }
-
-    /*
-    public void update(ReviewUpdateRequest request) {
-        this.content = request.getContent();
-        this.ratings = Ratings.of(request.getMainRate(), request.getAmountRate(), request.getTasteRate());
-    }
-    */
 
     public boolean isNotWrittenBy(User user) {
         return !this.user.equals(user);

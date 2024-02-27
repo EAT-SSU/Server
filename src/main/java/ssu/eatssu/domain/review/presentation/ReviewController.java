@@ -88,6 +88,36 @@ public class ReviewController {
         return BaseResponse.success();
     }
 
+    /**
+     * 리뷰 이미지 업로드
+     */
+    @Operation(summary = "리뷰 이미지 업로드", description = "리뷰 이미지를 업로드하고 이미지 URL 을 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이미지 업로드 및 URL 반환 성공"),
+            @ApiResponse(responseCode = "500", description = "이미지 업로드 실패", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @PostMapping(value = "/upload/image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse<SavedReviewImage> uploadReviewImage(@RequestPart(value = "image") MultipartFile image) {
+        return BaseResponse.success(reviewService.uploadImage(image));
+    }
+
+    @Operation(summary = "리뷰 작성", description = "리뷰를 작성하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 작성 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+    })
+    @PostMapping("/write/{menuId}")
+    public BaseResponse<?> writeReview(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
+                                       @RequestBody UploadReviewRequest uploadReviewRequest,
+                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        reviewService.uploadReview(customUserDetails, menuId, uploadReviewRequest);
+        return BaseResponse.success();
+    }
+
+
     @Operation(summary = "리뷰 수정(글 수정)", description = """
             리뷰 내용을 수정하는 API 입니다.<br><br>
             글 수정만 가능하며 사진 수정은 지원하지 않습니다.
