@@ -17,12 +17,7 @@ import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.repository.MealRepository;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
 import ssu.eatssu.domain.rating.entity.JpaProjectionRatingCalculator;
-import ssu.eatssu.domain.review.dto.ReviewCreateRequest;
-import ssu.eatssu.domain.review.dto.MealReviewsResponse;
-import ssu.eatssu.domain.review.dto.MenuReviewResponse;
-import ssu.eatssu.domain.review.dto.RatingAverages;
-import ssu.eatssu.domain.review.dto.ReviewRatingCount;
-import ssu.eatssu.domain.review.dto.ReviewUpdateRequest;
+import ssu.eatssu.domain.review.dto.*;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewImage;
 import ssu.eatssu.domain.review.repository.ReviewImageRepository;
@@ -87,6 +82,31 @@ public class ReviewService {
                 throw new BaseException(FAIL_IMAGE_UPLOAD);
             }
         }
+    }
+
+    public SavedReviewImage uploadImage(MultipartFile image) {
+        try {
+            String imageUrl = s3Uploader.upload(image, "reviewImg");
+            return new SavedReviewImage(imageUrl);
+        } catch (IOException e) {
+            throw new BaseException(FAIL_IMAGE_UPLOAD);
+        }
+    }
+
+    public void uploadReview(CustomUserDetails userDetails, Long menuId, UploadReviewRequest request) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+
+        Review review = request.toReviewEntity(user, menu);
+        reviewRepository.save(review);
+
+        ReviewImage reviewImage = new ReviewImage(review, request.getImageUrl());
+        reviewImageRepository.save(reviewImage);
+
+        menu.addReview(review);
     }
 
     public void updateReview(CustomUserDetails userDetails, Long reviewId,
