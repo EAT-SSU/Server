@@ -1,13 +1,12 @@
 package ssu.eatssu.domain.rating.entity;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
-import ssu.eatssu.domain.review.repository.ReviewRepository;
-import ssu.eatssu.domain.review.dto.RatingsDto;
 import ssu.eatssu.domain.review.dto.RatingAverages;
+import ssu.eatssu.domain.review.dto.RatingsDto;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
+import ssu.eatssu.domain.review.repository.ReviewRepository;
 
 import java.util.Collection;
 

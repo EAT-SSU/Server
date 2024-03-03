@@ -32,15 +32,15 @@ public class MealReviewsResponse implements ReviewInformationResponse {
     private ReviewRatingCount reviewRatingCount;
 
     public static MealReviewsResponse of(Long totalReviewCount, List<String> menuNames,
-        RatingAverages ratingAverages, ReviewRatingCount reviewRatingCount) {
+                                         RatingAverages ratingAverages, ReviewRatingCount reviewRatingCount) {
 
         return MealReviewsResponse.builder()
-            .menuNames(menuNames)
-            .mainRating(ratingAverages.mainRating())
-            .amountRating(ratingAverages.amountRating())
-            .tasteRating(ratingAverages.tasteRating())
-            .totalReviewCount(totalReviewCount)
-            .reviewRatingCount(reviewRatingCount)
-            .build();
+                .menuNames(menuNames)
+                .mainRating(ratingAverages.mainRating())
+                .amountRating(ratingAverages.amountRating())
+                .tasteRating(ratingAverages.tasteRating())
+                .totalReviewCount(totalReviewCount)
+                .reviewRatingCount(reviewRatingCount)
+                .build();
     }
 }
