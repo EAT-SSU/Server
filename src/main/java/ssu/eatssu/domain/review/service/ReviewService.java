@@ -16,7 +16,7 @@ import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.repository.MealRepository;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
-import ssu.eatssu.domain.rating.entity.JpaProjectionRatingCalculator;
+import ssu.eatssu.domain.rating.entity.RatingCalculator;
 import ssu.eatssu.domain.review.dto.*;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewImage;
@@ -41,7 +41,7 @@ public class ReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
-    private final JpaProjectionRatingCalculator ratingCalculator;
+    private final RatingCalculator ratingCalculator;
     private final S3Uploader s3Uploader;
 
     public Review createReview(CustomUserDetails userDetails, Long menuId, ReviewCreateRequest request,
@@ -155,7 +155,7 @@ public class ReviewService {
         Meal meal = mealRepository.findById(mealId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
 
-        int reviewCount = ratingCalculator.mealTotalReviewCount(meal);
+        long reviewCount = ratingCalculator.mealTotalReviewCount(meal);
 
         RatingAverages averageRating = ratingCalculator.mealAverageRatings(meal);
         ReviewRatingCount ratingCountMap = ratingCalculator.mealRatingCount(meal);
