@@ -93,33 +93,8 @@ public class JpaProjectionRatingCalculator implements RatingCalculator {
         return totalRating / (double) totalReviewCount;
     }
 
-    @Override
     public Integer mealTotalMainRating(Meal meal) {
         return null;
     }
 
-    @Override
-    public Integer mealTotalAmountRating(Meal meal) {
-        return null;
-    }
-
-    @Override
-    public Integer mealTotalTasteRating(Meal meal) {
-        return null;
-    }
-
-    @Override
-    public Integer menuTotalMainRating(Menu menu) {
-        return null;
-    }
-
-    @Override
-    public Integer menuTotalAmountRating(Menu menu) {
-        return null;
-    }
-
-    @Override
-    public Integer menuTotalTasteRating(Menu menu) {
-        return null;
-    }
 }

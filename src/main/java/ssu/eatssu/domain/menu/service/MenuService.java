@@ -32,11 +32,15 @@ public class MenuService {
     private final MealRepository mealRepository;
     private final MealMenuRepository mealMenuRepository;
 
+    private final MealRatingService mealRatingService;
+
+    private final MenuRatingService menuRatingService;
+
     public MenuInformationListResponse findMenusByRestaurant(Restaurant restaurant) {
         List<Menu> menus = menuRepository.findAllByRestaurant(restaurant);
 
         List<MenuInformation> menuInformationList = menus.stream()
-                .map(MenuInformation::from)
+                .map(menu -> MenuInformation.from(menu, menuRatingService.getMainRatingAverage(menu.getId())))
                 .collect(Collectors.toList());
 
         return new MenuInformationListResponse(menuInformationList);
@@ -48,10 +52,12 @@ public class MenuService {
         List<Meal> meals = getMeals(date, timePart, restaurant);
 
         return meals.stream()
-                .map(MealInformationResponse::from)
+                .map(meal -> MealInformationResponse.from(meal, mealRatingService.getMainRatingAverage(meal.getId())))
                 .toList();
     }
 
+
+    // TODO 삭제할까 말까
     public void createMeal(Date date, Restaurant restaurant, TimePart timePart,
                            MealCreateRequest request) {
         List<Meal> meals = getMeals(date, timePart, restaurant);

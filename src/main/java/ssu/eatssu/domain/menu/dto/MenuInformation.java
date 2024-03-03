@@ -23,8 +23,7 @@ public class MenuInformation {
     @Schema(description = "메뉴 평점(평점이 없으면 null)", example = "4.4")
     private Double mainRating;
 
-    public static MenuInformation from(Menu menu) {
-        return new MenuInformation(menu.getId(), menu.getName(),
-                menu.getPrice(), menu.getReviews().getAverageMainRating());
+    public static MenuInformation from(Menu menu, Double mainRating) {
+        return new MenuInformation(menu.getId(), menu.getName(), menu.getPrice(), mainRating);
     }
 }
