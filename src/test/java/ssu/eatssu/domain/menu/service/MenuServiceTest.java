@@ -11,13 +11,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ssu.eatssu.domain.menu.dto.MenuRequest.MealCreateRequest;
-import ssu.eatssu.domain.menu.dto.MenuResponse.MenuInformationResponse;
-import ssu.eatssu.domain.menu.dto.MenuResponse.MenusInformationResponse;
+import ssu.eatssu.domain.menu.dto.MealCreateRequest;
+import ssu.eatssu.domain.menu.dto.MenuInformationListResponse;
+import ssu.eatssu.domain.menu.dto.MenusInformationResponse;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.repository.MealRepository;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
+import ssu.eatssu.domain.menu.dto.MenuInformation;
 
 @SpringBootTest
 class MenuServiceTest {
@@ -44,13 +45,17 @@ class MenuServiceTest {
         Restaurant foodCourt = Restaurant.from("FOOD_COURT");
         menus.add(Menu.createFixed("라면", foodCourt, 3000, null));
         menus.add(Menu.createFixed("떡볶이", foodCourt, 5000, null));
-        menus.add(Menu.createFixed("짜게치", foodCourt, 4000, null));
+        menus.add(Menu.createFixed("짜계치", foodCourt, 4000, null));
         menuRepository.saveAll(menus);
 
-        // when & then
-        assertThat(menuService.findMenusByRestaurant(foodCourt))
-            .extracting(MenuInformationResponse::getName)
-            .containsExactly("라면", "떡볶이", "짜게치");
+        //when
+        MenuInformationListResponse response = menuService.findMenusByRestaurant(foodCourt);
+
+        // then
+        assertThat(response.getMenusInformationList())
+         .extracting(MenuInformation::getName)
+         .containsExactly("라면", "떡볶이", "짜계치");
+
     }
 
     @Test

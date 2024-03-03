@@ -28,7 +28,7 @@ public class MealInformationResponse {
     private List<BriefMenuInformation> menusInformationList;
 
 
-    public static MealInformationResponse from(Meal meal) {
+    public static MealInformationResponse from(Meal meal, Double mainRating) {
         if (!meal.getMealMenus().isEmpty()) {
             List<BriefMenuInformation> menusInformation = meal.getMealMenus().stream()
                     .map(MealMenu::getMenu)
@@ -36,7 +36,7 @@ public class MealInformationResponse {
 
             return new MealInformationResponse(meal.getId(),
                     meal.getRestaurant().getRestaurantPrice(),
-                    meal.getAverateMainRating(), menusInformation);
+                    mainRating, menusInformation);
         } else {
             return null;
         }
