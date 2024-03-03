@@ -5,7 +5,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ssu.eatssu.domain.menu.entity.QMenu;
-import ssu.eatssu.domain.menu.repository.LoadMenusInMealRepository;
 import ssu.eatssu.domain.review.entity.QReview;
 
 import java.util.List;

@@ -42,11 +42,11 @@ public class QuerydslMealRatingCounter {
 
     public Long getTotalRatingCount(Long mealId) {
         return queryFactory
-              .select(review.count())
-              .from(review)
-              .join(review.menu, menu)
-              .where(menuIdIn(loadMenusInMealRepository.getMenuIds(mealId)))
-              .fetchOne();
+                .select(review.count())
+                .from(review)
+                .join(review.menu, menu)
+                .where(menuIdIn(loadMenusInMealRepository.getMenuIds(mealId)))
+                .fetchOne();
     }
 
     private BooleanExpression menuIdIn(List<Long> menuIds) {

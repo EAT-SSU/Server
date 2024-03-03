@@ -1,6 +1,5 @@
 package ssu.eatssu.domain.rating.entity;
 
-import org.springframework.stereotype.Component;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.MealMenu;
 import ssu.eatssu.domain.menu.entity.Menu;
