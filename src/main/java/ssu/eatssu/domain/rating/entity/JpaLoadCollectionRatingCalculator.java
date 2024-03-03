@@ -10,7 +10,6 @@ import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 /**
  * JPA 의 OneToMany객체참조를 이용하여 구현한 클래스입니다.
  */
-@Component
 public class JpaLoadCollectionRatingCalculator implements RatingCalculator {
 
     // 식단에 포함된 메뉴들의 평점 별 리뷰 개수 계산
@@ -33,7 +32,7 @@ public class JpaLoadCollectionRatingCalculator implements RatingCalculator {
 
     // 식단 평균 평점 세트 계산
     public RatingAverages mealAverageRatings(Meal meal) {
-        int totalReviewCount = mealTotalReviewCount(meal);
+        long totalReviewCount = mealTotalReviewCount(meal);
 
         if (totalReviewCount == 0)
             return new RatingAverages(null, null, null);
@@ -62,7 +61,7 @@ public class JpaLoadCollectionRatingCalculator implements RatingCalculator {
 
     // 식단 메인 평점 평균 계산
     public Double mealAverageMainRating(Meal meal) {
-        int totalReviewCount = mealTotalReviewCount(meal);
+        long totalReviewCount = mealTotalReviewCount(meal);
 
         if (totalReviewCount == 0) {
             return null;
@@ -81,14 +80,14 @@ public class JpaLoadCollectionRatingCalculator implements RatingCalculator {
     }
 
     // 식단 총 리뷰 개수
-    public int mealTotalReviewCount(Meal meal) {
+    public long mealTotalReviewCount(Meal meal) {
         return meal.getMealMenus().stream()
                 .map(MealMenu::getMenu)
-                .mapToInt(menu -> menu.getReviews().size()).sum();
+                .mapToLong(menu -> menu.getReviews().size()).sum();
     }
 
     // 평균 평점 계산
-    public Double averageRating(Integer totalRating, int totalReviewCount) {
+    public Double averageRating(Integer totalRating, long totalReviewCount) {
         if (totalRating == null || totalReviewCount == 0) {
             return null;
         }

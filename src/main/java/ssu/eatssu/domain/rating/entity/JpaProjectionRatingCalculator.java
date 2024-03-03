@@ -18,7 +18,6 @@ import java.util.Collection;
  * JpaProjectionRatingCalculator : 174 lines
  */
 
-@Component
 @RequiredArgsConstructor
 public class JpaProjectionRatingCalculator implements RatingCalculator {
 
@@ -41,7 +40,7 @@ public class JpaProjectionRatingCalculator implements RatingCalculator {
 
     @Override
     public RatingAverages mealAverageRatings(Meal meal) {
-        int totalReviewCount = mealTotalReviewCount(meal);
+        long totalReviewCount = mealTotalReviewCount(meal);
 
         if (totalReviewCount == 0)
             return new RatingAverages(null, null, null);
@@ -66,7 +65,7 @@ public class JpaProjectionRatingCalculator implements RatingCalculator {
 
     @Override
     public Double mealAverageMainRating(Meal meal) {
-        int totalReviewCount = mealTotalReviewCount(meal);
+        long totalReviewCount = mealTotalReviewCount(meal);
 
         if (totalReviewCount == 0) {
             return null;
@@ -81,12 +80,11 @@ public class JpaProjectionRatingCalculator implements RatingCalculator {
     }
 
     @Override
-    public int mealTotalReviewCount(Meal meal) {
-        return reviewRepository.countByMenu_MealMenus_Meal(meal).intValue();
+    public long mealTotalReviewCount(Meal meal) {
+        return reviewRepository.countByMenu_MealMenus_Meal(meal);
     }
 
-    @Override
-    public Double averageRating(Integer totalRating, int totalReviewCount) {
+    public Double averageRating(Integer totalRating, long totalReviewCount) {
         if (totalRating == null || totalReviewCount == 0) {
             return null;
         }

@@ -17,7 +17,7 @@ public class MealReviewsResponse implements ReviewInformationResponse {
     private List<String> menuNames;
 
     @Schema(description = "리뷰 개수", example = "15")
-    private Integer totalReviewCount;
+    private Long totalReviewCount;
 
     @Schema(description = "평점-메인", example = "4.4")
     private Double mainRating;
@@ -31,7 +31,7 @@ public class MealReviewsResponse implements ReviewInformationResponse {
     @Schema(description = "평점 별 갯수")
     private ReviewRatingCount reviewRatingCount;
 
-    public static MealReviewsResponse of(Integer totalReviewCount, List<String> menuNames,
+    public static MealReviewsResponse of(Long totalReviewCount, List<String> menuNames,
         RatingAverages ratingAverages, ReviewRatingCount reviewRatingCount) {
 
         return MealReviewsResponse.builder()

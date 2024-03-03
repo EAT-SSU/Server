@@ -26,28 +26,7 @@ public interface RatingCalculator {
     Double menuAverageMainRating(Menu menu);
 
     // 식단 총 리뷰 개수
-    int mealTotalReviewCount(Meal meal);
-
-    // 평균 평점 계산
-    Double averageRating(Integer totalRating, int totalReviewCount);
-
-    // 식단 메인 평점 총합
-    Integer mealTotalMainRating(Meal meal);
-
-    // 식단 양 평점 총합
-    Integer mealTotalAmountRating(Meal meal);
-
-    // 식단 맛 평점 총합
-    Integer mealTotalTasteRating(Meal meal);
-
-    // 메뉴 메인 평점 총합
-    Integer menuTotalMainRating(Menu menu);
-
-    // 메뉴 양 평점 총합
-    Integer menuTotalAmountRating(Menu menu);
-
-    // 메뉴 맛 평점 총합
-    Integer menuTotalTasteRating(Menu menu);
+    long mealTotalReviewCount(Meal meal);
 
     /**
      * 리뷰 평접 총합 계산용
