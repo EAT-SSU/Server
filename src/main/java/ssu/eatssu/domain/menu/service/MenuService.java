@@ -66,6 +66,8 @@ public class MenuService {
             .toList();
     }
 
+
+    // TODO 삭제할까 말까
     public void createMeal(Date date, Restaurant restaurant, TimePart timePart,
         MealCreateRequest request) {
         List<Meal> meals = getMeals(date, timePart, restaurant);
@@ -77,7 +79,7 @@ public class MenuService {
 
         mealRepository.save(meal);
 
-        addMenusToMeal(meal, restaurant, request.getMenuNames());
+        addMenusToMeal(meal, restaurant, request.menuNames());
     }
 
     public MenusInformationResponse findMenusInMeal(Long mealId) {

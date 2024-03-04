@@ -26,6 +26,7 @@ public class Menu {
 
     private Integer price;
 
+    @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
 
     private boolean isDiscontinued = false;

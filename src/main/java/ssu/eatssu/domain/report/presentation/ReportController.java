@@ -10,12 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.domain.report.dto.ReportTypeList;
 import ssu.eatssu.domain.review.entity.Report;
 import ssu.eatssu.domain.report.service.ReportService;
 import ssu.eatssu.domain.slack.entity.SlackChannel;
 import ssu.eatssu.domain.slack.entity.SlackMessageFormat;
 import ssu.eatssu.domain.report.dto.ReportCreateRequest;
-import ssu.eatssu.domain.report.dto.ReportTypeResponse;
 
 import ssu.eatssu.domain.slack.service.SlackService;
 import ssu.eatssu.global.handler.response.BaseResponse;
@@ -31,8 +31,9 @@ public class ReportController {
 
     @Operation(summary = "리뷰 신고 사유 종류 조회", description = "리뷰 신고 사유 종류를 조회하는 API 입니다.")
     @GetMapping("/types")
-    public BaseResponse<ReportTypeResponse> getReportType() {
-        return BaseResponse.success(reportService.getReportType());
+    public BaseResponse<ReportTypeList> getReportType() {
+        ReportTypeList reportTypeList = reportService.getReportType();
+        return BaseResponse.success(reportTypeList);
     }
 
     /**

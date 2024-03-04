@@ -12,15 +12,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ssu.eatssu.domain.menu.dto.MenuRequest.MealCreateRequest;
-import ssu.eatssu.domain.menu.dto.MenuResponse.MenuInformationResponse;
-import ssu.eatssu.domain.menu.dto.MenuResponse.MenusInformationResponse;
+import ssu.eatssu.domain.menu.dto.MealCreateRequest;
+import ssu.eatssu.domain.menu.dto.MenuInformationListResponse;
+import ssu.eatssu.domain.menu.dto.MenusInformationResponse;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.entity.MenuCategory;
 import ssu.eatssu.domain.menu.repository.MealRepository;
 import ssu.eatssu.domain.menu.repository.MenuCategoryRepository;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
+import ssu.eatssu.domain.menu.dto.MenuInformation;
 
 @SpringBootTest
 class MenuServiceTest {
