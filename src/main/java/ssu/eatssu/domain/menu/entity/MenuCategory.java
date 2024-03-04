@@ -16,9 +16,8 @@ public class MenuCategory {
     @Column(name = "menu_category_id")
     private Long id;
 
-    private String name; // 여기에 카테고리가 들어가는건가?
+    private String name;
 
     @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
-
 }
