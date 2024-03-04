@@ -59,7 +59,6 @@ public class Menu {
      * 고정 메뉴를 생성합니다.
      * todo: 고정메뉴 식당이 아니라 변동 메뉴 식당으로 잘못 들어온다면 어떻게 처리?
      */
-
     public static Menu createFixed(String name, Restaurant restaurant, Integer price,
         MenuCategory category) {
         return new Menu(name, restaurant, price, category);

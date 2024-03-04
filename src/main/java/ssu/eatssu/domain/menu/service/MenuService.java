@@ -2,6 +2,8 @@ package ssu.eatssu.domain.menu.service;
 
 import jakarta.transaction.Transactional;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,8 @@ import ssu.eatssu.domain.menu.dto.MenuResponse.MealInformationResponse;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.MealMenu;
 import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.menu.entity.MenuCategory;
+import ssu.eatssu.domain.menu.repository.MenuCategoryRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.menu.entity.TimePart;
 import ssu.eatssu.domain.menu.repository.MealMenuRepository;
@@ -23,7 +27,6 @@ import java.util.List;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
 import ssu.eatssu.domain.menu.util.MenuValidator;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,15 +35,25 @@ public class MenuService {
 
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
+    private final MenuCategoryRepository menuCategoryRepository;
     private final MealMenuRepository mealMenuRepository;
 
-    public List<MenuInformationResponse> findMenusByRestaurant(Restaurant restaurant) {
-        List<Menu> menus = menuRepository.findAllByRestaurant(restaurant);
+    public Map<String, List<MenuInformationResponse>> findMenusByRestaurant(Restaurant restaurant) {
+        List<MenuCategory> categories = menuCategoryRepository.findAllByRestaurant(restaurant);
+        Map<String, List<MenuInformationResponse>> categoryMenus = new HashMap<>();
 
-        return menus.stream()
-            .filter(menu -> !menu.isDiscontinued())
-            .map(menu -> MenuInformationResponse.from(menu))
-            .toList();
+        for (MenuCategory category : categories) {
+
+            List<MenuInformationResponse> menus = menuRepository.findAllByRestaurantAndCategory(
+	    restaurant, category).stream()
+	.filter(menu -> !menu.isDiscontinued())
+	.map(menu -> MenuInformationResponse.from(menu))
+	.toList();
+
+            categoryMenus.put(category.getName(), menus);
+        }
+
+        return categoryMenus;
     }
 
     public List<MealInformationResponse> findSpecificMeals(Date date,
