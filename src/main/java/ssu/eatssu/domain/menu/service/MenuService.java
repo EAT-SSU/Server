@@ -5,12 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.menu.dto.*;
-import ssu.eatssu.domain.menu.entity.Meal;
-import ssu.eatssu.domain.menu.entity.MealMenu;
-import ssu.eatssu.domain.menu.entity.Menu;
-import ssu.eatssu.domain.menu.entity.TimePart;
+import ssu.eatssu.domain.menu.entity.*;
 import ssu.eatssu.domain.menu.repository.MealMenuRepository;
 import ssu.eatssu.domain.menu.repository.MealRepository;
+import ssu.eatssu.domain.menu.repository.MenuCategoryRepository;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
 import ssu.eatssu.domain.menu.util.MenuValidator;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
@@ -18,8 +16,9 @@ import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 
 @Slf4j
@@ -31,19 +30,25 @@ public class MenuService {
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
     private final MealMenuRepository mealMenuRepository;
+    private final MenuCategoryRepository menuCategoryRepository;
 
     private final MealRatingService mealRatingService;
-
     private final MenuRatingService menuRatingService;
 
-    public MenuInformationListResponse findMenusByRestaurant(Restaurant restaurant) {
-        List<Menu> menus = menuRepository.findAllByRestaurant(restaurant);
+    public CategoryMenuListCollection findMenusByRestaurant(Restaurant restaurant) {
+        List<MenuCategory> categories = menuCategoryRepository.findAllByRestaurant(restaurant);
+        CategoryMenuListCollection collection = CategoryMenuListCollection.init();
+        for (MenuCategory category : categories) {
+            List<MenuInformation> menus = menuRepository.findAllByRestaurantAndCategory(
+                            restaurant, category).stream()
+                    .filter(menu -> !menu.isDiscontinued())
+                    .map(menu -> MenuInformation.from(menu, menuRatingService.getMainRatingAverage(menu.getId())))
+                    .toList();
+            CategoryMenuList categoryMenuList = new CategoryMenuList(category.getName(), menus);
+            collection.add(categoryMenuList);
+        }
 
-        List<MenuInformation> menuInformationList = menus.stream()
-                .map(menu -> MenuInformation.from(menu, menuRatingService.getMainRatingAverage(menu.getId())))
-                .collect(Collectors.toList());
-
-        return new MenuInformationListResponse(menuInformationList);
+        return collection;
     }
 
     public List<MealInformationResponse> findSpecificMeals(Date date,

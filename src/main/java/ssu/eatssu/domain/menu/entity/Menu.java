@@ -39,6 +39,8 @@ public class Menu {
     @JoinColumn(name = "menu_category_id")
     private MenuCategory category;
 
+    private boolean isDiscontinued = false;
+
     private Menu(String name, Restaurant restaurant, Integer price, MenuCategory category) {
         this.name = name;
         this.restaurant = restaurant;

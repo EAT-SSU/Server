@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ssu.eatssu.domain.menu.dto.MenuInformationListResponse;
+import ssu.eatssu.domain.menu.dto.CategoryMenuListCollection;
 import ssu.eatssu.domain.menu.dto.MenusInformationResponse;
 import ssu.eatssu.domain.menu.service.MenuService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
@@ -40,7 +40,7 @@ public class MenuController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("")
-    public BaseResponse<MenuInformationListResponse> getMenus(
+    public BaseResponse<CategoryMenuListCollection> getMenus(
             @RequestParam("restaurant") Restaurant restaurant) {
         if (RestaurantType.isVariableType(restaurant)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
@@ -48,17 +48,5 @@ public class MenuController {
         return BaseResponse.success(menuService.findMenusByRestaurant(restaurant));
     }
 
-    @Operation(summary = "메뉴 정보 리스트 조회", description = """
-            메뉴 정보 리스트를 조회하는 API 입니다.<br><br>
-            식단식별자(mealId)로 해당 식단에 속하는 메뉴 정보 목록을 조회합니다.")
-            """)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "메뉴 정보 리스트 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
-    @GetMapping("/in-meal")
-    public BaseResponse<MenusInformationResponse> getMenusInMeal(@Parameter(description = "mealId")
-                                                                 @RequestParam("mealId") Long mealId) {
-        return BaseResponse.success(menuService.findMenusInMeal(mealId));
-    }
+
 }

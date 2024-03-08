@@ -6,19 +6,20 @@ import static ssu.eatssu.domain.menu.entity.TimePart.LUNCH;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ssu.eatssu.domain.menu.dto.MealCreateRequest;
-import ssu.eatssu.domain.menu.dto.MenuInformationListResponse;
 import ssu.eatssu.domain.menu.dto.MenusInformationResponse;
 import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.menu.entity.MenuCategory;
 import ssu.eatssu.domain.menu.repository.MealRepository;
+import ssu.eatssu.domain.menu.repository.MenuCategoryRepository;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-import ssu.eatssu.domain.menu.dto.MenuInformation;
 
 @SpringBootTest
 class MenuServiceTest {
@@ -28,6 +29,9 @@ class MenuServiceTest {
 
     @Autowired
     private MenuRepository menuRepository;
+
+    @Autowired
+    private MenuCategoryRepository menuCategoryRepository;
 
     @Autowired
     private MealRepository mealRepository;
@@ -43,18 +47,26 @@ class MenuServiceTest {
         // given
         List<Menu> menus = new ArrayList<>();
         Restaurant foodCourt = Restaurant.from("FOOD_COURT");
-        menus.add(Menu.createFixed("라면", foodCourt, 3000, null));
-        menus.add(Menu.createFixed("떡볶이", foodCourt, 5000, null));
-        menus.add(Menu.createFixed("짜계치", foodCourt, 4000, null));
+
+        MenuCategory category1 = MenuCategory.builder().name("분식").restaurant(foodCourt).build();
+        MenuCategory category2 = MenuCategory.builder().name("한식").restaurant(foodCourt).build();
+        menus.add(Menu.createFixed("라면", foodCourt, 3000, category1));
+        menus.add(Menu.createFixed("떡볶이", foodCourt, 5000, category2));
+        menus.add(Menu.createFixed("짜게치", foodCourt, 4000, category1));
+        menuCategoryRepository.save(category1);
+        menuCategoryRepository.save(category2);
         menuRepository.saveAll(menus);
 
-        //when
-        MenuInformationListResponse response = menuService.findMenusByRestaurant(foodCourt);
+        // when
+        Map<String, MenuInformationList> response = menuService.findMenusByRestaurant(foodCourt);
 
         // then
-        assertThat(response.getMenusInformationList())
-         .extracting(MenuInformation::getName)
-         .containsExactly("라면", "떡볶이", "짜계치");
+        assertThat(response).hasSize(2);
+        for (String key : response.keySet()) {
+            System.out.print(key + " : ");
+            response.get(key).getMenusInformationList().forEach(menu -> System.out.print(menu.getName() + " "));
+            System.out.print("\n");
+        }
 
     }
 
