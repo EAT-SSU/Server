@@ -13,6 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.menu.dto.MealCreateRequest;
 import ssu.eatssu.domain.menu.dto.MealInformationResponse;
+import ssu.eatssu.domain.menu.dto.MenusInformationResponse;
 import ssu.eatssu.domain.menu.entity.TimePart;
 import ssu.eatssu.domain.menu.service.MenuService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
@@ -28,7 +29,7 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_SUPPORT_
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/meals")
-@Tag(name = "Menu", description = "메뉴 API")
+@Tag(name = "Meal", description = "식단 API")
 public class MealController {
 
     private final MenuService menuService;
@@ -91,5 +92,19 @@ public class MealController {
             @Parameter(description = "mealId") @PathVariable("mealId") Long mealId) {
         menuService.deleteMeal(mealId);
         return BaseResponse.success();
+    }
+
+    @Operation(summary = "메뉴 정보 리스트 조회", description = """
+            메뉴 정보 리스트를 조회하는 API 입니다.<br><br>
+            식단식별자(mealId)로 해당 식단에 속하는 메뉴 정보 목록을 조회합니다.")
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "메뉴 정보 리스트 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @GetMapping("/{mealId}/menus-info")
+    public BaseResponse<MenusInformationResponse> getMenusInMeal(@Parameter(description = "mealId")
+                                                                 @PathVariable("mealId") Long mealId) {
+        return BaseResponse.success(menuService.findMenusInMeal(mealId));
     }
 }
