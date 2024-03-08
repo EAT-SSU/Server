@@ -1,6 +1,5 @@
 package ssu.eatssu.domain.restaurant.entity;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Arrays;
 import lombok.Getter;
 

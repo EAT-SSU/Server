@@ -22,46 +22,46 @@ public class LoadFixMenuRepository {
 
     public List<BriefMenu> findBriefMenusByCategoryId(Long categoryId) {
         return queryFactory
-                .select(Projections.constructor(BriefMenu.class,
-                        menu.id,
-                        menu.name,
-                        menu.price))
-                .from(menu)
-                .join(menu.category, category)
-                .where(
-                        menuCategoryIdEq(categoryId)
-                )
-                .orderBy(menu.name.asc())
-                .fetch();
+            .select(Projections.constructor(BriefMenu.class,
+                menu.id,
+                menu.name,
+                menu.price))
+            .from(menu)
+            .join(menu.category, category)
+            .where(
+                menuCategoryIdEq(categoryId)
+            )
+            .orderBy(menu.name.asc())
+            .fetch();
     }
 
     public boolean existsMenu(String name, Restaurant restaurant) {
         return queryFactory
-                .select(menu.id)
-                .from(menu)
-                .where(
-                        menuNameEq(name),
-                        restaurantNameEq(restaurant)
-                )
-                .fetchFirst() != null;
+            .select(menu.id)
+            .from(menu)
+            .where(
+                menuNameEq(name),
+                restaurantNameEq(restaurant)
+            )
+            .fetchFirst() != null;
     }
 
     public Restaurant getRestaurant(Long menuId) {
         return queryFactory
-                .select(menu.restaurant)
-                .from(menu)
-                .where(
-                        menu.id.eq(menuId)
-                )
-                .fetchFirst();
+            .select(menu.restaurant)
+            .from(menu)
+            .where(
+                menu.id.eq(menuId)
+            )
+            .fetchFirst();
     }
 
     public List<MenuCategory> findMenuCategoriesByRestaurant(Restaurant restaurant) {
         return queryFactory
-                .selectFrom(category)
-                .where(
-                        categoryRestaurantNameEq(restaurant)
-                ).fetch();
+            .selectFrom(category)
+            .where(
+                categoryRestaurantNameEq(restaurant)
+            ).fetch();
     }
 
     private BooleanExpression menuNameEq(String menuName) {

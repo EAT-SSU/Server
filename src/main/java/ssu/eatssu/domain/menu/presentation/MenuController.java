@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,8 +41,9 @@ public class MenuController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("")
-    public BaseResponse<MenuInformationListResponse> getMenus(
-            @RequestParam("restaurant") Restaurant restaurant) {
+    public BaseResponse<Map<String, List<MenuInformationResponse>>> getMenus(
+        @RequestParam("restaurant") Restaurant restaurant) {
+
         if (RestaurantType.isVariableType(restaurant)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
