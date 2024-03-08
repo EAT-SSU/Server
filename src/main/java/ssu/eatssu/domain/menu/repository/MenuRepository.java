@@ -13,7 +13,7 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     Optional<Menu> findByNameAndRestaurant(String name, Restaurant restaurant);
 
-    List<Menu> findAllByRestaurant(Restaurant restaurant);
     List<Menu> findAllByRestaurantAndCategory(Restaurant restaurant, MenuCategory category);
+
     List<Menu> findAll();
 }

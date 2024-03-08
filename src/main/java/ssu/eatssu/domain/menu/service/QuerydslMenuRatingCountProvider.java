@@ -25,6 +25,7 @@ public class QuerydslMenuRatingCountProvider {
                 )
                 .fetchOne().intValue();
     }
+
     private BooleanExpression reviewStarIs(Integer star) {
         return review.ratings.mainRating.eq(star);
     }
