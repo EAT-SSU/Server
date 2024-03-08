@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.menu.service;
+package ssu.eatssu.domain.menu.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
