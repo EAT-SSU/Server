@@ -1,13 +1,5 @@
 package ssu.eatssu.domain.menu.service;
 
-import static org.assertj.core.api.Assertions.*;
-import static ssu.eatssu.domain.menu.entity.TimePart.LUNCH;
-
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +12,14 @@ import ssu.eatssu.domain.menu.repository.MealRepository;
 import ssu.eatssu.domain.menu.repository.MenuCategoryRepository;
 import ssu.eatssu.domain.menu.repository.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
+
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static ssu.eatssu.domain.menu.entity.TimePart.LUNCH;
 
 @SpringBootTest
 class MenuServiceTest {
@@ -78,8 +78,8 @@ class MenuServiceTest {
         assertThat(mealRepository.findAll()).hasSize(1);
         assertThat(menuRepository.findAll()).hasSize(3);
         assertThat(menuRepository.findAll())
-            .extracting(Menu::getName)
-            .containsExactly("돈까스", "샐러드", "김치");
+                .extracting(Menu::getName)
+                .containsExactly("돈까스", "샐러드", "김치");
     }
 
     private Long 식단_생성_요청() {
@@ -92,9 +92,9 @@ class MenuServiceTest {
         menuService.createMeal(date, haksik, LUNCH, request);
 
         return mealRepository.findAll().stream()
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("Meal not created"))
-            .getId();
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Meal not created"))
+                .getId();
     }
 
     @Test
