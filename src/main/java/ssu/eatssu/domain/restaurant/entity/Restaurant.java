@@ -12,7 +12,7 @@ import ssu.eatssu.global.handler.response.BaseResponseStatus;
 public enum Restaurant {
 
     DODAM("도담 식당", 6000),
-    DORMITORY("기숙사 식당", 5000),
+    DORMITORY("기숙사 식당", 5500),
     FOOD_COURT( "푸드 코트", null),
     SNACK_CORNER( "스낵 코너", null),
     HAKSIK("학생 식당", 5000);
