@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.menu.dto.MealCreateRequest;
+import ssu.eatssu.domain.menu.dto.MealCreateWithPriceRequest;
 import ssu.eatssu.domain.menu.dto.MealInformationResponse;
 import ssu.eatssu.domain.menu.dto.MenusInformationResponse;
 import ssu.eatssu.domain.menu.entity.TimePart;
@@ -56,6 +57,32 @@ public class MealController {
         }
 
         menuService.createMeal(date, restaurant, timePart, mealCreateRequest);
+        return BaseResponse.success();
+    }
+
+    @Operation(summary = "식단 추가", description = """
+            식단을 추가하는 API 입니다.<br><br>
+            변동메뉴 식당(학생식당, 도담, 기숙사 식당)의 특정날짜(yyyyMMdd), 특정시간대(아침/점심/저녁)에 해당하는 식단을 추가합니다.<br><br>
+            이미 존재하는 식단일 경우 중복저장 되지 않도록 처리합니다.(별도의 ErrorResponse 응답 X)
+            가격을 외부에서 입력받습니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "식단 추가 성공"),
+            @ApiResponse(responseCode = "400", description = "지원하지 않는 식당(고정 메뉴 식당)", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 날짜형식", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @PostMapping("/with-price")
+    public BaseResponse<?> createMealWithPrice(
+            @Parameter(schema = @Schema(type = "string", format = "date", example = "20240101")) @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
+            @Parameter(description = "식당이름") @RequestParam("restaurant") Restaurant restaurant,
+            @Parameter(description = "시간대") @RequestParam("time") TimePart timePart,
+            @RequestBody MealCreateWithPriceRequest request) {
+        if (RestaurantType.isFixedType(restaurant)) {
+            throw new BaseException(NOT_SUPPORT_RESTAURANT);
+        }
+
+        menuService.createMealWithPrice(date, restaurant, timePart, request);
         return BaseResponse.success();
     }
 

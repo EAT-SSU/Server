@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-import ssu.eatssu.domain.restaurant.entity.RestaurantType;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.Reviews;
 
@@ -50,9 +49,6 @@ public class Menu {
 
     public static Menu createVariable(String name, Restaurant restaurant) {
         int price = 0;
-        if (RestaurantType.isVariableType(restaurant)) {
-            price = restaurant.getRestaurantPrice();
-        }
         return new Menu(name, restaurant, price, null);
     }
 
@@ -62,7 +58,7 @@ public class Menu {
      */
 
     public static Menu createFixed(String name, Restaurant restaurant, Integer price,
-        MenuCategory category) {
+                                   MenuCategory category) {
         return new Menu(name, restaurant, price, category);
     }
 

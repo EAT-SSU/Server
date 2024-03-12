@@ -65,10 +65,27 @@ public class MenuService {
                            MealCreateRequest request) {
         List<Meal> meals = getMeals(date, timePart, restaurant);
 
-        if (MenuValidator.validateExistedMeal(meals, request)) {
+        if (MenuValidator.validateExistedMeal(meals, request.menuNames())) {
             return;
         }
         Meal meal = new Meal(date, timePart, restaurant);
+
+        mealRepository.save(meal);
+
+        addMenusToMeal(meal, restaurant, request.menuNames());
+    }
+
+    /**
+     * 가격 추가 용
+     */
+    public void createMealWithPrice(Date date, Restaurant restaurant, TimePart timePart,
+                                    MealCreateWithPriceRequest request) {
+        List<Meal> meals = getMeals(date, timePart, restaurant);
+
+        if (MenuValidator.validateExistedMeal(meals, request.menuNames())) {
+            return;
+        }
+        Meal meal = new Meal(date, timePart, restaurant, request.price());
 
         mealRepository.save(meal);
 
