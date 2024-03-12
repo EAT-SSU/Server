@@ -31,6 +31,8 @@ public class Meal {
     @Enumerated(EnumType.STRING)
     private TimePart timePart;
 
+    private Integer price;
+
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
     private List<MealMenu> mealMenus = new ArrayList<>();
 
@@ -38,6 +40,14 @@ public class Meal {
         this.date = date;
         this.timePart = timePart;
         this.restaurant = restaurant;
+        this.price = restaurant.getRestaurantPrice();
+    }
+
+    public Meal(Date date, TimePart timePart, Restaurant restaurant, Integer price) {
+        this.date = date;
+        this.timePart = timePart;
+        this.restaurant = restaurant;
+        this.price = price;
     }
 
     public List<String> getMenuNames() {

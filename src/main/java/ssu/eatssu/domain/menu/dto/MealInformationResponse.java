@@ -35,7 +35,7 @@ public class MealInformationResponse {
                     .map(BriefMenuInformation::new).toList();
 
             return new MealInformationResponse(meal.getId(),
-                    meal.getRestaurant().getRestaurantPrice(),
+                    meal.getPrice(),
                     mainRating, menusInformation);
         } else {
             return null;
