@@ -115,8 +115,8 @@ public class ReviewService {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
 
-        review.update(request.content(), request.mainRate(), request.amountRate(),
-                request.tasteRate());
+        review.update(request.content(), request.mainRating(), request.amountRating(),
+                request.tasteRating());
     }
 
 

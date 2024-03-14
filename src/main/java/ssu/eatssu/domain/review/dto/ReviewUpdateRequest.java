@@ -7,13 +7,13 @@ import jakarta.validation.constraints.Max;
 public record ReviewUpdateRequest(
 
     @Schema(description = "평점-메인", example = "4")
-    Integer mainRate,
+    Integer mainRating,
 
     @Schema(description = "평점-양", example = "4")
-    Integer amountRate,
+    Integer amountRating,
 
     @Schema(description = "평점-맛", example = "4")
-    Integer tasteRate,
+    Integer tasteRating,
 
     @Max(150)
     @Schema(description = "한줄평", example = "맛있어용")
