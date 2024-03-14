@@ -7,9 +7,9 @@ import com.slack.api.methods.request.chat.ChatPostMessageRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ssu.eatssu.domain.slack.entity.SlackChannel;
 
 import java.io.IOException;
-import ssu.eatssu.domain.slack.entity.SlackChannel;
 
 @Slf4j
 @Service
@@ -26,9 +26,9 @@ public class SlackService {
             MethodsClient methods = Slack.getInstance().methods(slackToken);
 
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
-	.channel(channelAddress)
-	.text(message)
-	.build();
+                    .channel(channelAddress)
+                    .text(message)
+                    .build();
 
             methods.chatPostMessage(request);
 
