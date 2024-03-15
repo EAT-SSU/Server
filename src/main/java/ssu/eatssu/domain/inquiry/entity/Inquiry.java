@@ -39,4 +39,7 @@ public class Inquiry extends BaseTimeEntity {
         this.status = status;
     }
 
+    public void clearUser() {
+        this.user = null;
+    }
 }

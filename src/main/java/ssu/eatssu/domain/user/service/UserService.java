@@ -27,7 +27,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-
     public User join(String email, OAuthProvider provider, String providerId) {
         String credentials = createCredentials(provider, providerId);
         User user = User.create(email, provider, providerId, credentials);
@@ -52,6 +51,7 @@ public class UserService {
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         user.getReviews().forEach(Review::clearUser);
+        user.getUserInquiries().forEach(inquiry -> inquiry.clearUser());
         userRepository.delete(user);
 
         return true;

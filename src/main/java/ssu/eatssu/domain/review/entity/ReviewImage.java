@@ -21,7 +21,6 @@ public class ReviewImage {
 
     private String imageUrl;
 
-
     public ReviewImage(Review review, String imageUrl) {
         this.review = review;
         this.imageUrl = imageUrl;
