@@ -101,7 +101,7 @@ public class OAuthService {
     }
 
     private String makeOauthCredentials(OAuthProvider provider, String providerId) {
-        return provider + "_" + providerId;
+        return provider + providerId;
     }
 
 }

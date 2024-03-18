@@ -66,6 +66,6 @@ public class UserService {
     }
 
     private String createCredentials(OAuthProvider provider, String providerId) {
-        return passwordEncoder.encode(provider + "_" + providerId);
+        return passwordEncoder.encode(provider + providerId);
     }
 }
