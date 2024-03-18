@@ -53,10 +53,4 @@ public class Meal {
     public List<String> getMenuNames() {
         return mealMenus.stream().map(mealMenu -> mealMenu.getMenu().getName()).toList();
     }
-
-    public Double getAverateMainRating() {
-        return mealMenus.stream()
-                .mapToDouble(mealMenu -> mealMenu.getMenu().getReviews().getAverageMainRating())
-                .average().orElse(0);
-    }
 }
