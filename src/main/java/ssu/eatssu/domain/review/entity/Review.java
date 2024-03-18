@@ -36,10 +36,9 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "menu_id")
     private Menu menu;
 
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
-    //Entity -> Dto 방향 의존관계 제거
     public void update(String content, Integer mainRate, Integer amountRate, Integer tasteRate) {
         this.content = content;
         this.ratings = Ratings.of(mainRate, amountRate, tasteRate);
