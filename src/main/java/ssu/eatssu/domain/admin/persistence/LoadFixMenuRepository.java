@@ -79,4 +79,5 @@ public class LoadFixMenuRepository {
     private BooleanExpression menuCategoryIdEq(Long categoryId) {
         return category.id.eq(categoryId);
     }
+
 }
