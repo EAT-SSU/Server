@@ -66,13 +66,13 @@ public class ManageFixMenuService {
     }
 
     public void register(Restaurant restaurant, RegisterFixMenuRequest request) {
+
+        // 해당 식당에 이미 존재하는 메뉴인지 확인
         if (loadMenuRepository.existsMenu(request.name(), restaurant)) {
             throw new BaseException(BaseResponseStatus.CONFLICT);
         }
 
-        /**
-         * 해당 식당의 메뉴카테고리들 중에 요청받은 카테고리가 존재하는지 확인
-         */
+        // 해당 식당의 메뉴 카테고리들 중에 요청받은 카테고리가 존재하는지 확인
         List<MenuCategory> menuCategories = loadMenuRepository.findMenuCategoriesByRestaurant(restaurant);
         MenuCategory category = menuCategories.stream()
                 .filter(menuCategory -> menuCategory.getId().equals(request.categoryId()))
@@ -90,9 +90,7 @@ public class ManageFixMenuService {
         Menu menu = manageMenuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MENU));
 
-        /**
-         * 식당에 같은 이름의 메뉴가 있는 지 확인
-         */
+        // 식당에 같은 이름의 메뉴가 있는 지 확인
         Restaurant restaurant = loadMenuRepository.getRestaurant(menuId);
         duplicateCheck(request.name(), restaurant);
         menu.update(request.name(), request.price());
