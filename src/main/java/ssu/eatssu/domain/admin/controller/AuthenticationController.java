@@ -17,15 +17,10 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @GetMapping("/login")
-    public String loginPage() {
-        return "login";
-    }
-
     @ResponseBody
     @PostMapping("/login")
     public BaseResponse<Tokens> login(@RequestBody LoginRequest request) {
-        return BaseResponse.success(authenticationService.login(request.password()));
+        return BaseResponse.success(authenticationService.login(request));
     }
 
 }

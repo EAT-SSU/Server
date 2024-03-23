@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.admin.controller.AdminAuth;
+import ssu.eatssu.domain.admin.dto.LoginRequest;
 import ssu.eatssu.domain.auth.security.JwtTokenProvider;
 import ssu.eatssu.domain.user.dto.Tokens;
 import ssu.eatssu.domain.user.entity.User;
@@ -17,8 +18,8 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final AdminAuth adminAuth;
 
-    public Tokens login(String password) {
-        return tokenProvider.generateTokens(adminAuth.loginId(), password);
+    public Tokens login(LoginRequest request) {
+        return tokenProvider.generateTokens(request.loginId(), request.password());
     }
 
     private void join(String loginId, String password) {
