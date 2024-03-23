@@ -50,7 +50,7 @@ public class ManageFixMenuService {
     }
 
     private MenuSection getMenuSection(MenuCategory category) {
-        MenuSection menuSection = new MenuSection(category.getName());
+        MenuSection menuSection = new MenuSection(category);
 
         List<BriefMenu> briefMenus = loadMenuRepository.findBriefMenusByCategoryId(category.getId());
 
