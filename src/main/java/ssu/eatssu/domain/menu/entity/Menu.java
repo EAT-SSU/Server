@@ -74,4 +74,8 @@ public class Menu {
         this.name = name;
         this.price = price;
     }
+
+    public void changeDiscontinuedStatus() {
+        this.isDiscontinued = !this.isDiscontinued;
+    }
 }

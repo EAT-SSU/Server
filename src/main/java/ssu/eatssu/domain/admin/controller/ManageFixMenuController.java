@@ -36,17 +36,23 @@ public class ManageFixMenuController {
 
     @ResponseBody
     @PatchMapping("/{menuId}")
-    public String update(@PathVariable Long menuId,
+    public BaseResponse update(@PathVariable Long menuId,
                          @RequestBody UpdateFixMenuRequest request) {
         manageFixMenuService.updateMenu(menuId, request);
-        return "redirect:/admin/menu/fix-menu";
+        return BaseResponse.success();
     }
 
     @ResponseBody
     @DeleteMapping("/{menuId}")
-    public String delete(@PathVariable Long menuId) {
+    public BaseResponse delete(@PathVariable Long menuId) {
         manageFixMenuService.delete(menuId);
-        return "redirect:/admin/menu/fix-menu";
+        return BaseResponse.success();
+    }
+
+    @ResponseBody
+    @PatchMapping("/{menuId}/discontinued-status")
+    public BaseResponse<Boolean> toggleDiscontinuedStatus(@PathVariable Long menuId) {
+        return BaseResponse.success(manageFixMenuService.changeDiscontinuedStatus(menuId));
     }
 
 }
