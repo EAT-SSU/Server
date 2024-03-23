@@ -16,8 +16,8 @@ import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
 import java.util.List;
 
-@Transactional
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ManageFixMenuService {
 
@@ -112,4 +112,18 @@ public class ManageFixMenuService {
     public void delete(Long menuId) {
         manageMenuRepository.deleteById(menuId);
     }
+
+    public Boolean changeDiscontinuedStatus(Long menuId) {
+        if (isFixedMenu(menuId)) {
+            throw new BaseException(BaseResponseStatus.NOT_SUPPORT_RESTAURANT);
+        }
+
+        Menu menu = manageMenuRepository.findById(menuId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MENU));
+
+        menu.changeDiscontinuedStatus();
+
+        return menu.isDiscontinued();
+    }
 }
+
