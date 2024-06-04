@@ -1,5 +1,6 @@
 package ssu.eatssu.domain.menu.entity;
 
+import io.jsonwebtoken.lang.Assert;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import ssu.eatssu.domain.review.entity.Reviews;
 
 import java.util.ArrayList;
 import java.util.List;
+import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
 @Entity
 @Getter
@@ -21,9 +23,14 @@ public class Menu {
     @Column(name = "menu_id")
     private Long id;
 
+    @Column(name = "sorted_index")
+    private Integer soretedIndex;
+
     private String name;
 
     private Integer price;
+
+    private boolean isDiscontinued = false;
 
     @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
@@ -31,14 +38,13 @@ public class Menu {
     @Embedded
     private Reviews reviews = new Reviews();
 
-    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MealMenu> mealMenus = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_category_id")
     private MenuCategory category;
 
-    private boolean isDiscontinued = false;
 
     private Menu(String name, Restaurant restaurant, Integer price, MenuCategory category) {
         this.name = name;
@@ -48,29 +54,26 @@ public class Menu {
     }
 
     public static Menu createVariable(String name, Restaurant restaurant) {
-        int price = 0;
+        Assert.isTrue(restaurant.isVariableType(), "변동 메뉴 식당이 아닙니다.");
+        final int price = 0;
         return new Menu(name, restaurant, price, null);
     }
 
-    /**
-     * 고정 메뉴를 생성합니다.
-     * todo: 고정메뉴 식당이 아니라 변동 메뉴 식당으로 잘못 들어온다면 어떻게 처리?
-     */
     public static Menu createFixed(String name, Restaurant restaurant, Integer price,
-                                   MenuCategory category) {
+        MenuCategory category) {
+        Assert.isTrue(restaurant.isFixedType(), "고정 메뉴 식당이 아닙니다.");
         return new Menu(name, restaurant, price, category);
     }
 
-    // COMMENT: CASCADE.PERSIST 를 사용하면, Menu 를 저장할 때 Review 도 같이 저장된다.
     public void addReview(Review review) {
-        reviews.add(review);
+        this.reviews.add(review);
     }
 
     public int getTotalReviewCount() {
         return reviews.size();
     }
 
-    public void update(String name, Integer price) {
+    public void update(final String name, final Integer price) {
         this.name = name;
         this.price = price;
     }
