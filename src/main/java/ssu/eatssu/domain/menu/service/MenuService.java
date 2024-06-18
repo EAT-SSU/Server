@@ -36,6 +36,7 @@ public class MenuService {
     public CategoryMenuListCollection findMenusByRestaurant(Restaurant restaurant) {
         List<MenuCategory> categories = menuCategoryRepository.findAllByRestaurant(restaurant);
         CategoryMenuListCollection collection = CategoryMenuListCollection.init();
+
         for (MenuCategory category : categories) {
             List<MenuInformation> menus = menuRepository.findAllByRestaurantAndCategory(
                             restaurant, category).stream()

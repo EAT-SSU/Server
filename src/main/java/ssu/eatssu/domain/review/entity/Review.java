@@ -37,6 +37,7 @@ public class Review extends BaseTimeEntity {
     private Menu menu;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
     public void update(String content, Integer mainRate, Integer amountRate, Integer tasteRate) {

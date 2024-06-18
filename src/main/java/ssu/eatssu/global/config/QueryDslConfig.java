@@ -1,4 +1,4 @@
-package ssu.eatssu.config;
+package ssu.eatssu.global.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

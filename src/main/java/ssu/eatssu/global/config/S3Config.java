@@ -1,4 +1,4 @@
-package ssu.eatssu.config;
+package ssu.eatssu.global.config;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;

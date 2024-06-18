@@ -24,7 +24,7 @@ public class Menu {
     private Long id;
 
     @Column(name = "sorted_index")
-    private Integer soretedIndex;
+    private Integer sortedIndex;
 
     private String name;
 

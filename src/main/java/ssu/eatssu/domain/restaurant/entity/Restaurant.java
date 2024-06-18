@@ -2,12 +2,14 @@ package ssu.eatssu.domain.restaurant.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
 import java.util.Arrays;
 
 
+@RequiredArgsConstructor
 @Getter
 public enum Restaurant {
 
@@ -17,19 +19,22 @@ public enum Restaurant {
     SNACK_CORNER("스낵 코너", null),
     HAKSIK("학생 식당", 5000);
 
-    private String restaurantName;
-    private Integer restaurantPrice;
+    private final String restaurantName;
+    private final Integer restaurantPrice;
 
     @JsonCreator
     public static Restaurant from(String restaurantName) {
         return Arrays.stream(Restaurant.values())
-                .filter(r -> r.getRestaurantName().equals(restaurantName))
-                .findAny()
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
+            .filter(r -> r.getRestaurantName().equals(restaurantName))
+            .findAny()
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
     }
 
-    Restaurant(String restaurantName, Integer price) {
-        this.restaurantName = restaurantName;
-        this.restaurantPrice = price;
+    public boolean isFixedType() {
+        return this == FOOD_COURT || this == SNACK_CORNER;
+    }
+
+    public boolean isVariableType() {
+        return !isFixedType();
     }
 }

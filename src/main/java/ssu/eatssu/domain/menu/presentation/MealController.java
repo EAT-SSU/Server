@@ -1,6 +1,5 @@
 package ssu.eatssu.domain.menu.presentation;
 
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

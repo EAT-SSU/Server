@@ -2,12 +2,11 @@ package ssu.eatssu.domain.admin.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.admin.dto.MenuBoards;
 import ssu.eatssu.domain.admin.dto.RegisterFixMenuRequest;
 import ssu.eatssu.domain.admin.dto.UpdateFixMenuRequest;
-import ssu.eatssu.domain.admin.service.ManageFixMenuService;
+import ssu.eatssu.domain.admin.service.ManageFixedMenuService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
@@ -16,7 +15,7 @@ import ssu.eatssu.global.handler.response.BaseResponse;
 @RequiredArgsConstructor
 public class ManageFixMenuController {
 
-    private final ManageFixMenuService manageFixMenuService;
+    private final ManageFixedMenuService manageFixMenuService;
 
     @ResponseBody
     @GetMapping("")

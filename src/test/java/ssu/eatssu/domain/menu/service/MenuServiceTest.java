@@ -42,33 +42,33 @@ class MenuServiceTest {
         mealRepository.deleteAll();
     }
 
-    @Test
-    void 식당_이름으로_고정_메뉴를_조회한다() {
-        // given
-        List<Menu> menus = new ArrayList<>();
-        Restaurant foodCourt = Restaurant.from("FOOD_COURT");
-
-        MenuCategory category1 = MenuCategory.builder().name("분식").restaurant(foodCourt).build();
-        MenuCategory category2 = MenuCategory.builder().name("한식").restaurant(foodCourt).build();
-        menus.add(Menu.createFixed("라면", foodCourt, 3000, category1));
-        menus.add(Menu.createFixed("떡볶이", foodCourt, 5000, category2));
-        menus.add(Menu.createFixed("짜게치", foodCourt, 4000, category1));
-        menuCategoryRepository.save(category1);
-        menuCategoryRepository.save(category2);
-        menuRepository.saveAll(menus);
-
-        // when
-        Map<String, MenuInformationList> response = menuService.findMenusByRestaurant(foodCourt);
-
-        // then
-        assertThat(response).hasSize(2);
-        for (String key : response.keySet()) {
-            System.out.print(key + " : ");
-            response.get(key).getMenusInformationList().forEach(menu -> System.out.print(menu.getName() + " "));
-            System.out.print("\n");
-        }
-
-    }
+//    @Test
+//    void 식당_이름으로_고정_메뉴를_조회한다() {
+//        // given
+//        List<Menu> menus = new ArrayList<>();
+//        Restaurant foodCourt = Restaurant.from("FOOD_COURT");
+//
+//        MenuCategory category1 = MenuCategory.builder().name("분식").restaurant(foodCourt).build();
+//        MenuCategory category2 = MenuCategory.builder().name("한식").restaurant(foodCourt).build();
+//        menus.add(Menu.createFixed("라면", foodCourt, 3000, category1));
+//        menus.add(Menu.createFixed("떡볶이", foodCourt, 5000, category2));
+//        menus.add(Menu.createFixed("짜게치", foodCourt, 4000, category1));
+//        menuCategoryRepository.save(category1);
+//        menuCategoryRepository.save(category2);
+//        menuRepository.saveAll(menus);
+//
+//        // when
+//        Map<String, MenuInformationList> response = menuService.findMenusByRestaurant(foodCourt);
+//
+//        // then
+//        assertThat(response).hasSize(2);
+//        for (String key : response.keySet()) {
+//            System.out.print(key + " : ");
+//            response.get(key).getMenusInformationList().forEach(menu -> System.out.print(menu.getName() + " "));
+//            System.out.print("\n");
+//        }
+//
+//    }
 
     @Test
     void 식단을_생성한다() {

@@ -20,5 +20,4 @@ public class MenuCategory {
 
     @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
-
 }
