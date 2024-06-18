@@ -23,7 +23,7 @@ public class SwaggerConfig {
 
     @Value("${swagger.url}")
     private String SERVER_URL;
-    @Value("${swagger.url.description}")
+    @Value("${swagger.description}")
     private String SERVER_DESCRIPTION;
 
 
