@@ -38,6 +38,7 @@ public class ReviewService {
     private final RatingCalculator ratingCalculator;
     private final S3Uploader s3Uploader;
 
+    @Deprecated
     public Review createReview(CustomUserDetails userDetails, Long menuId, ReviewCreateRequest request,
                                List<MultipartFile> images) {
 
@@ -101,6 +102,29 @@ public class ReviewService {
         reviewImageRepository.save(reviewImage);
 
         menu.addReview(review);
+    }
+
+    public void createReview(CustomUserDetails userDetails, Long mealId, CreateReviewRequest request) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        Meal meal = mealRepository.findById(mealId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
+
+        Review review = request.toReviewEntity(user, meal);
+        reviewRepository.save(review);
+
+        List<ReviewImage> reviewImages = request.createReviewImages(review);
+        reviewImageRepository.saveAll(reviewImages);
+
+        for (MenuLikeRequest menuLikes : request.getMenuLikes()) {
+            Menu menu = menuRepository.findById(menuLikes.getMenuId())
+                    .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+
+            if (menuLikes.getLike()) {
+                menu.getLike();
+            }
+        }
     }
 
     public void updateReview(CustomUserDetails userDetails, Long reviewId,

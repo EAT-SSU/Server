@@ -28,6 +28,7 @@ public class Menu {
     @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
 
+    // TODO : 삭제되어야 함
     @Embedded
     private Reviews reviews = new Reviews();
 
@@ -39,6 +40,9 @@ public class Menu {
     private MenuCategory category;
 
     private boolean isDiscontinued = false;
+
+    @Column(name = "like_count")
+    private Integer likeCount = 0;
 
     private Menu(String name, Restaurant restaurant, Integer price, MenuCategory category) {
         this.name = name;
@@ -77,5 +81,9 @@ public class Menu {
 
     public void changeDiscontinuedStatus() {
         this.isDiscontinued = !this.isDiscontinued;
+    }
+
+    public void getLike() {
+        likeCount++;
     }
 }
