@@ -11,7 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.report.dto.ReportTypeList;
-import ssu.eatssu.domain.review.entity.Report;
+import ssu.eatssu.domain.report.entity.Report;
 import ssu.eatssu.domain.report.service.ReportService;
 import ssu.eatssu.domain.slack.entity.SlackChannel;
 import ssu.eatssu.domain.slack.entity.SlackMessageFormat;

@@ -1,6 +1,6 @@
 package ssu.eatssu.domain.admin.dto;
 
-import ssu.eatssu.domain.review.entity.Report;
+import ssu.eatssu.domain.report.entity.Report;
 import ssu.eatssu.domain.review.entity.Review;
 
 import java.time.LocalDateTime;

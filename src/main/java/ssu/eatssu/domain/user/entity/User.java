@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.review.entity.Review;
-import ssu.eatssu.domain.review.entity.Report;
+import ssu.eatssu.domain.report.entity.Report;
 
 import java.util.List;
 

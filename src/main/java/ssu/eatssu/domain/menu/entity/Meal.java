@@ -1,6 +1,7 @@
 package ssu.eatssu.domain.menu.entity;
 
 import jakarta.persistence.*;
+import java.util.HashMap;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,18 +37,29 @@ public class Meal {
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
     private List<MealMenu> mealMenus = new ArrayList<>();
 
-    public Meal(Date date, TimePart timePart, Restaurant restaurant) {
+    @ElementCollection
+    private HashMap<String, Integer> countMap = new HashMap<>();
+
+    public Meal(Date date, TimePart timePart, Restaurant restaurant, List<String> menuNames) {
         this.date = date;
         this.timePart = timePart;
         this.restaurant = restaurant;
         this.price = restaurant.getRestaurantPrice();
+
+        initializeMap(menuNames);
     }
 
-    public Meal(Date date, TimePart timePart, Restaurant restaurant, Integer price) {
+    public Meal(Date date, TimePart timePart, Restaurant restaurant, int price) {
         this.date = date;
         this.timePart = timePart;
         this.restaurant = restaurant;
         this.price = price;
+    }
+
+    private void initializeMap(List<String> menuNames) {
+        for (String name : menuNames) {
+            countMap.put(name, countMap.getOrDefault(name, 0) + 1);
+        }
     }
 
     public List<String> getMenuNames() {

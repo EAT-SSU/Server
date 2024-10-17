@@ -12,7 +12,7 @@ import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.report.dto.ReportCreateRequest;
 import ssu.eatssu.domain.report.entity.ReportType;
 import ssu.eatssu.domain.report.repository.ReportRepository;
-import ssu.eatssu.domain.review.entity.Report;
+import ssu.eatssu.domain.report.entity.Report;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.user.entity.User;

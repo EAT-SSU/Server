@@ -19,6 +19,7 @@ public class ReviewImage {
     @JoinColumn(name = "review_id")
     private Review review;
 
+    @Column(name = "review_image_url")
     private String imageUrl;
 
     public ReviewImage(Review review, String imageUrl) {

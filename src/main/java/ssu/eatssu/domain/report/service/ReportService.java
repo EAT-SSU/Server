@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.report.dto.ReportTypeList;
 import ssu.eatssu.domain.review.entity.Review;
-import ssu.eatssu.domain.review.entity.Report;
+import ssu.eatssu.domain.report.entity.Report;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.report.entity.ReportStatus;
 import ssu.eatssu.domain.report.repository.ReportRepository;

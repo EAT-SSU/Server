@@ -33,6 +33,7 @@ public class MenuService {
     private final MealRatingService mealRatingService;
     private final MenuRatingService menuRatingService;
 
+    // DONE
     public CategoryMenuListCollection findMenusByRestaurant(Restaurant restaurant) {
         List<MenuCategory> categories = menuCategoryRepository.findAllByRestaurant(restaurant);
         CategoryMenuListCollection collection = CategoryMenuListCollection.init();
@@ -68,7 +69,8 @@ public class MenuService {
         if (MenuValidator.validateExistedMeal(meals, request.menuNames())) {
             return;
         }
-        Meal meal = new Meal(date, timePart, restaurant);
+
+        Meal meal = new Meal(date, timePart, restaurant, request.menuNames());
 
         mealRepository.save(meal);
 

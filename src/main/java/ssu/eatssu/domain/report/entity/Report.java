@@ -1,12 +1,11 @@
-package ssu.eatssu.domain.review.entity;
+package ssu.eatssu.domain.report.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import ssu.eatssu.domain.report.dto.ReportCreateRequest;
-import ssu.eatssu.domain.report.entity.ReportType;
+import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.entity.BaseTimeEntity;
 import ssu.eatssu.domain.user.entity.User;
-import ssu.eatssu.domain.report.entity.ReportStatus;
 
 @Builder
 @Entity
