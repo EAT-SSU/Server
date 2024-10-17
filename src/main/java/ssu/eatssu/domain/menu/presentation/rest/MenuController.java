@@ -40,6 +40,6 @@ public class MenuController {
     public BaseResponse<MenuRestaurantResponse> getMenus(
         @RequestParam("restaurant") Restaurant restaurant) {
 
-        return BaseResponse.success(menuService.findMenusByRestaurant(restaurant));
+        return BaseResponse.success(menuService.getMenusByRestaurant(restaurant));
     }
 }
