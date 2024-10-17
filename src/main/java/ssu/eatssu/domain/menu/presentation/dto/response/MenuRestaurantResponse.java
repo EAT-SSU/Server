@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.menu.presentation.dto;
+package ssu.eatssu.domain.menu.presentation.dto.response;
 
 import lombok.Getter;
 

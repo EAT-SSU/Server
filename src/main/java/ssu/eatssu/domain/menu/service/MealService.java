@@ -4,6 +4,7 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_SUPPORT_
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.entity.constants.TimePart;
 import ssu.eatssu.domain.menu.persistence.MealMenuRepository;
 import ssu.eatssu.domain.menu.persistence.MealRepository;
-import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateRequest;
+import ssu.eatssu.domain.menu.presentation.dto.request.CreateMealRequest;
 import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateWithPriceRequest;
 import ssu.eatssu.domain.menu.presentation.dto.response.MealDetailResponse;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenusInMealResponse;
@@ -35,7 +36,8 @@ public class MealService {
     private final MenuService menuService;
 
     public MenusInMealResponse getMenusInMealByMealId(Long mealId) {
-        Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MEAL));
+        Meal meal = mealRepository.findById(mealId)
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MEAL));
 
         return MenusInMealResponse.from(meal);
     }
@@ -48,11 +50,13 @@ public class MealService {
         List<Meal> meals = findMealsByDateAndTimePartAndRestaurant(date, timePart, restaurant);
 
         return meals.stream()
-            .map(meal -> MealDetailResponse.from(meal, mealRatingService.getMainRatingAverage(meal.getId())))
+            .map(meal -> MealDetailResponse.from(meal,
+	mealRatingService.getMainRatingAverage(meal.getId())))
             .toList();
     }
 
-    private List<Meal> findMealsByDateAndTimePartAndRestaurant(Date date, TimePart timePart, Restaurant restaurant) {
+    private List<Meal> findMealsByDateAndTimePartAndRestaurant(Date date, TimePart timePart,
+        Restaurant restaurant) {
         return mealRepository.findAllByDateAndTimePartAndRestaurant(date, timePart, restaurant);
     }
 
@@ -63,38 +67,48 @@ public class MealService {
     }
 
     @Transactional
-    public void createMeal(Date date, Restaurant restaurant, TimePart timePart, MealCreateRequest request) {
-        createMealWithOptionalPrice(date, restaurant, timePart, request.menuNames(), null);
+    public Long createMeal(Date date, Restaurant restaurant, TimePart timePart,
+        CreateMealRequest request) {
+        return createMealWithOptionalPrice(date, restaurant, timePart, request.menuNames(), null);
     }
 
     @Transactional
-    public void createMealWithPrice(Date date, Restaurant restaurant, TimePart timePart, MealCreateWithPriceRequest request) {
-        createMealWithOptionalPrice(date, restaurant, timePart, request.menuNames(), request.price());
+    public Long createMealWithPrice(Date date, Restaurant restaurant, TimePart timePart,
+        MealCreateWithPriceRequest request) {
+        return createMealWithOptionalPrice(date, restaurant, timePart, request.menuNames(), request.price());
     }
 
-    private void createMealWithOptionalPrice(Date date, Restaurant restaurant, TimePart timePart, List<String> menuNames, Integer price) {
-        if (validateExistedMeal(date, timePart, restaurant, menuNames)) {
-            return; // 중복된 메뉴가 있는 경우 바로 종료
+    private Long createMealWithOptionalPrice(Date date, Restaurant restaurant, TimePart timePart, List<String> menuNames, Integer price) {
+
+        Optional<Long> existingMealId = getExistingMealId(date, timePart, restaurant, menuNames);
+        if (existingMealId.isPresent()) {
+            return existingMealId.get();  // 이미 존재하는 식단의 ID를 반환
         }
 
         Meal meal = new Meal(date, timePart, restaurant, price);
-        mealRepository.save(meal);
+        Meal savedMeal = mealRepository.save(meal);
         addMenusToMeal(meal, restaurant, menuNames);
+
+        return savedMeal.getId();
     }
 
-    private boolean validateExistedMeal(Date date, TimePart timePart, Restaurant restaurant, List<String> menuNames) {
+    private Optional<Long> getExistingMealId(Date date, TimePart timePart, Restaurant restaurant,
+        List<String> menuNames) {
         List<Meal> meals = mealRepository.findAllByDateAndTimePartAndRestaurant(date, timePart, restaurant);
 
         List<String> sortedRequestMenuNames = menuNames.stream()
             .sorted()
             .toList();
 
-        return meals.stream().anyMatch(meal -> {
-            List<String> sortedMenuNames = meal.getMenuNames().stream()
-                .sorted()
-                .toList();
-            return sortedMenuNames.equals(sortedRequestMenuNames);
-        });
+        return meals.stream()
+            .filter(meal -> {
+                List<String> sortedMenuNames = meal.getMenuNames().stream()
+                    .sorted()
+                    .toList();
+                return sortedMenuNames.equals(sortedRequestMenuNames);
+            })
+            .findFirst()
+            .map(Meal::getId);
     }
 
     private void addMenusToMeal(Meal meal, Restaurant restaurant, List<String> menuNames) {
@@ -111,11 +125,13 @@ public class MealService {
             .build();
 
         mealMenuRepository.save(mealMenu);
+        meal.addMealMenu(mealMenu);
     }
 
     @Transactional
     public void deleteByMealId(Long mealId) {
-        Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MEAL));
+        Meal meal = mealRepository.findById(mealId)
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MEAL));
 
         List<Menu> menus = meal.getMealMenus().stream()
             .map(MealMenu::getMenu)

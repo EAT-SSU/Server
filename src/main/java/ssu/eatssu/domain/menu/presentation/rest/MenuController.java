@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ssu.eatssu.domain.menu.presentation.dto.MenuRestaurantResponse;
+import ssu.eatssu.domain.menu.presentation.dto.response.MenuRestaurantResponse;
 import ssu.eatssu.domain.menu.service.MenuService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.global.handler.response.BaseResponse;

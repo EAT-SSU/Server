@@ -10,6 +10,5 @@ import java.util.List;
 
 public interface MealRepository extends JpaRepository<Meal, Long> {
 
-    List<Meal> findAllByDateAndTimePartAndRestaurant(Date date, TimePart timePart,
-                                                     Restaurant restaurant);
+    List<Meal> findAllByDateAndTimePartAndRestaurant(Date date, TimePart timePart, Restaurant restaurant);
 }
