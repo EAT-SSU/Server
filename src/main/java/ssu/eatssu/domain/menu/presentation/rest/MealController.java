@@ -11,13 +11,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateRequest;
+import ssu.eatssu.domain.menu.presentation.dto.request.CreateMealRequest;
 import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateWithPriceRequest;
 import ssu.eatssu.domain.menu.presentation.dto.response.MealDetailResponse;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenusInMealResponse;
 import ssu.eatssu.domain.menu.entity.constants.TimePart;
 import ssu.eatssu.domain.menu.service.MealService;
-import ssu.eatssu.domain.menu.service.MenuService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
 import ssu.eatssu.global.handler.response.BaseException;
@@ -34,7 +33,6 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_SUPPORT_
 @Tag(name = "Meal", description = "식단 API")
 public class MealController {
 
-    private final MenuService menuService;
     private final MealService mealService;
 
     @Operation(summary = "식단 추가", description = """
@@ -53,7 +51,7 @@ public class MealController {
         @Parameter(schema = @Schema(type = "string", format = "date", example = "20240101")) @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
         @Parameter(description = "식당이름") @RequestParam("restaurant") Restaurant restaurant,
         @Parameter(description = "시간대") @RequestParam("time") TimePart timePart,
-        @RequestBody MealCreateRequest mealCreateRequest) {
+        @RequestBody CreateMealRequest mealCreateRequest) {
         if (RestaurantType.isFixedType(restaurant)) {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }

@@ -1,10 +1,12 @@
 package ssu.eatssu.domain.menu.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ssu.eatssu.domain.menu.presentation.dto.MenuRestaurantResponse;
+import org.springframework.test.context.ActiveProfiles;
+import ssu.eatssu.domain.menu.presentation.dto.response.MenuRestaurantResponse;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.entity.MenuCategory;
 import ssu.eatssu.domain.menu.persistence.MealRepository;
@@ -18,6 +20,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@DisplayName("MenuService 테스트")
+@ActiveProfiles("test")
 class MenuServiceTest {
 
     @Autowired
@@ -29,13 +33,9 @@ class MenuServiceTest {
     @Autowired
     private MenuCategoryRepository menuCategoryRepository;
 
-    @Autowired
-    private MealRepository mealRepository;
-
     @BeforeEach
     void setUp() {
         menuRepository.deleteAll();
-        mealRepository.deleteAll();
     }
 
     @Test
@@ -61,56 +61,4 @@ class MenuServiceTest {
         // then
         assertThat(response.getCategoryMenuListCollection()).hasSize(2);
     }
-
-//    @Test
-//    void 식단을_생성한다() {
-//        식단_생성_요청();
-//
-//        // then
-//        assertThat(mealRepository.findAll()).hasSize(1);
-//        assertThat(menuRepository.findAll()).hasSize(3);
-//        assertThat(menuRepository.findAll())
-//                .extracting(Menu::getName)
-//                .containsExactly("돈까스", "샐러드", "김치");
-//    }
-//
-//    private Long 식단_생성_요청() {
-//        // given
-//        Date date = Date.valueOf("2024-01-03");
-//        Restaurant haksik = Restaurant.from("HAKSIK");
-//        MealCreateRequest request = new MealCreateRequest(List.of("돈까스", "샐러드", "김치"));
-//
-//        // when
-//        menuService.createMeal(date, haksik, LUNCH, request);
-//
-//        return mealRepository.findAll().stream()
-//                .findFirst()
-//                .orElseThrow(() -> new RuntimeException("Meal not created"))
-//                .getId();
-//    }
-
-//    @Test
-//    void 식단을_조회한다() {
-//        // given
-//        Long createdMealId = 식단_생성_요청();
-//
-//        // when
-//        MenusInMealResponse response = menuService.findMenusInMeal(createdMealId);
-//
-//        // then
-//        assertThat(response.getMenusInformation()).hasSize(3);
-//    }
-
-//    @Test
-//    void 식단을_삭제한다() {
-//        // given
-//        Long createdMealId = 식단_생성_요청();
-//
-//        // when
-//        menuService.deleteMeal(createdMealId);
-//
-//        // then
-//        assertThat(mealRepository.findAll()).hasSize(0);
-//        assertThat(menuRepository.findAll()).hasSize(0);
-//    }
 }
