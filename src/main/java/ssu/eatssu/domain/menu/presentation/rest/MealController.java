@@ -13,9 +13,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateRequest;
 import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateWithPriceRequest;
-import ssu.eatssu.domain.menu.presentation.dto.response.MealInformationResponse;
+import ssu.eatssu.domain.menu.presentation.dto.response.MealDetailResponse;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenusInformationResponse;
 import ssu.eatssu.domain.menu.entity.constants.TimePart;
+import ssu.eatssu.domain.menu.service.MealService;
 import ssu.eatssu.domain.menu.service.MenuService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
@@ -34,6 +35,7 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_SUPPORT_
 public class MealController {
 
     private final MenuService menuService;
+    private final MealService mealService;
 
     @Operation(summary = "식단 추가", description = """
         식단을 추가하는 API 입니다.<br><br>
@@ -89,7 +91,7 @@ public class MealController {
     @Operation(summary = "변동 메뉴 식단 리스트 조회", description = """
         변동 메뉴 식단 리스트를 조회하는 API 입니다.
         변동 메뉴 식당 (학생 식당, 도담, 기숙사 식당) 의 특정날짜(yyyyMMdd), 특정시간대(아침/점심/저녁)에 해당하는 식단 목록을 조회합니다.
-        일반적으로 학생식당과 도담의 경우 식단 여러개가 조회되고 기숙사식당은 한개만 조회됩니다.)
+        일반적으로 학생식당과 도담의 경우 식단 여러 개가 조회되고 기숙사식당은 한 개만 조회됩니다.)
         """)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "식단 리스트 조회 성공"),
@@ -97,16 +99,12 @@ public class MealController {
         @ApiResponse(responseCode = "404", description = "존재 하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("")
-    public BaseResponse<List<MealInformationResponse>> getMeal(
+    public BaseResponse<List<MealDetailResponse>> getMeal(
         @Parameter(schema = @Schema(type = "string", format = "date", example = "20240101")) @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
         @Parameter(description = "식당 이름") @RequestParam("restaurant") Restaurant restaurant,
         @Parameter(description = "시간대") @RequestParam("time") TimePart timePart) {
 
-        if (RestaurantType.isFixedType(restaurant)) {
-            throw new BaseException(NOT_SUPPORT_RESTAURANT);
-        }
-
-        return BaseResponse.success(menuService.findSpecificMeals(date, restaurant, timePart));
+        return BaseResponse.success(mealService.getMealDetailsByDateAndRestaurantAndTimePart(date, restaurant, timePart));
     }
 
     @Operation(summary = "식단 삭제", description = "식단을 삭제하는 API 입니다.")
