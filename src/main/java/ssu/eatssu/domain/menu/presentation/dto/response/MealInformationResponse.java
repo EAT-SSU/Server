@@ -1,9 +1,10 @@
-package ssu.eatssu.domain.menu.dto;
+package ssu.eatssu.domain.menu.presentation.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ssu.eatssu.domain.menu.presentation.dto.BriefMenuInformation;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.MealMenu;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "오늘의 식단 리스트 조회 Res")
+@Schema(title = "오늘의 식단 리스트 조회 Response")
 public class MealInformationResponse {
 
     @Schema(description = "식단 식별자 mealId", example = "12")
@@ -31,12 +32,12 @@ public class MealInformationResponse {
     public static MealInformationResponse from(Meal meal, Double mainRating) {
         if (!meal.getMealMenus().isEmpty()) {
             List<BriefMenuInformation> menusInformation = meal.getMealMenus().stream()
-                    .map(MealMenu::getMenu)
-                    .map(BriefMenuInformation::new).toList();
+	.map(MealMenu::getMenu)
+	.map(BriefMenuInformation::new).toList();
 
             return new MealInformationResponse(meal.getId(),
-                    meal.getPrice(),
-                    mainRating, menusInformation);
+	meal.getPrice(),
+	mainRating, menusInformation);
         } else {
             return null;
         }

@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import ssu.eatssu.domain.menu.entity.MealMenu;
+import ssu.eatssu.domain.menu.entity.constants.TimePart;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 
 import java.util.ArrayList;

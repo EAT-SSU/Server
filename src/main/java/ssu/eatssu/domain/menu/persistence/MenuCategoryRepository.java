@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.menu.repository;
+package ssu.eatssu.domain.menu.persistence;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

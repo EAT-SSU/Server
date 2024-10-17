@@ -18,7 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
-import ssu.eatssu.domain.menu.entity.MenuType;
+import ssu.eatssu.domain.menu.entity.constants.MenuType;
 import ssu.eatssu.domain.review.dto.*;
 import ssu.eatssu.domain.review.service.ReviewService;
 import ssu.eatssu.domain.slice.dto.SliceResponse;

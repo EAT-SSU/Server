@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.menu.dto;
+package ssu.eatssu.domain.menu.presentation.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -16,7 +16,7 @@ public class BriefMenuInformation {
     @Schema(description = "메뉴 이름", example = "돈까스")
     private String name;
 
-    protected BriefMenuInformation(Menu menu) {
+    public BriefMenuInformation(Menu menu) {
         this.menuId = menu.getId();
         this.name = menu.getName();
     }
