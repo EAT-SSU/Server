@@ -12,7 +12,7 @@ import ssu.eatssu.domain.menu.presentation.dto.MenuRestaurantResponse;
 import ssu.eatssu.domain.menu.presentation.dto.MenuResponse;
 import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateRequest;
 import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateWithPriceRequest;
-import ssu.eatssu.domain.menu.presentation.dto.response.MealInformationResponse;
+import ssu.eatssu.domain.menu.presentation.dto.response.MealDetailResponse;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenusInformationResponse;
 import ssu.eatssu.domain.menu.entity.*;
 import ssu.eatssu.domain.menu.entity.constants.TimePart;
@@ -82,13 +82,13 @@ public class MenuService {
         }
     }
 
-    public List<MealInformationResponse> findSpecificMeals(Date date,
+    public List<MealDetailResponse> findSpecificMeals(Date date,
         Restaurant restaurant,
         TimePart timePart) {
         List<Meal> meals = getMeals(date, timePart, restaurant);
 
         return meals.stream()
-            .map(meal -> MealInformationResponse.from(meal,
+            .map(meal -> MealDetailResponse.from(meal,
 	mealRatingService.getMainRatingAverage(meal.getId())))
             .toList();
     }
