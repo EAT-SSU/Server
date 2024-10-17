@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.menu.repository;
+package ssu.eatssu.domain.menu.persistence;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

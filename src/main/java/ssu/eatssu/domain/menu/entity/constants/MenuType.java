@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.menu.entity;
+package ssu.eatssu.domain.menu.entity.constants;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
