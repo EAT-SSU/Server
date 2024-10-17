@@ -14,19 +14,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(title ="식단 속 메뉴 정보 리스트")
-public class MenusInformationResponse {
+public class MenusInMealResponse {
 
     @Schema(description = "식단 속 메뉴 목록", example = "[]")
-    private List<BriefMenuResponse> menusInformation;
+    private List<BriefMenuResponse> briefMenus;
 
-    public static MenusInformationResponse from(Meal meal) {
-        if (!meal.getMealMenus().isEmpty()) {
-            List<BriefMenuResponse> menusInformation = meal.getMealMenus().stream()
-                    .map(MealMenu::getMenu)
-                    .map(BriefMenuResponse::new).toList();
-            return new MenusInformationResponse(menusInformation);
-        } else {
-            return null;
-        }
+    public static MenusInMealResponse from(Meal meal) {
+        List<BriefMenuResponse> menusInformation = meal.getMealMenus().stream()
+            .map(MealMenu::getMenu)
+            .map(BriefMenuResponse::new)
+            .toList();
+
+        return new MenusInMealResponse(menusInformation);
     }
 }
