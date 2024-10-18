@@ -44,6 +44,9 @@ public class Menu {
     @Column(name = "like_count")
     private Integer likeCount = 0;
 
+    @Column(name = "unlike_count")
+    private Integer unlikeCount = 0;
+
     private Menu(String name, Restaurant restaurant, Integer price, MenuCategory category) {
         this.name = name;
         this.restaurant = restaurant;
@@ -85,5 +88,9 @@ public class Menu {
 
     public void getLike() {
         likeCount++;
+    }
+
+    public void getUnLike() {
+        unlikeCount++;
     }
 }
