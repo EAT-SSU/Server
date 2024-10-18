@@ -1,5 +1,6 @@
 package ssu.eatssu.domain.review.presentation;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -64,6 +65,7 @@ public class ReviewController {
         return BaseResponse.success(myReviews);
     }
 
+    @Hidden
     @Operation(summary = "리뷰 작성", description = """
             리뷰를 작성하는 API 입니다.<br><br>
             reviewCreate는 application/json, multipartFileList는 multipart/form-data로 요청해주세요.<br><br>
@@ -114,6 +116,21 @@ public class ReviewController {
                                        @RequestBody UploadReviewRequest uploadReviewRequest,
                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         reviewService.uploadReview(customUserDetails, menuId, uploadReviewRequest);
+        return BaseResponse.success();
+    }
+
+    @Operation(summary = "리뷰 작성 v2", description = "리뷰를 작성하는 API v2 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 작성 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+    })
+    @PostMapping("/v2/write")
+    public BaseResponse<?> createReview(
+                                       @RequestBody CreateReviewRequest createReviewRequest,
+                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        reviewService.createReview(customUserDetails, createReviewRequest.getMealId(), createReviewRequest);
         return BaseResponse.success();
     }
 
