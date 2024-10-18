@@ -9,7 +9,7 @@ import ssu.eatssu.domain.admin.dto.MealInfo;
 import ssu.eatssu.domain.admin.dto.MenuBoards;
 import ssu.eatssu.domain.admin.dto.RegisterMealRequest;
 import ssu.eatssu.domain.admin.service.ManageMealService;
-import ssu.eatssu.domain.menu.entity.TimePart;
+import ssu.eatssu.domain.menu.entity.constants.TimePart;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
