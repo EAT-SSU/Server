@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import ssu.eatssu.domain.menu.entity.MealMenu;
+import ssu.eatssu.domain.menu.entity.constants.TimePart;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ public class Meal {
 
     private Integer price;
 
-    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<MealMenu> mealMenus = new ArrayList<>();
 
     public Meal(Date date, TimePart timePart, Restaurant restaurant) {
@@ -52,5 +54,9 @@ public class Meal {
 
     public List<String> getMenuNames() {
         return mealMenus.stream().map(mealMenu -> mealMenu.getMenu().getName()).toList();
+    }
+
+    public void addMealMenu(MealMenu mealMenu) {
+        mealMenus.add(mealMenu);
     }
 }

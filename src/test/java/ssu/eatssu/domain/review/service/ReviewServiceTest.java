@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.menu.entity.Menu;
-import ssu.eatssu.domain.menu.repository.MenuRepository;
+import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.ReviewCreateRequest;
 import ssu.eatssu.domain.review.dto.ReviewUpdateRequest;

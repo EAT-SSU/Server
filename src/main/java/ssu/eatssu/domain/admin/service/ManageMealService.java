@@ -7,7 +7,7 @@ import ssu.eatssu.domain.admin.persistence.*;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.MealMenu;
 import ssu.eatssu.domain.menu.entity.Menu;
-import ssu.eatssu.domain.menu.entity.TimePart;
+import ssu.eatssu.domain.menu.entity.constants.TimePart;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
