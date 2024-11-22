@@ -28,6 +28,8 @@ public class QMenu extends EntityPathBase<Menu> {
 
     public final BooleanPath isDiscontinued = createBoolean("isDiscontinued");
 
+    public final NumberPath<Integer> likeCount = createNumber("likeCount", Integer.class);
+
     public final ListPath<MealMenu, QMealMenu> mealMenus = this.<MealMenu, QMealMenu>createList("mealMenus", MealMenu.class, QMealMenu.class, PathInits.DIRECT2);
 
     public final StringPath name = createString("name");
@@ -37,6 +39,8 @@ public class QMenu extends EntityPathBase<Menu> {
     public final EnumPath<ssu.eatssu.domain.restaurant.entity.Restaurant> restaurant = createEnum("restaurant", ssu.eatssu.domain.restaurant.entity.Restaurant.class);
 
     public final ssu.eatssu.domain.review.entity.QReviews reviews;
+
+    public final NumberPath<Integer> unlikeCount = createNumber("unlikeCount", Integer.class);
 
     public QMenu(String variable) {
         this(Menu.class, forVariable(variable), INITS);

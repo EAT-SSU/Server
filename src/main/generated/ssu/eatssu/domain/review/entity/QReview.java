@@ -31,10 +31,14 @@ public class QReview extends EntityPathBase<Review> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final ssu.eatssu.domain.menu.entity.QMeal meal;
+
     public final ssu.eatssu.domain.menu.entity.QMenu menu;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedDate = _super.modifiedDate;
+
+    public final NumberPath<Integer> rating = createNumber("rating", Integer.class);
 
     public final ssu.eatssu.domain.rating.entity.QRatings ratings;
 
@@ -60,6 +64,7 @@ public class QReview extends EntityPathBase<Review> {
 
     public QReview(Class<? extends Review> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.meal = inits.isInitialized("meal") ? new ssu.eatssu.domain.menu.entity.QMeal(forProperty("meal")) : null;
         this.menu = inits.isInitialized("menu") ? new ssu.eatssu.domain.menu.entity.QMenu(forProperty("menu"), inits.get("menu")) : null;
         this.ratings = inits.isInitialized("ratings") ? new ssu.eatssu.domain.rating.entity.QRatings(forProperty("ratings")) : null;
         this.user = inits.isInitialized("user") ? new ssu.eatssu.domain.user.entity.QUser(forProperty("user")) : null;
