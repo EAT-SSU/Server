@@ -2,7 +2,9 @@ package ssu.eatssu.domain.review.service;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MEAL;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.REVIEW_PERMISSION_DENIED;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,6 +27,7 @@ import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.MenuLikeRequest;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
+import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewImage;
 import ssu.eatssu.domain.review.entity.ReviewMenuLike;
@@ -156,5 +159,74 @@ public class MealReviewService {
                 .hasNext(pageReviews.hasNext())
                 .dataList(mealReviewResponses)
                 .build();
+    }
+
+    /**
+     * 리뷰 수정
+     */
+    @Transactional
+    public void updateReview(CustomUserDetails userDetails, Long reviewId, UpdateMealReviewRequest request) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
+
+        if (review.isNotWrittenBy(user)) {
+            throw new BaseException(REVIEW_PERMISSION_DENIED);
+        }
+
+        List<ReviewMenuLike> reviewMenuLikes = reviewMenuLikeRepository.findByReview(review);
+
+        Map<Long, Boolean> menuLikes = request.getMenuLikes().stream()
+                .collect(Collectors.toMap(MenuLikeRequest::getMenuId, MenuLikeRequest::getIsLike));
+
+        // 기존 데이터 수정 또는 삭제
+        for (ReviewMenuLike reviewMenuLike : reviewMenuLikes) {
+            Boolean updatedIsLike = menuLikes.get(reviewMenuLike.getMenu().getId());
+            if (updatedIsLike == null) {
+                // 요청 데이터에 없으면 삭제
+                reviewMenuLikeRepository.delete(reviewMenuLike);
+                if (reviewMenuLike.getIsLike()) {
+                    reviewMenuLike.getMenu().decreaseLikeCount();
+                } else {
+                    reviewMenuLike.getMenu().increaseUnlikeCount();
+                }
+            } else if (!reviewMenuLike.getIsLike().equals(updatedIsLike)) {
+                // 요청 데이터와 다르면 수정
+                reviewMenuLike.updateLike(updatedIsLike);
+                if (updatedIsLike) {
+                    reviewMenuLike.getMenu().increaseLikeCount();
+                    reviewMenuLike.getMenu().decreaseUnlikeCount();
+                } else {
+                    reviewMenuLike.getMenu().increaseUnlikeCount();
+                    reviewMenuLike.getMenu().decreaseLikeCount();
+                }
+            }
+            menuLikes.remove(reviewMenuLike.getMenu().getId());
+        }
+
+        // 새롭게 리뷰 요청된 메뉴 데이터 처리
+        for (Map.Entry<Long, Boolean> entry : menuLikes.entrySet()) {
+            Menu menu = menuRepository.findById(entry.getKey())
+                    .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+
+            ReviewMenuLike reviewMenuLike = ReviewMenuLike.builder()
+                    .review(review)
+                    .menu(menu)
+                    .isLike(entry.getValue()).build();
+            reviewMenuLikeRepository.save(reviewMenuLike);
+
+            if (entry.getValue()) {
+                menu.increaseLikeCount();
+            } else {
+                menu.increaseUnlikeCount();
+            }
+        }
+
+        // 리뷰 본문 및 평점 수정
+        review.setContent(request.getContent());
+        review.setRating(request.getRating());
+        reviewRepository.save(review);
     }
 }
