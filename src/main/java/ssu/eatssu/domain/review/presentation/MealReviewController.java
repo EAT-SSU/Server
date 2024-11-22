@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -111,6 +112,21 @@ public class MealReviewController {
             @RequestBody UpdateMealReviewRequest request,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         mealReviewService.updateReview(customUserDetails, reviewId, request);
+        return BaseResponse.success();
+    }
+
+    @Operation(summary = "리뷰 삭제", description = "리뷰를 삭제하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 삭제 성공"),
+            @ApiResponse(responseCode = "403", description = "리뷰에 대한 권한이 없음", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 리뷰", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @DeleteMapping("/{reviewId}")
+    public BaseResponse<?> deleteReview(
+            @Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        mealReviewService.deleteReview(customUserDetails, reviewId);
         return BaseResponse.success();
     }
 }

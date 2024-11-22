@@ -229,4 +229,35 @@ public class MealReviewService {
         review.setRating(request.getRating());
         reviewRepository.save(review);
     }
+
+    /**
+     * 리뷰 삭제
+     */
+    @Transactional
+    public void deleteReview(CustomUserDetails userDetails, Long reviewId) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
+
+        if (review.isNotWrittenBy(user)) {
+            throw new BaseException(REVIEW_PERMISSION_DENIED);
+        }
+
+        List<ReviewMenuLike> reviewMenuLikes = reviewMenuLikeRepository.findByReview(review);
+
+        // ReviewMenuLike 삭제 전, 메뉴의 likeCount와 unlikeCount 수정
+        for (ReviewMenuLike reviewMenuLike : reviewMenuLikes) {
+            Menu menu = reviewMenuLike.getMenu();
+            if (reviewMenuLike.getIsLike()) {
+                menu.decreaseLikeCount();
+            } else {
+                menu.decreaseUnlikeCount();
+            }
+        }
+
+        reviewMenuLikeRepository.deleteAll(reviewMenuLikes);
+        reviewRepository.delete(review);
+    }
 }
