@@ -1,6 +1,7 @@
 package ssu.eatssu.domain.slice.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Collections;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,4 +20,8 @@ public class SliceResponse<D> {
 
     @Schema(description = "데이터 리스트")
     private List<D> dataList;
+
+    public static <T> SliceResponse<T> empty() {
+        return new SliceResponse<>(0, false, Collections.emptyList());
+    }
 }

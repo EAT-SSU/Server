@@ -2,12 +2,16 @@ package ssu.eatssu.domain.review.presentation;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
+import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.service.MealReviewService;
+import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 @RestController
@@ -59,5 +65,27 @@ public class MealReviewController {
             @RequestParam Restaurant restaurant
     ) {
         return BaseResponse.success(mealReviewService.findRestaurantReviews(restaurant));
+    }
+
+    @Operation(summary = "리뷰 리스트 조회", description = """
+            리뷰 리스트를 조회하는 API 입니다.<br><br>
+            커서 기반 페이지네이션으로 리뷰 리스트를 조회합니다.<br><br>
+            페이징 기본 값 = {size=20, sort=date, direction=desc}<br><br>
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 리스트 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @GetMapping("")
+    public BaseResponse<SliceResponse<MealReviewResponse>> getReviews(
+            @Parameter(description = "mealId")
+            @RequestParam Long mealId,
+            @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY)
+            @RequestParam(value = "lastReviewId", required = false) Long lastReviewId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "id"));
+        SliceResponse<MealReviewResponse> myReviews = mealReviewService.findReviews(mealId, lastReviewId, pageable,
+                customUserDetails);
+        return BaseResponse.success(myReviews);
     }
 }
