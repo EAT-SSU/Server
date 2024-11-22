@@ -2,6 +2,7 @@ package ssu.eatssu.domain.review.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.user.entity.BaseTimeEntity;
@@ -25,16 +26,24 @@ public class Review extends BaseTimeEntity {
 
     private String content;
 
+    // TODO : 삭제되어야 함
     @Embedded
     private Ratings ratings;
+
+    private Integer rating;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
+    // TODO : 삭제되어야 함
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_id")
     private Menu menu;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "meal_id")
+    private Meal meal;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImages = new ArrayList<>();
