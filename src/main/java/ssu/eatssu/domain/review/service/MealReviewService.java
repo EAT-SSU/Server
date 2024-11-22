@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
@@ -35,6 +36,7 @@ import ssu.eatssu.domain.review.repository.ReviewImageRepository;
 import ssu.eatssu.domain.review.repository.ReviewMenuLikeRepository;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
+import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
@@ -259,5 +261,26 @@ public class MealReviewService {
 
         reviewMenuLikeRepository.deleteAll(reviewMenuLikes);
         reviewRepository.delete(review);
+    }
+
+    /**
+     * 내 리뷰 리스트 조회
+     */
+    public SliceResponse<MyMealReviewResponse> findMyReviews(CustomUserDetails userDetails, Long lastReviewId,
+            Pageable pageable) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        Slice<Review> sliceReviews = reviewRepository.findByUserOrderByIdDesc(user, lastReviewId,
+                pageable);
+
+        List<MyMealReviewResponse> myMealReviewResponses = sliceReviews.getContent().stream()
+                .map(MyMealReviewResponse::from).toList();
+
+        return SliceResponse.<MyMealReviewResponse>builder()
+                .numberOfElements(sliceReviews.getNumberOfElements())
+                .hasNext(sliceReviews.hasNext())
+                .dataList(myMealReviewResponses)
+                .build();
     }
 }
