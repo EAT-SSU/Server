@@ -14,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,7 @@ import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
+import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
 import ssu.eatssu.domain.review.service.MealReviewService;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.global.handler.response.BaseResponse;
@@ -87,5 +90,27 @@ public class MealReviewController {
         SliceResponse<MealReviewResponse> myReviews = mealReviewService.findReviews(mealId, lastReviewId, pageable,
                 customUserDetails);
         return BaseResponse.success(myReviews);
+    }
+
+    @Operation(summary = "리뷰 수정(글 수정)", description = """
+            리뷰 내용을 수정하는 API 입니다.<br><br>
+            글 수정만 가능하며 사진 수정은 지원하지 않습니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 수정 성공"),
+            @ApiResponse(responseCode = "403", description = "리뷰에 대한 권한이 없음", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 리뷰", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class)))
+    })
+    @PatchMapping("/{reviewId}")
+    public BaseResponse<?> updateReview(@Parameter(description = "reviewId")
+    @PathVariable("reviewId") Long reviewId,
+            @RequestBody UpdateMealReviewRequest request,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        mealReviewService.updateReview(customUserDetails, reviewId, request);
+        return BaseResponse.success();
     }
 }
