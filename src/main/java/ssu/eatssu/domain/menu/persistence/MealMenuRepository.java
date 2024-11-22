@@ -1,7 +1,13 @@
 package ssu.eatssu.domain.menu.persistence;
 
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.MealMenu;
+import ssu.eatssu.domain.menu.entity.Menu;
 
 public interface MealMenuRepository extends JpaRepository<MealMenu, Long> {
+    @Query("SELECT mm.menu FROM MealMenu mm WHERE mm.meal IN :meals")
+    List<Menu> findMenusByMeals(List<Meal> meals);
 }

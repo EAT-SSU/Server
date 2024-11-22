@@ -19,4 +19,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
 
     Long countByMenu_MealMenus_Meal(Meal meal);
 
+    List<Review> findByMealIn(List<Meal> meals);
 }
