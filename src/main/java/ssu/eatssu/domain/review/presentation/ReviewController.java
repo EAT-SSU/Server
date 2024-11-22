@@ -1,5 +1,6 @@
 package ssu.eatssu.domain.review.presentation;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -64,6 +65,7 @@ public class ReviewController {
         return BaseResponse.success(myReviews);
     }
 
+    @Hidden
     @Operation(summary = "리뷰 작성", description = """
             리뷰를 작성하는 API 입니다.<br><br>
             reviewCreate는 application/json, multipartFileList는 multipart/form-data로 요청해주세요.<br><br>
