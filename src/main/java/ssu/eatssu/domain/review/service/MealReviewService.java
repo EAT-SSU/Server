@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
@@ -19,6 +21,7 @@ import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
+import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.MenuLikeRequest;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
@@ -28,6 +31,7 @@ import ssu.eatssu.domain.review.entity.ReviewMenuLike;
 import ssu.eatssu.domain.review.repository.ReviewImageRepository;
 import ssu.eatssu.domain.review.repository.ReviewMenuLikeRepository;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
+import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
@@ -117,6 +121,40 @@ public class MealReviewService {
                 .mainRating(averageRating)
                 .likeCount(likeCount)
                 .unlikeCount(unlikeCount)
+                .build();
+    }
+
+    /**
+     * 특정 식단 리뷰 리스트 조회
+     */
+    public SliceResponse<MealReviewResponse> findReviews(Long mealId, Long lastReviewId, Pageable pageable,
+            CustomUserDetails userDetails) {
+        if (!mealRepository.existsById(mealId)) {
+            throw new BaseException(NOT_FOUND_MEAL);
+        }
+
+        List<Long> menuIds = mealMenuRepository.findMenuIdsByMealId(mealId);
+
+        if (menuIds.isEmpty()) {
+            return SliceResponse.empty();
+        }
+
+        List<Long> mealIds = mealMenuRepository.findMealIdsByMenuIds(menuIds);
+
+        if (menuIds.isEmpty()) {
+            return SliceResponse.empty();
+        }
+
+        Page<Review> pageReviews = reviewRepository.findReviewsByMealIds(mealIds, lastReviewId, pageable);
+
+        List<MealReviewResponse> mealReviewResponses =
+                pageReviews.getContent().stream().map(review -> MealReviewResponse.from(review,
+                        userDetails.getId())).collect(Collectors.toList());
+
+        return SliceResponse.<MealReviewResponse>builder()
+                .numberOfElements(pageReviews.getNumberOfElements())
+                .hasNext(pageReviews.hasNext())
+                .dataList(mealReviewResponses)
                 .build();
     }
 }
