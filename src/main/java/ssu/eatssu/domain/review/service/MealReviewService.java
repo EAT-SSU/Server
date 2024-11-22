@@ -4,7 +4,10 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_ME
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +17,11 @@ import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.persistence.MealMenuRepository;
 import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.MenuLikeRequest;
+import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
+import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewImage;
 import ssu.eatssu.domain.review.entity.ReviewMenuLike;
@@ -34,6 +40,7 @@ public class MealReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
+    private final MealMenuRepository mealMenuRepository;
     private final ReviewMenuLikeRepository reviewMenuLikeRepository;
 
     /**
@@ -72,5 +79,44 @@ public class MealReviewService {
                 menu.increaseUnlikeCount();
             }
         }
+    }
+
+    /**
+     * 특정 식당 리뷰 조회
+     */
+    public RestaurantReviewResponse findRestaurantReviews(Restaurant restaurant) {
+        List<Meal> meals = mealRepository.findByRestaurant(restaurant);
+
+        List<Review> reviews = reviewRepository.findByMealIn(meals);
+
+        Integer reviewCount = reviews.size();
+
+        Double averageRating = reviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0.0);
+
+        List<Menu> menus = mealMenuRepository.findMenusByMeals(meals);
+
+        Integer likeCount = menus.stream()
+                .mapToInt(Menu::getLikeCount)
+                .sum();
+
+        Integer unlikeCount = menus.stream()
+                .mapToInt(Menu::getUnlikeCount)
+                .sum();
+
+        Map<Integer, Long> ratingDistribution = reviews.stream()
+                .collect(Collectors.groupingBy(Review::getRating, LinkedHashMap::new, Collectors.counting()));
+
+        ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(ratingDistribution);
+
+        return RestaurantReviewResponse.builder()
+                .totalReviewCount(reviewCount)
+                .reviewRatingCount(reviewRatingCount)
+                .mainRating(averageRating)
+                .likeCount(likeCount)
+                .unlikeCount(unlikeCount)
+                .build();
     }
 }
