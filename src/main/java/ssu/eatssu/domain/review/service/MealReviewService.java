@@ -6,7 +6,6 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_RE
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.REVIEW_PERMISSION_DENIED;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,8 +29,6 @@ import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
 import ssu.eatssu.domain.review.entity.Review;
-import ssu.eatssu.domain.review.entity.ReviewImage;
-import ssu.eatssu.domain.review.entity.ReviewMenuLike;
 import ssu.eatssu.domain.review.repository.ReviewImageRepository;
 import ssu.eatssu.domain.review.repository.ReviewMenuLikeRepository;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
@@ -46,11 +43,9 @@ import ssu.eatssu.global.handler.response.BaseException;
 public class MealReviewService {
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
-    private final ReviewImageRepository reviewImageRepository;
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
     private final MealMenuRepository mealMenuRepository;
-    private final ReviewMenuLikeRepository reviewMenuLikeRepository;
 
     /**
      * 리뷰 생성
@@ -81,17 +76,13 @@ public class MealReviewService {
      */
     public RestaurantReviewResponse findRestaurantReviews(Restaurant restaurant) {
         List<Meal> meals = mealRepository.findByRestaurant(restaurant);
-
         List<Review> reviews = reviewRepository.findByMealIn(meals);
-
-        Integer reviewCount = reviews.size();
+        List<Menu> menus = mealMenuRepository.findMenusByMeals(meals);
 
         Double averageRating = reviews.stream()
                 .mapToInt(Review::getRating)
                 .average()
                 .orElse(0.0);
-
-        List<Menu> menus = mealMenuRepository.findMenusByMeals(meals);
 
         Integer likeCount = menus.stream()
                 .mapToInt(Menu::getLikeCount)
@@ -101,13 +92,10 @@ public class MealReviewService {
                 .mapToInt(Menu::getUnlikeCount)
                 .sum();
 
-        Map<Integer, Long> ratingDistribution = reviews.stream()
-                .collect(Collectors.groupingBy(Review::getRating, LinkedHashMap::new, Collectors.counting()));
-
-        ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(ratingDistribution);
+        ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 
         return RestaurantReviewResponse.builder()
-                .totalReviewCount(reviewCount)
+                .totalReviewCount(reviews.size())
                 .reviewRatingCount(reviewRatingCount)
                 .mainRating(averageRating)
                 .likeCount(likeCount)
