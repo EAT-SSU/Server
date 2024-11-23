@@ -164,57 +164,12 @@ public class MealReviewService {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
 
-        List<ReviewMenuLike> reviewMenuLikes = reviewMenuLikeRepository.findByReview(review);
+        Map<Menu, Boolean> menuLikes = request.getMenuLikes().stream()
+                .collect(Collectors.toMap(menuLike -> menuRepository.findById(menuLike.getMenuId())
+                                            .orElseThrow(() -> new BaseException(NOT_FOUND_MENU)),
+                                        MenuLikeRequest::getIsLike));
 
-        Map<Long, Boolean> menuLikes = request.getMenuLikes().stream()
-                .collect(Collectors.toMap(MenuLikeRequest::getMenuId, MenuLikeRequest::getIsLike));
-
-        // 기존 데이터 수정 또는 삭제
-        for (ReviewMenuLike reviewMenuLike : reviewMenuLikes) {
-            Boolean updatedIsLike = menuLikes.get(reviewMenuLike.getMenu().getId());
-            if (updatedIsLike == null) {
-                // 요청 데이터에 없으면 삭제
-                reviewMenuLikeRepository.delete(reviewMenuLike);
-                if (reviewMenuLike.getIsLike()) {
-                    reviewMenuLike.getMenu().decreaseLikeCount();
-                } else {
-                    reviewMenuLike.getMenu().increaseUnlikeCount();
-                }
-            } else if (!reviewMenuLike.getIsLike().equals(updatedIsLike)) {
-                // 요청 데이터와 다르면 수정
-                reviewMenuLike.updateLike(updatedIsLike);
-                if (updatedIsLike) {
-                    reviewMenuLike.getMenu().increaseLikeCount();
-                    reviewMenuLike.getMenu().decreaseUnlikeCount();
-                } else {
-                    reviewMenuLike.getMenu().increaseUnlikeCount();
-                    reviewMenuLike.getMenu().decreaseLikeCount();
-                }
-            }
-            menuLikes.remove(reviewMenuLike.getMenu().getId());
-        }
-
-        // 새롭게 리뷰 요청된 메뉴 데이터 처리
-        for (Map.Entry<Long, Boolean> entry : menuLikes.entrySet()) {
-            Menu menu = menuRepository.findById(entry.getKey())
-                    .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
-
-            ReviewMenuLike reviewMenuLike = ReviewMenuLike.builder()
-                    .review(review)
-                    .menu(menu)
-                    .isLike(entry.getValue()).build();
-            reviewMenuLikeRepository.save(reviewMenuLike);
-
-            if (entry.getValue()) {
-                menu.increaseLikeCount();
-            } else {
-                menu.increaseUnlikeCount();
-            }
-        }
-
-        // 리뷰 본문 및 평점 수정
-        review.setContent(request.getContent());
-        review.setRating(request.getRating());
+        review.update(request.getContent(), request.getRating(), menuLikes);
         reviewRepository.save(review);
     }
 

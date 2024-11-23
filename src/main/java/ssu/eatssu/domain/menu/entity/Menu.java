@@ -100,4 +100,22 @@ public class Menu {
     public void decreaseUnlikeCount() {
         unlikeCount--;
     }
+
+    public void changeLikeStatus(Boolean isLike) {
+        if (isLike) {
+            decreaseUnlikeCount();
+            increaseLikeCount();
+        } else {
+            decreaseLikeCount();
+            increaseUnlikeCount();
+        }
+    }
+
+    public void adjustLikeCount(int count, Boolean isLike) {
+        if (isLike) {
+            this.likeCount += count;
+        } else {
+            this.unlikeCount += count;
+        }
+    }
 }
