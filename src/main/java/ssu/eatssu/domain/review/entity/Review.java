@@ -1,6 +1,8 @@
 package ssu.eatssu.domain.review.entity;
 
 import jakarta.persistence.*;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.*;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
@@ -90,6 +92,39 @@ public class Review extends BaseTimeEntity {
             reviewMenuLike.getMenu().decreaseLikeCount();
         } else {
             reviewMenuLike.getMenu().decreaseUnlikeCount();
+        }
+    }
+
+    public void update(String content, int rating, Map<Menu, Boolean> updatedMenuLikes) {
+        this.content = content;
+        this.rating = rating;
+
+        // 현재 menu like 상태를 menu를 기준으로 매핑
+        Map<Menu, ReviewMenuLike> currentMenuLikes = this.reviewMenuLikes.stream()
+                .collect(Collectors.toMap(ReviewMenuLike::getMenu, menuLike -> menuLike));
+
+        for (Map.Entry<Menu, Boolean> entry : updatedMenuLikes.entrySet()) {
+            Menu menu = entry.getKey();
+            Boolean isLike = entry.getValue();
+
+            ReviewMenuLike currentMenuLike = currentMenuLikes.get(menu);
+
+            if (currentMenuLike == null) {
+                // 새롭게 추가된 menu like
+                this.addReviewMenuLike(menu, isLike);
+            } else if (!currentMenuLike.getIsLike().equals(isLike)) {
+                // 기존 menu like 수정
+                currentMenuLike.updateLike(isLike);
+                menu.changeLikeStatus(isLike);
+            }
+            // 수정 후 map에서 제거(나머지는 삭제 대상)
+            currentMenuLikes.remove(menu);
+        }
+
+        // 리뷰 요청 데이터에 없는 menu 항목이므로 삭제
+        for (ReviewMenuLike remainingMenuLike : currentMenuLikes.values()) {
+            this.reviewMenuLikes.remove(remainingMenuLike);
+            remainingMenuLike.getMenu().adjustLikeCount(-1, remainingMenuLike.getIsLike());
         }
     }
 }
