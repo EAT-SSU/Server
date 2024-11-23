@@ -113,14 +113,12 @@ public class MealReviewService {
         }
 
         List<Long> menuIds = mealMenuRepository.findMenuIdsByMealId(mealId);
-
         if (menuIds.isEmpty()) {
             return SliceResponse.empty();
         }
 
         List<Long> mealIds = mealMenuRepository.findMealIdsByMenuIds(menuIds);
-
-        if (menuIds.isEmpty()) {
+        if (mealIds.isEmpty()) {
             return SliceResponse.empty();
         }
 
