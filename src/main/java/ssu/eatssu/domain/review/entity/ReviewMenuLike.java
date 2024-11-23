@@ -40,4 +40,12 @@ public class ReviewMenuLike {
     public void updateLike(Boolean like) {
         isLike = like;
     }
+
+    public static ReviewMenuLike create(Review review, Menu menu, Boolean isLike) {
+        return ReviewMenuLike.builder()
+                .review(review)
+                .menu(menu)
+                .isLike(isLike)
+                .build();
+    }
 }
