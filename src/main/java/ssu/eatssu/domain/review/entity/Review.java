@@ -54,7 +54,7 @@ public class Review extends BaseTimeEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReviewMenuLike> reviewMenuLikes = new ArrayList<>();
+    private List<ReviewMenuLike> menuLikes = new ArrayList<>();
 
     public void update(String content, Integer mainRate, Integer amountRate, Integer tasteRate) {
         this.content = content;
@@ -76,7 +76,7 @@ public class Review extends BaseTimeEntity {
 
     public void addReviewMenuLike(Menu menu, boolean isLike) {
         ReviewMenuLike reviewMenuLike = ReviewMenuLike.create(this, menu, isLike);
-        this.reviewMenuLikes.add(reviewMenuLike);
+        this.menuLikes.add(reviewMenuLike);
 
         if (isLike) {
             menu.increaseLikeCount();
@@ -86,7 +86,7 @@ public class Review extends BaseTimeEntity {
     }
 
     public void removeReviewMenuLike(ReviewMenuLike reviewMenuLike) {
-        this.reviewMenuLikes.remove(reviewMenuLike);
+        this.menuLikes.remove(reviewMenuLike);
 
         if (reviewMenuLike.getIsLike()) {
             reviewMenuLike.getMenu().decreaseLikeCount();
@@ -100,7 +100,7 @@ public class Review extends BaseTimeEntity {
         this.rating = rating;
 
         // 현재 menu like 상태를 menu를 기준으로 매핑
-        Map<Menu, ReviewMenuLike> currentMenuLikes = this.reviewMenuLikes.stream()
+        Map<Menu, ReviewMenuLike> currentMenuLikes = this.menuLikes.stream()
                 .collect(Collectors.toMap(ReviewMenuLike::getMenu, menuLike -> menuLike));
 
         for (Map.Entry<Menu, Boolean> entry : updatedMenuLikes.entrySet()) {
@@ -123,8 +123,15 @@ public class Review extends BaseTimeEntity {
 
         // 리뷰 요청 데이터에 없는 menu 항목이므로 삭제
         for (ReviewMenuLike remainingMenuLike : currentMenuLikes.values()) {
-            this.reviewMenuLikes.remove(remainingMenuLike);
+            this.menuLikes.remove(remainingMenuLike);
             remainingMenuLike.getMenu().adjustLikeCount(-1, remainingMenuLike.getIsLike());
         }
+    }
+
+    public void resetMenuLikes() {
+        for (ReviewMenuLike reviewMenuLike : this.menuLikes) {
+            reviewMenuLike.resetMenuLikeStatus();
+        }
+        this.menuLikes.clear();
     }
 }

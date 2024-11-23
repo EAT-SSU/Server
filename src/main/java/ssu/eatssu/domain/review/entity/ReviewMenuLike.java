@@ -48,4 +48,8 @@ public class ReviewMenuLike {
                 .isLike(isLike)
                 .build();
     }
+
+    public void resetMenuLikeStatus() {
+        menu.adjustLikeCount(-1, this.isLike);
+    }
 }

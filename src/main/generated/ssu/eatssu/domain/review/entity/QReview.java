@@ -35,6 +35,8 @@ public class QReview extends EntityPathBase<Review> {
 
     public final ssu.eatssu.domain.menu.entity.QMenu menu;
 
+    public final ListPath<ReviewMenuLike, QReviewMenuLike> menuLikes = this.<ReviewMenuLike, QReviewMenuLike>createList("menuLikes", ReviewMenuLike.class, QReviewMenuLike.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedDate = _super.modifiedDate;
 
@@ -43,8 +45,6 @@ public class QReview extends EntityPathBase<Review> {
     public final ssu.eatssu.domain.rating.entity.QRatings ratings;
 
     public final ListPath<ReviewImage, QReviewImage> reviewImages = this.<ReviewImage, QReviewImage>createList("reviewImages", ReviewImage.class, QReviewImage.class, PathInits.DIRECT2);
-
-    public final ListPath<ReviewMenuLike, QReviewMenuLike> reviewMenuLikes = this.<ReviewMenuLike, QReviewMenuLike>createList("reviewMenuLikes", ReviewMenuLike.class, QReviewMenuLike.class, PathInits.DIRECT2);
 
     public final ssu.eatssu.domain.user.entity.QUser user;
 
