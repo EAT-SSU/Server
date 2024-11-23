@@ -46,8 +46,13 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "meal_id")
     private Meal meal;
 
+    @Builder.Default
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImages = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewMenuLike> reviewMenuLikes = new ArrayList<>();
 
     public void update(String content, Integer mainRate, Integer amountRate, Integer tasteRate) {
         this.content = content;
@@ -62,4 +67,29 @@ public class Review extends BaseTimeEntity {
         this.user = null;
     }
 
+    public void addReviewImage(String imageUrl) {
+        ReviewImage reviewImage = new ReviewImage(this, imageUrl);
+        this.reviewImages.add(reviewImage);
+    }
+
+    public void addReviewMenuLike(Menu menu, boolean isLike) {
+        ReviewMenuLike reviewMenuLike = ReviewMenuLike.create(this, menu, isLike);
+        this.reviewMenuLikes.add(reviewMenuLike);
+
+        if (isLike) {
+            menu.increaseLikeCount();
+        } else {
+            menu.increaseUnlikeCount();
+        }
+    }
+
+    public void removeReviewMenuLike(ReviewMenuLike reviewMenuLike) {
+        this.reviewMenuLikes.remove(reviewMenuLike);
+
+        if (reviewMenuLike.getIsLike()) {
+            reviewMenuLike.getMenu().decreaseLikeCount();
+        } else {
+            reviewMenuLike.getMenu().decreaseUnlikeCount();
+        }
+    }
 }

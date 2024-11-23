@@ -64,30 +64,16 @@ public class MealReviewService {
                 .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
 
         Review review = request.toReviewEntity(user, meal);
-        reviewRepository.save(review);
 
-        List<ReviewImage> reviewImages = request.createReviewImages(review);
-        reviewImageRepository.saveAll(reviewImages);
+        request.getImageUrls().forEach(review::addReviewImage);
 
-        for (MenuLikeRequest menuLikes : request.getMenuLikes()) {
-            Menu menu = menuRepository.findById(menuLikes.getMenuId())
+        for (MenuLikeRequest menuLike : request.getMenuLikes()) {
+            Menu menu = menuRepository.findById(menuLike.getMenuId())
                     .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
-
-            // 리뷰-메뉴 좋아요 정보 저장
-            ReviewMenuLike reviewMenuLike = ReviewMenuLike.builder()
-                    .review(review)
-                    .menu(menu)
-                    .isLike(menuLikes.getIsLike()).build();
-            reviewMenuLikeRepository.save(reviewMenuLike);
-
-            // 메뉴에 좋아요/싫어요 수 반영
-            if (menuLikes.getIsLike()) {
-                menu.increaseLikeCount();
-            }
-            else {
-                menu.increaseUnlikeCount();
-            }
+            review.addReviewMenuLike(menu, menuLike.getIsLike());
         }
+
+        reviewRepository.save(review);
     }
 
     /**

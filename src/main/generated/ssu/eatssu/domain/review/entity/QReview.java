@@ -44,6 +44,8 @@ public class QReview extends EntityPathBase<Review> {
 
     public final ListPath<ReviewImage, QReviewImage> reviewImages = this.<ReviewImage, QReviewImage>createList("reviewImages", ReviewImage.class, QReviewImage.class, PathInits.DIRECT2);
 
+    public final ListPath<ReviewMenuLike, QReviewMenuLike> reviewMenuLikes = this.<ReviewMenuLike, QReviewMenuLike>createList("reviewMenuLikes", ReviewMenuLike.class, QReviewMenuLike.class, PathInits.DIRECT2);
+
     public final ssu.eatssu.domain.user.entity.QUser user;
 
     public QReview(String variable) {
