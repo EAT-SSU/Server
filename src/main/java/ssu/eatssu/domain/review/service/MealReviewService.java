@@ -188,19 +188,7 @@ public class MealReviewService {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
 
-        List<ReviewMenuLike> reviewMenuLikes = reviewMenuLikeRepository.findByReview(review);
-
-        // ReviewMenuLike 삭제 전, 메뉴의 likeCount와 unlikeCount 수정
-        for (ReviewMenuLike reviewMenuLike : reviewMenuLikes) {
-            Menu menu = reviewMenuLike.getMenu();
-            if (reviewMenuLike.getIsLike()) {
-                menu.decreaseLikeCount();
-            } else {
-                menu.decreaseUnlikeCount();
-            }
-        }
-
-        reviewMenuLikeRepository.deleteAll(reviewMenuLikes);
+        review.resetMenuLikes();
         reviewRepository.delete(review);
     }
 
