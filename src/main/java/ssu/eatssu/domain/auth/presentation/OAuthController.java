@@ -30,7 +30,7 @@ public class OAuthController {
 
     private final OAuthService oauthService;
 
-    @Operation(summary = "카카오 회원가입, 로그인", description = """
+    @Operation(summary = "카카오 회원가입, 로그인 [인증 토큰 필요 X]", description = """
         카카오 회원가입, 로그인 API 입니다.<br><br>
         가입된 회원일 경우 카카오 로그인, 미가입 회원일 경우 회원가입 후 자동 로그인됩니다.
         """)
@@ -43,7 +43,7 @@ public class OAuthController {
         return BaseResponse.success(tokens);
     }
 
-    @Operation(summary = "애플 회원가입, 로그인", description = """
+    @Operation(summary = "애플 회원가입, 로그인 [인증 토큰 필요 X]", description = """
         애플 로그인, 회원가입 API 입니다.<br><br>
         가입된 회원일 경우 카카오 로그인, 미가입 회원일 경우 회원가입 후 자동 로그인됩니다.
         """)
