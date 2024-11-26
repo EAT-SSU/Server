@@ -24,7 +24,7 @@ public class MenuController {
 
     private final MenuService menuService;
 
-    @Operation(summary = "고정 메뉴 리스트 조회",
+    @Operation(summary = "고정 메뉴 리스트 조회 [인증 토큰 필요 X]",
         description =
             """
 	고정 메뉴 리스트를 조회하는 API 입니다.
