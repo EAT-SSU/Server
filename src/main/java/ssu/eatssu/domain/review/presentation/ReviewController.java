@@ -37,7 +37,7 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final SliceService sliceService;
 
-    @Operation(summary = "리뷰 리스트 조회", description = """
+    @Operation(summary = "리뷰 리스트 조회 [인증 토큰 필수 X]", description = """
             리뷰 리스트를 조회하는 API 입니다.<br><br>
             menuType=FIX 의 경우 menuId 파라미터를 넣어주세요.<br><br>
             menuType=CHANGE 의 경우 mealId 파라미터를 넣어주세요.<br><br>
@@ -154,7 +154,7 @@ public class ReviewController {
         return BaseResponse.success();
     }
 
-    @Operation(summary = "식단(변동 메뉴) 리뷰 정보 조회(메뉴명, 평점 등등)", description = """
+    @Operation(summary = "식단(변동 메뉴) 리뷰 정보 조회(메뉴명, 평점 등등) [인증 토큰 필요 X]", description = """
             식단 리뷰 정보를 조회하는 API 입니다.<br><br>
             메뉴명 리스트, 리뷰 수, 메인 평점, 양 평점, 맛 평점, 각 평점의 개수를 조회합니다.
             """)
@@ -172,7 +172,7 @@ public class ReviewController {
         return BaseResponse.success(reviewService.findMealReviews(mealId));
     }
 
-    @Operation(summary = "고정 메뉴 리뷰 정보 조회(메뉴명, 평점 등등)", description = """
+    @Operation(summary = "고정 메뉴 리뷰 정보 조회(메뉴명, 평점 등등) [인증 토큰 필요 X]", description = """
             고정 메뉴 리뷰 정보를 조회하는 API 입니다.<br><br>
             메뉴명, 리뷰 수, 메인 평점, 양 평점, 맛 평점, 각 평점의 개수를 조회합니다.
             """)

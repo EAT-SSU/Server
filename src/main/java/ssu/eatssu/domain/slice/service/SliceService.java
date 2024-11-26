@@ -68,7 +68,8 @@ public class SliceService {
 	pageable);
         }
 
-        return convertToReviewDetail(sliceReviews, userDetails.getId());
+        Long userId = (userDetails != null) ? userDetails.getId() : null;
+        return convertToReviewDetail(sliceReviews, userId);
     }
 
     private SliceResponse<ReviewDetail> convertToReviewDetail(Slice<Review> sliceReviews,
