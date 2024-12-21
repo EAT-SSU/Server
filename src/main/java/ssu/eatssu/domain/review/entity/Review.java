@@ -124,7 +124,7 @@ public class Review extends BaseTimeEntity {
         // 리뷰 요청 데이터에 없는 menu 항목이므로 삭제
         for (ReviewMenuLike remainingMenuLike : currentMenuLikes.values()) {
             this.menuLikes.remove(remainingMenuLike);
-            remainingMenuLike.getMenu().adjustLikeCount(-1, remainingMenuLike.getIsLike());
+            remainingMenuLike.getMenu().cancelLike(remainingMenuLike.getIsLike());
         }
     }
 

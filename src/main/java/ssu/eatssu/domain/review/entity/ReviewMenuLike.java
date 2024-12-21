@@ -50,6 +50,6 @@ public class ReviewMenuLike {
     }
 
     public void resetMenuLikeStatus() {
-        menu.adjustLikeCount(-1, this.isLike);
+        menu.cancelLike(this.isLike);
     }
 }

@@ -111,11 +111,11 @@ public class Menu {
         }
     }
 
-    public void adjustLikeCount(int count, Boolean isLike) {
+    public void cancelLike(Boolean isLike) {
         if (isLike) {
-            this.likeCount += count;
+            decreaseLikeCount();
         } else {
-            this.unlikeCount += count;
+            decreaseUnlikeCount();
         }
     }
 }
