@@ -124,9 +124,10 @@ public class MealReviewService {
 
         Page<Review> pageReviews = reviewRepository.findReviewsByMealIds(mealIds, lastReviewId, pageable);
 
+        Long userId = (userDetails != null) ? userDetails.getId() : null;
         List<MealReviewResponse> mealReviewResponses =
                 pageReviews.getContent().stream().map(review -> MealReviewResponse.from(review,
-                        userDetails.getId())).collect(Collectors.toList());
+                        userId)).collect(Collectors.toList());
 
         return SliceResponse.<MealReviewResponse>builder()
                 .numberOfElements(pageReviews.getNumberOfElements())
