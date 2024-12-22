@@ -3,6 +3,7 @@ package ssu.eatssu.domain.user.service;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
 import jakarta.transaction.Transactional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,7 +30,8 @@ public class UserService {
 
     public User join(String email, OAuthProvider provider, String providerId) {
         String credentials = createCredentials(provider, providerId);
-        User user = User.create(email, provider, providerId, credentials);
+        String nickname = createNickname();
+        User user = User.create(email, nickname, provider, providerId, credentials);
         return userRepository.save(user);
     }
 
@@ -63,6 +65,12 @@ public class UserService {
 
     public Boolean validateDuplicatedNickname(String nickname) {
         return !userRepository.existsByNickname(nickname);
+    }
+
+    public String createNickname() {
+        String uuid = UUID.randomUUID().toString();
+        String shortUUID = uuid.substring(0, 4);
+        return "user-" + shortUUID;
     }
 
     private String createCredentials(OAuthProvider provider, String providerId) {

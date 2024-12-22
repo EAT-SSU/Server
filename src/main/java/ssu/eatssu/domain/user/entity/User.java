@@ -55,9 +55,10 @@ public class User extends BaseTimeEntity {
     /**
      * Oauth 회원가입 용 생성자
      */
-    private User(@NotNull String email, @NotNull Role role, @NotNull OAuthProvider provider,
+    private User(@NotNull String email, String nickname, @NotNull Role role, @NotNull OAuthProvider provider,
                  @NotNull String providerId, @NotNull UserStatus status, @NotNull String credentials) {
         this.email = email;
+        this.nickname = nickname;
         this.role = role;
         this.provider = provider;
         this.providerId = providerId;
@@ -69,9 +70,10 @@ public class User extends BaseTimeEntity {
      * <--Static Factory Method-->
      * Oauth 회원가입
      */
-    public static User create(@NotNull String email, @NotNull OAuthProvider provider, String providerId,
+    public static User create(@NotNull String email, @NotNull String nickname, @NotNull OAuthProvider provider,
+            String providerId,
                                  String credentials) {
-        return new User(email, Role.USER, provider, providerId, UserStatus.ACTIVE, credentials);
+        return new User(email, nickname, Role.USER, provider, providerId, UserStatus.ACTIVE, credentials);
     }
 
     /**
@@ -80,7 +82,7 @@ public class User extends BaseTimeEntity {
      * Role 은 다른 방법으로 세팅할 예정
      */
     public static User adminJoin(@NotNull String loginId, @NotNull String credentials) {
-        return new User(loginId, Role.USER, OAuthProvider.EATSSU, loginId, UserStatus.INACTIVE, credentials);
+        return new User(loginId, null, Role.USER, OAuthProvider.EATSSU, loginId, UserStatus.INACTIVE, credentials);
     }
 
     public void updateNickname(@NotNull String nickname) {
