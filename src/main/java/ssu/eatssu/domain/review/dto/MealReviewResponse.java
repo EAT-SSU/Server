@@ -4,10 +4,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import ssu.eatssu.domain.review.entity.Review;
+import ssu.eatssu.domain.review.entity.ReviewMenuLike;
 
 @AllArgsConstructor
 @Builder
@@ -38,16 +40,25 @@ public class MealReviewResponse {
     @Schema(description = "리뷰 이미지 url 리스트", example = "[\"imgurl1\", \"imgurl2\"]")
     private List<String> imageUrls;
 
+    @Schema(description = "좋아요한 메뉴명 리스트", example = "[\"메뉴1\", \"메뉴2\"]")
+    private List<String> likedMenuNames;
+
     public static MealReviewResponse from(Review review, Long userId) {
         List<String> imageUrls = new ArrayList<>();
         review.getReviewImages().forEach(i -> imageUrls.add(i.getImageUrl()));
+
+        List<String> likedMenuNames = review.getMenuLikes().stream()
+                .filter(ReviewMenuLike::getIsLike)
+                .map(like -> like.getMenu().getName())
+                .collect(Collectors.toList());
 
         MealReviewResponseBuilder builder = MealReviewResponse.builder()
                 .reviewId(review.getId())
                 .rating(review.getRating())
                 .writtenAt(review.getCreatedDate().toLocalDate())
                 .content(review.getContent())
-                .imageUrls(imageUrls);
+                .imageUrls(imageUrls)
+                .likedMenuNames(likedMenuNames);
 
         if (review.getUser() == null) {
             return builder.writerId(null)
