@@ -61,6 +61,7 @@ public class Review extends BaseTimeEntity {
         this.ratings = Ratings.of(mainRate, amountRate, tasteRate);
     }
 
+    // TODO : this.user가 null이면?
     public boolean isNotWrittenBy(User user) {
         return !this.user.equals(user);
     }
@@ -105,26 +106,18 @@ public class Review extends BaseTimeEntity {
 
         for (Map.Entry<Menu, Boolean> entry : updatedMenuLikes.entrySet()) {
             Menu menu = entry.getKey();
-            Boolean isLike = entry.getValue();
-
-            ReviewMenuLike currentMenuLike = currentMenuLikes.get(menu);
-
-            if (currentMenuLike == null) {
-                // 새롭게 추가된 menu like
-                this.addReviewMenuLike(menu, isLike);
-            } else if (!currentMenuLike.getIsLike().equals(isLike)) {
-                // 기존 menu like 수정
-                currentMenuLike.updateLike(isLike);
-                menu.changeLikeStatus(isLike);
+            Boolean newState = entry.getValue();
+            ReviewMenuLike existingReviewMenuLike = currentMenuLikes.get(menu);
+            if (existingReviewMenuLike == null) {
+                // 기존에 없는 메뉴이면 새롭게 추가
+                this.addReviewMenuLike(menu, newState);
+            } else {
+                // 기존에 있는 경우 : 상태가 다르면 업데이트
+                if (!existingReviewMenuLike.getIsLike().equals(newState)) {
+                    existingReviewMenuLike.updateLike(newState);
+                    menu.changeLikeStatus(newState);
+                }
             }
-            // 수정 후 map에서 제거(나머지는 삭제 대상)
-            currentMenuLikes.remove(menu);
-        }
-
-        // 리뷰 요청 데이터에 없는 menu 항목이므로 삭제
-        for (ReviewMenuLike remainingMenuLike : currentMenuLikes.values()) {
-            this.menuLikes.remove(remainingMenuLike);
-            remainingMenuLike.getMenu().cancelLike(remainingMenuLike.getIsLike());
         }
     }
 
