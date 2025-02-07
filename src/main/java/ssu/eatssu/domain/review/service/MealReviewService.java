@@ -97,7 +97,7 @@ public class MealReviewService {
         return RestaurantReviewResponse.builder()
                 .totalReviewCount(reviews.size())
                 .reviewRatingCount(reviewRatingCount)
-                .mainRating(averageRating)
+                .mainRating(Math.round(averageRating * 10) / 10.0)
                 .likeCount(likeCount)
                 .unlikeCount(unlikeCount)
                 .build();
