@@ -8,6 +8,7 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.REVIEW_PERMI
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,8 +30,8 @@ import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
 import ssu.eatssu.domain.review.entity.Review;
-import ssu.eatssu.domain.review.repository.ReviewImageRepository;
-import ssu.eatssu.domain.review.repository.ReviewMenuLikeRepository;
+import ssu.eatssu.domain.review.entity.ReviewLike;
+import ssu.eatssu.domain.review.repository.ReviewLikeRepository;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
@@ -46,6 +47,7 @@ public class MealReviewService {
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
     private final MealMenuRepository mealMenuRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     /**
      * 리뷰 생성
@@ -198,5 +200,29 @@ public class MealReviewService {
                 .hasNext(sliceReviews.hasNext())
                 .dataList(myMealReviewResponses)
                 .build();
+    }
+
+    /**
+     * 리뷰 좋아요 누르기/취소하기
+     */
+    @Transactional
+    public void toggleReviewLike(CustomUserDetails userDetails, Long reviewId) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
+
+        Optional<ReviewLike> optionalReviewLike = reviewLikeRepository.findByReviewAndUser(review, user);
+        if (optionalReviewLike.isPresent()) {
+            // 이미 좋아요 한 경우 -> 좋아요 취소 처리
+            ReviewLike reviewLike = optionalReviewLike.get();
+            review.getReviewLikes().remove(reviewLike);
+            reviewLikeRepository.delete(reviewLike);
+        } else {
+            // 좋아요 하지 않은 경우 -> 좋아요 추가 처리
+            ReviewLike reviewLike = ReviewLike.create(user, review);
+            review.getReviewLikes().add(reviewLike);
+            reviewLikeRepository.save(reviewLike);
+        }
     }
 }

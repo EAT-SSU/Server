@@ -56,6 +56,9 @@ public class Review extends BaseTimeEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewMenuLike> menuLikes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewLike> reviewLikes = new ArrayList<>();
+
     public void update(String content, Integer mainRate, Integer amountRate, Integer tasteRate) {
         this.content = content;
         this.ratings = Ratings.of(mainRate, amountRate, tasteRate);
