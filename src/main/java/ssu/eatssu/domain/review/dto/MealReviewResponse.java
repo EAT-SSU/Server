@@ -43,6 +43,12 @@ public class MealReviewResponse {
     @Schema(description = "좋아요한 메뉴명 리스트", example = "[\"메뉴1\", \"메뉴2\"]")
     private List<String> likedMenuNames;
 
+    @Schema(description = "본인이 이 리뷰에 좋아요를 눌렀는지 여부(true/false)", example = "true")
+    private Boolean isLikedByUser;
+
+    @Schema(description = "리뷰 좋아요 개수", example = "10")
+    private Integer likeCount;
+
     public static MealReviewResponse from(Review review, Long userId) {
         List<String> imageUrls = new ArrayList<>();
         review.getReviewImages().forEach(i -> imageUrls.add(i.getImageUrl()));
@@ -52,13 +58,18 @@ public class MealReviewResponse {
                 .map(like -> like.getMenu().getName())
                 .collect(Collectors.toList());
 
+        boolean isLikedByUser = (userId != null) && review.getReviewLikes().stream()
+                .anyMatch(like -> like.getUser().getId().equals(userId));
+
         MealReviewResponseBuilder builder = MealReviewResponse.builder()
                 .reviewId(review.getId())
                 .rating(review.getRating())
                 .writtenAt(review.getCreatedDate().toLocalDate())
                 .content(review.getContent())
                 .imageUrls(imageUrls)
-                .likedMenuNames(likedMenuNames);
+                .likedMenuNames(likedMenuNames)
+                .isLikedByUser(isLikedByUser)
+                .likeCount(review.getReviewLikes().size());
 
         if (review.getUser() == null) {
             return builder.writerId(null)
