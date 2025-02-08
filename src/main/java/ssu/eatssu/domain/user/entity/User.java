@@ -8,11 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
+import ssu.eatssu.domain.department.entity.Department;
 import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.Report;
 
 import java.util.List;
+import ssu.eatssu.domain.review.entity.ReviewLike;
 
 @Entity
 @Getter
@@ -51,6 +53,13 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
     private List<Inquiry> userInquiries = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    private List<ReviewLike> reviewLikes = new ArrayList<>();
 
     /**
      * Oauth 회원가입 용 생성자
