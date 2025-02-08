@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewMenuLike;
+import ssu.eatssu.domain.user.util.UserAliasUtil;
 
 @AllArgsConstructor
 @Builder
@@ -49,6 +50,9 @@ public class MealReviewResponse {
     @Schema(description = "리뷰 좋아요 개수", example = "10")
     private Integer likeCount;
 
+    @Schema(description = "별칭", example = "미슈테리 미식가")
+    private String alias;
+
     public static MealReviewResponse from(Review review, Long userId) {
         List<String> imageUrls = new ArrayList<>();
         review.getReviewImages().forEach(i -> imageUrls.add(i.getImageUrl()));
@@ -61,6 +65,9 @@ public class MealReviewResponse {
         boolean isLikedByUser = (userId != null) && review.getReviewLikes().stream()
                 .anyMatch(like -> like.getUser().getId().equals(userId));
 
+        String alias = (review.getUser() != null) ? UserAliasUtil.getUserAlias(review.getUser(),
+                review.getUser().getReviews()) : "알 수 없음";
+
         MealReviewResponseBuilder builder = MealReviewResponse.builder()
                 .reviewId(review.getId())
                 .rating(review.getRating())
@@ -69,7 +76,8 @@ public class MealReviewResponse {
                 .imageUrls(imageUrls)
                 .likedMenuNames(likedMenuNames)
                 .isLikedByUser(isLikedByUser)
-                .likeCount(review.getReviewLikes().size());
+                .likeCount(review.getReviewLikes().size())
+                .alias(alias);
 
         if (review.getUser() == null) {
             return builder.writerId(null)
