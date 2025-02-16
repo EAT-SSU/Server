@@ -7,6 +7,7 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_PA
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipCollege;
 import ssu.eatssu.domain.partnership.entity.PartnershipDepartment;
+import ssu.eatssu.domain.partnership.entity.PartnershipLike;
 import ssu.eatssu.domain.partnership.persistence.PartnershipLikeRepository;
 import ssu.eatssu.domain.partnership.persistence.PartnershipRepository;
 import ssu.eatssu.domain.user.entity.User;
@@ -72,5 +74,24 @@ public class PartnershipService {
         boolean likedByUser = partnershipLikeRepository.findByUserAndPartnership(user, partnership).isPresent();
 
         return PartnershipDetailResponse.fromEntity(partnership, likedByUser);
+    }
+
+    @Transactional
+    public void togglePartnershipLike(Long partnershipId, CustomUserDetails userDetails) {
+        Partnership partnership = partnershipRepository.findById(partnershipId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_PARTNERSHIP));
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        Optional<PartnershipLike> optionalPartnershipLike = partnershipLikeRepository.findByUserAndPartnership(user, partnership);
+        if (optionalPartnershipLike.isPresent()) {
+            PartnershipLike partnershipLike = optionalPartnershipLike.get();
+            partnership.getLikes().remove(partnershipLike);
+            partnershipLikeRepository.delete(partnershipLike);
+        } else {
+            PartnershipLike partnershipLike = new PartnershipLike(user, partnership);
+            partnership.getLikes().add(partnershipLike);
+            partnershipLikeRepository.save(partnershipLike);
+        }
     }
 }
