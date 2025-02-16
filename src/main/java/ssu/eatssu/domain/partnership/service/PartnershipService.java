@@ -69,10 +69,13 @@ public class PartnershipService {
     public PartnershipDetailResponse getPartnership(Long partnershipId, CustomUserDetails userDetails) {
         Partnership partnership = partnershipRepository.findById(partnershipId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_PARTNERSHIP));
-        User user = userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-        boolean likedByUser = partnershipLikeRepository.findByUserAndPartnership(user, partnership).isPresent();
+        boolean likedByUser = false;
+        if (userDetails != null) {
+            User user = userRepository.findById(userDetails.getId())
+                    .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+            likedByUser = partnershipLikeRepository.findByUserAndPartnership(user, partnership).isPresent();
+        }
 
         return PartnershipDetailResponse.fromEntity(partnership, likedByUser);
     }
