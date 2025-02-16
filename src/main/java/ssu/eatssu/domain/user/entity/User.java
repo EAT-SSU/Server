@@ -8,11 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
+import ssu.eatssu.domain.department.entity.Department;
 import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.Report;
 
 import java.util.List;
+import ssu.eatssu.domain.review.entity.ReviewLike;
 
 @Entity
 @Getter
@@ -52,12 +54,20 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
     private List<Inquiry> userInquiries = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    private List<ReviewLike> reviewLikes = new ArrayList<>();
+
     /**
      * Oauth 회원가입 용 생성자
      */
-    private User(@NotNull String email, @NotNull Role role, @NotNull OAuthProvider provider,
+    private User(@NotNull String email, String nickname, @NotNull Role role, @NotNull OAuthProvider provider,
                  @NotNull String providerId, @NotNull UserStatus status, @NotNull String credentials) {
         this.email = email;
+        this.nickname = nickname;
         this.role = role;
         this.provider = provider;
         this.providerId = providerId;
@@ -69,9 +79,10 @@ public class User extends BaseTimeEntity {
      * <--Static Factory Method-->
      * Oauth 회원가입
      */
-    public static User create(@NotNull String email, @NotNull OAuthProvider provider, String providerId,
+    public static User create(@NotNull String email, @NotNull String nickname, @NotNull OAuthProvider provider,
+            String providerId,
                                  String credentials) {
-        return new User(email, Role.USER, provider, providerId, UserStatus.ACTIVE, credentials);
+        return new User(email, nickname, Role.USER, provider, providerId, UserStatus.ACTIVE, credentials);
     }
 
     /**
@@ -80,7 +91,7 @@ public class User extends BaseTimeEntity {
      * Role 은 다른 방법으로 세팅할 예정
      */
     public static User adminJoin(@NotNull String loginId, @NotNull String credentials) {
-        return new User(loginId, Role.USER, OAuthProvider.EATSSU, loginId, UserStatus.INACTIVE, credentials);
+        return new User(loginId, null, Role.USER, OAuthProvider.EATSSU, loginId, UserStatus.INACTIVE, credentials);
     }
 
     public void updateNickname(@NotNull String nickname) {
