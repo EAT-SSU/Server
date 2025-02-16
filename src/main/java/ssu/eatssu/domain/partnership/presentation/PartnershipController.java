@@ -39,4 +39,12 @@ public class PartnershipController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(partnershipService.getPartnership(partnershipId, userDetails));
     }
+
+    @PostMapping("/{partnershipId}/like")
+    public BaseResponse<?> togglePartnershipLike(
+            @PathVariable Long partnershipId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        partnershipService.togglePartnershipLike(partnershipId, userDetails);
+        return BaseResponse.success();
+    }
 }
