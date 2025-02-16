@@ -13,12 +13,16 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 public class Partnership {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,12 +36,16 @@ public class Partnership {
     @Column(name = "store_name", nullable = false)
     private String storeName;
 
+    @Column(name = "description", nullable = false)
+    private String description;
+
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "restaurant_type", nullable = false)
     private RestaurantType restaurantType;
 
@@ -47,12 +55,15 @@ public class Partnership {
     @Column(name = "latitude", nullable = false)
     private Double latitude; // 위도 == y축
 
+    @Builder.Default
     @OneToMany(mappedBy = "partnership", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartnershipCollege> partnershipColleges = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "partnership", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartnershipDepartment> partnershipDepartments = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "partnership", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartnershipLike> likes = new ArrayList<>();
 }

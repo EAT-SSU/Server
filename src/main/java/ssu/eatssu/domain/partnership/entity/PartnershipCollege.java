@@ -29,4 +29,9 @@ public class PartnershipCollege {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "college_id")
     private College college;
+
+    public PartnershipCollege(Partnership partnership, College college) {
+        this.partnership = partnership;
+        this.college = college;
+    }
 }
