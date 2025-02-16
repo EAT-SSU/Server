@@ -46,6 +46,8 @@ public class QReview extends EntityPathBase<Review> {
 
     public final ListPath<ReviewImage, QReviewImage> reviewImages = this.<ReviewImage, QReviewImage>createList("reviewImages", ReviewImage.class, QReviewImage.class, PathInits.DIRECT2);
 
+    public final ListPath<ReviewLike, QReviewLike> reviewLikes = this.<ReviewLike, QReviewLike>createList("reviewLikes", ReviewLike.class, QReviewLike.class, PathInits.DIRECT2);
+
     public final ssu.eatssu.domain.user.entity.QUser user;
 
     public QReview(String variable) {
@@ -69,7 +71,7 @@ public class QReview extends EntityPathBase<Review> {
         this.meal = inits.isInitialized("meal") ? new ssu.eatssu.domain.menu.entity.QMeal(forProperty("meal")) : null;
         this.menu = inits.isInitialized("menu") ? new ssu.eatssu.domain.menu.entity.QMenu(forProperty("menu"), inits.get("menu")) : null;
         this.ratings = inits.isInitialized("ratings") ? new ssu.eatssu.domain.rating.entity.QRatings(forProperty("ratings")) : null;
-        this.user = inits.isInitialized("user") ? new ssu.eatssu.domain.user.entity.QUser(forProperty("user")) : null;
+        this.user = inits.isInitialized("user") ? new ssu.eatssu.domain.user.entity.QUser(forProperty("user"), inits.get("user")) : null;
     }
 
 }

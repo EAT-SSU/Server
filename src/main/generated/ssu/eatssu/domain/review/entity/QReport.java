@@ -61,7 +61,7 @@ public class QReport extends EntityPathBase<Report> {
     public QReport(Class<? extends Report> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.review = inits.isInitialized("review") ? new QReview(forProperty("review"), inits.get("review")) : null;
-        this.user = inits.isInitialized("user") ? new ssu.eatssu.domain.user.entity.QUser(forProperty("user")) : null;
+        this.user = inits.isInitialized("user") ? new ssu.eatssu.domain.user.entity.QUser(forProperty("user"), inits.get("user")) : null;
     }
 
 }
