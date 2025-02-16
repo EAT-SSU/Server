@@ -22,7 +22,7 @@ public class QPartnershipDepartment extends EntityPathBase<PartnershipDepartment
 
     public static final QPartnershipDepartment partnershipDepartment = new QPartnershipDepartment("partnershipDepartment");
 
-    public final ssu.eatssu.domain.department.entity.QDepartment department;
+    public final ssu.eatssu.domain.user.department.entity.QDepartment department;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -46,7 +46,7 @@ public class QPartnershipDepartment extends EntityPathBase<PartnershipDepartment
 
     public QPartnershipDepartment(Class<? extends PartnershipDepartment> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.department = inits.isInitialized("department") ? new ssu.eatssu.domain.department.entity.QDepartment(forProperty("department"), inits.get("department")) : null;
+        this.department = inits.isInitialized("department") ? new ssu.eatssu.domain.user.department.entity.QDepartment(forProperty("department"), inits.get("department")) : null;
         this.partnership = inits.isInitialized("partnership") ? new QPartnership(forProperty("partnership")) : null;
     }
 

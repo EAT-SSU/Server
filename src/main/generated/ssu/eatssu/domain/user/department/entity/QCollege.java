@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.department.entity;
+package ssu.eatssu.domain.user.department.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -16,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QCollege extends EntityPathBase<College> {
 
-    private static final long serialVersionUID = -1622040298L;
+    private static final long serialVersionUID = 498379863L;
 
     public static final QCollege college = new QCollege("college");
 

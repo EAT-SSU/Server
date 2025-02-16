@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
-import ssu.eatssu.domain.department.entity.Department;
+import ssu.eatssu.domain.user.department.entity.Department;
 import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.partnership.entity.PartnershipLike;
 import ssu.eatssu.domain.review.entity.Review;
@@ -104,6 +104,10 @@ public class User extends BaseTimeEntity {
 
     public void updateEmail(String email) {
         this.email = email;
+    }
+
+    public void updateDepartment(Department department) {
+        this.department = department;
     }
 
 }

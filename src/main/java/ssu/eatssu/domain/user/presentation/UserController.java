@@ -27,6 +27,7 @@ import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.slice.service.SliceService;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
+import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
 import ssu.eatssu.domain.user.service.UserService;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
@@ -136,5 +137,11 @@ public class UserController {
     @GetMapping("/partnerships")
     public BaseResponse<List<PartnershipResponse>> getUserLikedPartnerships(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(partnershipService.getUserLikedPartnerships(userDetails));
+    }
+
+    @PostMapping("/department")
+    public BaseResponse<?> registerDepartment(@RequestBody UpdateDepartmentRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        userService.registerDepartment(request, userDetails);
+        return BaseResponse.success();
     }
 }

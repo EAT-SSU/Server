@@ -1,5 +1,6 @@
 package ssu.eatssu.domain.user.service;
 
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
 import jakarta.transaction.Transactional;
@@ -11,8 +12,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.domain.user.department.entity.Department;
+import ssu.eatssu.domain.user.department.persistence.DepartmentRepository;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
+import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.entity.User;
@@ -27,6 +31,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DepartmentRepository departmentRepository;
 
     public User join(String email, OAuthProvider provider, String providerId) {
         String credentials = createCredentials(provider, providerId);
@@ -75,5 +80,15 @@ public class UserService {
 
     private String createCredentials(OAuthProvider provider, String providerId) {
         return passwordEncoder.encode(provider + providerId);
+    }
+
+    @Transactional
+    public void registerDepartment(UpdateDepartmentRequest request, CustomUserDetails userDetails) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        Department department = departmentRepository.findByName(request.getDepartmentName())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
+
+        user.updateDepartment(department);
     }
 }

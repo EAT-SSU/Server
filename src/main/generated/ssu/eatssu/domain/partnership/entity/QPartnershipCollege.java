@@ -22,7 +22,7 @@ public class QPartnershipCollege extends EntityPathBase<PartnershipCollege> {
 
     public static final QPartnershipCollege partnershipCollege = new QPartnershipCollege("partnershipCollege");
 
-    public final ssu.eatssu.domain.department.entity.QCollege college;
+    public final ssu.eatssu.domain.user.department.entity.QCollege college;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -46,7 +46,7 @@ public class QPartnershipCollege extends EntityPathBase<PartnershipCollege> {
 
     public QPartnershipCollege(Class<? extends PartnershipCollege> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.college = inits.isInitialized("college") ? new ssu.eatssu.domain.department.entity.QCollege(forProperty("college")) : null;
+        this.college = inits.isInitialized("college") ? new ssu.eatssu.domain.user.department.entity.QCollege(forProperty("college")) : null;
         this.partnership = inits.isInitialized("partnership") ? new QPartnership(forProperty("partnership")) : null;
     }
 
