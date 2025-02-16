@@ -95,7 +95,7 @@ class ReviewServiceTest {
     }
 
     private User createUser() {
-        return User.create("test@test.com", OAuthProvider.EATSSU, "1234", "1234");
+        return User.create("test@test.com", "user-test", OAuthProvider.EATSSU, "1234", "1234");
     }
 
     private CustomUserDetails createCustomUserDetails(User user) {

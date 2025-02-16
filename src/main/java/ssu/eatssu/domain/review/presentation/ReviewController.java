@@ -119,7 +119,6 @@ public class ReviewController {
         return BaseResponse.success();
     }
 
-
     @Operation(summary = "리뷰 수정(글 수정)", description = """
             리뷰 내용을 수정하는 API 입니다.<br><br>
             글 수정만 가능하며 사진 수정은 지원하지 않습니다.

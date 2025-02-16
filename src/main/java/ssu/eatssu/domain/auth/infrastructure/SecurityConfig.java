@@ -29,7 +29,7 @@ public class SecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
             "/", "/oauths/kakao", "/oauths/apple", "/menus/**", "/meals/**", "/admin/login",
-            "/reviews", "/reviews/menus/**", "/reviews/meals/**"
+            "/reviews", "/reviews/menus/**", "/reviews/meals/**", "/v2/reviews/statistics", "/v2/reviews"
     };
 
     private static final String[] ADMIN_PAGE_LIST = {
