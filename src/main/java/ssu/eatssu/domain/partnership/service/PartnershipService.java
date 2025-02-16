@@ -3,19 +3,29 @@ package ssu.eatssu.domain.partnership.service;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.INVALID_TARGET_TYPE;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_COLLEGE;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_PARTNERSHIP;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.department.entity.College;
 import ssu.eatssu.domain.department.entity.Department;
 import ssu.eatssu.domain.department.persistence.CollegeRepository;
 import ssu.eatssu.domain.department.persistence.DepartmentRepository;
 import ssu.eatssu.domain.partnership.dto.CreatePartnershipRequest;
+import ssu.eatssu.domain.partnership.dto.PartnershipDetailResponse;
+import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipCollege;
 import ssu.eatssu.domain.partnership.entity.PartnershipDepartment;
+import ssu.eatssu.domain.partnership.persistence.PartnershipLikeRepository;
 import ssu.eatssu.domain.partnership.persistence.PartnershipRepository;
+import ssu.eatssu.domain.user.entity.User;
+import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 
 @Service
@@ -24,6 +34,8 @@ public class PartnershipService {
     private final PartnershipRepository partnershipRepository;
     private final CollegeRepository collegeRepository;
     private final DepartmentRepository departmentRepository;
+    private final UserRepository userRepository;
+    private final PartnershipLikeRepository partnershipLikeRepository;
 
     @Transactional
     public void createPartnership(CreatePartnershipRequest request) {
@@ -45,4 +57,20 @@ public class PartnershipService {
         partnershipRepository.save(partnership);
     }
 
+    public List<PartnershipResponse> getAllPartnerships() {
+        List<Partnership> partnerships = partnershipRepository.findAll();
+        return partnerships.stream().map(PartnershipResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public PartnershipDetailResponse getPartnership(Long partnershipId, CustomUserDetails userDetails) {
+        Partnership partnership = partnershipRepository.findById(partnershipId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_PARTNERSHIP));
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        boolean likedByUser = partnershipLikeRepository.findByUserAndPartnership(user, partnership).isPresent();
+
+        return PartnershipDetailResponse.fromEntity(partnership, likedByUser);
+    }
 }
