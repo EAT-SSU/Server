@@ -134,17 +134,39 @@ public class UserController {
         return BaseResponse.success(userService.findMyPage(customUserDetails));
     }
 
+    @Operation(summary = "유저가 찜한 제휴 조회", description = "유저가 찜한 제휴를 조회하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저가 찜한 제휴 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+    })
     @GetMapping("/partnerships")
     public BaseResponse<List<PartnershipResponse>> getUserLikedPartnerships(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(partnershipService.getUserLikedPartnerships(userDetails));
     }
 
+    @Operation(summary = "유저의 학과 등록", description = "유저의 학과를 등록하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저의 학과 등록 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 학과", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+    })
     @PostMapping("/department")
     public BaseResponse<?> registerDepartment(@RequestBody UpdateDepartmentRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
         userService.registerDepartment(request, userDetails);
         return BaseResponse.success();
     }
 
+    @Operation(summary = "유저의 단과대/학과 제휴 조회", description = "유저의 단과대/학과 제휴를 조회하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저의 단과대/학과 제휴 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "유저의 학과 정보가 등록되지 않음", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+    })
     @GetMapping("/department/partnerships")
     public BaseResponse<List<PartnershipResponse>> getUserDepartmentPartnerships(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(partnershipService.getUserDepartmentPartnerships(userDetails));
