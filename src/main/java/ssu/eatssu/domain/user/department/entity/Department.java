@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.department.entity;
+package ssu.eatssu.domain.user.department.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

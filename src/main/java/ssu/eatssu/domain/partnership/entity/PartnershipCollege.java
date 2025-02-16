@@ -11,7 +11,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ssu.eatssu.domain.department.entity.College;
+import ssu.eatssu.domain.user.department.entity.College;
 
 @Entity
 @Getter

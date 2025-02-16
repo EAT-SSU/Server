@@ -29,7 +29,7 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath credentials = createString("credentials");
 
-    public final ssu.eatssu.domain.department.entity.QDepartment department;
+    public final ssu.eatssu.domain.user.department.entity.QDepartment department;
 
     public final StringPath email = createString("email");
 
@@ -76,7 +76,7 @@ public class QUser extends EntityPathBase<User> {
 
     public QUser(Class<? extends User> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.department = inits.isInitialized("department") ? new ssu.eatssu.domain.department.entity.QDepartment(forProperty("department"), inits.get("department")) : null;
+        this.department = inits.isInitialized("department") ? new ssu.eatssu.domain.user.department.entity.QDepartment(forProperty("department"), inits.get("department")) : null;
     }
 
 }
