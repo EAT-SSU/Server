@@ -29,4 +29,9 @@ public class PartnershipDepartment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
     private Department department;
+
+    public PartnershipDepartment(Partnership partnership, Department department) {
+        this.partnership = partnership;
+        this.department = department;
+    }
 }

@@ -29,7 +29,7 @@ public enum BaseResponseStatus {
     NOT_SUPPORT_RESTAURANT(false, HttpStatus.BAD_REQUEST, 40009, "해당 식당은 지원하지 않습니다."),
     INVALID_IDENTITY_TOKEN(false, HttpStatus.BAD_REQUEST, 40010, "잘못된 identityToken 입니다."),
     EXISTED_MEAL(false, HttpStatus.BAD_REQUEST, 40011, "이미 존재하는 식단입니다."),
-
+    INVALID_TARGET_TYPE(false, HttpStatus.BAD_REQUEST, 40012, "잘못된 targetType 입니다."),
 
     /**
      * 401 UNAUTHORIZED 권한없음(인증 실패)
@@ -54,6 +54,8 @@ public enum BaseResponseStatus {
     NOT_FOUND_REVIEW(false, HttpStatus.NOT_FOUND, 40405, "해당 리뷰을 찾을 수 없습니다."),
     NOT_FOUND_REVIEW_REPORT(false, HttpStatus.NOT_FOUND, 40406, "해당 리뷰 신고 내역을 찾을 수 없습니다."),
     NOT_FOUND_USER_INQUIRY(false, HttpStatus.NOT_FOUND, 40407, "해당 문의 내역을 찾을 수 없습니다."),
+    NOT_FOUND_COLLEGE(false, HttpStatus.NOT_FOUND, 40408, "해당 대학을 찾을 수 없습니다."),
+    NOT_FOUND_DEPARTMENT(false, HttpStatus.NOT_FOUND, 40409, "해당 학과를 찾을 수 없습니다."),
 
     /**
      * 405 METHOD_NOT_ALLOWED 지원하지 않은 method 호출

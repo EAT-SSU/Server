@@ -20,6 +20,8 @@ public class QPartnership extends EntityPathBase<Partnership> {
 
     public static final QPartnership partnership = new QPartnership("partnership");
 
+    public final StringPath description = createString("description");
+
     public final DatePath<java.time.LocalDate> endDate = createDate("endDate", java.time.LocalDate.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
