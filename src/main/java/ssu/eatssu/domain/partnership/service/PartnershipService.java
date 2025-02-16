@@ -94,4 +94,13 @@ public class PartnershipService {
             partnershipLikeRepository.save(partnershipLike);
         }
     }
+
+    public List<PartnershipResponse> getUserLikedPartnerships(CustomUserDetails userDetails) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        List<PartnershipLike> likes = partnershipLikeRepository.findAllByUser(user);
+        return likes.stream().map(PartnershipLike::getPartnership)
+                .map(PartnershipResponse::fromEntity).collect(Collectors.toList());
+    }
 }

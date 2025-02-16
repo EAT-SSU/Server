@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
+import ssu.eatssu.domain.partnership.service.PartnershipService;
 import ssu.eatssu.domain.review.service.MealReviewService;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.domain.user.dto.MyReviewDetail;
@@ -36,6 +39,7 @@ public class UserController {
     private final UserService userService;
     private final SliceService sliceService;
     private final MealReviewService mealReviewService;
+    private final PartnershipService partnershipService;
 
     @Operation(summary = "이메일 중복 체크", description = """
         이메일 중복 체크 API 입니다.<br><br>
@@ -127,5 +131,10 @@ public class UserController {
     public BaseResponse<MyPageResponse> getMyPage(
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return BaseResponse.success(userService.findMyPage(customUserDetails));
+    }
+
+    @GetMapping("/partnerships")
+    public BaseResponse<List<PartnershipResponse>> getUserLikedPartnerships(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return BaseResponse.success(partnershipService.getUserLikedPartnerships(userDetails));
     }
 }
