@@ -1,6 +1,7 @@
 package ssu.eatssu.domain.partnership.service;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.INVALID_TARGET_TYPE;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.MISSING_USER_DEPARTMENT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_COLLEGE;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_PARTNERSHIP;
@@ -102,5 +103,18 @@ public class PartnershipService {
         List<PartnershipLike> likes = partnershipLikeRepository.findAllByUser(user);
         return likes.stream().map(PartnershipLike::getPartnership)
                 .map(PartnershipResponse::fromEntity).collect(Collectors.toList());
+    }
+
+    public List<PartnershipResponse> getUserDepartmentPartnerships(CustomUserDetails userDetails) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        Department department = user.getDepartment();
+        if (department == null) {
+            throw new BaseException(MISSING_USER_DEPARTMENT);
+        }
+        College college = department.getCollege();
+
+        return partnershipRepository.findRelevantPartnerships(college, department).stream().map(PartnershipResponse::fromEntity).collect(Collectors.toList());
     }
 }

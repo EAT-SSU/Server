@@ -144,4 +144,9 @@ public class UserController {
         userService.registerDepartment(request, userDetails);
         return BaseResponse.success();
     }
+
+    @GetMapping("/department/partnerships")
+    public BaseResponse<List<PartnershipResponse>> getUserDepartmentPartnerships(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return BaseResponse.success(partnershipService.getUserDepartmentPartnerships(userDetails));
+    }
 }
