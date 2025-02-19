@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
+import ssu.eatssu.domain.partnership.service.PartnershipService;
 import ssu.eatssu.domain.review.service.MealReviewService;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.domain.user.dto.MyReviewDetail;
@@ -24,6 +27,7 @@ import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.slice.service.SliceService;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
+import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
 import ssu.eatssu.domain.user.service.UserService;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
@@ -36,6 +40,7 @@ public class UserController {
     private final UserService userService;
     private final SliceService sliceService;
     private final MealReviewService mealReviewService;
+    private final PartnershipService partnershipService;
 
     @Operation(summary = "이메일 중복 체크", description = """
         이메일 중복 체크 API 입니다.<br><br>
@@ -127,5 +132,43 @@ public class UserController {
     public BaseResponse<MyPageResponse> getMyPage(
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return BaseResponse.success(userService.findMyPage(customUserDetails));
+    }
+
+    @Operation(summary = "유저가 찜한 제휴 조회", description = "유저가 찜한 제휴를 조회하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저가 찜한 제휴 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+    })
+    @GetMapping("/partnerships")
+    public BaseResponse<List<PartnershipResponse>> getUserLikedPartnerships(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return BaseResponse.success(partnershipService.getUserLikedPartnerships(userDetails));
+    }
+
+    @Operation(summary = "유저의 학과 등록", description = "유저의 학과를 등록하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저의 학과 등록 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 학과", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+    })
+    @PostMapping("/department")
+    public BaseResponse<?> registerDepartment(@RequestBody UpdateDepartmentRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        userService.registerDepartment(request, userDetails);
+        return BaseResponse.success();
+    }
+
+    @Operation(summary = "유저의 단과대/학과 제휴 조회", description = "유저의 단과대/학과 제휴를 조회하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저의 단과대/학과 제휴 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "유저의 학과 정보가 등록되지 않음", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+    })
+    @GetMapping("/department/partnerships")
+    public BaseResponse<List<PartnershipResponse>> getUserDepartmentPartnerships(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return BaseResponse.success(partnershipService.getUserDepartmentPartnerships(userDetails));
     }
 }
