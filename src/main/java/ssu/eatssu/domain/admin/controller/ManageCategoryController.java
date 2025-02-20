@@ -17,7 +17,7 @@ public class ManageCategoryController {
 
     @ResponseBody
     @PostMapping("/")
-    public BaseResponse register(@RequestParam Restaurant restaurant,
+    public BaseResponse<Void> register(@RequestParam Restaurant restaurant,
                                          @RequestBody RegisterCategoryRequest request) {
         manageCategoryService.register(restaurant, request);
         return BaseResponse.success();
