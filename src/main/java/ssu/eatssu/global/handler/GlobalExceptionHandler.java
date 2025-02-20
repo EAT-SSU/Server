@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponse;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
+import org.springframework.lang.NonNull;
 
 /**
  * 전역 Controller 예외처리
@@ -34,7 +35,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * BaseException 처리
      */
     @ExceptionHandler(BaseException.class)
-    public ResponseEntity<BaseResponse> handleBaseException(BaseException e) {
+    public ResponseEntity<BaseResponse<Void>> handleBaseException(BaseException e) {
         log.info(e.getStatus().toString());
         return ResponseEntity.status(e.getStatus().getHttpStatus()).body(BaseResponse.fail(e.getStatus()));
     }
@@ -43,8 +44,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * 경로는 있으나 지원하지 않는 http method로 요청 시
      */
     @Override
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
-                                                                         HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
+            @NonNull HttpRequestMethodNotSupportedException ex,
+            @NonNull HttpHeaders headers, 
+            @NonNull HttpStatusCode status, 
+            @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(BaseResponse.fail(
             BaseResponseStatus.METHOD_NOT_ALLOWED));
     }
@@ -53,64 +57,91 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * 지원하지 않는 content type으로 요청 시
      */
     @Override
-    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex,
-                                                                     HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(BaseResponse.fail(BaseResponseStatus.UNSUPPORTED_MEDIA_TYPE));
-
+    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
+            @NonNull HttpMediaTypeNotSupportedException ex,
+            @NonNull HttpHeaders headers, 
+            @NonNull HttpStatusCode status, 
+            @NonNull WebRequest request) {
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+            .body(BaseResponse.fail(BaseResponseStatus.UNSUPPORTED_MEDIA_TYPE));
     }
 
     /**
      * 인식할 수 없는 content type으로 요청 시
      */
     @Override
-    protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(HttpMediaTypeNotAcceptableException ex,
-                                                                      HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(BaseResponse.fail(BaseResponseStatus.NOT_ACCEPTABLE));
+    protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(
+            @NonNull HttpMediaTypeNotAcceptableException ex,
+            @NonNull HttpHeaders headers, 
+            @NonNull HttpStatusCode status, 
+            @NonNull WebRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+            .body(BaseResponse.fail(BaseResponseStatus.NOT_ACCEPTABLE));
     }
 
     /**
      * PathVariable 값 누락 시
      */
     @Override
-    protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers,
-                                                               HttpStatusCode status, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.fail(BaseResponseStatus.MISSING_PATH_VARIABLE));
+    protected ResponseEntity<Object> handleMissingPathVariable(
+            @NonNull MissingPathVariableException ex, 
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status, 
+            @NonNull WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(BaseResponse.fail(BaseResponseStatus.MISSING_PATH_VARIABLE));
     }
 
     /***
      * RequestParam 값 누락 시
      */
     @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
-                                                                          HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.fail(BaseResponseStatus.MISSING_REQUEST_PARAM));
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(
+            @NonNull MissingServletRequestParameterException ex,
+            @NonNull HttpHeaders headers, 
+            @NonNull HttpStatusCode status, 
+            @NonNull WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(BaseResponse.fail(BaseResponseStatus.MISSING_REQUEST_PARAM));
     }
 
     /**
      * RequestPart 값 누락 시
      */
     @Override
-    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.fail(BaseResponseStatus.MISSING_REQUEST_PART));
+    protected ResponseEntity<Object> handleMissingServletRequestPart(
+            @NonNull MissingServletRequestPartException ex, 
+            @NonNull HttpHeaders headers, 
+            @NonNull HttpStatusCode status, 
+            @NonNull WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(BaseResponse.fail(BaseResponseStatus.MISSING_REQUEST_PART));
     }
 
     /**
      * 요청 값 바인딩 처리에 실패한 경우
      */
     @Override
-    protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException ex,
-                                                                          HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.fail(BaseResponseStatus.REQ_BINDING_FAIL));
+    protected ResponseEntity<Object> handleServletRequestBindingException(
+            @NonNull ServletRequestBindingException ex,
+            @NonNull HttpHeaders headers, 
+            @NonNull HttpStatusCode status, 
+            @NonNull WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(BaseResponse.fail(BaseResponseStatus.REQ_BINDING_FAIL));
     }
 
     /**
      *	request @Valid 유효성 체크를 통과하지 못한 경우
      */
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  HttpHeaders headers, HttpStatusCode status,
-                                                                  WebRequest request) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.fail(BaseResponseStatus.FAILED_VALIDATION));
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            @NonNull MethodArgumentNotValidException ex,
+            @NonNull HttpHeaders headers, 
+            @NonNull HttpStatusCode status,
+            @NonNull WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(BaseResponse.fail(BaseResponseStatus.FAILED_VALIDATION));
     }
 
     /**
@@ -119,43 +150,65 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * NoHandlerFoundException 예외를 발생</p>
      */
     @Override
-    protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponse.fail(BaseResponseStatus.NOT_FOUND));
+    protected ResponseEntity<Object> handleNoHandlerFoundException(
+            @NonNull NoHandlerFoundException ex, 
+            @NonNull HttpHeaders headers, 
+            @NonNull HttpStatusCode status, 
+            @NonNull WebRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(BaseResponse.fail(BaseResponseStatus.NOT_FOUND));
     }
 
     /**
      * 비동기 요청의 응답시간이 초과될 경우
      */
     @Override
-    protected ResponseEntity<Object> handleAsyncRequestTimeoutException(AsyncRequestTimeoutException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(BaseResponse.fail(BaseResponseStatus.INTERNAL_SERVER_TIME_OUT));
+    protected ResponseEntity<Object> handleAsyncRequestTimeoutException(
+            @NonNull AsyncRequestTimeoutException ex, 
+            @NonNull HttpHeaders headers, 
+            @NonNull HttpStatusCode status, 
+            @NonNull WebRequest request) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+            .body(BaseResponse.fail(BaseResponseStatus.INTERNAL_SERVER_TIME_OUT));
     }
 
     /**
      * 파라미터 타입 불일치가 발생한 경우
      */
     @Override
-    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.fail(BaseResponseStatus.MISMATCH_PARAM_TYPE));
+    protected ResponseEntity<Object> handleTypeMismatch(
+            @NonNull TypeMismatchException ex, 
+            @NonNull HttpHeaders headers, 
+            @NonNull HttpStatusCode status, 
+            @NonNull WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(BaseResponse.fail(BaseResponseStatus.MISMATCH_PARAM_TYPE));
     }
 
     /**
      * 적절하지 않은 RequestBody 때문에 HttpMessageConverter.read 메소드 실패한 경우
      */
     @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
-                                                                  HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.fail(BaseResponseStatus.BAD_REQUEST));
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+            @NonNull HttpMessageNotReadableException ex,
+            @NonNull HttpHeaders headers, 
+            @NonNull HttpStatusCode status, 
+            @NonNull WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(BaseResponse.fail(BaseResponseStatus.BAD_REQUEST));
     }
 
     /**
      * 직렬화 실패한 경우
      */
     @Override
-    protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex,
-                                                                  HttpHeaders headers, HttpStatusCode status,
-                                                                  WebRequest request) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BaseResponse.fail(BaseResponseStatus.INTERNAL_SERVER_ERROR));
+    protected ResponseEntity<Object> handleHttpMessageNotWritable(
+            @NonNull HttpMessageNotWritableException ex,
+            @NonNull HttpHeaders headers, 
+            @NonNull HttpStatusCode status,
+            @NonNull WebRequest request) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(BaseResponse.fail(BaseResponseStatus.INTERNAL_SERVER_ERROR));
     }
 
 }
