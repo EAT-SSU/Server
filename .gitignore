@@ -1,10 +1,9 @@
-HELP.md
-.gradle
+### Build files ###
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-build.gradle
 
 ### STS ###
 .apt_generated
@@ -37,5 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 
+### application files ###
 *.properties
 *.yml
+
+### Generated files ###
+/src/main/generated/
