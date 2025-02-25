@@ -21,6 +21,7 @@ import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
 import ssu.eatssu.domain.partnership.service.PartnershipService;
 import ssu.eatssu.domain.review.service.MealReviewService;
+import ssu.eatssu.domain.user.dto.DepartmentResponse;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.domain.user.dto.MyReviewDetail;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
@@ -170,5 +171,30 @@ public class UserController {
     @GetMapping("/department/partnerships")
     public BaseResponse<List<PartnershipResponse>> getUserDepartmentPartnerships(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(partnershipService.getUserDepartmentPartnerships(userDetails));
+    }
+
+    @Operation(summary = "학과 기입 여부 체크", description = """
+        학과 기입 여부 체크 API 입니다.<br><br>
+        학과를 기입했으면 true, 아니면 false 를 반환합니다
+        """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "학과 기입함")
+    })
+    @GetMapping("/validate/department")
+    public BaseResponse<Boolean> validateDepartmentExists(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return BaseResponse.success(userService.validateDepartmentExists(userDetails));
+    }
+
+    @Operation(summary = "유저의 학과 조회", description = "유저의 학과를 조회하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저의 학과 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "유저의 학과 정보가 등록되지 않음", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+    })
+    @GetMapping("/department")
+    public BaseResponse<DepartmentResponse> getDepartment(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return BaseResponse.success(userService.getDepartment(userDetails));
     }
 }
