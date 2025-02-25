@@ -1,5 +1,6 @@
 package ssu.eatssu.domain.user.service;
 
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.MISSING_USER_DEPARTMENT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
@@ -14,6 +15,7 @@ import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.user.department.entity.Department;
 import ssu.eatssu.domain.user.department.persistence.DepartmentRepository;
+import ssu.eatssu.domain.user.dto.DepartmentResponse;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
 import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
@@ -90,5 +92,21 @@ public class UserService {
                 .orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
 
         user.updateDepartment(department);
+    }
+
+    public Boolean validateDepartmentExists(CustomUserDetails userDetails) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        return user.getDepartment() != null;
+    }
+
+    public DepartmentResponse getDepartment(CustomUserDetails userDetails) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        Department department = user.getDepartment();
+        if (department == null) {
+            throw new BaseException(MISSING_USER_DEPARTMENT);
+        }
+        return new DepartmentResponse(department.getName());
     }
 }
