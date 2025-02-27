@@ -17,11 +17,11 @@ public class BaseResponse<T> {
     private final int code;
 
     @Schema(description = "결과 값")
-    @JsonInclude(JsonInclude.Include.NON_NULL) //Json으로 응답이 나갈 때 null인 경우 포함되지 않음
+    @JsonInclude(JsonInclude.Include.NON_NULL) //JSON으로 응답이 나갈 때 null인 경우 포함되지 않음
     private T result;
 
     /**
-     * 정적 팩토리 메서드
+     * 정적 팩토리 메서드를 위한 private 생성자
      */
     private BaseResponse(BaseResponseStatus status) {
         this.isSuccess = status.isSuccess();
