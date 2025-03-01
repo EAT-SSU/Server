@@ -11,6 +11,12 @@ import java.util.Optional;
 public class AppleKeys {
     private List<Key> keys;
 
+    public Optional<Key> findKeyBy(String kid, String alg) {
+        return this.keys.stream()
+                .filter(key -> key.getKid().equals(kid) && key.getAlg().equals(alg))
+                .findFirst();
+    }
+
     @Getter
     @NoArgsConstructor
     public static class Key {
@@ -21,11 +27,5 @@ public class AppleKeys {
         private String n;
         private String e;
 
-    }
-
-    public Optional<Key> findKeyBy(String kid, String alg) {
-        return this.keys.stream()
-                .filter(key -> key.getKid().equals(kid) && key.getAlg().equals(alg))
-                .findFirst();
     }
 }

@@ -1,11 +1,6 @@
 package ssu.eatssu.domain.user.service;
 
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.MISSING_USER_DEPARTMENT;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
-
 import jakarta.transaction.Transactional;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,16 +8,20 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.department.entity.Department;
 import ssu.eatssu.domain.user.department.persistence.DepartmentRepository;
 import ssu.eatssu.domain.user.dto.DepartmentResponse;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
 import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
-import ssu.eatssu.domain.user.repository.UserRepository;
-import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.entity.User;
+import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
+
+import java.util.UUID;
+
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 @Slf4j
 @Service

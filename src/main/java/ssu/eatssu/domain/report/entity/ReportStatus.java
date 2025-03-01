@@ -1,8 +1,9 @@
 package ssu.eatssu.domain.report.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.Arrays;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 @Getter
 public enum ReportStatus {
@@ -21,8 +22,8 @@ public enum ReportStatus {
     @JsonCreator
     public static ReportStatus from(final String description) {
         return Arrays.stream(ReportStatus.values())
-            .filter(v -> v.getDescription().equals(description))
-            .findAny()
-            .orElseThrow(IllegalArgumentException::new);
+                .filter(v -> v.getDescription().equals(description))
+                .findAny()
+                .orElseThrow(IllegalArgumentException::new);
     }
 }

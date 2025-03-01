@@ -26,7 +26,7 @@ public enum ReviewRating {
     public static ReviewRating fromValue(int value) {
         for (ReviewRating RATING : ReviewRating.values()) {
             if (RATING.value == value) {
-	return RATING;
+                return RATING;
             }
         }
         throw new IllegalArgumentException("Invalid ratings value: " + value);
@@ -34,11 +34,11 @@ public enum ReviewRating {
 
     public static ReviewRatingCount toResponse() {
         return new ReviewRatingCount(
-            RATING_ONE.getCount(),
-            RATING_TWO.getCount(),
-            RATING_THREE.getCount(),
-            RATING_FOUR.getCount(),
-            RATING_FIVE.getCount()
+                RATING_ONE.getCount(),
+                RATING_TWO.getCount(),
+                RATING_THREE.getCount(),
+                RATING_FOUR.getCount(),
+                RATING_FIVE.getCount()
         );
     }
 

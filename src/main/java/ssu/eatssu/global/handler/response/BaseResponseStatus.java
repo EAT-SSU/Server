@@ -21,10 +21,10 @@ public enum BaseResponseStatus {
     VALIDATION_ERROR(false, HttpStatus.BAD_REQUEST, 40001, "입력값을 확인해주세요."),
     MISSING_PATH_VARIABLE(false, HttpStatus.BAD_REQUEST, 40002, "경로 변수가 누락되었습니다."),
     MISSING_REQUEST_PARAM(false, HttpStatus.BAD_REQUEST, 40003, "쿼리 파라미터가 누락되었습니다."),
-    MISSING_REQUEST_PART(false, HttpStatus.BAD_REQUEST,40004, "multipart/form-data 파일이 누락되었습니다."),
-    REQ_BINDING_FAIL(false, HttpStatus.BAD_REQUEST,40005, "잘못된 request 입니다."),
-    MISMATCH_PARAM_TYPE(false, HttpStatus.BAD_REQUEST,40006, "잘못된 파라미터 타입입니다."),
-    FAILED_VALIDATION(false, HttpStatus.BAD_REQUEST,40007,"입력값이 누락되었거나, 부적절한 입력 값이 있습니다."),
+    MISSING_REQUEST_PART(false, HttpStatus.BAD_REQUEST, 40004, "multipart/form-data 파일이 누락되었습니다."),
+    REQ_BINDING_FAIL(false, HttpStatus.BAD_REQUEST, 40005, "잘못된 request 입니다."),
+    MISMATCH_PARAM_TYPE(false, HttpStatus.BAD_REQUEST, 40006, "잘못된 파라미터 타입입니다."),
+    FAILED_VALIDATION(false, HttpStatus.BAD_REQUEST, 40007, "입력값이 누락되었거나, 부적절한 입력 값이 있습니다."),
     INVALID_DATE(false, HttpStatus.BAD_REQUEST, 40008, "잘못된 날짜형식입니다."),
     NOT_SUPPORT_RESTAURANT(false, HttpStatus.BAD_REQUEST, 40009, "해당 식당은 지원하지 않습니다."),
     INVALID_IDENTITY_TOKEN(false, HttpStatus.BAD_REQUEST, 40010, "잘못된 identityToken 입니다."),
@@ -36,7 +36,7 @@ public enum BaseResponseStatus {
      * 401 UNAUTHORIZED 권한없음(인증 실패)
      */
     UNAUTHORIZED(false, HttpStatus.UNAUTHORIZED, 401, "인증에 실패했습니다."),
-    INVALID_TOKEN(false, HttpStatus.UNAUTHORIZED, 40101, "유효하지 않은 토큰 입니다." ),
+    INVALID_TOKEN(false, HttpStatus.UNAUTHORIZED, 40101, "유효하지 않은 토큰 입니다."),
 
     /**
      * 403 FORBIDDEN 권한없음(인가 실패)
@@ -62,7 +62,7 @@ public enum BaseResponseStatus {
     /**
      * 405 METHOD_NOT_ALLOWED 지원하지 않은 method 호출
      */
-    METHOD_NOT_ALLOWED(false, HttpStatus.METHOD_NOT_ALLOWED,405,"해당 method는 지원하지 않습니다."),
+    METHOD_NOT_ALLOWED(false, HttpStatus.METHOD_NOT_ALLOWED, 405, "해당 method는 지원하지 않습니다."),
 
     /**
      * 406 NOT_ACCEPTABLE 인식할 수 없는 content type

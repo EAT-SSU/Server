@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
 import ssu.eatssu.domain.menu.entity.Menu;
 
 @Schema(title = "메뉴 리뷰 정보(평점 등등)")
@@ -32,15 +31,15 @@ public class MenuReviewResponse implements ReviewInformationResponse {
     private ReviewRatingCount reviewRatingCount;
 
     public static MenuReviewResponse of(Menu menu,
-        RatingAverages ratingAverages,
-        ReviewRatingCount reviewRatingCount) {
+                                        RatingAverages ratingAverages,
+                                        ReviewRatingCount reviewRatingCount) {
         return MenuReviewResponse.builder()
-            .menuName(menu.getName())
-            .totalReviewCount(menu.getTotalReviewCount())
-            .mainRating(ratingAverages.mainRating())
-            .amountRating(ratingAverages.amountRating())
-            .tasteRating(ratingAverages.tasteRating())
-            .reviewRatingCount(reviewRatingCount)
-            .build();
+                .menuName(menu.getName())
+                .totalReviewCount(menu.getTotalReviewCount())
+                .mainRating(ratingAverages.mainRating())
+                .amountRating(ratingAverages.amountRating())
+                .tasteRating(ratingAverages.tasteRating())
+                .reviewRatingCount(reviewRatingCount)
+                .build();
     }
 }

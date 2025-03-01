@@ -3,10 +3,10 @@ package ssu.eatssu.domain.review.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import ssu.eatssu.domain.report.dto.ReportCreateRequest;
+import ssu.eatssu.domain.report.entity.ReportStatus;
 import ssu.eatssu.domain.report.entity.ReportType;
 import ssu.eatssu.domain.user.entity.BaseTimeEntity;
 import ssu.eatssu.domain.user.entity.User;
-import ssu.eatssu.domain.report.entity.ReportStatus;
 
 @Builder
 @Entity
@@ -37,13 +37,13 @@ public class Report extends BaseTimeEntity {
     private ReportStatus status;
 
     public static Report create(User user, Review review, ReportCreateRequest request,
-        ReportStatus status) {
+                                ReportStatus status) {
         return Report.builder()
-            .user(user)
-            .review(review)
-            .reportType(request.reportType())
-            .content(request.content())
-            .status(status)
-            .build();
+                .user(user)
+                .review(review)
+                .reportType(request.reportType())
+                .content(request.content())
+                .status(status)
+                .build();
     }
 }

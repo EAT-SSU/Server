@@ -1,8 +1,9 @@
 package ssu.eatssu.domain.menu.entity.constants;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.Arrays;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 @Getter
 public enum TimePart {
@@ -19,8 +20,8 @@ public enum TimePart {
     @JsonCreator
     public static TimePart from(String description) {
         return Arrays.stream(TimePart.values())
-            .filter(d -> d.getDescription().equals(description))
-            .findAny()
-            .orElseThrow(IllegalArgumentException::new);
+                .filter(d -> d.getDescription().equals(description))
+                .findAny()
+                .orElseThrow(IllegalArgumentException::new);
     }
 }

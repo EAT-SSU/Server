@@ -14,7 +14,7 @@ public class UserPrincipalDto {
     private String email;
     private String role;
 
-    public static UserPrincipalDto from(CustomUserDetails userDetails){
+    public static UserPrincipalDto from(CustomUserDetails userDetails) {
         return UserPrincipalDto.builder()
                 .id(userDetails.getId())
                 .email(userDetails.getEmail())

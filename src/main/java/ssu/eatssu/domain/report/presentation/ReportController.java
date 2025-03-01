@@ -10,13 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.domain.report.dto.ReportCreateRequest;
 import ssu.eatssu.domain.report.dto.ReportTypeList;
-import ssu.eatssu.domain.review.entity.Report;
 import ssu.eatssu.domain.report.service.ReportService;
+import ssu.eatssu.domain.review.entity.Report;
 import ssu.eatssu.domain.slack.entity.SlackChannel;
 import ssu.eatssu.domain.slack.entity.SlackMessageFormat;
-import ssu.eatssu.domain.report.dto.ReportCreateRequest;
-
 import ssu.eatssu.domain.slack.service.SlackService;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
@@ -42,14 +41,14 @@ public class ReportController {
     @Operation(summary = "리뷰 신고하기", description = "리뷰를 신고하는 API 입니다.")
     @PostMapping("")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "리뷰 신고 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+            @ApiResponse(responseCode = "200", description = "리뷰 신고 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     public BaseResponse<Void> reportReview(@RequestBody ReportCreateRequest createReportRequest,
-        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+                                           @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Report report = reportService.reportReview(customUserDetails, createReportRequest);
         slackService.sendSlackMessage(SlackMessageFormat.sendReport(report),
-            SlackChannel.REPORT_CHANNEL);
+                SlackChannel.REPORT_CHANNEL);
         return BaseResponse.success();
     }
 

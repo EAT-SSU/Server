@@ -30,23 +30,23 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
         Info info = new Info()
-            .version(API_VERSION)
-            .title(API_NAME)
-            .description(API_DESCRIPTION);
+                .version(API_VERSION)
+                .title(API_NAME)
+                .description(API_DESCRIPTION);
 
         List<Server> servers = new ArrayList<>();
         servers.add(new Server().url(SERVER_URL).description(SERVER_DESCRIPTION));
 
         SecurityScheme securityScheme = new SecurityScheme()
-            .type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")
-            .in(SecurityScheme.In.HEADER).name("Authorization");
+                .type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")
+                .in(SecurityScheme.In.HEADER).name("Authorization");
 
         SecurityRequirement securityRequirement = new SecurityRequirement().addList("bearerAuth");
 
         return new OpenAPI()
-            .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
-            .security(Arrays.asList(securityRequirement))
-            .servers(servers)
-            .info(info);
+                .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
+                .security(Arrays.asList(securityRequirement))
+                .servers(servers)
+                .info(info);
     }
 }

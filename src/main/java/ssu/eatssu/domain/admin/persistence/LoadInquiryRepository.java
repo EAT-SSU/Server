@@ -31,6 +31,7 @@ public class LoadInquiryRepository {
                 .select(inquiry.count())
                 .from(inquiry);
     }
+
     private List<Inquiry> fetchInquiries(Pageable pageable) {
         return queryFactory
                 .selectFrom(inquiry)

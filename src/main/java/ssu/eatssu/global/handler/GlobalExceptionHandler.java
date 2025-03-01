@@ -2,9 +2,13 @@ package ssu.eatssu.global.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.lang.NonNull;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -22,7 +26,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponse;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
-import org.springframework.lang.NonNull;
 
 /**
  * 전역 Controller 예외처리
@@ -46,11 +49,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
             @NonNull HttpRequestMethodNotSupportedException ex,
-            @NonNull HttpHeaders headers, 
-            @NonNull HttpStatusCode status, 
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(BaseResponse.fail(
-            BaseResponseStatus.METHOD_NOT_ALLOWED));
+                BaseResponseStatus.METHOD_NOT_ALLOWED));
     }
 
     /**
@@ -59,11 +62,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
             @NonNull HttpMediaTypeNotSupportedException ex,
-            @NonNull HttpHeaders headers, 
-            @NonNull HttpStatusCode status, 
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-            .body(BaseResponse.fail(BaseResponseStatus.UNSUPPORTED_MEDIA_TYPE));
+                .body(BaseResponse.fail(BaseResponseStatus.UNSUPPORTED_MEDIA_TYPE));
     }
 
     /**
@@ -72,11 +75,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(
             @NonNull HttpMediaTypeNotAcceptableException ex,
-            @NonNull HttpHeaders headers, 
-            @NonNull HttpStatusCode status, 
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-            .body(BaseResponse.fail(BaseResponseStatus.NOT_ACCEPTABLE));
+                .body(BaseResponse.fail(BaseResponseStatus.NOT_ACCEPTABLE));
     }
 
     /**
@@ -84,12 +87,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleMissingPathVariable(
-            @NonNull MissingPathVariableException ex, 
+            @NonNull MissingPathVariableException ex,
             @NonNull HttpHeaders headers,
-            @NonNull HttpStatusCode status, 
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(BaseResponse.fail(BaseResponseStatus.MISSING_PATH_VARIABLE));
+                .body(BaseResponse.fail(BaseResponseStatus.MISSING_PATH_VARIABLE));
     }
 
     /***
@@ -98,11 +101,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
             @NonNull MissingServletRequestParameterException ex,
-            @NonNull HttpHeaders headers, 
-            @NonNull HttpStatusCode status, 
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(BaseResponse.fail(BaseResponseStatus.MISSING_REQUEST_PARAM));
+                .body(BaseResponse.fail(BaseResponseStatus.MISSING_REQUEST_PARAM));
     }
 
     /**
@@ -110,12 +113,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestPart(
-            @NonNull MissingServletRequestPartException ex, 
-            @NonNull HttpHeaders headers, 
-            @NonNull HttpStatusCode status, 
+            @NonNull MissingServletRequestPartException ex,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(BaseResponse.fail(BaseResponseStatus.MISSING_REQUEST_PART));
+                .body(BaseResponse.fail(BaseResponseStatus.MISSING_REQUEST_PART));
     }
 
     /**
@@ -124,24 +127,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleServletRequestBindingException(
             @NonNull ServletRequestBindingException ex,
-            @NonNull HttpHeaders headers, 
-            @NonNull HttpStatusCode status, 
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(BaseResponse.fail(BaseResponseStatus.REQ_BINDING_FAIL));
+                .body(BaseResponse.fail(BaseResponseStatus.REQ_BINDING_FAIL));
     }
 
     /**
-     *	request @Valid 유효성 체크를 통과하지 못한 경우
+     * request @Valid 유효성 체크를 통과하지 못한 경우
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             @NonNull MethodArgumentNotValidException ex,
-            @NonNull HttpHeaders headers, 
+            @NonNull HttpHeaders headers,
             @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(BaseResponse.fail(BaseResponseStatus.FAILED_VALIDATION));
+                .body(BaseResponse.fail(BaseResponseStatus.FAILED_VALIDATION));
     }
 
     /**
@@ -151,12 +154,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(
-            @NonNull NoHandlerFoundException ex, 
-            @NonNull HttpHeaders headers, 
-            @NonNull HttpStatusCode status, 
+            @NonNull NoHandlerFoundException ex,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body(BaseResponse.fail(BaseResponseStatus.NOT_FOUND));
+                .body(BaseResponse.fail(BaseResponseStatus.NOT_FOUND));
     }
 
     /**
@@ -164,12 +167,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleAsyncRequestTimeoutException(
-            @NonNull AsyncRequestTimeoutException ex, 
-            @NonNull HttpHeaders headers, 
-            @NonNull HttpStatusCode status, 
+            @NonNull AsyncRequestTimeoutException ex,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-            .body(BaseResponse.fail(BaseResponseStatus.INTERNAL_SERVER_TIME_OUT));
+                .body(BaseResponse.fail(BaseResponseStatus.INTERNAL_SERVER_TIME_OUT));
     }
 
     /**
@@ -177,12 +180,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(
-            @NonNull TypeMismatchException ex, 
-            @NonNull HttpHeaders headers, 
-            @NonNull HttpStatusCode status, 
+            @NonNull TypeMismatchException ex,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(BaseResponse.fail(BaseResponseStatus.MISMATCH_PARAM_TYPE));
+                .body(BaseResponse.fail(BaseResponseStatus.MISMATCH_PARAM_TYPE));
     }
 
     /**
@@ -191,11 +194,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
             @NonNull HttpMessageNotReadableException ex,
-            @NonNull HttpHeaders headers, 
-            @NonNull HttpStatusCode status, 
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(BaseResponse.fail(BaseResponseStatus.BAD_REQUEST));
+                .body(BaseResponse.fail(BaseResponseStatus.BAD_REQUEST));
     }
 
     /**
@@ -204,11 +207,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotWritable(
             @NonNull HttpMessageNotWritableException ex,
-            @NonNull HttpHeaders headers, 
+            @NonNull HttpHeaders headers,
             @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(BaseResponse.fail(BaseResponseStatus.INTERNAL_SERVER_ERROR));
+                .body(BaseResponse.fail(BaseResponseStatus.INTERNAL_SERVER_ERROR));
     }
 
 }

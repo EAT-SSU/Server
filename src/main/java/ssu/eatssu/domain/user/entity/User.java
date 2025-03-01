@@ -2,20 +2,20 @@ package ssu.eatssu.domain.user.entity;
 
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
-import ssu.eatssu.domain.user.department.entity.Department;
 import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.partnership.entity.PartnershipLike;
-import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.Report;
-
-import java.util.List;
+import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewLike;
+import ssu.eatssu.domain.user.department.entity.Department;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -84,8 +84,8 @@ public class User extends BaseTimeEntity {
      * Oauth 회원가입
      */
     public static User create(@NotNull String email, @NotNull String nickname, @NotNull OAuthProvider provider,
-            String providerId,
-                                 String credentials) {
+                              String providerId,
+                              String credentials) {
         return new User(email, nickname, Role.USER, provider, providerId, UserStatus.ACTIVE, credentials);
     }
 

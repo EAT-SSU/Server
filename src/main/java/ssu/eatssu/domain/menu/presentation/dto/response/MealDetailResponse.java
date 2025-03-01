@@ -29,15 +29,15 @@ public class MealDetailResponse {
 
     public static MealDetailResponse from(Meal meal, Double mainRating) {
         List<BriefMenuResponse> briefMenus = meal.getMealMenus().stream()
-            .map(MealMenu::getMenu)
-            .map(BriefMenuResponse::new)
-            .toList();
+                .map(MealMenu::getMenu)
+                .map(BriefMenuResponse::new)
+                .toList();
 
         return new MealDetailResponse(
-            meal.getId(),
-            meal.getPrice(),
-            mainRating,
-            briefMenus
+                meal.getId(),
+                meal.getPrice(),
+                mainRating,
+                briefMenus
         );
     }
 }

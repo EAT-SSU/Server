@@ -1,15 +1,5 @@
 package ssu.eatssu.domain.review.service;
 
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MEAL;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.REVIEW_PERMISSION_DENIED;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,12 +13,7 @@ import ssu.eatssu.domain.menu.persistence.MealMenuRepository;
 import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
-import ssu.eatssu.domain.review.dto.MealReviewResponse;
-import ssu.eatssu.domain.review.dto.MenuLikeRequest;
-import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
-import ssu.eatssu.domain.review.dto.ReviewRatingCount;
-import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
+import ssu.eatssu.domain.review.dto.*;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewLike;
 import ssu.eatssu.domain.review.repository.ReviewLikeRepository;
@@ -38,6 +23,13 @@ import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service
@@ -109,7 +101,7 @@ public class MealReviewService {
      * 특정 식단 리뷰 리스트 조회
      */
     public SliceResponse<MealReviewResponse> findReviews(Long mealId, Long lastReviewId, Pageable pageable,
-            CustomUserDetails userDetails) {
+                                                         CustomUserDetails userDetails) {
         if (!mealRepository.existsById(mealId)) {
             throw new BaseException(NOT_FOUND_MEAL);
         }
@@ -155,8 +147,8 @@ public class MealReviewService {
 
         Map<Menu, Boolean> menuLikes = request.getMenuLikes().stream()
                 .collect(Collectors.toMap(menuLike -> menuRepository.findById(menuLike.getMenuId())
-                                            .orElseThrow(() -> new BaseException(NOT_FOUND_MENU)),
-                                        MenuLikeRequest::getIsLike));
+                                .orElseThrow(() -> new BaseException(NOT_FOUND_MENU)),
+                        MenuLikeRequest::getIsLike));
 
         review.update(request.getContent(), request.getRating(), menuLikes);
         reviewRepository.save(review);
@@ -185,7 +177,7 @@ public class MealReviewService {
      * 내 리뷰 리스트 조회
      */
     public SliceResponse<MyMealReviewResponse> findMyReviews(CustomUserDetails userDetails, Long lastReviewId,
-            Pageable pageable) {
+                                                             Pageable pageable) {
         User user = userRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 

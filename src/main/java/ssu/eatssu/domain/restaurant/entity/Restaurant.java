@@ -20,16 +20,16 @@ public enum Restaurant {
     private String restaurantName;
     private Integer restaurantPrice;
 
+    Restaurant(String restaurantName, Integer price) {
+        this.restaurantName = restaurantName;
+        this.restaurantPrice = price;
+    }
+
     @JsonCreator
     public static Restaurant from(String restaurantName) {
         return Arrays.stream(Restaurant.values())
                 .filter(r -> r.getRestaurantName().equals(restaurantName))
                 .findAny()
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_RESTAURANT));
-    }
-
-    Restaurant(String restaurantName, Integer price) {
-        this.restaurantName = restaurantName;
-        this.restaurantPrice = price;
     }
 }
