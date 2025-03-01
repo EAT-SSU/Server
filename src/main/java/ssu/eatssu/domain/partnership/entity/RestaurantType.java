@@ -5,7 +5,6 @@ public enum RestaurantType {
     CAFE("카페");
 
     private final String type;
-    ;
 
     RestaurantType(String type) {
         this.type = type;
