@@ -54,35 +54,35 @@ public class ReviewDetail {
         review.getReviewImages().forEach(i -> imageUrls.add(i.getImageUrl()));
 
         ReviewDetailBuilder builder = ReviewDetail.builder()
-            .reviewId(review.getId())
-            .mainRating(review.getRatings().getMainRating())
-            .amountRating(review.getRatings().getAmountRating())
-            .tasteRating(review.getRatings().getTasteRating())
-            .writedAt(review.getCreatedDate().toLocalDate())
-            .content(review.getContent())
-            .imageUrls(imageUrls)
-            .menu(review.getMenu().getName());
+                .reviewId(review.getId())
+                .mainRating(review.getRatings().getMainRating())
+                .amountRating(review.getRatings().getAmountRating())
+                .tasteRating(review.getRatings().getTasteRating())
+                .writedAt(review.getCreatedDate().toLocalDate())
+                .content(review.getContent())
+                .imageUrls(imageUrls)
+                .menu(review.getMenu().getName());
 
         if (review.getUser() == null) {
             return builder
-	.writerId(null)
-	.writerNickname("알 수 없음")
-	.isWriter(false)
-	.build();
+                    .writerId(null)
+                    .writerNickname("알 수 없음")
+                    .isWriter(false)
+                    .build();
         }
 
         if (review.getUser().getId().equals(userId)) {
             return builder
-	.writerId(review.getUser().getId())
-	.writerNickname(review.getUser().getNickname())
-	.isWriter(true)
-	.build();
+                    .writerId(review.getUser().getId())
+                    .writerNickname(review.getUser().getNickname())
+                    .isWriter(true)
+                    .build();
         }
 
         return builder
-            .writerId(review.getUser().getId())
-            .writerNickname(review.getUser().getNickname())
-            .isWriter(false)
-            .build();
+                .writerId(review.getUser().getId())
+                .writerNickname(review.getUser().getNickname())
+                .isWriter(false)
+                .build();
     }
 }

@@ -12,7 +12,7 @@ public enum SlackChannel {
     @Getter
     private String krName;
 
-    SlackChannel(String krName){
+    SlackChannel(String krName) {
         this.krName = krName;
     }
 }

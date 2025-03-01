@@ -2,7 +2,6 @@ package ssu.eatssu.domain.admin.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ssu.eatssu.domain.admin.dto.MenuBoards;
 import ssu.eatssu.domain.admin.dto.RegisterFixMenuRequest;
@@ -37,7 +36,7 @@ public class ManageFixMenuController {
     @ResponseBody
     @PatchMapping("/{menuId}")
     public BaseResponse update(@PathVariable Long menuId,
-                         @RequestBody UpdateFixMenuRequest request) {
+                               @RequestBody UpdateFixMenuRequest request) {
         manageFixMenuService.updateMenu(menuId, request);
         return BaseResponse.success();
     }

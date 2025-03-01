@@ -1,8 +1,6 @@
 package ssu.eatssu.domain.review.entity;
 
 import jakarta.persistence.*;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.*;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
@@ -12,6 +10,8 @@ import ssu.eatssu.domain.user.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Entity

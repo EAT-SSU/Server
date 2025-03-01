@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ssu.eatssu.domain.admin.dto.BriefMenu;
 import ssu.eatssu.domain.admin.dto.MealInfo;
-import ssu.eatssu.domain.menu.entity.*;
-import ssu.eatssu.domain.menu.entity.constants.TimePart;
 import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.menu.entity.QMeal;
+import ssu.eatssu.domain.menu.entity.QMealMenu;
+import ssu.eatssu.domain.menu.entity.QMenu;
+import ssu.eatssu.domain.menu.entity.constants.TimePart;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 
 import java.util.Date;

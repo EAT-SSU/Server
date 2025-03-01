@@ -18,7 +18,7 @@ public class CustomUserDetails implements UserDetails {
     private final String credentials;
     private final GrantedAuthority role;
 
-    public CustomUserDetails(User user){
+    public CustomUserDetails(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.credentials = user.getCredentials();

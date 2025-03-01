@@ -117,7 +117,7 @@ public class ManageMealService {
 
     private void deleteUnusedMenus(List<Long> menuIds) {
         menuIds.forEach(menuId -> {
-            if(loadMealRepository.countMealMenuByMenuId(menuId)==0){
+            if (loadMealRepository.countMealMenuByMenuId(menuId) == 0) {
                 manageMenuRepository.deleteById(menuId);
             }
         });

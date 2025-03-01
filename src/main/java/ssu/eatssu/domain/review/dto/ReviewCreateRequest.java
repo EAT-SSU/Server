@@ -45,11 +45,11 @@ public class ReviewCreateRequest {
     public Review toEntity(User user, Menu menu) {
         Ratings ratings = Ratings.of(this.mainRating, this.amountRating, this.tasteRating);
         return Review.builder()
-            .user(user)
-            .content(this.content)
-            .ratings(ratings)
-            .menu(menu)
-            .build();
+                .user(user)
+                .content(this.content)
+                .ratings(ratings)
+                .menu(menu)
+                .build();
     }
 
 }

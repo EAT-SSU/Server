@@ -27,6 +27,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
 
     @Query("SELECT r FROM Review r WHERE r.meal.id IN :mealIds AND (:lastReviewId IS NULL OR r.id < :lastReviewId) ")
     Page<Review> findReviewsByMealIds(@Param("mealIds") List<Long> mealIds,
-            @Param("lastReviewId") Long lastReviewId,
-            Pageable pageable);
+                                      @Param("lastReviewId") Long lastReviewId,
+                                      Pageable pageable);
 }

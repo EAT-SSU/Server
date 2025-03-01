@@ -1,14 +1,15 @@
 package ssu.eatssu.domain.review.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewImage;
 import ssu.eatssu.domain.user.entity.User;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Schema(title = "리뷰 작성")
 @Getter

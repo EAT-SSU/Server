@@ -1,13 +1,14 @@
 package ssu.eatssu.domain.user.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import ssu.eatssu.domain.review.entity.Review;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @Builder
@@ -31,7 +32,7 @@ public class MyMealReviewResponse {
 
     public static MyMealReviewResponse from(Review review) {
         List<String> imgUrlList = new ArrayList<>();
-        review.getReviewImages().forEach(i->imgUrlList.add(i.getImageUrl()));
+        review.getReviewImages().forEach(i -> imgUrlList.add(i.getImageUrl()));
 
         return MyMealReviewResponse.builder()
                 .reviewId(review.getId())

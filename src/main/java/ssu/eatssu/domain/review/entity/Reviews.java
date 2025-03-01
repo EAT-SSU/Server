@@ -3,12 +3,13 @@ package ssu.eatssu.domain.review.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.rating.entity.ReviewRating;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -39,7 +40,7 @@ public class Reviews {
 
     public int getTotalAmountRating() {
         return this.reviews.stream().mapToInt(review -> review.getRatings().getAmountRating())
-            .sum();
+                .sum();
     }
 
     public int getTotalTasteRating() {

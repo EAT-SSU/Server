@@ -25,20 +25,20 @@ public class MenuController {
     private final MenuService menuService;
 
     @Operation(summary = "고정 메뉴 리스트 조회 [인증 토큰 필요 X]",
-        description =
-            """
-	고정 메뉴 리스트를 조회하는 API 입니다.
-	메뉴가 고정된 식당(푸드코트, 스낵코너, <s>더 키친</s>)의 메뉴 리스트를 조회합니다.
-	"""
+            description =
+                    """
+                            고정 메뉴 리스트를 조회하는 API 입니다.
+                            메뉴가 고정된 식당(푸드코트, 스낵코너, <s>더 키친</s>)의 메뉴 리스트를 조회합니다.
+                            """
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "메뉴 리스트 조회 성공"),
-        @ApiResponse(responseCode = "400", description = "지원하지 않는 식당(변동 메뉴 식당)", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+            @ApiResponse(responseCode = "200", description = "메뉴 리스트 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "지원하지 않는 식당(변동 메뉴 식당)", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping
     public BaseResponse<MenuRestaurantResponse> getMenus(
-        @RequestParam("restaurant") Restaurant restaurant) {
+            @RequestParam("restaurant") Restaurant restaurant) {
 
         return BaseResponse.success(menuService.getMenusByRestaurant(restaurant));
     }

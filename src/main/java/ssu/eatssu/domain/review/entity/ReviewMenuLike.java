@@ -1,18 +1,7 @@
 package ssu.eatssu.domain.review.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 import ssu.eatssu.domain.menu.entity.Menu;
 
 @Entity
@@ -37,16 +26,16 @@ public class ReviewMenuLike {
     @Column(nullable = false)
     private Boolean isLike; // true : 좋아요, false : 싫어요
 
-    public void updateLike(Boolean like) {
-        isLike = like;
-    }
-
     public static ReviewMenuLike create(Review review, Menu menu, Boolean isLike) {
         return ReviewMenuLike.builder()
                 .review(review)
                 .menu(menu)
                 .isLike(isLike)
                 .build();
+    }
+
+    public void updateLike(Boolean like) {
+        isLike = like;
     }
 
     public void resetMenuLikeStatus() {

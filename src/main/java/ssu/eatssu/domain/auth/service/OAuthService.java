@@ -1,8 +1,6 @@
 package ssu.eatssu.domain.auth.service;
 
 
-import static ssu.eatssu.domain.auth.entity.OAuthProvider.*;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,14 +10,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.auth.dto.AppleLoginRequest;
 import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
+import ssu.eatssu.domain.auth.dto.OAuthInfo;
 import ssu.eatssu.domain.auth.entity.AppleAuthenticator;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.JwtTokenProvider;
+import ssu.eatssu.domain.user.dto.Tokens;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
-import ssu.eatssu.domain.auth.dto.OAuthInfo;
-import ssu.eatssu.domain.user.dto.Tokens;
 import ssu.eatssu.domain.user.service.UserService;
+
+import static ssu.eatssu.domain.auth.entity.OAuthProvider.APPLE;
+import static ssu.eatssu.domain.auth.entity.OAuthProvider.KAKAO;
 
 
 @Slf4j
@@ -36,26 +37,26 @@ public class OAuthService {
 
     public Tokens kakaoLogin(KakaoLoginRequest request) {
         User user = userRepository.findByProviderId(request.providerId())
-            .orElseGet(
-	() -> userService.join(request.email(), KAKAO, request.providerId()));
+                .orElseGet(
+                        () -> userService.join(request.email(), KAKAO, request.providerId()));
 
         return generateOauthJwtTokens(user.getEmail(), KAKAO,
-            request.providerId());
+                request.providerId());
     }
 
     public Tokens appleLogin(AppleLoginRequest request) {
         OAuthInfo oAuthInfo = appleAuthenticator.getOAuthInfoByIdentityToken(
-            request.identityToken());
+                request.identityToken());
 
         User user = userRepository.findByProviderId(oAuthInfo.providerId())
-            .orElseGet(() -> userService.join(oAuthInfo.email(), APPLE,
-	oAuthInfo.providerId()));
+                .orElseGet(() -> userService.join(oAuthInfo.email(), APPLE,
+                        oAuthInfo.providerId()));
 
         //todo 이메일 갱신의 이유?
         updateAppleUserEmail(user, oAuthInfo.email());
 
         return generateOauthJwtTokens(user.getEmail(), APPLE,
-            oAuthInfo.providerId());
+                oAuthInfo.providerId());
     }
 
     /**
@@ -88,13 +89,13 @@ public class OAuthService {
         // email, credentials 를 기반으로 Authentication 객체 생성
         // 이때 authentication 은 인증 여부를 확인하는 authenticated 값이 false
         UsernamePasswordAuthenticationToken authenticationToken =
-            new UsernamePasswordAuthenticationToken(email,
-	makeOauthCredentials(provider, providerId));
+                new UsernamePasswordAuthenticationToken(email,
+                        makeOauthCredentials(provider, providerId));
 
         // 실제 검증 (사용자 비밀번호 체크)
         // authenticate 메서드 실행 => CustomUserDetailsService 에서 만든 loadUserByUsername 메서드 실행
         Authentication authentication = authenticationManagerBuilder.getObject()
-            .authenticate(authenticationToken);
+                .authenticate(authenticationToken);
 
         // 인증 정보를 바탕으로 JWT 토큰 생성
         return jwtTokenProvider.generateTokens(authentication);

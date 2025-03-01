@@ -60,7 +60,7 @@ public class Menu {
     }
 
     public static Menu createFixed(String name, Restaurant restaurant, Integer price,
-        MenuCategory category) {
+                                   MenuCategory category) {
         return new Menu(name, restaurant, price, category);
     }
 

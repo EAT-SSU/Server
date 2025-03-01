@@ -2,9 +2,9 @@ package ssu.eatssu.domain.review.repository;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.entity.User;
 
 public interface ReviewRepositoryCustom {
