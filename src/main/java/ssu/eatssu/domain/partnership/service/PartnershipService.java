@@ -1,23 +1,9 @@
 package ssu.eatssu.domain.partnership.service;
 
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.INVALID_TARGET_TYPE;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.MISSING_USER_DEPARTMENT;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_COLLEGE;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_PARTNERSHIP;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
-import ssu.eatssu.domain.user.department.entity.College;
-import ssu.eatssu.domain.user.department.entity.Department;
-import ssu.eatssu.domain.user.department.persistence.CollegeRepository;
-import ssu.eatssu.domain.user.department.persistence.DepartmentRepository;
 import ssu.eatssu.domain.partnership.dto.CreatePartnershipRequest;
 import ssu.eatssu.domain.partnership.dto.PartnershipDetailResponse;
 import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
@@ -27,9 +13,19 @@ import ssu.eatssu.domain.partnership.entity.PartnershipDepartment;
 import ssu.eatssu.domain.partnership.entity.PartnershipLike;
 import ssu.eatssu.domain.partnership.persistence.PartnershipLikeRepository;
 import ssu.eatssu.domain.partnership.persistence.PartnershipRepository;
+import ssu.eatssu.domain.user.department.entity.College;
+import ssu.eatssu.domain.user.department.entity.Department;
+import ssu.eatssu.domain.user.department.persistence.CollegeRepository;
+import ssu.eatssu.domain.user.department.persistence.DepartmentRepository;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -104,8 +100,11 @@ public class PartnershipService {
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         List<PartnershipLike> likes = partnershipLikeRepository.findAllByUser(user);
-        return likes.stream().map(PartnershipLike::getPartnership)
-                .map(PartnershipResponse::fromEntity).collect(Collectors.toList());
+        return likes
+                .stream()
+                .map(PartnershipLike::getPartnership)
+                .map(PartnershipResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 
     public List<PartnershipResponse> getUserDepartmentPartnerships(CustomUserDetails userDetails) {
@@ -118,6 +117,10 @@ public class PartnershipService {
         }
         College college = department.getCollege();
 
-        return partnershipRepository.findRelevantPartnerships(college, department).stream().map(PartnershipResponse::fromEntity).collect(Collectors.toList());
+        return partnershipRepository
+                .findRelevantPartnerships(college, department)
+                .stream()
+                .map(PartnershipResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 }
