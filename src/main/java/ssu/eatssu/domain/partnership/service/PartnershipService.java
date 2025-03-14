@@ -1,8 +1,10 @@
 package ssu.eatssu.domain.partnership.service;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.partnership.dto.CreatePartnershipRequest;
 import ssu.eatssu.domain.partnership.dto.PartnershipDetailResponse;
@@ -30,97 +32,98 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 @Service
 @RequiredArgsConstructor
 public class PartnershipService {
-    private final PartnershipRepository partnershipRepository;
-    private final CollegeRepository collegeRepository;
-    private final DepartmentRepository departmentRepository;
-    private final UserRepository userRepository;
-    private final PartnershipLikeRepository partnershipLikeRepository;
+	private final PartnershipRepository partnershipRepository;
+	private final CollegeRepository collegeRepository;
+	private final DepartmentRepository departmentRepository;
+	private final UserRepository userRepository;
+	private final PartnershipLikeRepository partnershipLikeRepository;
 
-    @Transactional
-    public void createPartnership(CreatePartnershipRequest request) {
-        Partnership partnership = request.toPartnershipEntity();
+	@Transactional
+	public void createPartnership(CreatePartnershipRequest request) {
+		Partnership partnership = request.toPartnershipEntity();
 
-        if ("college".equalsIgnoreCase(request.getTargetType())) {
-            College college = collegeRepository.findByName(request.getTargetName())
-                    .orElseThrow(() -> new BaseException(NOT_FOUND_COLLEGE));
-            PartnershipCollege partnershipCollege = new PartnershipCollege(partnership, college);
-            partnership.getPartnershipColleges().add(partnershipCollege);
-        } else if ("department".equalsIgnoreCase(request.getTargetType())) {
-            Department department = departmentRepository.findByName(request.getTargetName())
-                    .orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
-            PartnershipDepartment partnershipDepartment = new PartnershipDepartment(partnership, department);
-            partnership.getPartnershipDepartments().add(partnershipDepartment);
-        } else {
-            throw new BaseException(INVALID_TARGET_TYPE);
-        }
-        partnershipRepository.save(partnership);
-    }
+		if ("college".equalsIgnoreCase(request.getTargetType())) {
+			College college = collegeRepository.findByName(request.getTargetName())
+											   .orElseThrow(() -> new BaseException(NOT_FOUND_COLLEGE));
+			PartnershipCollege partnershipCollege = new PartnershipCollege(partnership, college);
+			partnership.getPartnershipColleges().add(partnershipCollege);
+		} else if ("department".equalsIgnoreCase(request.getTargetType())) {
+			Department department = departmentRepository.findByName(request.getTargetName())
+														.orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
+			PartnershipDepartment partnershipDepartment = new PartnershipDepartment(partnership, department);
+			partnership.getPartnershipDepartments().add(partnershipDepartment);
+		} else {
+			throw new BaseException(INVALID_TARGET_TYPE);
+		}
+		partnershipRepository.save(partnership);
+	}
 
-    public List<PartnershipResponse> getAllPartnerships() {
-        List<Partnership> partnerships = partnershipRepository.findAll();
-        return partnerships.stream().map(PartnershipResponse::fromEntity)
-                .collect(Collectors.toList());
-    }
+	public List<PartnershipResponse> getAllPartnerships() {
+		List<Partnership> partnerships = partnershipRepository.findAll();
+		return partnerships.stream().map(PartnershipResponse::fromEntity)
+						   .collect(Collectors.toList());
+	}
 
-    public PartnershipDetailResponse getPartnership(Long partnershipId, CustomUserDetails userDetails) {
-        Partnership partnership = partnershipRepository.findById(partnershipId)
-                .orElseThrow(() -> new BaseException(NOT_FOUND_PARTNERSHIP));
+	public PartnershipDetailResponse getPartnership(Long partnershipId, CustomUserDetails userDetails) {
+		Partnership partnership = partnershipRepository.findById(partnershipId)
+													   .orElseThrow(() -> new BaseException(NOT_FOUND_PARTNERSHIP));
 
-        boolean likedByUser = false;
-        if (userDetails != null) {
-            User user = userRepository.findById(userDetails.getId())
-                    .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-            likedByUser = partnershipLikeRepository.findByUserAndPartnership(user, partnership).isPresent();
-        }
+		boolean likedByUser = false;
+		if (userDetails != null) {
+			User user = userRepository.findById(userDetails.getId())
+									  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+			likedByUser = partnershipLikeRepository.findByUserAndPartnership(user, partnership).isPresent();
+		}
 
-        return PartnershipDetailResponse.fromEntity(partnership, likedByUser);
-    }
+		return PartnershipDetailResponse.fromEntity(partnership, likedByUser);
+	}
 
-    @Transactional
-    public void togglePartnershipLike(Long partnershipId, CustomUserDetails userDetails) {
-        Partnership partnership = partnershipRepository.findById(partnershipId)
-                .orElseThrow(() -> new BaseException(NOT_FOUND_PARTNERSHIP));
-        User user = userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+	@Transactional
+	public void togglePartnershipLike(Long partnershipId, CustomUserDetails userDetails) {
+		Partnership partnership = partnershipRepository.findById(partnershipId)
+													   .orElseThrow(() -> new BaseException(NOT_FOUND_PARTNERSHIP));
+		User user = userRepository.findById(userDetails.getId())
+								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-        Optional<PartnershipLike> optionalPartnershipLike = partnershipLikeRepository.findByUserAndPartnership(user, partnership);
-        if (optionalPartnershipLike.isPresent()) {
-            PartnershipLike partnershipLike = optionalPartnershipLike.get();
-            partnership.getLikes().remove(partnershipLike);
-            partnershipLikeRepository.delete(partnershipLike);
-        } else {
-            PartnershipLike partnershipLike = new PartnershipLike(user, partnership);
-            partnership.getLikes().add(partnershipLike);
-            partnershipLikeRepository.save(partnershipLike);
-        }
-    }
+		Optional<PartnershipLike> optionalPartnershipLike = partnershipLikeRepository.findByUserAndPartnership(user,
+			partnership);
+		if (optionalPartnershipLike.isPresent()) {
+			PartnershipLike partnershipLike = optionalPartnershipLike.get();
+			partnership.getLikes().remove(partnershipLike);
+			partnershipLikeRepository.delete(partnershipLike);
+		} else {
+			PartnershipLike partnershipLike = new PartnershipLike(user, partnership);
+			partnership.getLikes().add(partnershipLike);
+			partnershipLikeRepository.save(partnershipLike);
+		}
+	}
 
-    public List<PartnershipResponse> getUserLikedPartnerships(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+	public List<PartnershipResponse> getUserLikedPartnerships(CustomUserDetails userDetails) {
+		User user = userRepository.findById(userDetails.getId())
+								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-        List<PartnershipLike> likes = partnershipLikeRepository.findAllByUser(user);
-        return likes
-                .stream()
-                .map(PartnershipLike::getPartnership)
-                .map(PartnershipResponse::fromEntity)
-                .collect(Collectors.toList());
-    }
+		List<PartnershipLike> likes = partnershipLikeRepository.findAllByUser(user);
+		return likes
+			.stream()
+			.map(PartnershipLike::getPartnership)
+			.map(PartnershipResponse::fromEntity)
+			.collect(Collectors.toList());
+	}
 
-    public List<PartnershipResponse> getUserDepartmentPartnerships(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+	public List<PartnershipResponse> getUserDepartmentPartnerships(CustomUserDetails userDetails) {
+		User user = userRepository.findById(userDetails.getId())
+								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-        Department department = user.getDepartment();
-        if (department == null) {
-            throw new BaseException(MISSING_USER_DEPARTMENT);
-        }
-        College college = department.getCollege();
+		Department department = user.getDepartment();
+		if (department == null) {
+			throw new BaseException(MISSING_USER_DEPARTMENT);
+		}
+		College college = department.getCollege();
 
-        return partnershipRepository
-                .findRelevantPartnerships(college, department)
-                .stream()
-                .map(PartnershipResponse::fromEntity)
-                .collect(Collectors.toList());
-    }
+		return partnershipRepository
+			.findRelevantPartnerships(college, department)
+			.stream()
+			.map(PartnershipResponse::fromEntity)
+			.collect(Collectors.toList());
+	}
 }

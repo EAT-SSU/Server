@@ -11,9 +11,9 @@ import ssu.eatssu.domain.auth.entity.OAuthProvider;
 @Schema(title = "마이페이지 정보")
 @Getter
 public class MyPageResponse {
-    @Schema(description = "닉네임", example = "피치푸치")
-    private String nickname;
+	@Schema(description = "닉네임", example = "피치푸치")
+	private String nickname;
 
-    @Schema(description = "연결 계정 정보", example = "피치푸치")
-    private OAuthProvider provider;
+	@Schema(description = "연결 계정 정보", example = "피치푸치")
+	private OAuthProvider provider;
 }

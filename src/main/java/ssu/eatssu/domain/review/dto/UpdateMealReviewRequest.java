@@ -11,10 +11,10 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class UpdateMealReviewRequest {
-    @Schema(description = "평점", example = "4")
-    private Integer rating;
-    private List<MenuLikeRequest> menuLikes;
-    @Max(150)
-    @Schema(description = "한줄평", example = "맛있어용")
-    private String content;
+	@Schema(description = "평점", example = "4")
+	private Integer rating;
+	private List<MenuLikeRequest> menuLikes;
+	@Max(150)
+	@Schema(description = "한줄평", example = "맛있어용")
+	private String content;
 }

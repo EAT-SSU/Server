@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class BaseException extends RuntimeException {
-    private final BaseResponseStatus status;
+	private final BaseResponseStatus status;
 }

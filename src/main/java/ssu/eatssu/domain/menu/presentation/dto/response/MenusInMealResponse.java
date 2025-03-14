@@ -15,15 +15,15 @@ import java.util.List;
 @Schema(title = "식단 속 메뉴 정보 리스트")
 public class MenusInMealResponse {
 
-    @Schema(description = "식단 속 메뉴 목록", example = "[]")
-    private List<BriefMenuResponse> briefMenus;
+	@Schema(description = "식단 속 메뉴 목록", example = "[]")
+	private List<BriefMenuResponse> briefMenus;
 
-    public static MenusInMealResponse from(Meal meal) {
-        List<BriefMenuResponse> menusInformation = meal.getMealMenus().stream()
-                .map(MealMenu::getMenu)
-                .map(BriefMenuResponse::new)
-                .toList();
+	public static MenusInMealResponse from(Meal meal) {
+		List<BriefMenuResponse> menusInformation = meal.getMealMenus().stream()
+													   .map(MealMenu::getMenu)
+													   .map(BriefMenuResponse::new)
+													   .toList();
 
-        return new MenusInMealResponse(menusInformation);
-    }
+		return new MenusInMealResponse(menusInformation);
+	}
 }

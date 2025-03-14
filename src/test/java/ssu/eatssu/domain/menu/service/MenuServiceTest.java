@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
 import ssu.eatssu.domain.menu.presentation.dto.response.MenuRestaurantResponse;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.entity.MenuCategory;
@@ -24,41 +25,41 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 class MenuServiceTest {
 
-    @Autowired
-    private MenuService menuService;
+	@Autowired
+	private MenuService menuService;
 
-    @Autowired
-    private MenuRepository menuRepository;
+	@Autowired
+	private MenuRepository menuRepository;
 
-    @Autowired
-    private MenuCategoryRepository menuCategoryRepository;
+	@Autowired
+	private MenuCategoryRepository menuCategoryRepository;
 
-    @BeforeEach
-    void setUp() {
-        menuRepository.deleteAll();
-    }
+	@BeforeEach
+	void setUp() {
+		menuRepository.deleteAll();
+	}
 
-    @Test
-    void 식당_이름으로_고정_메뉴를_조회한다() {
-        // given
-        List<Menu> menus = new ArrayList<>();
-        Restaurant foodCourt = Restaurant.from("FOOD_COURT");
+	@Test
+	void 식당_이름으로_고정_메뉴를_조회한다() {
+		// given
+		List<Menu> menus = new ArrayList<>();
+		Restaurant foodCourt = Restaurant.from("FOOD_COURT");
 
-        MenuCategory category1 = MenuCategory.builder().name("분식").restaurant(foodCourt).build();
-        MenuCategory category2 = MenuCategory.builder().name("한식").restaurant(foodCourt).build();
+		MenuCategory category1 = MenuCategory.builder().name("분식").restaurant(foodCourt).build();
+		MenuCategory category2 = MenuCategory.builder().name("한식").restaurant(foodCourt).build();
 
-        menus.add(Menu.createFixed("라면", foodCourt, 3000, category1));
-        menus.add(Menu.createFixed("떡볶이", foodCourt, 5000, category2));
-        menus.add(Menu.createFixed("짜게치", foodCourt, 4000, category1));
+		menus.add(Menu.createFixed("라면", foodCourt, 3000, category1));
+		menus.add(Menu.createFixed("떡볶이", foodCourt, 5000, category2));
+		menus.add(Menu.createFixed("짜게치", foodCourt, 4000, category1));
 
-        menuCategoryRepository.save(category1);
-        menuCategoryRepository.save(category2);
-        menuRepository.saveAll(menus);
+		menuCategoryRepository.save(category1);
+		menuCategoryRepository.save(category2);
+		menuRepository.saveAll(menus);
 
-        // when
-        MenuRestaurantResponse response = menuService.getMenusByRestaurant(foodCourt);
+		// when
+		MenuRestaurantResponse response = menuService.getMenusByRestaurant(foodCourt);
 
-        // then
-        assertThat(response.getCategoryMenuListCollection()).hasSize(2);
-    }
+		// then
+		assertThat(response.getCategoryMenuListCollection()).hasSize(2);
+	}
 }

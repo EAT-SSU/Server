@@ -20,78 +20,78 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class JpaProjectionRatingCalculator implements RatingCalculator {
 
-    private final ReviewRepository reviewRepository;
+	private final ReviewRepository reviewRepository;
 
-    @Override
-    public ReviewRatingCount mealRatingCount(Meal meal) {
-        ReviewRating.resetAll();
+	@Override
+	public ReviewRatingCount mealRatingCount(Meal meal) {
+		ReviewRating.resetAll();
 
-        Collection<RatingsDto> mealRatings = reviewRepository.findByMenu_MealMenus_Meal(meal, RatingsDto.class);
-        mealRatings.forEach(ratings -> ReviewRating.fromValue(ratings.getMainRating()).incrementCount());
+		Collection<RatingsDto> mealRatings = reviewRepository.findByMenu_MealMenus_Meal(meal, RatingsDto.class);
+		mealRatings.forEach(ratings -> ReviewRating.fromValue(ratings.getMainRating()).incrementCount());
 
-        return ReviewRating.toResponse();
-    }
+		return ReviewRating.toResponse();
+	}
 
-    @Override
-    public ReviewRatingCount menuRatingCount(Menu menu) {
-        return null;
-    }
+	@Override
+	public ReviewRatingCount menuRatingCount(Menu menu) {
+		return null;
+	}
 
-    @Override
-    public RatingAverages mealAverageRatings(Meal meal) {
-        long totalReviewCount = mealTotalReviewCount(meal);
+	@Override
+	public RatingAverages mealAverageRatings(Meal meal) {
+		long totalReviewCount = mealTotalReviewCount(meal);
 
-        if (totalReviewCount == 0)
-            return new RatingAverages(null, null, null);
+		if (totalReviewCount == 0)
+			return new RatingAverages(null, null, null);
 
-        Collection<RatingsDto> mealRatings = reviewRepository.findByMenu_MealMenus_Meal(meal, RatingsDto.class);
+		Collection<RatingsDto> mealRatings = reviewRepository.findByMenu_MealMenus_Meal(meal, RatingsDto.class);
 
-        Integer totalMainRating = mealRatings.stream().mapToInt(RatingsDto::getMainRating).sum();
-        Integer totalTasteRating = mealRatings.stream().mapToInt(RatingsDto::getTasteRating).sum();
-        Integer totalAmountRating = mealRatings.stream().mapToInt(RatingsDto::getAmountRating).sum();
+		Integer totalMainRating = mealRatings.stream().mapToInt(RatingsDto::getMainRating).sum();
+		Integer totalTasteRating = mealRatings.stream().mapToInt(RatingsDto::getTasteRating).sum();
+		Integer totalAmountRating = mealRatings.stream().mapToInt(RatingsDto::getAmountRating).sum();
 
-        return RatingAverages.builder()
-                .mainRating(averageRating(totalMainRating, totalReviewCount))
-                .tasteRating(averageRating(totalTasteRating, totalReviewCount))
-                .amountRating(averageRating(totalAmountRating, totalReviewCount))
-                .build();
-    }
+		return RatingAverages.builder()
+							 .mainRating(averageRating(totalMainRating, totalReviewCount))
+							 .tasteRating(averageRating(totalTasteRating, totalReviewCount))
+							 .amountRating(averageRating(totalAmountRating, totalReviewCount))
+							 .build();
+	}
 
-    @Override
-    public RatingAverages menuAverageRatings(Menu menu) {
-        return null;
-    }
+	@Override
+	public RatingAverages menuAverageRatings(Menu menu) {
+		return null;
+	}
 
-    @Override
-    public Double mealAverageMainRating(Meal meal) {
-        long totalReviewCount = mealTotalReviewCount(meal);
+	@Override
+	public Double mealAverageMainRating(Meal meal) {
+		long totalReviewCount = mealTotalReviewCount(meal);
 
-        if (totalReviewCount == 0) {
-            return null;
-        }
+		if (totalReviewCount == 0) {
+			return null;
+		}
 
-        return averageRating(mealTotalMainRating(meal), totalReviewCount);
-    }
+		return averageRating(mealTotalMainRating(meal), totalReviewCount);
+	}
 
-    @Override
-    public Double menuAverageMainRating(Menu menu) {
-        return null;
-    }
+	@Override
+	public Double menuAverageMainRating(Menu menu) {
+		return null;
+	}
 
-    @Override
-    public long mealTotalReviewCount(Meal meal) {
-        return reviewRepository.countByMenu_MealMenus_Meal(meal);
-    }
+	@Override
+	public long mealTotalReviewCount(Meal meal) {
+		return reviewRepository.countByMenu_MealMenus_Meal(meal);
+	}
 
-    public Double averageRating(Integer totalRating, long totalReviewCount) {
-        if (totalRating == null || totalReviewCount == 0) {
-            return null;
-        }
-        return totalRating / (double) totalReviewCount;
-    }
+	public Double averageRating(Integer totalRating, long totalReviewCount) {
+		if (totalRating == null || totalReviewCount == 0) {
+			return null;
+		}
+		return totalRating / (double)totalReviewCount;
+	}
 
-    public Integer mealTotalMainRating(Meal meal) {
-        return null;
-    }
+	public Integer mealTotalMainRating(Meal meal) {
+		return null;
+	}
 
 }

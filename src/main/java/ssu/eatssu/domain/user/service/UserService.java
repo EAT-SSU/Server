@@ -3,9 +3,11 @@ package ssu.eatssu.domain.user.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.review.entity.Review;
@@ -30,82 +32,82 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 @Component
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final DepartmentRepository departmentRepository;
+	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final DepartmentRepository departmentRepository;
 
-    public User join(String email, OAuthProvider provider, String providerId) {
-        String credentials = createCredentials(provider, providerId);
-        String nickname = createNickname();
-        User user = User.create(email, nickname, provider, providerId, credentials);
-        return userRepository.save(user);
-    }
+	public User join(String email, OAuthProvider provider, String providerId) {
+		String credentials = createCredentials(provider, providerId);
+		String nickname = createNickname();
+		User user = User.create(email, nickname, provider, providerId, credentials);
+		return userRepository.save(user);
+	}
 
-    public void updateNickname(CustomUserDetails userDetails, NicknameUpdateRequest request) {
-        User user = userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+	public void updateNickname(CustomUserDetails userDetails, NicknameUpdateRequest request) {
+		User user = userRepository.findById(userDetails.getId())
+								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-        user.updateNickname(request.nickname());
-    }
+		user.updateNickname(request.nickname());
+	}
 
-    public MyPageResponse findMyPage(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        return new MyPageResponse(user.getNickname(), user.getProvider());
-    }
+	public MyPageResponse findMyPage(CustomUserDetails userDetails) {
+		User user = userRepository.findById(userDetails.getId())
+								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+		return new MyPageResponse(user.getNickname(), user.getProvider());
+	}
 
-    public boolean withdraw(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+	public boolean withdraw(CustomUserDetails userDetails) {
+		User user = userRepository.findById(userDetails.getId())
+								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-        user.getReviews().forEach(Review::clearUser);
-        user.getUserInquiries().forEach(inquiry -> inquiry.clearUser());
-        userRepository.delete(user);
+		user.getReviews().forEach(Review::clearUser);
+		user.getUserInquiries().forEach(inquiry -> inquiry.clearUser());
+		userRepository.delete(user);
 
-        return true;
-    }
+		return true;
+	}
 
-    public Boolean validateDuplicatedEmail(String email) {
-        return !userRepository.existsByEmail(email);
-    }
+	public Boolean validateDuplicatedEmail(String email) {
+		return !userRepository.existsByEmail(email);
+	}
 
-    public Boolean validateDuplicatedNickname(String nickname) {
-        return !userRepository.existsByNickname(nickname);
-    }
+	public Boolean validateDuplicatedNickname(String nickname) {
+		return !userRepository.existsByNickname(nickname);
+	}
 
-    public String createNickname() {
-        String uuid = UUID.randomUUID().toString();
-        String shortUUID = uuid.substring(0, 4);
-        return "user-" + shortUUID;
-    }
+	public String createNickname() {
+		String uuid = UUID.randomUUID().toString();
+		String shortUUID = uuid.substring(0, 4);
+		return "user-" + shortUUID;
+	}
 
-    private String createCredentials(OAuthProvider provider, String providerId) {
-        return passwordEncoder.encode(provider + providerId);
-    }
+	private String createCredentials(OAuthProvider provider, String providerId) {
+		return passwordEncoder.encode(provider + providerId);
+	}
 
-    @Transactional
-    public void registerDepartment(UpdateDepartmentRequest request, CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        Department department = departmentRepository.findByName(request.getDepartmentName())
-                .orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
+	@Transactional
+	public void registerDepartment(UpdateDepartmentRequest request, CustomUserDetails userDetails) {
+		User user = userRepository.findById(userDetails.getId())
+								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+		Department department = departmentRepository.findByName(request.getDepartmentName())
+													.orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
 
-        user.updateDepartment(department);
-    }
+		user.updateDepartment(department);
+	}
 
-    public Boolean validateDepartmentExists(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        return user.getDepartment() != null;
-    }
+	public Boolean validateDepartmentExists(CustomUserDetails userDetails) {
+		User user = userRepository.findById(userDetails.getId())
+								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+		return user.getDepartment() != null;
+	}
 
-    public DepartmentResponse getDepartment(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        Department department = user.getDepartment();
-        if (department == null) {
-            throw new BaseException(MISSING_USER_DEPARTMENT);
-        }
-        return new DepartmentResponse(department.getName());
-    }
+	public DepartmentResponse getDepartment(CustomUserDetails userDetails) {
+		User user = userRepository.findById(userDetails.getId())
+								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+		Department department = user.getDepartment();
+		if (department == null) {
+			throw new BaseException(MISSING_USER_DEPARTMENT);
+		}
+		return new DepartmentResponse(department.getName());
+	}
 }
