@@ -13,34 +13,34 @@ import java.util.List;
 @Builder
 public class MealReviewsResponse implements ReviewInformationResponse {
 
-    @Schema(description = "메뉴명 리스트", example = "['고구마치즈돈까스', '막국수', '미니밥','단무지', '요구르트']")
-    private List<String> menuNames;
+	@Schema(description = "메뉴명 리스트", example = "['고구마치즈돈까스', '막국수', '미니밥','단무지', '요구르트']")
+	private List<String> menuNames;
 
-    @Schema(description = "리뷰 개수", example = "15")
-    private Long totalReviewCount;
+	@Schema(description = "리뷰 개수", example = "15")
+	private Long totalReviewCount;
 
-    @Schema(description = "평점-메인", example = "4.4")
-    private Double mainRating;
+	@Schema(description = "평점-메인", example = "4.4")
+	private Double mainRating;
 
-    @Schema(description = "평점-양", example = "4.4")
-    private Double amountRating;
+	@Schema(description = "평점-양", example = "4.4")
+	private Double amountRating;
 
-    @Schema(description = "평점-맛", example = "4.4")
-    private Double tasteRating;
+	@Schema(description = "평점-맛", example = "4.4")
+	private Double tasteRating;
 
-    @Schema(description = "평점 별 갯수")
-    private ReviewRatingCount reviewRatingCount;
+	@Schema(description = "평점 별 갯수")
+	private ReviewRatingCount reviewRatingCount;
 
-    public static MealReviewsResponse of(Long totalReviewCount, List<String> menuNames,
-                                         RatingAverages ratingAverages, ReviewRatingCount reviewRatingCount) {
+	public static MealReviewsResponse of(Long totalReviewCount, List<String> menuNames,
+		RatingAverages ratingAverages, ReviewRatingCount reviewRatingCount) {
 
-        return MealReviewsResponse.builder()
-                .menuNames(menuNames)
-                .mainRating(ratingAverages.mainRating())
-                .amountRating(ratingAverages.amountRating())
-                .tasteRating(ratingAverages.tasteRating())
-                .totalReviewCount(totalReviewCount)
-                .reviewRatingCount(reviewRatingCount)
-                .build();
-    }
+		return MealReviewsResponse.builder()
+								  .menuNames(menuNames)
+								  .mainRating(ratingAverages.mainRating())
+								  .amountRating(ratingAverages.amountRating())
+								  .tasteRating(ratingAverages.tasteRating())
+								  .totalReviewCount(totalReviewCount)
+								  .reviewRatingCount(reviewRatingCount)
+								  .build();
+	}
 }
