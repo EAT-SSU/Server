@@ -8,8 +8,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class MenuLikeRequest {
-    @Schema(description = "메뉴 식별자", example = "123")
-    private Long menuId;
-    @Schema(description = "좋아요 or 싫어요", example = "좋아요 : true or 싫어요 : false")
-    private Boolean isLike;
+	@Schema(description = "메뉴 식별자", example = "123")
+	private Long menuId;
+	@Schema(description = "좋아요 or 싫어요", example = "좋아요 : true or 싫어요 : false")
+	private Boolean isLike;
 }

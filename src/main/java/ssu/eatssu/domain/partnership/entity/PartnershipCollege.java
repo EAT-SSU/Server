@@ -10,21 +10,21 @@ import ssu.eatssu.domain.user.department.entity.College;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PartnershipCollege {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "partnership_college_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "partnership_college_id")
+	private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "partnership_id")
-    private Partnership partnership;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "partnership_id")
+	private Partnership partnership;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "college_id")
-    private College college;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "college_id")
+	private College college;
 
-    public PartnershipCollege(Partnership partnership, College college) {
-        this.partnership = partnership;
-        this.college = college;
-    }
+	public PartnershipCollege(Partnership partnership, College college) {
+		this.partnership = partnership;
+		this.college = college;
+	}
 }

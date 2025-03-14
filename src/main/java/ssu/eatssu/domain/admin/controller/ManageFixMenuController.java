@@ -1,8 +1,10 @@
 package ssu.eatssu.domain.admin.controller;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
 import ssu.eatssu.domain.admin.dto.MenuBoards;
 import ssu.eatssu.domain.admin.dto.RegisterFixMenuRequest;
 import ssu.eatssu.domain.admin.dto.UpdateFixMenuRequest;
@@ -15,43 +17,42 @@ import ssu.eatssu.global.handler.response.BaseResponse;
 @RequiredArgsConstructor
 public class ManageFixMenuController {
 
-    private final ManageFixMenuService manageFixMenuService;
+	private final ManageFixMenuService manageFixMenuService;
 
-    @ResponseBody
-    @GetMapping("")
-    public BaseResponse<MenuBoards> fixMenuPage() {
-        MenuBoards menuBoards = manageFixMenuService.getMenuBoards();
-        return BaseResponse.success(menuBoards);
-    }
+	@ResponseBody
+	@GetMapping("")
+	public BaseResponse<MenuBoards> fixMenuPage() {
+		MenuBoards menuBoards = manageFixMenuService.getMenuBoards();
+		return BaseResponse.success(menuBoards);
+	}
 
-    @ResponseBody
-    @PostMapping("")
-    public BaseResponse register(@RequestParam Restaurant restaurant,
-                                 @RequestBody RegisterFixMenuRequest request) {
-        manageFixMenuService.register(restaurant, request);
-        return BaseResponse.success();
-    }
+	@ResponseBody
+	@PostMapping("")
+	public BaseResponse register(@RequestParam Restaurant restaurant,
+		@RequestBody RegisterFixMenuRequest request) {
+		manageFixMenuService.register(restaurant, request);
+		return BaseResponse.success();
+	}
 
+	@ResponseBody
+	@PatchMapping("/{menuId}")
+	public BaseResponse update(@PathVariable Long menuId,
+		@RequestBody UpdateFixMenuRequest request) {
+		manageFixMenuService.updateMenu(menuId, request);
+		return BaseResponse.success();
+	}
 
-    @ResponseBody
-    @PatchMapping("/{menuId}")
-    public BaseResponse update(@PathVariable Long menuId,
-                               @RequestBody UpdateFixMenuRequest request) {
-        manageFixMenuService.updateMenu(menuId, request);
-        return BaseResponse.success();
-    }
+	@ResponseBody
+	@DeleteMapping("/{menuId}")
+	public BaseResponse delete(@PathVariable Long menuId) {
+		manageFixMenuService.delete(menuId);
+		return BaseResponse.success();
+	}
 
-    @ResponseBody
-    @DeleteMapping("/{menuId}")
-    public BaseResponse delete(@PathVariable Long menuId) {
-        manageFixMenuService.delete(menuId);
-        return BaseResponse.success();
-    }
-
-    @ResponseBody
-    @PatchMapping("/{menuId}/discontinued-status")
-    public BaseResponse<Boolean> toggleDiscontinuedStatus(@PathVariable Long menuId) {
-        return BaseResponse.success(manageFixMenuService.changeDiscontinuedStatus(menuId));
-    }
+	@ResponseBody
+	@PatchMapping("/{menuId}/discontinued-status")
+	public BaseResponse<Boolean> toggleDiscontinuedStatus(@PathVariable Long menuId) {
+		return BaseResponse.success(manageFixMenuService.changeDiscontinuedStatus(menuId));
+	}
 
 }

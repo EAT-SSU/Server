@@ -12,14 +12,14 @@ import java.util.List;
 @Schema(title = "리뷰 신고 사유 목록 Response")
 public class ReportTypeList {
 
-    @Schema(description = "리뷰 신고 사유 목록")
-    private final List<ReportTypeInformation> response = new ArrayList<>();
+	@Schema(description = "리뷰 신고 사유 목록")
+	private final List<ReportTypeInformation> response = new ArrayList<>();
 
-    public static ReportTypeList get() {
-        ReportTypeList reportTypeList = new ReportTypeList();
-        Arrays.stream(ReportType.values())
-                .forEach(reportType -> reportTypeList.response.add(
-                        new ReportTypeInformation(reportType.name(), reportType.getDescription())));
-        return reportTypeList;
-    }
+	public static ReportTypeList get() {
+		ReportTypeList reportTypeList = new ReportTypeList();
+		Arrays.stream(ReportType.values())
+			  .forEach(reportType -> reportTypeList.response.add(
+				  new ReportTypeInformation(reportType.name(), reportType.getDescription())));
+		return reportTypeList;
+	}
 }
