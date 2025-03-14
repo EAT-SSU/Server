@@ -6,5 +6,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class DepartmentResponse {
-    private String departmentName;
+	private String departmentName;
 }

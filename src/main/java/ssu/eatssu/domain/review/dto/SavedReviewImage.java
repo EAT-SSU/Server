@@ -9,6 +9,6 @@ import lombok.Getter;
 @Schema(title = "업로드 된 이미지 url")
 public class SavedReviewImage {
 
-    @Schema(description = "이미지 url", example = "image123.jpg")
-    private String url;
+	@Schema(description = "이미지 url", example = "image123.jpg")
+	private String url;
 }
