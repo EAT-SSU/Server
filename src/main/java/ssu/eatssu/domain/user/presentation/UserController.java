@@ -1,5 +1,22 @@
 package ssu.eatssu.domain.user.presentation;
 
+import java.util.List;
+
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -10,25 +27,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
 import ssu.eatssu.domain.partnership.service.PartnershipService;
 import ssu.eatssu.domain.review.service.MealReviewService;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.slice.service.SliceService;
-import ssu.eatssu.domain.user.dto.*;
+import ssu.eatssu.domain.user.dto.DepartmentResponse;
+import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
+import ssu.eatssu.domain.user.dto.MyPageResponse;
+import ssu.eatssu.domain.user.dto.MyReviewDetail;
+import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
+import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
 import ssu.eatssu.domain.user.service.UserService;
 import ssu.eatssu.global.handler.response.BaseResponse;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

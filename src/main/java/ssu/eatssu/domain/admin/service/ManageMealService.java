@@ -1,11 +1,23 @@
 package ssu.eatssu.domain.admin.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import ssu.eatssu.domain.admin.dto.*;
-import ssu.eatssu.domain.admin.persistence.*;
+import lombok.RequiredArgsConstructor;
+import ssu.eatssu.domain.admin.dto.BriefMenu;
+import ssu.eatssu.domain.admin.dto.MealInfo;
+import ssu.eatssu.domain.admin.dto.MealSection;
+import ssu.eatssu.domain.admin.dto.MenuBoard;
+import ssu.eatssu.domain.admin.dto.MenuBoards;
+import ssu.eatssu.domain.admin.dto.MenuLine;
+import ssu.eatssu.domain.admin.dto.RegisterMealRequest;
+import ssu.eatssu.domain.admin.persistence.LoadMealRepository;
+import ssu.eatssu.domain.admin.persistence.ManageMealMenuRepository;
+import ssu.eatssu.domain.admin.persistence.ManageMealRepository;
+import ssu.eatssu.domain.admin.persistence.ManageMenuRepository;
+import ssu.eatssu.domain.admin.persistence.MenuRatingRepository;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.MealMenu;
 import ssu.eatssu.domain.menu.entity.Menu;
@@ -13,9 +25,6 @@ import ssu.eatssu.domain.menu.entity.constants.TimePart;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
-
-import java.util.Date;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service

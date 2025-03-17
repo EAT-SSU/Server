@@ -1,14 +1,13 @@
 package ssu.eatssu.domain.review.dto;
 
+import org.springframework.util.Assert;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.springframework.util.Assert;
-
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.review.entity.Review;

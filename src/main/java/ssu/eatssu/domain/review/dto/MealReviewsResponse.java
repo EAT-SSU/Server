@@ -1,11 +1,11 @@
 package ssu.eatssu.domain.review.dto;
 
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Schema(title = "식단 리뷰 정보(평점 등등)")
 @Getter

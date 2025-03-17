@@ -1,7 +1,7 @@
 package ssu.eatssu.domain.menu.service;
 
 import static org.assertj.core.api.Assertions.*;
-import static ssu.eatssu.domain.menu.entity.constants.TimePart.LUNCH;
+import static ssu.eatssu.domain.menu.entity.constants.TimePart.*;
 
 import java.sql.Date;
 import java.util.List;

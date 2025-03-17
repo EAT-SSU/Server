@@ -1,11 +1,15 @@
 package ssu.eatssu.domain.slice.service;
 
-import lombok.RequiredArgsConstructor;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
@@ -20,12 +24,6 @@ import ssu.eatssu.domain.user.dto.MyReviewDetail;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
 @Service
 @RequiredArgsConstructor

@@ -1,11 +1,18 @@
 package ssu.eatssu.domain.admin.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ssu.eatssu.domain.admin.dto.*;
+import lombok.RequiredArgsConstructor;
+import ssu.eatssu.domain.admin.dto.BriefMenu;
+import ssu.eatssu.domain.admin.dto.MenuBoard;
+import ssu.eatssu.domain.admin.dto.MenuBoards;
+import ssu.eatssu.domain.admin.dto.MenuLine;
+import ssu.eatssu.domain.admin.dto.MenuSection;
+import ssu.eatssu.domain.admin.dto.RegisterFixMenuRequest;
+import ssu.eatssu.domain.admin.dto.UpdateFixMenuRequest;
 import ssu.eatssu.domain.admin.persistence.LoadFixMenuRepository;
 import ssu.eatssu.domain.admin.persistence.ManageMenuRepository;
 import ssu.eatssu.domain.admin.persistence.MenuRatingRepository;
@@ -15,8 +22,6 @@ import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
-
-import java.util.List;
 
 @Service
 @Transactional

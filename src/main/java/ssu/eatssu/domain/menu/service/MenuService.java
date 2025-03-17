@@ -1,12 +1,15 @@
 package ssu.eatssu.domain.menu.service;
 
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
+
+import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.entity.MenuCategory;
 import ssu.eatssu.domain.menu.persistence.MenuCategoryRepository;
@@ -18,10 +21,6 @@ import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
-
-import java.util.List;
-
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_SUPPORT_RESTAURANT;
 
 @Slf4j
 @Service

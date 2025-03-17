@@ -1,12 +1,12 @@
 package ssu.eatssu.domain.slice.dto;
 
+import java.util.Collections;
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.Collections;
-import java.util.List;
 
 @AllArgsConstructor
 @Builder

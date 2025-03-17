@@ -1,13 +1,16 @@
 package ssu.eatssu.domain.user.service;
 
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
+
+import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.review.entity.Review;
@@ -20,10 +23,6 @@ import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
-
-import java.util.UUID;
-
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 @Slf4j
 @Service

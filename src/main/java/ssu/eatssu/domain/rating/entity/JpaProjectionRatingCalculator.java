@@ -1,5 +1,7 @@
 package ssu.eatssu.domain.rating.entity;
 
+import java.util.Collection;
+
 import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
@@ -7,8 +9,6 @@ import ssu.eatssu.domain.review.dto.RatingAverages;
 import ssu.eatssu.domain.review.dto.RatingsDto;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
-
-import java.util.Collection;
 
 /**
  * Jpa projection 을 이용하여 구현한 클래스입니다.

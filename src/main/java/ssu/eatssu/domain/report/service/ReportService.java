@@ -1,10 +1,11 @@
 package ssu.eatssu.domain.report.service;
 
-import lombok.RequiredArgsConstructor;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.report.dto.ReportCreateRequest;
 import ssu.eatssu.domain.report.dto.ReportTypeList;
@@ -16,9 +17,6 @@ import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
-
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
 @RequiredArgsConstructor
 @Service
