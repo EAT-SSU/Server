@@ -1,9 +1,9 @@
 package ssu.eatssu.domain.user.util;
 
+import java.util.List;
+
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.entity.User;
-
-import java.util.List;
 
 public class UserAliasUtil {
 	public static String getUserAlias(User user, List<Review> reviews) {

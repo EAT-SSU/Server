@@ -1,16 +1,15 @@
 package ssu.eatssu.domain.menu.persistence;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
-
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.menu.entity.QMeal;
 import ssu.eatssu.domain.menu.entity.QMealMenu;
 import ssu.eatssu.domain.menu.entity.QMenu;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor

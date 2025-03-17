@@ -1,10 +1,9 @@
 package ssu.eatssu.domain.admin.service;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.admin.dto.RegisterCategoryRequest;
 import ssu.eatssu.domain.admin.persistence.LoadCategoryRepository;
 import ssu.eatssu.domain.admin.persistence.ManageCategoryRepository;

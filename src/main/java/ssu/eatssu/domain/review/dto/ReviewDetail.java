@@ -1,14 +1,14 @@
 package ssu.eatssu.domain.review.dto;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import ssu.eatssu.domain.review.entity.Review;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @AllArgsConstructor
 @Builder

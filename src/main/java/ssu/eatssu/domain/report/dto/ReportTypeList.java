@@ -1,12 +1,12 @@
 package ssu.eatssu.domain.report.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import ssu.eatssu.domain.report.entity.ReportType;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import ssu.eatssu.domain.report.entity.ReportType;
 
 @Getter
 @Schema(title = "리뷰 신고 사유 목록 Response")

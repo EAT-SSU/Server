@@ -1,8 +1,8 @@
 package ssu.eatssu.global.handler.response;
 
-import lombok.Getter;
-
 import org.springframework.http.HttpStatus;
+
+import lombok.Getter;
 
 /**
  * 에러 코드 관리

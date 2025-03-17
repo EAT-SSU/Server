@@ -1,7 +1,6 @@
 package ssu.eatssu.domain.auth.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import static ssu.eatssu.domain.auth.entity.OAuthProvider.*;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -9,6 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ssu.eatssu.domain.auth.dto.AppleLoginRequest;
 import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
 import ssu.eatssu.domain.auth.dto.OAuthInfo;
@@ -19,9 +20,6 @@ import ssu.eatssu.domain.user.dto.Tokens;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.user.service.UserService;
-
-import static ssu.eatssu.domain.auth.entity.OAuthProvider.APPLE;
-import static ssu.eatssu.domain.auth.entity.OAuthProvider.KAKAO;
 
 @Slf4j
 @Service

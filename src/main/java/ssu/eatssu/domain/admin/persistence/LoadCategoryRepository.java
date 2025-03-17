@@ -1,11 +1,10 @@
 package ssu.eatssu.domain.admin.persistence;
 
+import org.springframework.stereotype.Repository;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.stereotype.Repository;
-
 import ssu.eatssu.domain.menu.entity.QMenuCategory;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 

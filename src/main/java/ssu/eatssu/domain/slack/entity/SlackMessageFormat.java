@@ -1,13 +1,13 @@
 package ssu.eatssu.domain.slack.entity;
 
+import java.text.MessageFormat;
+
 import org.springframework.stereotype.Component;
 
 import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.review.entity.Report;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.entity.User;
-
-import java.text.MessageFormat;
 
 @Component
 public class SlackMessageFormat {

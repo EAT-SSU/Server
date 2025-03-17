@@ -1,5 +1,12 @@
 package ssu.eatssu.domain.auth.presentation;
 
+import static ssu.eatssu.domain.auth.infrastructure.SecurityUtil.*;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,19 +16,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import ssu.eatssu.domain.auth.dto.AppleLoginRequest;
 import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
 import ssu.eatssu.domain.auth.service.OAuthService;
 import ssu.eatssu.domain.user.dto.Tokens;
 import ssu.eatssu.global.handler.response.BaseResponse;
-
-import static ssu.eatssu.domain.auth.infrastructure.SecurityUtil.getLoginUser;
 
 @Slf4j
 @RestController

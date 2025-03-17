@@ -1,10 +1,9 @@
 package ssu.eatssu.domain.admin.service;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.admin.controller.AdminAuth;
 import ssu.eatssu.domain.admin.dto.LoginRequest;
 import ssu.eatssu.domain.auth.security.JwtTokenProvider;

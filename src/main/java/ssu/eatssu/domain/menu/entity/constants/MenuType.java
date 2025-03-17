@@ -1,14 +1,14 @@
 package ssu.eatssu.domain.menu.entity.constants;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-
-import lombok.Getter;
-import ssu.eatssu.domain.restaurant.entity.Restaurant;
+import static ssu.eatssu.domain.restaurant.entity.Restaurant.*;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static ssu.eatssu.domain.restaurant.entity.Restaurant.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+
+import lombok.Getter;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 
 @Getter
 public enum MenuType {

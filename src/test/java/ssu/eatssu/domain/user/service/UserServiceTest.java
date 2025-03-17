@@ -1,5 +1,7 @@
 package ssu.eatssu.domain.user.service;
 
+import static org.assertj.core.api.Assertions.*;
+
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +14,6 @@ import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class UserServiceTest {
