@@ -16,6 +16,13 @@
 - [App Store](https://apps.apple.com/kr/app/eat-ssu-%EC%88%AD%EC%8B%A4%EB%8C%80-%ED%95%99%EC%8B%9D-%EB%A6%AC%EB%B7%B0-%EC%95%B1/id6472618331)
 - [Play Store](https://play.google.com/store/apps/details?id=com.eatssu.android)
 
-## 개발 조건
+## 개발 환경
+
+### Application 환경
 
 - `application.yml` 파일은 팀 내부에서만 공유합니다.
+
+### Java SDK 17
+
+- `build.gradle`을 확인해도 알겠지만, Java 17을 사용합니다.
+- Vendor는 어느 것을 사용해도 무방합니다.
