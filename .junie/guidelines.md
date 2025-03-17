@@ -1,40 +1,40 @@
-# EAT-SSU Project Guidelines
+# EAT-SSU 프로젝트 가이드라인
 
-## Project Overview
+## 프로젝트 개요
 
-EAT-SSU is a mobile application designed for Soongsil University students to review and compare cafeteria menus across campus. The app aims to enhance the dining experience by providing comprehensive information about various dining options, including menu reviews, operating hours, and locations.
+EAT-SSU는 숭실대학교 학생들이 캠퍼스 내 식당 메뉴를 리뷰하고 비교할 수 있는 모바일 애플리케이션입니다. 이 앱은 메뉴 리뷰, 운영 시간, 위치 등 다양한 식사 옵션에 대한 종합적인 정보를 제공하여 식사 경험을 향상시키는 것을 목표로 합니다.
 
-### Key Features
+### 주요 기능
 
-- View and compare menus from all campus dining facilities:
-  - Student Cafeteria (학생식당)
-  - Dodam Cafeteria (도담식당)
-  - Food Court (푸드코트)
-  - Snack Corner (스낵코너)
-  - Dormitory Cafeteria (기숙사 식당)
-- Write and read reviews for meals
-- Check restaurant operating hours and locations
-- User authentication system
+- 캠퍼스 내 모든 식당 시설의 메뉴 보기 및 비교:
+  - 학생식당
+  - 도담식당
+  - 푸드코트
+  - 스낵코너
+  - 기숙사 식당
+- 식사에 대한 리뷰 작성 및 읽기
+- 식당 운영 시간 및 위치 확인
+- 사용자 인증 시스템
 
-## Technical Stack
+## 기술 스택
 
-### Backend
-- **Framework**: Spring Boot 3.0.4
-- **Language**: Java 17
-- **Database**: MySQL (Production), H2 (Testing)
-- **ORM**: Spring Data JPA with QueryDSL
-- **Security**: Spring Security with JWT
-- **API Documentation**: OpenAPI (Springdoc)
-- **Build Tool**: Gradle
-- **Cloud Storage**: AWS S3
-- **Notifications**: Slack API integration
+### 백엔드
+- **프레임워크**: Spring Boot 3.0.4
+- **언어**: Java 17
+- **데이터베이스**: MySQL (프로덕션), H2 (테스팅)
+- **ORM**: Spring Data JPA와 QueryDSL
+- **보안**: Spring Security와 JWT
+- **API 문서화**: OpenAPI (Springdoc)
+- **빌드 도구**: Gradle
+- **클라우드 스토리지**: AWS S3
+- **알림**: Slack API 통합
 
-### Mobile Applications
-- Available on both iOS (App Store) and Android (Play Store)
+### 모바일 애플리케이션
+- iOS(App Store)와 Android(Play Store) 모두에서 이용 가능
 
-## Project Structure
+## 프로젝트 구조
 
-The project follows a domain-driven design approach with the following structure:
+이 프로젝트는 다음과 같은 구조로 도메인 주도 설계 접근 방식을 따릅니다:
 
 ```
 src/main/java/ssu/eatssu/
@@ -51,43 +51,43 @@ src/main/java/ssu/eatssu/
 │   │   ├── persistence/
 │   │   ├── presentation/
 │   │   └── service/
-│   └── [other domains]
+│   └── [기타 도메인]
 ├── global/
 │   ├── config/
 │   ├── error/
 │   └── security/
-└── [other packages]
+└── [기타 패키지]
 ```
 
-## Development Guidelines
+## 개발 가이드라인
 
-### Code Style
-- Follow Java coding conventions
-- Use meaningful variable and method names
-- Write comprehensive comments for complex logic
-- Create unit tests for all new features
+### 코드 스타일
+- Java 코딩 규칙 준수
+- 의미 있는 변수 및 메소드 이름 사용
+- 복잡한 로직에 대한 포괄적인 주석 작성
+- 모든 새로운 기능에 대한 단위 테스트 작성
 
-### Git Workflow
-- Create feature branches from the main branch
-- Use descriptive commit messages
-- Submit pull requests for code review before merging
-- Keep commits focused and atomic
+### Git 워크플로우
+- 메인 브랜치에서 기능 브랜치 생성
+- 설명적인 커밋 메시지 사용
+- 병합 전 코드 리뷰를 위한 풀 리퀘스트 제출
+- 커밋을 집중적이고 원자적으로 유지
 
-### Security
-- Never commit sensitive information (API keys, credentials)
-- The `application.yml` file is shared only within the team
-- Always validate user input
-- Follow the principle of least privilege
+### 보안
+- 민감한 정보(API 키, 자격 증명)를 절대 커밋하지 않음
+- `application.yml` 파일은 팀 내에서만 공유
+- 항상 사용자 입력 검증
+- 최소 권한 원칙 준수
 
-### Testing
-- Write unit tests for all services
-- Use integration tests for API endpoints
-- Maintain test coverage for critical components
+### 테스팅
+- 모든 서비스에 대한 단위 테스트 작성
+- API 엔드포인트에 대한 통합 테스트 사용
+- 중요 구성 요소에 대한 테스트 커버리지 유지
 
-## Deployment
+## 배포
 
-The application is deployed as a Docker container. The build process creates a JAR file named `eat-ssu.jar`.
+애플리케이션은 Docker 컨테이너로 배포됩니다. 빌드 프로세스는 `eat-ssu.jar`라는 JAR 파일을 생성합니다.
 
-## Contact
+## 연락처
 
-For more information about the project, visit the [project page](https://hi-jin-1514.notion.site/EAT-SSU-b04aaec9b7814a628c6ef6b3e08c74a3).
+프로젝트에 대한 자세한 정보는 [프로젝트 페이지](https://hi-jin-1514.notion.site/EAT-SSU-b04aaec9b7814a628c6ef6b3e08c74a3)를 방문하세요.
