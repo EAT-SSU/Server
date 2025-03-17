@@ -1,12 +1,11 @@
 package ssu.eatssu.domain.admin.persistence;
 
+import org.springframework.stereotype.Repository;
+
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.stereotype.Repository;
-
 import ssu.eatssu.domain.menu.entity.QMenu;
 import ssu.eatssu.domain.review.entity.QReview;
 

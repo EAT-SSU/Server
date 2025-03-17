@@ -1,5 +1,10 @@
 package ssu.eatssu.domain.menu.service;
 
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,18 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import ssu.eatssu.domain.menu.presentation.dto.response.MenuRestaurantResponse;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.entity.MenuCategory;
-import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuCategoryRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
+import ssu.eatssu.domain.menu.presentation.dto.response.MenuRestaurantResponse;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @DisplayName("MenuService 테스트")

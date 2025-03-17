@@ -1,10 +1,15 @@
 package ssu.eatssu.domain.partnership.service;
 
-import lombok.RequiredArgsConstructor;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.partnership.dto.CreatePartnershipRequest;
 import ssu.eatssu.domain.partnership.dto.PartnershipDetailResponse;
@@ -22,12 +27,6 @@ import ssu.eatssu.domain.user.department.persistence.DepartmentRepository;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor

@@ -1,10 +1,10 @@
 package ssu.eatssu.domain.menu.entity.constants;
 
+import java.util.Arrays;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 import lombok.Getter;
-
-import java.util.Arrays;
 
 @Getter
 public enum TimePart {

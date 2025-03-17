@@ -1,18 +1,29 @@
 package ssu.eatssu.domain.review.service;
 
-import lombok.RequiredArgsConstructor;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
+
+import java.io.IOException;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.rating.entity.RatingCalculator;
-import ssu.eatssu.domain.review.dto.*;
+import ssu.eatssu.domain.review.dto.MealReviewsResponse;
+import ssu.eatssu.domain.review.dto.MenuReviewResponse;
+import ssu.eatssu.domain.review.dto.RatingAverages;
+import ssu.eatssu.domain.review.dto.ReviewCreateRequest;
+import ssu.eatssu.domain.review.dto.ReviewRatingCount;
+import ssu.eatssu.domain.review.dto.ReviewUpdateRequest;
+import ssu.eatssu.domain.review.dto.SavedReviewImage;
+import ssu.eatssu.domain.review.dto.UploadReviewRequest;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewImage;
 import ssu.eatssu.domain.review.repository.ReviewImageRepository;
@@ -21,11 +32,6 @@ import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.util.S3Uploader;
-
-import java.io.IOException;
-import java.util.List;
-
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service

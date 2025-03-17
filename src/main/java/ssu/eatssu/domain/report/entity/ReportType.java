@@ -1,10 +1,10 @@
 package ssu.eatssu.domain.report.entity;
 
+import java.util.Locale;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 import lombok.Getter;
-
-import java.util.Locale;
 
 @Getter
 public enum ReportType {

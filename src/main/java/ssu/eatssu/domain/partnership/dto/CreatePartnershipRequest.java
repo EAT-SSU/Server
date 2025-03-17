@@ -1,13 +1,13 @@
 package ssu.eatssu.domain.partnership.dto;
 
+import java.time.LocalDate;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipType;
 import ssu.eatssu.domain.partnership.entity.RestaurantType;
-
-import java.time.LocalDate;
 
 @Schema(title = "제휴 등록")
 @Getter

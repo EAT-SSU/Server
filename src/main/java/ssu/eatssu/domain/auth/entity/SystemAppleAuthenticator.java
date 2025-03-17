@@ -1,22 +1,6 @@
 package ssu.eatssu.domain.auth.entity;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import ssu.eatssu.domain.auth.dto.AppleKeys;
-import ssu.eatssu.domain.auth.dto.OAuthInfo;
-import ssu.eatssu.global.handler.response.BaseException;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 import java.math.BigInteger;
 import java.net.URI;
@@ -28,7 +12,22 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.Map;
 
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.INVALID_IDENTITY_TOKEN;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
+import ssu.eatssu.domain.auth.dto.AppleKeys;
+import ssu.eatssu.domain.auth.dto.OAuthInfo;
+import ssu.eatssu.global.handler.response.BaseException;
 
 @Component
 @RequiredArgsConstructor

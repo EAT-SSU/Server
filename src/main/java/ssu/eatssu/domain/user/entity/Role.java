@@ -1,8 +1,8 @@
 package ssu.eatssu.domain.user.entity;
 
-import lombok.Getter;
-
 import org.springframework.security.core.GrantedAuthority;
+
+import lombok.Getter;
 
 @Getter
 public enum Role implements GrantedAuthority {

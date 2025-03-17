@@ -1,8 +1,8 @@
 package ssu.eatssu.domain.menu.presentation.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(title = "식단 추가(가격 입력 받는 버전)")
 public record MealCreateWithPriceRequest(
