@@ -1,12 +1,12 @@
 package ssu.eatssu.domain.restaurant.entity;
 
+import java.util.Arrays;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 import lombok.Getter;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
-
-import java.util.Arrays;
 
 @Getter
 public enum Restaurant {
@@ -17,8 +17,8 @@ public enum Restaurant {
 	SNACK_CORNER("SNACK_CORNER", null),
 	HAKSIK("HAKSIK", 5000);
 
-	private String restaurantName;
-	private Integer restaurantPrice;
+	private final String restaurantName;
+	private final Integer restaurantPrice;
 
 	Restaurant(String restaurantName, Integer price) {
 		this.restaurantName = restaurantName;

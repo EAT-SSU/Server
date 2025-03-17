@@ -1,9 +1,8 @@
 package ssu.eatssu.domain.menu.service;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.menu.persistence.QuerydslMenuRatingCalculator;
 
 @Service

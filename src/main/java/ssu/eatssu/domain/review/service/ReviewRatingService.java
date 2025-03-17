@@ -1,9 +1,10 @@
 package ssu.eatssu.domain.review.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.persistence.QuerydslMealRatingCalculator;
@@ -13,8 +14,6 @@ import ssu.eatssu.domain.menu.persistence.QuerydslMenuRatingCounter;
 import ssu.eatssu.domain.rating.entity.RatingCalculator;
 import ssu.eatssu.domain.review.dto.RatingAverages;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
-
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

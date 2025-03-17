@@ -1,11 +1,10 @@
 package ssu.eatssu.domain.admin.service;
 
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.admin.event.ReviewDeleteEvent;
 import ssu.eatssu.domain.admin.persistence.ManageReviewRepository;
 

@@ -1,10 +1,10 @@
 package ssu.eatssu.domain.auth.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.util.List;
 import java.util.Optional;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor

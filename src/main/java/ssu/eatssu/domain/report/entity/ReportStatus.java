@@ -1,10 +1,10 @@
 package ssu.eatssu.domain.report.entity;
 
+import java.util.Arrays;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 import lombok.Getter;
-
-import java.util.Arrays;
 
 @Getter
 public enum ReportStatus {

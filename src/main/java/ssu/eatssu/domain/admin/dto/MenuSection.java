@@ -1,9 +1,9 @@
 package ssu.eatssu.domain.admin.dto;
 
-import ssu.eatssu.domain.menu.entity.MenuCategory;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import ssu.eatssu.domain.menu.entity.MenuCategory;
 
 public record MenuSection(Long categoryId, String categoryName, List<MenuLine> menuLines) implements SectionInBoard {
 	public MenuSection(MenuCategory category) {

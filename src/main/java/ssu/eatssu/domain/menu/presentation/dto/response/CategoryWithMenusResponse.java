@@ -1,9 +1,9 @@
 package ssu.eatssu.domain.menu.presentation.dto.response;
 
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 @Schema(title = "카테고리 별 메뉴 목록 Response")

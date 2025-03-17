@@ -1,17 +1,16 @@
 package ssu.eatssu.domain.admin.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.admin.dto.PageWrapper;
 import ssu.eatssu.domain.admin.dto.ReportLine;
 import ssu.eatssu.domain.admin.persistence.LoadReportRepository;
 import ssu.eatssu.domain.admin.persistence.ManageReportRepository;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
