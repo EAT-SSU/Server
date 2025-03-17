@@ -13,7 +13,7 @@ import ssu.eatssu.domain.menu.entity.QMenu;
 
 @Component
 @RequiredArgsConstructor
-public class LoadMenusInMealRepository {
+public class MealMenuQueryRepository {
 
 	private final JPAQueryFactory queryFactory;
 	private final QMenu menu = QMenu.menu;

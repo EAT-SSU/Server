@@ -15,7 +15,7 @@ import ssu.eatssu.domain.review.entity.QReview;
 @RequiredArgsConstructor
 public class QuerydslMealRatingCalculator {
 
-	private final LoadMenusInMealRepository loadMenusInMealRepository;
+	private final MealMenuQueryRepository mealMenuQueryRepository;
 
 	private final JPAQueryFactory queryFactory;
 	private final QMenu menu = QMenu.menu;
@@ -23,7 +23,7 @@ public class QuerydslMealRatingCalculator {
 	private final QReview review = QReview.review;
 
 	public Double getMainRatingAverage(Long mealId) {
-		List<Long> menuIds = loadMenusInMealRepository.getMenuIds(mealId);
+		List<Long> menuIds = mealMenuQueryRepository.getMenuIds(mealId);
 		return queryFactory
 			.select(review.ratings.mainRating.avg())
 			.from(review)
@@ -35,7 +35,7 @@ public class QuerydslMealRatingCalculator {
 	}
 
 	public Double getTasteRatingAverage(Long mealId) {
-		List<Long> menuIds = loadMenusInMealRepository.getMenuIds(mealId);
+		List<Long> menuIds = mealMenuQueryRepository.getMenuIds(mealId);
 		return queryFactory
 			.select(review.ratings.tasteRating.avg())
 			.from(review)
@@ -47,7 +47,7 @@ public class QuerydslMealRatingCalculator {
 	}
 
 	public Double getAmountRatingAverage(Long mealId) {
-		List<Long> menuIds = loadMenusInMealRepository.getMenuIds(mealId);
+		List<Long> menuIds = mealMenuQueryRepository.getMenuIds(mealId);
 		return queryFactory
 			.select(review.ratings.amountRating.avg())
 			.from(review)
