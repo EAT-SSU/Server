@@ -1,5 +1,5 @@
 # 1단계: 빌드 단계 (Gradle Wrapper를 사용하여 애플리케이션 빌드)
-FROM gradle:7.5.1-jdk17 AS builder
+FROM --platform=linux/amd64 gradle:7.5.1-jdk17 AS builder
 WORKDIR /home/gradle/project
 
 # 소스 코드 전체를 복사 (gradlew, build.gradle, settings.gradle, src/ 등)
@@ -12,7 +12,7 @@ RUN chmod +x gradlew
 RUN ./gradlew clean build --no-daemon
 
 # 2단계: 실행 단계 (빌드 결과물 실행을 위한 환경)
-FROM openjdk:17-jdk-slim
+FROM --platform=linux/amd64 openjdk:17-jdk-slim
 WORKDIR /app
 
 # 빌드 단계에서 생성된 JAR 파일 복사 (파일명이 프로젝트에 따라 달라질 수 있으므로 와일드카드 사용)

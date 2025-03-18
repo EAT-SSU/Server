@@ -18,7 +18,7 @@ import ssu.eatssu.domain.review.entity.QReview;
 @RequiredArgsConstructor
 public class QuerydslMealRatingCounter {
 
-	private final LoadMenusInMealRepository loadMenusInMealRepository;
+	private final MealMenuQueryRepository mealMenuQueryRepository;
 
 	private final JPAQueryFactory queryFactory;
 	private final QMenu menu = QMenu.menu;
@@ -30,7 +30,7 @@ public class QuerydslMealRatingCounter {
 										 .from(review)
 										 .join(review.menu, menu)
 										 .groupBy(review.ratings.mainRating)
-										 .where(menuIdIn(loadMenusInMealRepository.getMenuIds(mealId)))
+										 .where(menuIdIn(mealMenuQueryRepository.getMenuIds(mealId)))
 										 .fetch();
 
 		Map<Integer, Long> ratingCountMap = new HashMap<>();
@@ -47,7 +47,7 @@ public class QuerydslMealRatingCounter {
 			.select(review.count())
 			.from(review)
 			.join(review.menu, menu)
-			.where(menuIdIn(loadMenusInMealRepository.getMenuIds(mealId)))
+			.where(menuIdIn(mealMenuQueryRepository.getMenuIds(mealId)))
 			.fetchOne();
 	}
 
