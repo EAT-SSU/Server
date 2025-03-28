@@ -1,7 +1,7 @@
 ---
 name: Feature Report
 about: 추가할 사항들
-title: "[feature]"
+title: 'feature: '
 labels: feat
 assignees: ''
 
