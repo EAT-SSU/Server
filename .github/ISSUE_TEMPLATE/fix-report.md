@@ -1,7 +1,7 @@
 ---
 name: Fix Report
 about: 고쳐야 할 사항들
-title: "[fix]"
+title: 'fix: '
 labels: fix
 assignees: ''
 
