@@ -1,10 +1,9 @@
-HELP.md
-.gradle
+### Build files ###
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-build.gradle
 
 ### STS ###
 .apt_generated
@@ -37,5 +36,19 @@ out/
 ### VS Code ###
 .vscode/
 
-*.properties
-*.yml
+### application files ###
+application.yml
+application-local.yml
+application-dev.yml
+application-test.yml
+application-prod.yml
+
+
+### Generated files ###
+/src/main/generated/
+
+### Docker Tar files ###
+/eat-ssu.tar
+
+### SDKMAN ###
+.sdkmanrc
