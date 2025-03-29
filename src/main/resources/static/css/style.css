@@ -22,6 +22,7 @@ html, body {
     font-style: var(--ios-ios-rate-font-style);
 
 }
+
 .onboarding-page .logo {
     -webkit-text-stroke: 1px #df5757;
     white-space: nowrap;
@@ -68,8 +69,10 @@ html, body {
     white-space: nowrap;
     text-align: center;
 }
+
 .onboarding-page .overlap-group {
 }
+
 .onboarding-page .rectangle {
     position: relative;
     width: 20em;
@@ -121,4 +124,6 @@ input {
     text-align: center;
 }
 
-input:focus { outline: none; }
+input:focus {
+    outline: none;
+}
