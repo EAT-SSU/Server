@@ -91,7 +91,7 @@ jobs:
             sudo docker ps
             sudo docker rm -f $(docker ps -qa)
             sudo docker pull ${{ secrets.DOCKER_REPO }}/eatssu-prod
-            sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_REPO }}/eatssu-prod
+            sudo docker run -d -p 9000:9000 ${{ secrets.DOCKER_REPO }}/eatssu-prod
             sudo docker image prune -f
       
 
