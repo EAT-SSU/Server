@@ -2,7 +2,7 @@ name: CI/CD github Actions & Docker
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "main", "dev" ]
 
 permissions:
   contents: read
@@ -40,13 +40,13 @@ jobs:
         shell: bash
 
       # 환경별 yml 파일 생성(2) - prod
-#      - name: make application-prod.yml
-#        if: contains(github.ref, 'main')
-#        run: |
-#          cd ./src/main/resources
-#          touch ./application.yml
-#          echo "${{ secrets.YML }}" > ./application.yml
-#        shell: bash
+      - name: make prod server application.yml
+        if: contains(github.ref, 'main')
+        run: |
+          cd ./src/main/resources
+          touch ./application.yml
+          echo "${{ secrets.YML }}" > ./application.yml
+        shell: bash
 
       # gradle chmod
       - name: Grant execute permission for gradlew
@@ -64,36 +64,36 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       # docker build & push to production
-#      - name: Docker build & push to prod
-#        if: contains(github.ref, 'main')
-#        run: |
-#          docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/eatssu .
-#          docker push ${{ secrets.DOCKER_REPO }}/eatssu
+      - name: Docker build & push to prod
+        if: contains(github.ref, 'main')
+        run: |
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/eatssu-prod .
+          docker push ${{ secrets.DOCKER_REPO }}/eatssu-prod
 
       # docker build & push to develop
       - name: Docker build & push to dev server
         if: contains(github.ref, 'dev')
         run: |
-          docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/eatssu .
-          docker push ${{ secrets.DOCKER_REPO }}/eatssu
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/eatssu-dev .
+          docker push ${{ secrets.DOCKER_REPO }}/eatssu-dev
 
       ## deploy to production
-#      - name: Deploy to prod
-#        uses: appleboy/ssh-action@master
-#        id: deploy-prod
-#        if: contains(github.ref, 'main')
-#        with:
-#          host: ${{ secrets.HOST_PROD }} # EC2 퍼블릭 IPv4 DNS
-#          username: ubuntu
-#          key: ${{ secrets.PRIVATE_KEY }}
-#          envs: GITHUB_SHA
-#          script: |
-#            sudo docker ps
-#            sudo docker rm -f $(docker ps -qa)
-#            sudo docker pull ${{ secrets.DOCKER_REPO }}/agaproject
-#            sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_REPO }}/agaproject
-#            sudo docker image prune -f
-      ## ## sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_REPO }}/agaproject
+      - name: Deploy to prod
+        uses: appleboy/ssh-action@master
+        id: deploy-prod
+        if: contains(github.ref, 'main')
+        with:
+          host: ${{ secrets.HOST_PROD }} # EC2 퍼블릭 IPv4 DNS
+          username: ubuntu
+          key: ${{ secrets.PROD_PRIVATE_KEY }}
+          envs: GITHUB_SHA
+          script: |
+            sudo docker ps
+            sudo docker rm -f $(docker ps -qa)
+            sudo docker pull ${{ secrets.DOCKER_REPO }}/eatssu-prod
+            sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_REPO }}/eatssu-prod
+            sudo docker image prune -f
+    
 
       ## deploy to develop
       - name: Deploy to dev server
@@ -108,6 +108,6 @@ jobs:
           script: |
             sudo docker ps
             sudo docker rm -f $(docker ps -qa)
-            sudo docker pull ${{ secrets.DOCKER_REPO }}/eatssu
-            sudo docker run -d -p 9000:9000 ${{ secrets.DOCKER_REPO }}/eatssu
+            sudo docker pull ${{ secrets.DOCKER_REPO }}/eatssu-dev
+            sudo docker run -d -p 9000:9000 ${{ secrets.DOCKER_REPO }}/eatssu-dev
             sudo docker image prune -f
