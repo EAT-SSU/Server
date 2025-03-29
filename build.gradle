@@ -14,12 +14,6 @@ bootJar {
     archiveVersion = "0.0.1"
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
-
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
