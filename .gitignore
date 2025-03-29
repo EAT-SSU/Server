@@ -38,7 +38,12 @@ out/
 
 ### application files ###
 *.properties
-*.yml
+application.yml
+application-local.yml
+application-dev.yml
+application-test.yml
+application-prod.yml
+
 
 ### Generated files ###
 /src/main/generated/
