@@ -78,7 +78,7 @@ public class OAuthController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "유효한 토큰인지 확인 성공")
 	})
-	@GetMapping("/valid/token")
+	@PostMapping("/valid/token")
 	public BaseResponse<Boolean> validToken(@Valid @RequestBody ValidRequest request) {
 		Boolean response = oauthService.validToken(request);
 		return BaseResponse.success(response);
