@@ -2,6 +2,11 @@ package ssu.eatssu.domain.auth.presentation;
 
 import static ssu.eatssu.domain.auth.infrastructure.SecurityUtil.*;
 
+import java.net.http.HttpRequest;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ssu.eatssu.domain.auth.dto.AppleLoginRequest;
 import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
+import ssu.eatssu.domain.auth.dto.ValidRequest;
 import ssu.eatssu.domain.auth.service.OAuthService;
 import ssu.eatssu.domain.user.dto.Tokens;
 import ssu.eatssu.global.handler.response.BaseResponse;
@@ -66,6 +72,16 @@ public class OAuthController {
 	public BaseResponse<Tokens> refreshToken() {
 		Tokens tokens = oauthService.refreshTokens(getLoginUser());
 		return BaseResponse.success(tokens);
+	}
+
+	@Operation(summary = "유효한 토큰 확인", description = "해당 토큰이 유효하면 true 반환하는, 유효하지 않은 false 반환하는 API 입니다")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "유효한 토큰인지 확인 성공")
+	})
+	@GetMapping("/valid/token")
+	public BaseResponse<Boolean> validToken(@Valid @RequestBody ValidRequest request) {
+		Boolean response = oauthService.validToken(request);
+		return BaseResponse.success(response);
 	}
 
 }
