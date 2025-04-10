@@ -1,18 +1,25 @@
 package ssu.eatssu.domain.auth.service;
 
 import static ssu.eatssu.domain.auth.entity.OAuthProvider.*;
+import static ssu.eatssu.domain.auth.security.JwtAuthenticationFilter.*;
+
+import java.net.http.HttpRequest;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ssu.eatssu.domain.auth.dto.AppleLoginRequest;
 import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
 import ssu.eatssu.domain.auth.dto.OAuthInfo;
+import ssu.eatssu.domain.auth.dto.ValidRequest;
 import ssu.eatssu.domain.auth.entity.AppleAuthenticator;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.JwtTokenProvider;
@@ -20,6 +27,7 @@ import ssu.eatssu.domain.user.dto.Tokens;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.user.service.UserService;
+import ssu.eatssu.global.handler.response.BaseException;
 
 @Slf4j
 @Service
@@ -32,6 +40,10 @@ public class OAuthService {
 	private final AppleAuthenticator appleAuthenticator;
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
 	private final JwtTokenProvider jwtTokenProvider;
+
+	private static final String AUTHORIZATION_HEADER = "Authorization";
+
+	private static final String BEARER_TYPE = "Bearer";
 
 	public Tokens kakaoLogin(KakaoLoginRequest request) {
 		User user = userRepository.findByProviderId(request.providerId())
@@ -68,6 +80,21 @@ public class OAuthService {
 		if (isHideEmail(user.getEmail()) && !isHideEmail(email)) {
 			user.updateEmail(email);
 			userRepository.save(user);
+		}
+	}
+
+	/**
+	 * 유효한 토큰인지 확인
+	 */
+
+	public Boolean validToken(ValidRequest request){
+		String token = request.token();
+
+		try {
+			return jwtTokenProvider.validateToken(token);
+		} catch (BaseException e) {
+			log.warn("토큰 유효성 검사 중 예외 발생: {}", e.getMessage());
+			return false;
 		}
 	}
 
