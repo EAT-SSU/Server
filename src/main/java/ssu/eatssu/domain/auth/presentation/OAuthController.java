@@ -74,7 +74,7 @@ public class OAuthController {
 		return BaseResponse.success(tokens);
 	}
 
-	@Operation(summary = "유효한 토큰 확인", description = "해당 토큰이 유효하면 true 반환하는, 유효하지 않은 false 반환하는 API 입니다")
+	@Operation(summary = "유효한 토큰 확인 [인증 토큰 필요 X]", description = "해당 토큰이 유효하면 true 반환하는, 유효하지 않은 false 반환하는 API 입니다")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "유효한 토큰인지 확인 성공")
 	})
