@@ -46,7 +46,12 @@ public class OAuthController {
 	})
 	@PostMapping("/kakao")
 	public BaseResponse<Tokens> kakaoLogin(@Valid @RequestBody KakaoLoginRequest request) {
+		long startTime = System.currentTimeMillis();
 		Tokens tokens = oauthService.kakaoLogin(request);
+		long endTime = System.currentTimeMillis();
+		long duration = endTime - startTime;
+		log.info("OAuthWarmupRunner 완료 - 소요 시간: {} ms", duration);
+
 		return BaseResponse.success(tokens);
 	}
 
