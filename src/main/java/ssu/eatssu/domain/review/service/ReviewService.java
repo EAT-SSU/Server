@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
@@ -33,6 +34,7 @@ import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.util.S3Uploader;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional
@@ -89,8 +91,11 @@ public class ReviewService {
 	public SavedReviewImage uploadImage(MultipartFile image) {
 		try {
 			String imageUrl = s3Uploader.upload(image, "reviewImg");
-			return new SavedReviewImage(imageUrl);
+			SavedReviewImage savedReviewImage = new SavedReviewImage(imageUrl);
+			log.info("[리뷰 이미지 업로드 완료] 업로드된 URL = {}", savedReviewImage.getUrl());
+			return savedReviewImage;
 		} catch (IOException e) {
+			log.error("[리뷰 이미지 업로드 실패]", e);
 			throw new BaseException(FAIL_IMAGE_UPLOAD);
 		}
 	}
