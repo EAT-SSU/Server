@@ -68,6 +68,13 @@ dependencies {
     implementation("com.slack.api:bolt-servlet:1.35.0")
     implementation("com.slack.api:bolt-jetty:1.35.0")
     implementation("org.slf4j:slf4j-simple:1.7.36")
+
+
+    // Spring Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Prometheus
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 }
 
 tasks.named('test') {
