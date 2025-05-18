@@ -27,9 +27,12 @@ import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
+import ssu.eatssu.domain.review.dto.MealReviewsResponse;
+import ssu.eatssu.domain.review.dto.MenuReviewResponse;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
 import ssu.eatssu.domain.review.service.MealReviewService;
+import ssu.eatssu.domain.review.service.ReviewService;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
@@ -39,6 +42,8 @@ import ssu.eatssu.global.handler.response.BaseResponse;
 @Tag(name = "Review V2", description = "리뷰 V2 API")
 public class MealReviewController {
 	private final MealReviewService mealReviewService;
+
+	private final ReviewService reviewService;
 
 	@Operation(summary = "리뷰 작성", description = "리뷰를 작성하는 API 입니다.")
 	@ApiResponses(value = {
@@ -144,4 +149,41 @@ public class MealReviewController {
 		mealReviewService.toggleReviewLike(customUserDetails, reviewId);
 		return BaseResponse.success();
 	}
+
+	@Operation(summary = "식단(변동 메뉴) 리뷰 정보 조회(메뉴명, 평점 등등) [인증 토큰 필요 X]", description = """
+		식단 리뷰 정보를 조회하는 API 입니다.<br><br>
+		메뉴명 리스트, 리뷰 수, 메인 평점, 양 평점, 맛 평점, 각 평점의 개수를 조회합니다.
+		""")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "리뷰 정보 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema =
+		@Schema(implementation = BaseResponse.class))),
+		@ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema =
+		@Schema(implementation = BaseResponse.class)))
+	})
+	@GetMapping("/meals/{mealId}")
+	public BaseResponse<MealReviewsResponse> getMealReviews(
+		@Parameter(description = "mealId")
+		@PathVariable(value = "mealId") Long mealId) {
+		return BaseResponse.success(reviewService.findMealReviews(mealId));
+	}
+
+	@Operation(summary = "고정 메뉴 리뷰 정보 조회(메뉴명, 평점 등등) [인증 토큰 필요 X]", description = """
+		고정 메뉴 리뷰 정보를 조회하는 API 입니다.<br><br>
+		메뉴명, 리뷰 수, 메인 평점, 양 평점, 맛 평점, 각 평점의 개수를 조회합니다.
+		""")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "리뷰 정보 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema =
+		@Schema(implementation = BaseResponse.class))),
+		@ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema =
+		@Schema(implementation = BaseResponse.class)))
+	})
+	@GetMapping("/menus/{menuId}")
+	public BaseResponse<MenuReviewResponse> getMainReviews(
+		@Parameter(description = "menuId")
+		@PathVariable(value = "menuId") Long menuId) {
+		return BaseResponse.success(reviewService.findMenuReviews(menuId));
+	}
+
 }
