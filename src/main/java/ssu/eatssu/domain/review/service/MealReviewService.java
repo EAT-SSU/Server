@@ -2,8 +2,10 @@ package ssu.eatssu.domain.review.service;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -79,18 +81,34 @@ public class MealReviewService {
 		List<Review> reviews = reviewRepository.findByMealIn(meals);
 		List<Menu> menus = mealMenuRepository.findMenusByMeals(meals);
 
-		Double averageRating = reviews.stream()
-									  .mapToInt(Review::getRating)
-									  .average()
-									  .orElse(0.0);
+		Double averageRating = Optional.ofNullable(reviews)
+			.orElse(Collections.emptyList())
+			.stream()
+			.filter(Objects::nonNull)
+			.map(Review::getRating)
+			.filter(Objects::nonNull)
+			.mapToInt(Integer::intValue)
+			.average()
+			.orElse(0.0);
 
-		Integer likeCount = menus.stream()
-								 .mapToInt(Menu::getLikeCount)
-								 .sum();
+		Integer likeCount = Optional.ofNullable(menus)
+			.orElse(Collections.emptyList())
+			.stream()
+			.filter(Objects::nonNull)
+			.map(Menu::getLikeCount)
+			.filter(Objects::nonNull)
+			.mapToInt(Integer::intValue)
+			.sum();
 
-		Integer unlikeCount = menus.stream()
-								   .mapToInt(Menu::getUnlikeCount)
-								   .sum();
+
+		Integer unlikeCount = Optional.ofNullable(menus)
+			.orElse(Collections.emptyList())
+			.stream()
+			.filter(Objects::nonNull)
+			.map(Menu::getUnlikeCount)
+			.filter(Objects::nonNull)
+			.mapToInt(Integer::intValue)
+			.sum();
 
 		ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 
