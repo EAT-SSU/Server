@@ -19,4 +19,7 @@ public interface MealMenuRepository extends JpaRepository<MealMenu, Long> {
 
 	@Query("SELECT DISTINCT mm.meal.id FROM MealMenu mm WHERE mm.menu.id IN :menuIds")
 	List<Long> findMealIdsByMenuIds(@Param("menuIds") List<Long> menuIds);
+
+	@Query("SELECT mm.menu FROM MealMenu mm WHERE mm.meal = :meal")
+	List<Menu> findMenusByMeal(Meal meal);
 }

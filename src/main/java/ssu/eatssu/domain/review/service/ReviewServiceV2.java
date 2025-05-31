@@ -2,8 +2,10 @@ package ssu.eatssu.domain.review.service;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -23,7 +25,9 @@ import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
+import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuLikeRequest;
+import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
@@ -39,7 +43,7 @@ import ssu.eatssu.global.handler.response.BaseException;
 
 @RequiredArgsConstructor
 @Service
-public class MealReviewService {
+public class ReviewServiceV2 {
 	private final UserRepository userRepository;
 	private final ReviewRepository reviewRepository;
 	private final MenuRepository menuRepository;
@@ -79,18 +83,34 @@ public class MealReviewService {
 		List<Review> reviews = reviewRepository.findByMealIn(meals);
 		List<Menu> menus = mealMenuRepository.findMenusByMeals(meals);
 
-		Double averageRating = reviews.stream()
-									  .mapToInt(Review::getRating)
-									  .average()
-									  .orElse(0.0);
+		Double averageRating = Optional.ofNullable(reviews)
+			.orElse(Collections.emptyList())
+			.stream()
+			.filter(Objects::nonNull)
+			.map(Review::getRating)
+			.filter(Objects::nonNull)
+			.mapToInt(Integer::intValue)
+			.average()
+			.orElse(0.0);
 
-		Integer likeCount = menus.stream()
-								 .mapToInt(Menu::getLikeCount)
-								 .sum();
+		Integer likeCount = Optional.ofNullable(menus)
+			.orElse(Collections.emptyList())
+			.stream()
+			.filter(Objects::nonNull)
+			.map(Menu::getLikeCount)
+			.filter(Objects::nonNull)
+			.mapToInt(Integer::intValue)
+			.sum();
 
-		Integer unlikeCount = menus.stream()
-								   .mapToInt(Menu::getUnlikeCount)
-								   .sum();
+
+		Integer unlikeCount = Optional.ofNullable(menus)
+			.orElse(Collections.emptyList())
+			.stream()
+			.filter(Objects::nonNull)
+			.map(Menu::getUnlikeCount)
+			.filter(Objects::nonNull)
+			.mapToInt(Integer::intValue)
+			.sum();
 
 		ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 
@@ -134,6 +154,87 @@ public class MealReviewService {
 							.hasNext(pageReviews.hasNext())
 							.dataList(mealReviewResponses)
 							.build();
+	}
+
+	/**
+	 * 특정 Menu 리뷰 조회
+	 */
+	public MenuReviewsV2Response findMenuReviews(Long menuId) {
+		Menu menu = menuRepository.findById(menuId).orElseThrow(()-> new BaseException(NOT_FOUND_MENU));
+		List<Review> reviews = reviewRepository.findAllByMenu(menu);
+
+		Double averageRating = Optional.ofNullable(reviews)
+			.orElse(Collections.emptyList())
+			.stream()
+			.filter(Objects::nonNull)
+			.map(Review::getRating)
+			.filter(Objects::nonNull)
+			.mapToInt(Integer::intValue)
+			.average()
+			.orElse(0.0);
+
+		Integer likeCount = menu.getLikeCount();
+
+
+		Integer unlikeCount = menu.getUnlikeCount();
+
+		ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
+
+		return MenuReviewsV2Response.builder()
+			.totalReviewCount((long)reviews.size())
+			.reviewRatingCount(reviewRatingCount)
+			.mainRating(Math.round(averageRating * 10) / 10.0)
+			.likeCount(likeCount)
+			.unlikeCount(unlikeCount)
+			.build();
+	}
+
+	/**
+	 * 특정 Meal 리뷰 조회
+	 */
+	public MealReviewsV2Response findMealReviews(Long mealId) {
+		Meal meal = mealRepository.findById(mealId).orElseThrow(()-> new BaseException(NOT_FOUND_MEAL));
+		List<Review> reviews = reviewRepository.findAllByMeal(meal);
+		List<Menu> menus = mealMenuRepository.findMenusByMeal(meal);
+
+		Double averageRating = Optional.ofNullable(reviews)
+			.orElse(Collections.emptyList())
+			.stream()
+			.filter(Objects::nonNull)
+			.map(Review::getRating)
+			.filter(Objects::nonNull)
+			.mapToInt(Integer::intValue)
+			.average()
+			.orElse(0.0);
+
+		Integer likeCount = Optional.ofNullable(menus)
+			.orElse(Collections.emptyList())
+			.stream()
+			.filter(Objects::nonNull)
+			.map(Menu::getLikeCount)
+			.filter(Objects::nonNull)
+			.mapToInt(Integer::intValue)
+			.sum();
+
+
+		Integer unlikeCount = Optional.ofNullable(menus)
+			.orElse(Collections.emptyList())
+			.stream()
+			.filter(Objects::nonNull)
+			.map(Menu::getUnlikeCount)
+			.filter(Objects::nonNull)
+			.mapToInt(Integer::intValue)
+			.sum();
+
+		ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
+
+		return MealReviewsV2Response.builder()
+			.totalReviewCount((long)reviews.size())
+			.reviewRatingCount(reviewRatingCount)
+			.mainRating(Math.round(averageRating * 10) / 10.0)
+			.likeCount(likeCount)
+			.unlikeCount(unlikeCount)
+			.build();
 	}
 
 	/**

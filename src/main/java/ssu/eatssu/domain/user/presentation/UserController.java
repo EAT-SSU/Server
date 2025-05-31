@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
 import ssu.eatssu.domain.partnership.service.PartnershipService;
-import ssu.eatssu.domain.review.service.MealReviewService;
+import ssu.eatssu.domain.review.service.ReviewServiceV2;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.slice.service.SliceService;
 import ssu.eatssu.domain.user.dto.DepartmentResponse;
@@ -50,7 +50,7 @@ public class UserController {
 
 	private final UserService userService;
 	private final SliceService sliceService;
-	private final MealReviewService mealReviewService;
+	private final ReviewServiceV2 mealReviewService;
 	private final PartnershipService partnershipService;
 
 	@Operation(summary = "이메일 중복 체크", description = """
