@@ -27,11 +27,12 @@ import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
-import ssu.eatssu.domain.review.dto.MealReviewsResponse;
+import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuReviewResponse;
+import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
-import ssu.eatssu.domain.review.service.MealReviewService;
+import ssu.eatssu.domain.review.service.ReviewServiceV2;
 import ssu.eatssu.domain.review.service.ReviewService;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.global.handler.response.BaseResponse;
@@ -40,8 +41,8 @@ import ssu.eatssu.global.handler.response.BaseResponse;
 @RequiredArgsConstructor
 @RequestMapping("/v2/reviews")
 @Tag(name = "Review V2", description = "리뷰 V2 API")
-public class MealReviewController {
-	private final MealReviewService mealReviewService;
+public class ReviewControllerV2 {
+	private final ReviewServiceV2 reviewServiceV2;
 
 	private final ReviewService reviewService;
 
@@ -56,7 +57,7 @@ public class MealReviewController {
 	public BaseResponse<?> createReview(
 		@RequestBody CreateMealReviewRequest createMealReviewRequest,
 		@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-		mealReviewService.createReview(customUserDetails, createMealReviewRequest);
+		reviewServiceV2.createReview(customUserDetails, createMealReviewRequest);
 		return BaseResponse.success();
 	}
 
@@ -74,7 +75,7 @@ public class MealReviewController {
 		@Parameter(description = "restaurant")
 		@RequestParam Restaurant restaurant
 	) {
-		return BaseResponse.success(mealReviewService.findRestaurantReviews(restaurant));
+		return BaseResponse.success(reviewServiceV2.findRestaurantReviews(restaurant));
 	}
 
 	@Operation(summary = "리뷰 리스트 조회", description = """
@@ -94,7 +95,7 @@ public class MealReviewController {
 		@RequestParam(value = "lastReviewId", required = false) Long lastReviewId,
 		@AuthenticationPrincipal CustomUserDetails customUserDetails) {
 		Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "id"));
-		SliceResponse<MealReviewResponse> myReviews = mealReviewService.findReviews(mealId, lastReviewId, pageable,
+		SliceResponse<MealReviewResponse> myReviews = reviewServiceV2.findReviews(mealId, lastReviewId, pageable,
 			customUserDetails);
 		return BaseResponse.success(myReviews);
 	}
@@ -117,7 +118,7 @@ public class MealReviewController {
 		@PathVariable("reviewId") Long reviewId,
 		@RequestBody UpdateMealReviewRequest request,
 		@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-		mealReviewService.updateReview(customUserDetails, reviewId, request);
+		reviewServiceV2.updateReview(customUserDetails, reviewId, request);
 		return BaseResponse.success();
 	}
 
@@ -132,7 +133,7 @@ public class MealReviewController {
 	public BaseResponse<?> deleteReview(
 		@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId,
 		@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-		mealReviewService.deleteReview(customUserDetails, reviewId);
+		reviewServiceV2.deleteReview(customUserDetails, reviewId);
 		return BaseResponse.success();
 	}
 
@@ -146,13 +147,13 @@ public class MealReviewController {
 	public BaseResponse<?> toggleReviewLike(
 		@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId,
 		@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-		mealReviewService.toggleReviewLike(customUserDetails, reviewId);
+		reviewServiceV2.toggleReviewLike(customUserDetails, reviewId);
 		return BaseResponse.success();
 	}
 
-	@Operation(summary = "식단(변동 메뉴) 리뷰 정보 조회(메뉴명, 평점 등등) [인증 토큰 필요 X]", description = """
+	@Operation(summary = "식단(변동 메뉴) 리뷰 정보 조회 V2(메뉴명, 평점 등등) [인증 토큰 필요 X]", description = """
 		식단 리뷰 정보를 조회하는 API 입니다.<br><br>
-		메뉴명 리스트, 리뷰 수, 메인 평점, 양 평점, 맛 평점, 각 평점의 개수를 조회합니다.
+		메뉴명 리스트, 리뷰 수, 메인 평점, 좋아요 개수, 싫어요 개수, 각 평점의 개수를 조회합니다.
 		""")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "리뷰 정보 조회 성공"),
@@ -162,15 +163,15 @@ public class MealReviewController {
 		@Schema(implementation = BaseResponse.class)))
 	})
 	@GetMapping("/meals/{mealId}")
-	public BaseResponse<MealReviewsResponse> getMealReviews(
+	public BaseResponse<MealReviewsV2Response> getMealReviews(
 		@Parameter(description = "mealId")
 		@PathVariable(value = "mealId") Long mealId) {
-		return BaseResponse.success(reviewService.findMealReviews(mealId));
+		return BaseResponse.success(reviewServiceV2.findMealReviews(mealId));
 	}
 
-	@Operation(summary = "고정 메뉴 리뷰 정보 조회(메뉴명, 평점 등등) [인증 토큰 필요 X]", description = """
+	@Operation(summary = "고정 메뉴 리뷰 정보 조회 V2(메뉴명, 평점 등등) [인증 토큰 필요 X]", description = """
 		고정 메뉴 리뷰 정보를 조회하는 API 입니다.<br><br>
-		메뉴명, 리뷰 수, 메인 평점, 양 평점, 맛 평점, 각 평점의 개수를 조회합니다.
+		메뉴명, 리뷰 수, 메인 평점, 좋아요 개수, 싫어요 개수, 각 평점의 개수를 조회합니다.
 		""")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "리뷰 정보 조회 성공"),
@@ -180,10 +181,10 @@ public class MealReviewController {
 		@Schema(implementation = BaseResponse.class)))
 	})
 	@GetMapping("/menus/{menuId}")
-	public BaseResponse<MenuReviewResponse> getMainReviews(
+	public BaseResponse<MenuReviewsV2Response> getMainReviews(
 		@Parameter(description = "menuId")
 		@PathVariable(value = "menuId") Long menuId) {
-		return BaseResponse.success(reviewService.findMenuReviews(menuId));
+		return BaseResponse.success(reviewServiceV2.findMenuReviews(menuId));
 	}
 
 }
