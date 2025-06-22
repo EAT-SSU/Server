@@ -9,6 +9,7 @@ import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
+import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 
 import lombok.extern.slf4j.Slf4j;
 import ssu.eatssu.domain.slack.entity.SlackChannel;
