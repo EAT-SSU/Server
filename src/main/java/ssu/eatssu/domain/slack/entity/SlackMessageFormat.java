@@ -63,4 +63,24 @@ public class SlackMessageFormat {
 			, inquiry.getCreatedDate(), inquiry.getContent()};
 		return messageFormat.format(args);
 	}
+
+
+	public static String sendServerError(Exception ex) {
+		MessageFormat messageFormat = new MessageFormat(
+			"""
+			===================
+			*서버 에러 발생*
+			- 예외 클래스: {0}
+			- 예외 메시지: {1}
+			- 원인: {2}
+			===================
+			"""
+		);
+		Object[] args = {
+			ex.getClass().getName(),
+			ex.getMessage(),
+			ex.getCause() != null ? ex.getCause().toString() : "없음"
+		};
+		return messageFormat.format(args);
+	}
 }
