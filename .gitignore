@@ -52,3 +52,12 @@ application-prod.yml
 
 ### SDKMAN ###
 .sdkmanrc
+
+### Junie guideline ###
+.junie
+
+### Cursor guideline ###
+eatssu-server-rule.mdc
+
+### Copilot guildline ###
+copilot-instructions.md
