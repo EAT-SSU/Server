@@ -1,0 +1,99 @@
+## port number
+server:
+  port: 9000
+  env: dev
+
+
+spring:
+  ## Database
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${EATSSU_DB_URL_DEV}
+    username: ${EATSSU_DB_USERNAME}
+    password: ${EATSSU_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 200
+      minimum-idle: 10
+      connection-timeout: 2500
+      connection-init-sql: SELECT 1
+      validation-timeout: 2000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  ## JPA
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+        hibernate:
+            jdbc:
+            lob:
+                non_contextual_creation: true
+            format_sql: false
+            show_sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+## Auth
+jwt:
+  secret:
+    key: ${EATSSU_JWT_SECRET}
+  token-validity-in-seconds: 86400
+  refresh-token-validity-in-seconds: 604800
+
+#S3
+cloud:
+  aws:
+    credentials:
+      accessKey: ${EATSSU_AWS_ACCESS_KEY_DEV}
+      secretKey: ${EATSSU_AWS_SECRET_KEY_DEV}
+    s3:
+        bucket: eatssu-bucket
+    region:
+        static: ap-northeast-2
+    stack:
+        auto: false
+
+#Slack
+slack:
+  token: ${EATSSU_SLACK_TOKEN}
+
+#Swagger
+swagger:
+  url: https://dev.eat-ssu.store
+  description: Test Server Swagger API
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    groups-order: DESC
+    operationsSorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+  api-docs:
+    path: /v3/api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  paths-to-match:
+    - /**
+
+logging:
+  level:
+    root: INFO
+    com.zaxxer.hikari: INFO
+
+management:
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus

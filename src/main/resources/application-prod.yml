@@ -1,0 +1,106 @@
+## port number
+server:
+  port: 9000
+  env: prod
+
+
+spring:
+  ## Database
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${EATSSU_DB_URL_PROD}
+    username: ${EATSSU_DB_USERNAME}
+    password: ${EATSSU_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 200
+      minimum-idle: 20
+      connection-timeout: 2500
+      connection-init-sql: SELECT 1
+      validation-timeout: 2000
+      idle-timeout: 600000
+      max-lifetime: 1500000
+
+  ## JPA
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+        hibernate:
+            jdbc:
+            lob:
+                non_contextual_creation: true
+            format_sql: true
+            show_sql: false
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+## Auth
+jwt:
+  secret:
+    key: ${EATSSU_JWT_SECRET}
+  token-validity-in-seconds: 86400
+  refresh-token-validity-in-seconds: 604800
+
+#S3
+cloud:
+  aws:
+    credentials:
+      accessKey: ${EATSSU_AWS_ACCESS_KEY_PROD}
+      secretKey: ${EATSSU_AWS_SECRET_KEY_PROD}
+    s3:
+        bucket: eatssu-prod-bucket
+    region:
+        static: ap-northeast-2
+    stack:
+        auto: false
+
+#Slack
+slack:
+  token: ${EATSSU_SLACK_TOKEN}
+
+#Swagger
+swagger:
+  url: https://eat-ssu.store
+  description: Prod-Server url
+
+springdoc:
+  swagger-ui:
+    # Swagger UI
+    path: /swagger-ui.html
+    # Group
+    groups-order: DESC
+    # API
+    operationsSorter: method
+    # Swagger UI
+    disable-swagger-default-url: true
+    # API
+    display-request-duration: true
+  api-docs:
+    path: /v3/api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  paths-to-match:
+    - /**
+
+logging:
+  level:
+    root: INFO
+    com.zaxxer.hikari: INFO
+
+
+management:
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+
