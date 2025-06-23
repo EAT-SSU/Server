@@ -2,6 +2,7 @@ package ssu.eatssu.domain.slack.entity;
 
 import java.text.MessageFormat;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import ssu.eatssu.domain.inquiry.entity.Inquiry;
@@ -12,7 +13,10 @@ import ssu.eatssu.domain.user.entity.User;
 @Component
 public class SlackMessageFormat {
 
-	private SlackMessageFormat() {
+	private static String serverEnv;
+
+	private SlackMessageFormat(@Value("${server.env:unknown}") String serverEnvValue) {
+		SlackMessageFormat.serverEnv = serverEnvValue;
 	}
 
 	public static String sendReport(Report report) {
@@ -72,14 +76,14 @@ public class SlackMessageFormat {
 			*서버 에러 발생*
 			- 예외 클래스: {0}
 			- 예외 메시지: {1}
-			- 원인: {2}
+			- 개발환경: {2}
 			===================
 			"""
 		);
 		Object[] args = {
 			ex.getClass().getName(),
 			ex.getMessage(),
-			ex.getCause() != null ? ex.getCause().toString() : "없음"
+			serverEnv,
 		};
 		return messageFormat.format(args);
 	}
