@@ -2,7 +2,7 @@ name: CI/CD github Actions & Docker
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "main", "develop" ]
 
 permissions:
   contents: read
@@ -30,22 +30,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 환경별 yml 파일 생성(1) - dev
-      - name: make dev server application.yml
+      # dev profile을 활성화 시킵니다.
+      - name: Set dev profile
         if: contains(github.ref, 'dev')
         run: |
-          cd ./src/main/resources
-          touch ./application.yml
-          echo "${{ secrets.YML_DEV }}" > ./application.yml
+          echo "spring:
+            profiles:
+              include: dev" > ./src/main/resources/application.yml
         shell: bash
 
-      # 환경별 yml 파일 생성(2) - prod
-      - name: make prod server application.yml
+      # prod profile을 활성화 시킵니다.
+      - name: Set prod profile
         if: contains(github.ref, 'main')
         run: |
-          cd ./src/main/resources
-          touch ./application.yml
-          echo "${{ secrets.YML_PROD }}" > ./application.yml
+          echo "spring:
+            profiles:
+              include: prod" > ./src/main/resources/application.yml
         shell: bash
 
       # gradle chmod
@@ -91,7 +91,15 @@ jobs:
             sudo docker ps
             sudo docker rm -f $(docker ps -qa)
             sudo docker pull ${{ secrets.DOCKER_REPO }}/eatssu-prod
-            sudo docker run -d -p 9000:9000 ${{ secrets.DOCKER_REPO }}/eatssu-prod
+            sudo docker run -d -p 9000:9000 \
+            -e EATSSU_DB_URL_PROD="${{ secrets.EATSSU_DB_URL_PROD }}" \
+            -e EATSSU_DB_USERNAME="${{ secrets.EATSSU_DB_USERNAME }}" \
+            -e EATSSU_DB_PASSWORD="${{ secrets.EATSSU_DB_PASSWORD }}" \
+            -e EATSSU_JWT_SECRET_PROD="${{ secrets.EATSSU_JWT_SECRET_PROD }}" \
+            -e EATSSU_AWS_ACCESS_KEY_PROD="${{ secrets.EATSSU_AWS_ACCESS_KEY_PROD }}" \
+            -e EATSSU_AWS_SECRET_KEY_PROD="${{ secrets.EATSSU_AWS_SECRET_KEY_PROD }}" \
+            -e EATSSU_SLACK_TOKEN="${{ secrets.EATSSU_SLACK_TOKEN }}" \
+            ${{ secrets.DOCKER_REPO }}/eatssu-prod
             sudo docker image prune -f
 
       ## deploy to develop
@@ -108,5 +116,13 @@ jobs:
             sudo docker ps
             sudo docker rm -f $(docker ps -qa)
             sudo docker pull ${{ secrets.DOCKER_REPO }}/eatssu-dev
-            sudo docker run -d -p 9000:9000 ${{ secrets.DOCKER_REPO }}/eatssu-dev
+            sudo docker run -d -p 9000:9000 \
+            -e EATSSU_DB_URL_DEV="${{ secrets.EATSSU_DB_URL_DEV }}" \
+            -e EATSSU_DB_USERNAME="${{ secrets.EATSSU_DB_USERNAME }}" \
+            -e EATSSU_DB_PASSWORD="${{ secrets.EATSSU_DB_PASSWORD }}" \
+            -e EATSSU_JWT_SECRET_DEV="${{ secrets.EATSSU_JWT_SECRET_DEV }}" \
+            -e EATSSU_AWS_ACCESS_KEY_DEV="${{ secrets.EATSSU_AWS_ACCESS_KEY_DEV }}" \
+            -e EATSSU_AWS_SECRET_KEY_DEV="${{ secrets.EATSSU_AWS_SECRET_KEY_DEV }}" \
+            -e EATSSU_SLACK_TOKEN="${{ secrets.EATSSU_SLACK_TOKEN }}" \
+            ${{ secrets.DOCKER_REPO }}/eatssu-dev
             sudo docker image prune -f
