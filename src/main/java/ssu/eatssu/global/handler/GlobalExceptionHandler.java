@@ -253,6 +253,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	private void sendErrorToSlack(Exception ex) {
+		if (!("dev".equals(serverEnv) || "prod".equals(serverEnv))) {
+			return;
+		}
+
 		try {
 			String message = SlackMessageFormat.sendServerError(ex);
 			slackService.sendSlackMessage(message, ssu.eatssu.domain.slack.entity.SlackChannel.SERVER_ERROR);
