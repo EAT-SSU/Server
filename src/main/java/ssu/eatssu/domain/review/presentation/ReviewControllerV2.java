@@ -137,20 +137,6 @@ public class ReviewControllerV2 {
 		return BaseResponse.success();
 	}
 
-	@Operation(summary = "리뷰 좋아요 누르기/취소하기", description = "리뷰에 좋아요(찜)를 누르거나 취소하는 API 입니다.")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "리뷰 좋아요 토글 성공"),
-		@ApiResponse(responseCode = "404", description = "존재하지 않는 리뷰", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-		@ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-	})
-	@PostMapping("/{reviewId}/like")
-	public BaseResponse<?> toggleReviewLike(
-		@Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId,
-		@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-		reviewServiceV2.toggleReviewLike(customUserDetails, reviewId);
-		return BaseResponse.success();
-	}
-
 	@Operation(summary = "식단(변동 메뉴) 리뷰 정보 조회 V2(메뉴명, 평점 등등) [인증 토큰 필요 X]", description = """
 		식단 리뷰 정보를 조회하는 API 입니다.<br><br>
 		메뉴명 리스트, 리뷰 수, 메인 평점, 좋아요 개수, 싫어요 개수, 각 평점의 개수를 조회합니다.
