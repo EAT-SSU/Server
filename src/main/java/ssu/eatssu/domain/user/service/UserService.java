@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.review.entity.Review;
+import ssu.eatssu.domain.user.config.UserProperties;
 import ssu.eatssu.domain.user.department.entity.Department;
 import ssu.eatssu.domain.user.department.persistence.DepartmentRepository;
 import ssu.eatssu.domain.user.dto.DepartmentResponse;
@@ -34,6 +35,7 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final DepartmentRepository departmentRepository;
+	private final UserProperties userProperties;
 
 	public User join(String email, OAuthProvider provider, String providerId) {
 		String credentials = createCredentials(provider, providerId);
@@ -45,6 +47,10 @@ public class UserService {
 	public void updateNickname(CustomUserDetails userDetails, NicknameUpdateRequest request) {
 		User user = userRepository.findById(userDetails.getId())
 								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+		if (isForbiddenNickname(request.nickname()) || userRepository.existsByNickname(request.nickname())) {
+			throw new BaseException(DUPLICATE_NICKNAME);
+		}
 
 		user.updateNickname(request.nickname());
 	}
@@ -71,6 +77,9 @@ public class UserService {
 	}
 
 	public Boolean validateDuplicatedNickname(String nickname) {
+		if (isForbiddenNickname(nickname)) {
+			return false;
+		}
 		return !userRepository.existsByNickname(nickname);
 	}
 
@@ -108,5 +117,10 @@ public class UserService {
 			throw new BaseException(MISSING_USER_DEPARTMENT);
 		}
 		return new DepartmentResponse(department.getName());
+	}
+
+	private boolean isForbiddenNickname(String nickname) {
+		return userProperties.getForbiddenNicknames().stream()
+				.anyMatch(forbidden -> forbidden.equalsIgnoreCase(nickname));
 	}
 }
