@@ -1,6 +1,7 @@
 package ssu.eatssu.global.handler;
 
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -39,6 +40,8 @@ import ssu.eatssu.global.handler.response.BaseResponseStatus;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	private final SlackService slackService;
+	@Value("${server.env:unknown}")
+	private String serverEnv;
 
 	/**
 	 * BaseException 처리

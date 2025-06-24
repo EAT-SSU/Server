@@ -70,7 +70,7 @@ public class ReviewControllerV2 {
 		@ApiResponse(responseCode = "400", description = "path parameter 누락", content = @Content(schema =
 		@Schema(implementation = BaseResponse.class)))
 	})
-	@GetMapping("/statistics")
+	@GetMapping("/statistics/restaurant")
 	public BaseResponse<RestaurantReviewResponse> getRestaurantReviews(
 		@Parameter(description = "restaurant")
 		@RequestParam Restaurant restaurant
@@ -87,7 +87,7 @@ public class ReviewControllerV2 {
 		@ApiResponse(responseCode = "200", description = "리뷰 리스트 조회 성공"),
 		@ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
 	})
-	@GetMapping("")
+	@GetMapping("/list/meal/{mealId}")
 	public BaseResponse<SliceResponse<MealReviewResponse>> getReviews(
 		@Parameter(description = "mealId")
 		@RequestParam Long mealId,
@@ -148,7 +148,7 @@ public class ReviewControllerV2 {
 		@ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema =
 		@Schema(implementation = BaseResponse.class)))
 	})
-	@GetMapping("/meals/{mealId}")
+	@GetMapping("/statistics/meals/{mealId}")
 	public BaseResponse<MealReviewsV2Response> getMealReviews(
 		@Parameter(description = "mealId")
 		@PathVariable(value = "mealId") Long mealId) {
@@ -166,7 +166,7 @@ public class ReviewControllerV2 {
 		@ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema =
 		@Schema(implementation = BaseResponse.class)))
 	})
-	@GetMapping("/menus/{menuId}")
+	@GetMapping("/statistics/menus/{menuId}")
 	public BaseResponse<MenuReviewsV2Response> getMainReviews(
 		@Parameter(description = "menuId")
 		@PathVariable(value = "menuId") Long menuId) {
