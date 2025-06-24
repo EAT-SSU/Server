@@ -40,7 +40,7 @@ spring:
 ## Auth
 jwt:
   secret:
-    key: ${EATSSU_JWT_SECRET}
+    key: ${EATSSU_JWT_SECRET_PROD}
   token-validity-in-seconds: 86400
   refresh-token-validity-in-seconds: 604800
 
