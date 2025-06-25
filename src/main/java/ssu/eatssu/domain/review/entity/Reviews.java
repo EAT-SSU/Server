@@ -29,34 +29,32 @@ public class Reviews {
 
 	public void calculateReviewRatings() {
 		this.reviews.forEach(review -> {
-			int rateValue = review.getRatings().getMainRating();
-			ReviewRating.fromValue(rateValue).incrementCount();
+			if (review.getRatings() != null) {
+				int rateValue = review.getRatings().getMainRating();
+				ReviewRating.fromValue(rateValue).incrementCount();
+			}
 		});
 	}
 
 	public int getTotalMainRating() {
-		return this.reviews.stream().mapToInt(review -> review.getRatings().getMainRating()).sum();
+		return this.reviews.stream()
+						   .filter(review -> review.getRatings() != null)
+						   .mapToInt(review-> review.getRatings().getMainRating())
+						   .sum();
 	}
 
 	public int getTotalAmountRating() {
-		return this.reviews.stream().mapToInt(review -> review.getRatings().getAmountRating())
+		return this.reviews.stream()
+						   .filter(review -> review.getRatings() != null)
+						   .mapToInt(review -> review.getRatings().getAmountRating())
 						   .sum();
 	}
 
 	public int getTotalTasteRating() {
-		return this.reviews.stream().mapToInt(review -> review.getRatings().getTasteRating()).sum();
+		return this.reviews.stream()
+						   .filter(review -> review.getRatings() != null)
+						   .mapToInt(review -> review.getRatings().getTasteRating()).sum();
 	}
 
-	public double getAverageMainRating() {
-		return (double)this.getTotalMainRating() / this.size();
-	}
-
-	public double getAverageAmountRating() {
-		return (double)this.getTotalAmountRating() / this.size();
-	}
-
-	public double getAverageTasteRating() {
-		return (double)this.getTotalTasteRating() / this.size();
-	}
 }
 

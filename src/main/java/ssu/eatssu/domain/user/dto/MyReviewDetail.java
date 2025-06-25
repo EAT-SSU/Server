@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.review.entity.Review;
 
 @AllArgsConstructor
@@ -41,19 +42,39 @@ public class MyReviewDetail {
 	private List<String> imgUrlList;
 
 	public static MyReviewDetail from(Review review) {
-
 		List<String> imgUrlList = new ArrayList<>();
-		review.getReviewImages().forEach(i -> imgUrlList.add(i.getImageUrl()));
+		if (review.getReviewImages() != null) {
+			review.getReviewImages().forEach(image -> {
+				if (image != null && image.getImageUrl() != null) {
+					imgUrlList.add(image.getImageUrl());
+				}
+			});
+		}
+
+		Ratings ratings = review.getRatings();
+		int mainRating = 0;
+		int amountRating = 0;
+		int tasteRating = 0;
+
+		if (ratings != null) {
+			mainRating = ratings.getMainRating() != null ? ratings.getMainRating() : 0;
+			amountRating = ratings.getAmountRating() != null ? ratings.getAmountRating() : 0;
+			tasteRating = ratings.getTasteRating() != null ? ratings.getTasteRating() : 0;
+		}
+
+		String menuName = review.getMenu() != null ? review.getMenu().getName() : null;
+		LocalDate writeDate = review.getCreatedDate() != null ? review.getCreatedDate().toLocalDate() : null;
 
 		return MyReviewDetail.builder()
 							 .reviewId(review.getId())
-							 .mainRating(review.getRatings().getMainRating())
-							 .amountRating(review.getRatings().getAmountRating())
-							 .tasteRating(review.getRatings().getTasteRating())
-							 .writeDate(review.getCreatedDate().toLocalDate())
+							 .mainRating(mainRating)
+							 .amountRating(amountRating)
+							 .tasteRating(tasteRating)
+							 .writeDate(writeDate)
 							 .content(review.getContent())
 							 .imgUrlList(imgUrlList)
-							 .menuName(review.getMenu().getName())
+							 .menuName(menuName)
 							 .build();
 	}
+
 }

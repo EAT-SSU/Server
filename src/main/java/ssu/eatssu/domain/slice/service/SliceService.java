@@ -3,6 +3,8 @@ package ssu.eatssu.domain.slice.service;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
@@ -87,9 +89,12 @@ public class SliceService {
 	}
 
 	private SliceResponse<MyReviewDetail> convertToMyReviewDetail(Slice<Review> sliceReviews) {
-		List<MyReviewDetail> myReviewDetails = sliceReviews.getContent().stream()
-														   .map(MyReviewDetail::from)
-														   .collect(Collectors.toList());
+		List<MyReviewDetail> myReviewDetails = Optional.of(sliceReviews.getContent())
+													   .orElse(List.of())
+													   .stream()
+													   .filter(Objects::nonNull)
+													   .map(MyReviewDetail::from)
+													   .collect(Collectors.toList());
 
 		return SliceResponse.<MyReviewDetail>builder()
 							.numberOfElements(sliceReviews.getNumberOfElements())
