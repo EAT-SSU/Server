@@ -70,6 +70,7 @@ public class Review extends BaseTimeEntity {
 	@OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ReviewMenuLike> menuLikes = new ArrayList<>();
 
+	// @TODO: 리뷰v2 배포 이후 제거 해야함
 	@OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ReviewLike> reviewLikes = new ArrayList<>();
 
