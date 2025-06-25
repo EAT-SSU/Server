@@ -163,29 +163,28 @@ public class ReviewServiceV2 {
 		Menu menu = menuRepository.findById(menuId).orElseThrow(()-> new BaseException(NOT_FOUND_MENU));
 		List<Review> reviews = reviewRepository.findAllByMenu(menu);
 
-		Double averageRating = Optional.ofNullable(reviews)
-			.orElse(Collections.emptyList())
-			.stream()
-			.filter(Objects::nonNull)
-			.map(Review::getRating)
-			.filter(Objects::nonNull)
-			.mapToInt(Integer::intValue)
-			.average()
-			.orElse(0.0);
+		double averageRating = Optional.ofNullable(reviews)
+									   .orElse(Collections.emptyList())
+									   .stream()
+									   .filter(Objects::nonNull)
+									   .map(Review::getRating)
+									   .filter(Objects::nonNull)
+									   .mapToInt(Integer::intValue)
+									   .average()
+									   .orElse(0.0);
 
 		Integer likeCount = menu.getLikeCount();
-
-
 		Integer unlikeCount = menu.getUnlikeCount();
 
 		ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
+		System.out.println(reviewRatingCount);
 
 		return MenuReviewsV2Response.builder()
 			.totalReviewCount((long)reviews.size())
 			.reviewRatingCount(reviewRatingCount)
 			.mainRating(Math.round(averageRating * 10) / 10.0)
-			.likeCount(likeCount)
-			.unlikeCount(unlikeCount)
+			.likeCount(likeCount!=null?likeCount:0)
+			.unlikeCount(unlikeCount!=null?unlikeCount:0)
 			.build();
 	}
 

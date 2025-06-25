@@ -16,8 +16,8 @@ public record ReviewRatingCount(long oneStarCount, long twoStarCount, long three
 
 	public static ReviewRatingCount from(List<Review> reviews) {
 		Map<Integer, Long> ratingDistribution = reviews.stream()
-													   .collect(
-														   Collectors.groupingBy(Review::getRating, LinkedHashMap::new,
+													   .filter(r -> r.getRating() != null)
+													   .collect(Collectors.groupingBy(Review::getRating, LinkedHashMap::new,
 															   Collectors.counting()));
 
 		return new ReviewRatingCount(

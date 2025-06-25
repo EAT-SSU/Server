@@ -48,7 +48,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	 */
 	@ExceptionHandler(BaseException.class)
 	public ResponseEntity<BaseResponse<Void>> handleBaseException(BaseException e) {
-		log.info(e.getStatus().toString());
 		sendErrorToSlack(e);
 		return ResponseEntity.status(e.getStatus().getHttpStatus()).body(BaseResponse.fail(e.getStatus()));
 	}
