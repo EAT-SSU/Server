@@ -2,7 +2,7 @@ name: EAT-SSU Server 개발 & 운영 서버 배포 파이프라인
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "develop", "hotfix/deploy-prod-fail", "hotfix/deploy-dev-fail" ]
 
 permissions:
   contents: read
@@ -30,7 +30,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: dev 프로필 설정
-        if: contains(github.ref, 'dev')
+        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
         run: |
           echo "spring:
             profiles:
@@ -38,7 +38,7 @@ jobs:
         shell: bash
 
       - name: prod 프로필 설정
-        if: contains(github.ref, 'main')
+        if: github.ref_name == 'main' || github.ref_name == 'hotfix/deploy-prod-fail'
         run: |
           echo "spring:
             profiles:
@@ -58,13 +58,13 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: prod 용 Docker 빌드 및 푸시
-        if: contains(github.ref, 'main')
+        if: github.ref_name == 'main' || github.ref_name == 'hotfix/deploy-prod-fail'
         run: |
           docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/eatssu-prod .
           docker push ${{ secrets.DOCKER_REPO }}/eatssu-prod
 
       - name: dev 서버 용 Docker 빌드 및 푸시
-        if: contains(github.ref, 'dev')
+        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
         run: |
           docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/eatssu-dev .
           docker push ${{ secrets.DOCKER_REPO }}/eatssu-dev
@@ -72,12 +72,12 @@ jobs:
       - name: prod에 배포
         uses: appleboy/ssh-action@master
         id: deploy-prod
-        if: contains(github.ref, 'main')
+        if: github.ref_name == 'main' || github.ref_name == 'hotfix/deploy-prod-fail'
         with:
           host: ${{ secrets.HOST_PROD }}
-          username: ubuntu
+          username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PROD_PRIVATE_KEY }}
-          envs: GITHUB_SHA
+          port: 22
           script: |
             sudo docker ps
             sudo docker rm -f $(docker ps -qa)
@@ -96,7 +96,7 @@ jobs:
       - name: dev 서버에 배포
         uses: appleboy/ssh-action@master
         id: deploy-dev
-        if: contains(github.ref, 'dev')
+        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
         with:
           host: ${{ secrets.HOST_DEV }}
           username: ${{ secrets.USERNAME }}
