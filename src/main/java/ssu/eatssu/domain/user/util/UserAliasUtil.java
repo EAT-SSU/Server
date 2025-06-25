@@ -1,6 +1,7 @@
 package ssu.eatssu.domain.user.util;
 
 import java.util.List;
+import java.util.Objects;
 
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.entity.User;
@@ -11,9 +12,12 @@ public class UserAliasUtil {
 			return "미슈테리 미식가";
 		}
 		double avg = reviews.stream()
-							.mapToInt(Review::getRating)
-							.average()
-							.orElse(0.0);
+			.map(Review::getRating)
+			.filter(Objects::nonNull)
+			.mapToInt(Integer::intValue)
+			.average()
+			.orElse(0.0);
+
 		int avgRating = (int)Math.round(avg);
 		switch (avgRating) {
 			case 1:

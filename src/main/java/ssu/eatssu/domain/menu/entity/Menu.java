@@ -97,19 +97,32 @@ public class Menu {
 		return !this.isDiscontinued;
 	}
 
-	public void increaseLikeCount() {
-		likeCount++;
+	public void increaseLikeCount()
+	{
+		if(this.likeCount==null){
+			this.likeCount=0;
+		}
+		this.likeCount++;
 	}
 
 	public void increaseUnlikeCount() {
-		unlikeCount++;
+		if(this.unlikeCount==null){
+			this.unlikeCount=0;
+		}
+		this.unlikeCount++;
 	}
 
 	public void decreaseLikeCount() {
-		likeCount--;
+		if(this.likeCount==null){
+			this.likeCount=0;
+		}
+		this.likeCount--;
 	}
 
 	public void decreaseUnlikeCount() {
+		if(this.unlikeCount==null){
+			this.unlikeCount=0;
+		}
 		unlikeCount--;
 	}
 

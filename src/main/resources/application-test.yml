@@ -1,0 +1,74 @@
+## port number
+server:
+  port: 9000
+
+
+spring:
+  ## Database
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${EATSSU_DB_URL_TEST}
+    username: ${EATSSU_DB_USERNAME_TEST}
+    password: ${EATSSU_DB_PASSWORD_TEST}
+
+  ## JPA
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+        hibernate:
+#            jdbc:
+            lob:
+                non_contextual_creation: true
+            format_sql: true
+            show_sql: true
+            dialect: org.hibernate.dialect.MySQLDialect
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+## Auth
+jwt:
+  secret:
+    key: ${EATSSU_JWT_SECRET_TEST}
+  token-validity-in-seconds: 86400
+  refresh-token-validity-in-seconds: 259200
+
+#S3
+cloud:
+  aws:
+    credentials:
+      accessKey: ${EATSSU_AWS_ACCESS_KEY_PROD}
+      secretKey: ${EATSSU_AWS_SECRET_KEY_PROD}
+    s3:
+        bucket: eatssu-dev-bucket
+    region:
+        static: ap-northeast-2
+    stack:
+        auto: false
+
+#Slack
+slack:
+  token: ${EATSSU_SLACK_TOKEN}
+
+#Swagger
+swagger:
+  url: http://localhost:9000
+  description: Test Server Swagger API
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    groups-order: DESC
+    operationsSorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+  api-docs:
+    path: /v3/api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  paths-to-match:
+    - /**

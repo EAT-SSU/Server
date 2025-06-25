@@ -17,6 +17,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
 
 	List<Review> findAllByMenu(Menu menu);
 
+	List<Review> findAllByMeal(Meal meal);
+
 	/**
 	 * dto projection
 	 */

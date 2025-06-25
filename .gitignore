@@ -36,14 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-### application files ###
-application.yml
-application-local.yml
-application-dev.yml
-application-test.yml
-application-prod.yml
-
-
 ### Generated files ###
 /src/main/generated/
 
@@ -52,3 +44,12 @@ application-prod.yml
 
 ### SDKMAN ###
 .sdkmanrc
+
+### Junie guideline ###
+.junie
+
+### Cursor guideline ###
+eatssu-server-rule.mdc
+
+### Copilot guildline ###
+copilot-instructions.md
