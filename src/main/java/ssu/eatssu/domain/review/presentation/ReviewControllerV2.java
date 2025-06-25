@@ -36,6 +36,7 @@ import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewDetail;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
+import ssu.eatssu.domain.review.dto.UploadReviewRequest;
 import ssu.eatssu.domain.review.service.ReviewServiceV2;
 import ssu.eatssu.domain.review.service.ReviewService;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
@@ -48,18 +49,18 @@ import ssu.eatssu.global.handler.response.BaseResponse;
 @Tag(name = "Review V2", description = "리뷰 V2 API")
 public class ReviewControllerV2 {
 	private final ReviewServiceV2 reviewServiceV2;
-
+	private final ReviewService reviewService;
 	private final SliceService sliceService;
 
-	@Operation(summary = "리뷰 작성", description = "리뷰를 작성하는 API 입니다.")
+	@Operation(summary = "meal(식단)에 대한 리뷰 작성", description = "리뷰를 작성하는 API 입니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "리뷰 작성 성공"),
 		@ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
 		@ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
 		@ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
 	})
-	@PostMapping()
-	public BaseResponse<?> createReview(
+	@PostMapping("/meal")
+	public BaseResponse<?> createMealReview(
 		@RequestBody CreateMealReviewRequest createMealReviewRequest,
 		@AuthenticationPrincipal CustomUserDetails customUserDetails) {
 		reviewServiceV2.createReview(customUserDetails, createMealReviewRequest);
@@ -83,7 +84,7 @@ public class ReviewControllerV2 {
 		return BaseResponse.success(reviewServiceV2.findRestaurantReviews(restaurant));
 	}
 
-	@Operation(summary = "meal에 대한 리뷰 리스트 조회", description = """
+	@Operation(summary = "meal(식단)에 대한 리뷰 리스트 조회", description = """
 		리뷰 리스트를 조회하는 API 입니다.<br><br>
 		커서 기반 페이지네이션으로 리뷰 리스트를 조회합니다.<br><br>
 		페이징 기본 값 = {size=20, sort=date, direction=desc}<br><br>
@@ -201,5 +202,20 @@ public class ReviewControllerV2 {
 
 		return BaseResponse.success(myReviews);
 	}
+
+	@Operation(summary = "menu에 대한 리뷰 작성", description = "리뷰를 작성하는 API 입니다.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "리뷰 작성 성공"),
+			@ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+			@ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+	})
+	@PostMapping("/menu/{menuId}")
+	public BaseResponse<?> createMenuReview(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
+									   @RequestBody UploadReviewRequest uploadReviewRequest,
+									   @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+		reviewService.uploadReview(customUserDetails, menuId, uploadReviewRequest);
+		return BaseResponse.success();
+	}
+
 
 }
