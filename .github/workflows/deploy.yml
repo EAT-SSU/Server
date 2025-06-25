@@ -1,0 +1,118 @@
+name: EAT-SSU Server 개발 & 운영 서버 배포 파이프라인
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+
+permissions:
+  contents: read
+
+jobs:
+  CI-CD:
+    name: CI/CD
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: JDK 17 설치
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Gradle 캐싱
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: dev 프로필 설정
+        if: contains(github.ref, 'dev')
+        run: |
+          echo "spring:
+            profiles:
+              include: dev" > ./src/main/resources/application.yml
+        shell: bash
+
+      - name: prod 프로필 설정
+        if: contains(github.ref, 'main')
+        run: |
+          echo "spring:
+            profiles:
+              include: prod" > ./src/main/resources/application.yml
+        shell: bash
+
+      - name: gradlew 실행 권한 부여
+        run: chmod +x gradlew
+
+      - name: Gradle로 빌드
+        run: ./gradlew clean build -x test
+
+      - name: Docker Hub 로그인
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: prod 용 Docker 빌드 및 푸시
+        if: contains(github.ref, 'main')
+        run: |
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/eatssu-prod .
+          docker push ${{ secrets.DOCKER_REPO }}/eatssu-prod
+
+      - name: dev 서버 용 Docker 빌드 및 푸시
+        if: contains(github.ref, 'dev')
+        run: |
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/eatssu-dev .
+          docker push ${{ secrets.DOCKER_REPO }}/eatssu-dev
+
+      - name: prod에 배포
+        uses: appleboy/ssh-action@master
+        id: deploy-prod
+        if: contains(github.ref, 'main')
+        with:
+          host: ${{ secrets.HOST_PROD }}
+          username: ubuntu
+          key: ${{ secrets.PROD_PRIVATE_KEY }}
+          envs: GITHUB_SHA
+          script: |
+            sudo docker ps
+            sudo docker rm -f $(docker ps -qa)
+            sudo docker pull ${{ secrets.DOCKER_REPO }}/eatssu-prod
+            sudo docker run -d -p 9000:9000 \
+            -e EATSSU_DB_URL_PROD="${{ secrets.EATSSU_DB_URL_PROD }}" \
+            -e EATSSU_DB_USERNAME="${{ secrets.EATSSU_DB_USERNAME }}" \
+            -e EATSSU_DB_PASSWORD="${{ secrets.EATSSU_DB_PASSWORD }}" \
+            -e EATSSU_JWT_SECRET_PROD="${{ secrets.EATSSU_JWT_SECRET_PROD }}" \
+            -e EATSSU_AWS_ACCESS_KEY_PROD="${{ secrets.EATSSU_AWS_ACCESS_KEY_PROD }}" \
+            -e EATSSU_AWS_SECRET_KEY_PROD="${{ secrets.EATSSU_AWS_SECRET_KEY_PROD }}" \
+            -e EATSSU_SLACK_TOKEN="${{ secrets.EATSSU_SLACK_TOKEN }}" \
+            ${{ secrets.DOCKER_REPO }}/eatssu-prod
+            sudo docker image prune -f
+
+      - name: dev 서버에 배포
+        uses: appleboy/ssh-action@master
+        id: deploy-dev
+        if: contains(github.ref, 'dev')
+        with:
+          host: ${{ secrets.HOST_DEV }}
+          username: ${{ secrets.USERNAME }}
+          port: 22
+          key: ${{ secrets.DEV_PRIVATE_KEY }}
+          script: |
+            sudo docker ps
+            sudo docker rm -f $(docker ps -qa)
+            sudo docker pull ${{ secrets.DOCKER_REPO }}/eatssu-dev
+            sudo docker run -d -p 9000:9000 \
+            -e EATSSU_DB_URL_DEV="${{ secrets.EATSSU_DB_URL_DEV }}" \
+            -e EATSSU_DB_USERNAME="${{ secrets.EATSSU_DB_USERNAME }}" \
+            -e EATSSU_DB_PASSWORD="${{ secrets.EATSSU_DB_PASSWORD }}" \
+            -e EATSSU_JWT_SECRET_DEV="${{ secrets.EATSSU_JWT_SECRET_DEV }}" \
+            -e EATSSU_AWS_ACCESS_KEY_DEV="${{ secrets.EATSSU_AWS_ACCESS_KEY_DEV }}" \
+            -e EATSSU_AWS_SECRET_KEY_DEV="${{ secrets.EATSSU_AWS_SECRET_KEY_DEV }}" \
+            -e EATSSU_SLACK_TOKEN="${{ secrets.EATSSU_SLACK_TOKEN }}" \
+            ${{ secrets.DOCKER_REPO }}/eatssu-dev
+            sudo docker image prune -f

@@ -23,14 +23,14 @@ import ssu.eatssu.global.handler.JwtAuthenticationEntryPoint;
 @RequiredArgsConstructor
 public class SecurityConfig {
 	private static final String[] RESOURCE_LIST = {
-		"/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**","/oauths/valid/token", "/admin/img/**", "/css/**", "/js/**",
+		"/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**","/oauths/valid/token", "/admin/img/**", "/css/**", "/js/**",
 		"/favicon.ico", "/error/**", "/webjars/**", "/h2-console/**"
 	};
 
 	private static final String[] AUTH_WHITELIST = {
 		"/", "/oauths/kakao", "/oauths/apple", "/menus/**", "/meals/**", "/admin/login",
 		"/reviews", "/reviews/menus/**", "/reviews/meals/**", "/v2/reviews/statistics", "/v2/reviews",
-		"/partnerships/**","/v2/reviews/menus/**","/v2/reviews/meals/**","/actuator/**"
+		"/partnerships/**","/v2/reviews/menus/**","/v2/reviews/meals/**","/actuator/**","/error-test/**"
 	};
 
 	private static final String[] ADMIN_PAGE_LIST = {

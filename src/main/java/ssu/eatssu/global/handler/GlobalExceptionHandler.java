@@ -23,7 +23,10 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ssu.eatssu.domain.slack.entity.SlackMessageFormat;
+import ssu.eatssu.domain.slack.service.SlackService;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponse;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
@@ -33,7 +36,9 @@ import ssu.eatssu.global.handler.response.BaseResponseStatus;
  */
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+	private final SlackService slackService;
 
 	/**
 	 * BaseException 처리
@@ -41,8 +46,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(BaseException.class)
 	public ResponseEntity<BaseResponse<Void>> handleBaseException(BaseException e) {
 		log.info(e.getStatus().toString());
+		sendErrorToSlack(e);
 		return ResponseEntity.status(e.getStatus().getHttpStatus()).body(BaseResponse.fail(e.getStatus()));
 	}
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<BaseResponse<Void>> handleAllUnhandledException(Exception ex) {
+		sendErrorToSlack(ex);
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+			.body(BaseResponse.fail(BaseResponseStatus.INTERNAL_SERVER_ERROR));
+	}
+
 
 	/**
 	 * 경로는 있으나 지원하지 않는 http method로 요청 시
@@ -214,5 +227,36 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 							 .body(BaseResponse.fail(BaseResponseStatus.INTERNAL_SERVER_ERROR));
 	}
+
+	@Override
+	protected ResponseEntity<Object> handleExceptionInternal(
+		@NonNull Exception ex,
+		Object body,
+		@NonNull HttpHeaders headers,
+		@NonNull HttpStatusCode statusCode,
+		@NonNull WebRequest request) {
+
+		HttpStatus status = HttpStatus.valueOf(statusCode.value());
+
+		if (status.is4xxClientError() || status.is5xxServerError()) {
+			sendErrorToSlack(ex);
+		}
+
+		BaseResponseStatus responseStatus = status.is4xxClientError()
+			? BaseResponseStatus.BAD_REQUEST
+			: BaseResponseStatus.INTERNAL_SERVER_ERROR;
+
+		return ResponseEntity.status(status).body(BaseResponse.fail(responseStatus));
+	}
+
+	private void sendErrorToSlack(Exception ex) {
+		try {
+			String message = SlackMessageFormat.sendServerError(ex);
+			slackService.sendSlackMessage(message, ssu.eatssu.domain.slack.entity.SlackChannel.SERVER_ERROR);
+		} catch (Exception slackEx) {
+			log.warn("슬랙 전송 실패: {}", slackEx.getMessage());
+		}
+	}
+
 
 }
