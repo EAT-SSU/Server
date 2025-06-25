@@ -1,8 +1,10 @@
 package ssu.eatssu.domain.review.presentation;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.domain.menu.entity.constants.MenuType;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
@@ -31,10 +34,12 @@ import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuReviewResponse;
 import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
+import ssu.eatssu.domain.review.dto.ReviewDetail;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
 import ssu.eatssu.domain.review.service.ReviewServiceV2;
 import ssu.eatssu.domain.review.service.ReviewService;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
+import ssu.eatssu.domain.slice.service.SliceService;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 @RestController
@@ -44,7 +49,7 @@ import ssu.eatssu.global.handler.response.BaseResponse;
 public class ReviewControllerV2 {
 	private final ReviewServiceV2 reviewServiceV2;
 
-	private final ReviewService reviewService;
+	private final SliceService sliceService;
 
 	@Operation(summary = "리뷰 작성", description = "리뷰를 작성하는 API 입니다.")
 	@ApiResponses(value = {
@@ -78,7 +83,7 @@ public class ReviewControllerV2 {
 		return BaseResponse.success(reviewServiceV2.findRestaurantReviews(restaurant));
 	}
 
-	@Operation(summary = "리뷰 리스트 조회", description = """
+	@Operation(summary = "meal에 대한 리뷰 리스트 조회", description = """
 		리뷰 리스트를 조회하는 API 입니다.<br><br>
 		커서 기반 페이지네이션으로 리뷰 리스트를 조회합니다.<br><br>
 		페이징 기본 값 = {size=20, sort=date, direction=desc}<br><br>
@@ -87,15 +92,15 @@ public class ReviewControllerV2 {
 		@ApiResponse(responseCode = "200", description = "리뷰 리스트 조회 성공"),
 		@ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
 	})
-	@GetMapping("/list/meal/{mealId}")
-	public BaseResponse<SliceResponse<MealReviewResponse>> getReviews(
+	@GetMapping("/list/meal")
+	public BaseResponse<SliceResponse<MealReviewResponse>> getMealReviewList(
 		@Parameter(description = "mealId")
 		@RequestParam Long mealId,
 		@Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY)
 		@RequestParam(value = "lastReviewId", required = false) Long lastReviewId,
 		@AuthenticationPrincipal CustomUserDetails customUserDetails) {
 		Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "id"));
-		SliceResponse<MealReviewResponse> myReviews = reviewServiceV2.findReviews(mealId, lastReviewId, pageable,
+		SliceResponse<MealReviewResponse> myReviews = reviewServiceV2.findMealReviewList(mealId, lastReviewId, pageable,
 			customUserDetails);
 		return BaseResponse.success(myReviews);
 	}
@@ -171,6 +176,30 @@ public class ReviewControllerV2 {
 		@Parameter(description = "menuId")
 		@PathVariable(value = "menuId") Long menuId) {
 		return BaseResponse.success(reviewServiceV2.findMenuReviews(menuId));
+	}
+
+	@Operation(summary = "menu 에 대한 리뷰 리스트 조회", description = """
+		리뷰 리스트를 조회하는 API 입니다.<br><br>
+		커서 기반 페이지네이션으로 리뷰 리스트를 조회합니다.<br><br>
+		페이징 기본 값 = {size=20, sort=date, direction=desc}<br><br>
+		""")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "리뷰 리스트 조회 성공"),
+		@ApiResponse(responseCode = "400", description = "쿼리 파라미터 누락", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+	})
+	@GetMapping("/list/menu")
+	public BaseResponse<SliceResponse<ReviewDetail>> getMenuReviewList(
+		@Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType") MenuType menuType,
+		@Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false) Long menuId,
+		@Parameter(description = "mealId(변동메뉴)") @RequestParam(value = "mealId", required = false) Long mealId,
+		@Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY)
+		@RequestParam(value = "lastReviewId", required = false) Long lastReviewId,
+		@ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
+		@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+		SliceResponse<ReviewDetail> myReviews = sliceService.findReviews(menuType, menuId, mealId,
+			pageable, lastReviewId, customUserDetails);
+
+		return BaseResponse.success(myReviews);
 	}
 
 }

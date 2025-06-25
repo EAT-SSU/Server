@@ -124,7 +124,7 @@ public class ReviewServiceV2 {
 	/**
 	 * 특정 식단 리뷰 리스트 조회
 	 */
-	public SliceResponse<MealReviewResponse> findReviews(Long mealId, Long lastReviewId, Pageable pageable,
+	public SliceResponse<MealReviewResponse> findMealReviewList(Long mealId, Long lastReviewId, Pageable pageable,
 		CustomUserDetails userDetails) {
 		if (!mealRepository.existsById(mealId)) {
 			throw new BaseException(NOT_FOUND_MEAL);
@@ -153,6 +153,8 @@ public class ReviewServiceV2 {
 							.dataList(mealReviewResponses)
 							.build();
 	}
+
+
 
 	/**
 	 * 특정 Menu 리뷰 조회
