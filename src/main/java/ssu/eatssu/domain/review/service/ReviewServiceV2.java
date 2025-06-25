@@ -177,7 +177,6 @@ public class ReviewServiceV2 {
 		Integer unlikeCount = menu.getUnlikeCount();
 
 		ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
-		System.out.println(reviewRatingCount);
 
 		return MenuReviewsV2Response
 				.builder()
