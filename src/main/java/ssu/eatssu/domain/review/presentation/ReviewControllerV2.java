@@ -41,6 +41,7 @@ import ssu.eatssu.domain.review.service.ReviewServiceV2;
 import ssu.eatssu.domain.review.service.ReviewService;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.slice.service.SliceService;
+import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 @RestController
@@ -215,6 +216,22 @@ public class ReviewControllerV2 {
 									   @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 		reviewService.uploadReview(customUserDetails, menuId, uploadReviewRequest);
 		return BaseResponse.success();
+	}
+
+	@Operation(summary = "내가 쓴 리뷰 리스트 조회", description = "내가 쓴 리뷰 리스트를 조회하는 API V2 입니다.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "내가 쓴 리뷰 리스트 조회 성공"),
+			@ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+	})
+	@GetMapping("/my")
+	public BaseResponse<SliceResponse<MyMealReviewResponse>> getMyReviews(
+			@Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY) @RequestParam(required = false) Long lastReviewId,
+			@ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
+			@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+		SliceResponse<MyMealReviewResponse> myReviews = reviewServiceV2.findMyReviews(customUserDetails,
+																						lastReviewId,
+																						pageable);
+		return BaseResponse.success(myReviews);
 	}
 
 
