@@ -179,13 +179,15 @@ public class ReviewServiceV2 {
 		ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 		System.out.println(reviewRatingCount);
 
-		return MenuReviewsV2Response.builder()
-			.totalReviewCount((long)reviews.size())
-			.reviewRatingCount(reviewRatingCount)
-			.mainRating(Math.round(averageRating * 10) / 10.0)
-			.likeCount(likeCount!=null?likeCount:0)
-			.unlikeCount(unlikeCount!=null?unlikeCount:0)
-			.build();
+		return MenuReviewsV2Response
+				.builder()
+				.menuName(menu.getName())
+				.totalReviewCount((long)reviews.size())
+				.reviewRatingCount(reviewRatingCount)
+				.mainRating(Math.round(averageRating * 10) / 10.0)
+				.likeCount(likeCount!=null?likeCount:0)
+				.unlikeCount(unlikeCount!=null?unlikeCount:0)
+				.build();
 	}
 
 	/**
@@ -227,13 +229,19 @@ public class ReviewServiceV2 {
 
 		ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 
-		return MealReviewsV2Response.builder()
-			.totalReviewCount((long)reviews.size())
-			.reviewRatingCount(reviewRatingCount)
-			.mainRating(Math.round(averageRating * 10) / 10.0)
-			.likeCount(likeCount)
-			.unlikeCount(unlikeCount)
-			.build();
+		return MealReviewsV2Response
+				.builder()
+				.menuNames( menus.stream()
+								 .filter(Objects::nonNull)
+								 .map(Menu::getName)
+								 .filter(Objects::nonNull)
+								 .collect(Collectors.toList()))
+				.totalReviewCount((long)reviews.size())
+				.reviewRatingCount(reviewRatingCount)
+				.mainRating(Math.round(averageRating * 10) / 10.0)
+				.likeCount(likeCount)
+				.unlikeCount(unlikeCount)
+				.build();
 	}
 
 	/**
