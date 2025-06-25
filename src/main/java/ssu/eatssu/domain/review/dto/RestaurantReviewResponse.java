@@ -10,18 +10,18 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class RestaurantReviewResponse {
-	@Schema(description = "리뷰 개수", example = "15")
-	private Integer totalReviewCount;
+    @Schema(description = "리뷰 개수", example = "15")
+    private Integer totalReviewCount;
 
-	@Schema(description = "별점 별 개수")
-	private ReviewRatingCount reviewRatingCount;
+    @Schema(description = "별점 별 개수")
+    private ReviewRatingCount reviewRatingCount;
 
-	@Schema(description = "리뷰 평점", example = "4.4")
-	private Double mainRating;
+    @Schema(description = "리뷰 평점", example = "4.4")
+    private Double mainRating;
 
-	@Schema(description = "좋아요 개수", example = "15")
-	private Integer likeCount;
+    @Schema(description = "좋아요 개수", example = "15")
+    private Integer likeCount;
 
-	@Schema(description = "싫어요 개수", example = "15")
-	private Integer unlikeCount;
+    @Schema(description = "싫어요 개수", example = "15")
+    private Integer unlikeCount;
 }

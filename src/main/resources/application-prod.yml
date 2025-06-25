@@ -25,12 +25,12 @@ spring:
     hibernate:
       ddl-auto: none
     properties:
-        hibernate:
-            jdbc:
-            lob:
-                non_contextual_creation: true
-            format_sql: true
-            show_sql: false
+      hibernate:
+        jdbc:
+        lob:
+          non_contextual_creation: true
+        format_sql: true
+        show_sql: false
 
   servlet:
     multipart:
@@ -51,11 +51,11 @@ cloud:
       accessKey: ${EATSSU_AWS_ACCESS_KEY_PROD}
       secretKey: ${EATSSU_AWS_SECRET_KEY_PROD}
     s3:
-        bucket: eatssu-prod-bucket
+      bucket: eatssu-prod-bucket
     region:
-        static: ap-northeast-2
+      static: ap-northeast-2
     stack:
-        auto: false
+      auto: false
 
 #Slack
 slack:

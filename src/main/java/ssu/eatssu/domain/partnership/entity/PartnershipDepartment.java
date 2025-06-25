@@ -17,21 +17,21 @@ import ssu.eatssu.domain.user.department.entity.Department;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PartnershipDepartment {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "partnership_college_id")
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "partnership_college_id")
+    private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "partnership_id")
-	private Partnership partnership;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "partnership_id")
+    private Partnership partnership;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "department_id")
-	private Department department;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
 
-	public PartnershipDepartment(Partnership partnership, Department department) {
-		this.partnership = partnership;
-		this.department = department;
-	}
+    public PartnershipDepartment(Partnership partnership, Department department) {
+        this.partnership = partnership;
+        this.department = department;
+    }
 }

@@ -25,34 +25,34 @@ import ssu.eatssu.domain.user.entity.User;
 @AllArgsConstructor
 public class Inquiry extends BaseTimeEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "user_inquiry_id")
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_inquiry_id")
+    private Long id;
 
-	private String content;
+    private String content;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-	private String email;
+    private String email;
 
-	@Enumerated(EnumType.STRING)
-	private InquiryStatus status;
+    @Enumerated(EnumType.STRING)
+    private InquiryStatus status;
 
-	public Inquiry(String content, User user, String email) {
-		this.content = content;
-		this.user = user;
-		this.email = email;
-		this.status = InquiryStatus.WAITING;
-	}
+    public Inquiry(String content, User user, String email) {
+        this.content = content;
+        this.user = user;
+        this.email = email;
+        this.status = InquiryStatus.WAITING;
+    }
 
-	public void updateStatus(InquiryStatus status) {
-		this.status = status;
-	}
+    public void updateStatus(InquiryStatus status) {
+        this.status = status;
+    }
 
-	public void clearUser() {
-		this.user = null;
-	}
+    public void clearUser() {
+        this.user = null;
+    }
 }

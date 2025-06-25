@@ -28,35 +28,35 @@ import ssu.eatssu.domain.user.entity.User;
 @AllArgsConstructor
 public class Report extends BaseTimeEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "review_report_id")
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "review_report_id")
+    private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "reporter_id")
-	private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reporter_id")
+    private User user;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "review_id")
-	private Review review;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "review_id")
+    private Review review;
 
-	@Enumerated(EnumType.STRING)
-	private ReportType reportType;
+    @Enumerated(EnumType.STRING)
+    private ReportType reportType;
 
-	private String content;
+    private String content;
 
-	@Enumerated(EnumType.STRING)
-	private ReportStatus status;
+    @Enumerated(EnumType.STRING)
+    private ReportStatus status;
 
-	public static Report create(User user, Review review, ReportCreateRequest request,
-		ReportStatus status) {
-		return Report.builder()
-					 .user(user)
-					 .review(review)
-					 .reportType(request.reportType())
-					 .content(request.content())
-					 .status(status)
-					 .build();
-	}
+    public static Report create(User user, Review review, ReportCreateRequest request,
+                                ReportStatus status) {
+        return Report.builder()
+                     .user(user)
+                     .review(review)
+                     .reportType(request.reportType())
+                     .content(request.content())
+                     .status(status)
+                     .build();
+    }
 }

@@ -10,12 +10,12 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class OAuthConfig {
 
-	@Bean
-	public RestTemplate restTemplate() {
-		HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-		CloseableHttpClient client = HttpClientBuilder.create().build();
-		factory.setConnectTimeout(3000); //3s
-		factory.setHttpClient(client);
-		return new RestTemplate(factory);
-	}
+    @Bean
+    public RestTemplate restTemplate() {
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        factory.setConnectTimeout(3000); //3s
+        factory.setHttpClient(client);
+        return new RestTemplate(factory);
+    }
 }
