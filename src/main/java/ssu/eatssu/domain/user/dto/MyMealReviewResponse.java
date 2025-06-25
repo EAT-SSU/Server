@@ -3,12 +3,14 @@ package ssu.eatssu.domain.user.dto;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import ssu.eatssu.domain.review.entity.Review;
+import ssu.eatssu.domain.review.entity.ReviewMenuLike;
 
 @AllArgsConstructor
 @Builder
@@ -30,16 +32,26 @@ public class MyMealReviewResponse {
 	@Schema(description = "리뷰 이미지 url 리스트", example = "[\"imgurl1\", \"imgurl2\"]")
 	private List<String> imageUrls;
 
+	@Schema(description = "좋아요한 메뉴명 리스트", example = "[\"메뉴1\", \"메뉴2\"]")
+	private List<String> likedMenuNames;
+
 	public static MyMealReviewResponse from(Review review) {
 		List<String> imgUrlList = new ArrayList<>();
 		review.getReviewImages().forEach(i -> imgUrlList.add(i.getImageUrl()));
 
-		return MyMealReviewResponse.builder()
-								   .reviewId(review.getId())
-								   .rating(review.getRating())
-								   .writtenAt(review.getCreatedDate().toLocalDate())
-								   .content(review.getContent())
-								   .imageUrls(imgUrlList)
-								   .build();
+		List<String> likedMenuNames = review.getMenuLikes().stream()
+											.filter(ReviewMenuLike::getIsLike)
+											.map(like -> like.getMenu().getName())
+											.toList();
+
+		return MyMealReviewResponse
+				.builder()
+				.reviewId(review.getId())
+				.rating(review.getRating())
+				.writtenAt(review.getCreatedDate().toLocalDate())
+				.content(review.getContent())
+				.imageUrls(imgUrlList)
+				.likedMenuNames(likedMenuNames)
+				.build();
 	}
 }
