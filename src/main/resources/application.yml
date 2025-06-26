@@ -1,6 +1,11 @@
 spring:
   profiles:
-#     include : prod
-#     include : dev
-     include : local
-#    include: test
+    # include : prod
+    # include : dev
+    include: local
+    # include: test
+
+user:
+  forbidden-nicknames:
+    - EAT-SSU
+    - EATSSU

@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ErrorTestController {
-	@GetMapping("/error-test")
-	public String triggerError() {
-		throw new RuntimeException("임의로 발생시킨 런타임 에러입니다!");
-	}
+    @GetMapping("/error-test")
+    public String triggerError() {
+        throw new RuntimeException("임의로 발생시킨 런타임 에러입니다!");
+    }
 }
