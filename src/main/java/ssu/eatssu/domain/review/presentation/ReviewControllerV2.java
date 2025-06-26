@@ -191,15 +191,12 @@ public class ReviewControllerV2 {
 	})
 	@GetMapping("/list/menu")
 	public BaseResponse<SliceResponse<ReviewDetail>> getMenuReviewList(
-		@Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType") MenuType menuType,
-		@Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false) Long menuId,
-		@Parameter(description = "mealId(변동메뉴)") @RequestParam(value = "mealId", required = false) Long mealId,
+		@Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId") Long menuId,
 		@Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY)
 		@RequestParam(value = "lastReviewId", required = false) Long lastReviewId,
 		@ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
 		@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-		SliceResponse<ReviewDetail> myReviews = sliceService.findReviews(menuType, menuId, mealId,
-			pageable, lastReviewId, customUserDetails);
+		SliceResponse<ReviewDetail> myReviews = reviewServiceV2.findMenuReviewList(menuId, pageable, lastReviewId, customUserDetails);
 
 		return BaseResponse.success(myReviews);
 	}

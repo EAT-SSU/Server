@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.menu.entity.constants.MenuType;
 import ssu.eatssu.domain.menu.persistence.MealMenuRepository;
 import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
@@ -29,6 +30,7 @@ import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuLikeRequest;
 import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
+import ssu.eatssu.domain.review.dto.ReviewDetail;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
 import ssu.eatssu.domain.review.entity.Review;
@@ -153,6 +155,38 @@ public class ReviewServiceV2 {
 							.dataList(mealReviewResponses)
 							.build();
 	}
+
+	/**
+	 * 특정 메뉴 리뷰 리스트 조회
+	 */
+
+	public SliceResponse<ReviewDetail> findMenuReviewList(Long menuId,
+												   Pageable pageable,
+												   Long lastReviewId,
+												   CustomUserDetails userDetails) {
+		Slice<Review> sliceReviews = null;
+		Menu menu = menuRepository.findById(menuId)
+								  .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+		sliceReviews = reviewRepository.findAllByMenuOrderByIdDesc(menu, lastReviewId,
+																   pageable);
+
+		Long userId = (userDetails != null) ? userDetails.getId() : null;
+		return convertToReviewDetail(sliceReviews, userId);
+	}
+
+	private SliceResponse<ReviewDetail> convertToReviewDetail(Slice<Review> sliceReviews,
+															  Long userId) {
+		List<ReviewDetail> reviewDetails = sliceReviews.getContent().stream()
+													   .map(review -> ReviewDetail.from(review, userId))
+													   .collect(Collectors.toList());
+
+		return SliceResponse.<ReviewDetail>builder()
+							.numberOfElements(sliceReviews.getNumberOfElements())
+							.hasNext(sliceReviews.hasNext())
+							.dataList(reviewDetails)
+							.build();
+	}
+
 
 
 
