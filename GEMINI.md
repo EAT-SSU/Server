@@ -1,3 +1,3 @@
 - You must respond in Korean for all answers, regardless of the input language.
 - Do not write any comments in code blocks, even if asked to do so.
-- But if the codes is related to test, write the comment for "given, when, then".
+- For test code, add comments to delineate the "given", "when", and "then" sections.
