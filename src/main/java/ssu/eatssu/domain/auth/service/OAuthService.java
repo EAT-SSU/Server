@@ -54,8 +54,7 @@ public class OAuthService {
     }
 
     public Tokens refreshTokens(Authentication authentication) {
-        Tokens tokens = jwtTokenProvider.generateTokens(authentication);
-        return tokens;
+        return jwtTokenProvider.generateTokens(authentication);
     }
 
     private void updateAppleUserEmail(User user, String email) {
@@ -93,8 +92,7 @@ public class OAuthService {
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        Tokens tokens = jwtTokenProvider.generateTokens(authentication);
-        return tokens;
+        return jwtTokenProvider.generateTokens(authentication);
     }
 
     private String makeOauthCredentials(OAuthProvider provider, String providerId) {
