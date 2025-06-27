@@ -1,7 +1,6 @@
 package ssu.eatssu.domain.auth.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -23,7 +22,6 @@ import ssu.eatssu.global.handler.response.BaseException;
 import static ssu.eatssu.domain.auth.entity.OAuthProvider.APPLE;
 import static ssu.eatssu.domain.auth.entity.OAuthProvider.KAKAO;
 
-@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -39,33 +37,25 @@ public class OAuthService {
 
     public Tokens kakaoLogin(KakaoLoginRequest request) {
         User user = userRepository.findByProviderId(request.providerId())
-                                  .orElseGet(
-                                          () -> userService.join(request.email(), KAKAO, request.providerId()));
+                                  .orElseGet(() -> userService.join(request.email(), KAKAO, request.providerId()));
 
-        return generateOauthJwtTokens(user.getEmail(), KAKAO,
-                                      request.providerId());
+        return generateOauthJwtTokens(user.getEmail(), KAKAO, request.providerId());
     }
 
     public Tokens appleLogin(AppleLoginRequest request) {
-        OAuthInfo oAuthInfo = appleAuthenticator.getOAuthInfoByIdentityToken(
-                request.identityToken());
+        OAuthInfo oAuthInfo = appleAuthenticator.getOAuthInfoByIdentityToken(request.identityToken());
 
         User user = userRepository.findByProviderId(oAuthInfo.providerId())
-                                  .orElseGet(() -> userService.join(oAuthInfo.email(), APPLE,
-                                                                    oAuthInfo.providerId()));
+                                  .orElseGet(() -> userService.join(oAuthInfo.email(), APPLE, oAuthInfo.providerId()));
 
-        //todo 이메일 갱신의 이유?
         updateAppleUserEmail(user, oAuthInfo.email());
 
-        return generateOauthJwtTokens(user.getEmail(), APPLE,
-                                      oAuthInfo.providerId());
+        return generateOauthJwtTokens(user.getEmail(), APPLE, oAuthInfo.providerId());
     }
 
-    /**
-     * JWT 토큰 재발급
-     */
     public Tokens refreshTokens(Authentication authentication) {
-        return jwtTokenProvider.generateTokens(authentication);
+        Tokens tokens = jwtTokenProvider.generateTokens(authentication);
+        return tokens;
     }
 
     private void updateAppleUserEmail(User user, String email) {
@@ -75,17 +65,12 @@ public class OAuthService {
         }
     }
 
-    /**
-     * 유효한 토큰인지 확인
-     */
-
     public Boolean validToken(ValidRequest request) {
         String token = request.token();
 
         try {
             return jwtTokenProvider.validateToken(token);
         } catch (BaseException e) {
-            log.warn("토큰 유효성 검사 중 예외 발생: {}", e.getMessage());
             return false;
         }
     }
@@ -98,24 +83,18 @@ public class OAuthService {
         }
     }
 
-    /**
-     * Oauth 회원 - email, providerId 를 통해 JwtToken 을 생성
-     * todo: 같은 이메일로 카카오, 애플 등 여러 회원가입을 한 회원 처리 필요
-     */
+    // FIXME: 같은 이메일로 카카오, 애플 등 여러 회원가입을 한 회원 처리 필요.
+    // 사용자는 같은 이메일로 로그인을 진행했을 시 같은 계정에 접근하기를 원함.
+    // iPhone을 사용하는 사용자들에서만 한함.
+    // 하지만 private relay를 사용하는 경우도 있는데, 이럴 때는 사용자의 계정을 묶기 다소 복잡하다.
     private Tokens generateOauthJwtTokens(String email, OAuthProvider provider, String providerId) {
-        // email, credentials 를 기반으로 Authentication 객체 생성
-        // 이때 authentication 은 인증 여부를 확인하는 authenticated 값이 false
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(email,
-                                                        makeOauthCredentials(provider, providerId));
+                new UsernamePasswordAuthenticationToken(email, makeOauthCredentials(provider, providerId));
 
-        // 실제 검증 (사용자 비밀번호 체크)
-        // authenticate 메서드 실행 => CustomUserDetailsService 에서 만든 loadUserByUsername 메서드 실행
-        Authentication authentication = authenticationManagerBuilder.getObject()
-                                                                    .authenticate(authenticationToken);
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        // 인증 정보를 바탕으로 JWT 토큰 생성
-        return jwtTokenProvider.generateTokens(authentication);
+        Tokens tokens = jwtTokenProvider.generateTokens(authentication);
+        return tokens;
     }
 
     private String makeOauthCredentials(OAuthProvider provider, String providerId) {
