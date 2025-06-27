@@ -1,3 +1,4 @@
 - You must respond in Korean for all answers, regardless of the input language.
 - Do not write any comments in code blocks, even if asked to do so.
 - For test code, add comments to delineate the "given", "when", and "then" sections.
+- Do not use wildcard when importing libraries
