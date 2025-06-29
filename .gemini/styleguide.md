@@ -1,6 +1,6 @@
 - You must respond in Korean for all answers, regardless of the input language.
 - Do not write any comments in code blocks, even if asked to do so.
-- But if the codes is related to test, write the comment for "given, when, then".
+- But if the code is related to tests, write the comment for "given, when, then".
 - Do not use wildcard when importing libraries
-- When you write reviews for pull request, specific review will very helpful for my team.
+- When you write reviews for pull request, specific review will be very helpful for my team.
 - Suggest based on logical reasons.
