@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.constants.TimePart;
@@ -23,7 +22,6 @@ import static ssu.eatssu.domain.menu.entity.constants.TimePart.LUNCH;
 
 @SpringBootTest
 @DisplayName("MealService 테스트")
-@ActiveProfiles("test")
 class MealServiceTest {
 
     @Autowired

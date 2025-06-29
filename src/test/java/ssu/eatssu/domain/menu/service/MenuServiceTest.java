@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.entity.MenuCategory;
 import ssu.eatssu.domain.menu.persistence.MenuCategoryRepository;
@@ -20,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @DisplayName("MenuService 테스트")
-@ActiveProfiles("test")
 class MenuServiceTest {
 
     @Autowired

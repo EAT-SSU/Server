@@ -2,3 +2,5 @@
 - Do not write any comments in code blocks, even if asked to do so.
 - But if the codes is related to test, write the comment for "given, when, then".
 - Do not use wildcard when importing libraries
+- When you write reviews for pull request, specific review will very helpful for my team.
+- Suggest based on logical reasons.
