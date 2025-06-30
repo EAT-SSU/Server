@@ -40,7 +40,7 @@ public class Review extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
     private Long id;
-
+    @Column(length = 300)
     private String content;
 
     // TODO : 삭제되어야 함
