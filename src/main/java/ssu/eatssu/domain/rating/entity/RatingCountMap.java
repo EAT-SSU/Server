@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class RatingCountMap {
 
-    private Map<Integer, Integer> ratingCountMap;
+    private final Map<Integer, Integer> ratingCountMap;
 
     public RatingCountMap() {
         this.ratingCountMap = new HashMap<>();
