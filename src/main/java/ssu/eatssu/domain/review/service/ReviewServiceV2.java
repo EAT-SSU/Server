@@ -221,7 +221,6 @@ public class ReviewServiceV2 {
                 .reviewRatingCount(reviewRatingCount)
                 .mainRating(Math.round(averageRating * 10) / 10.0)
                 .likeCount(likeCount != null ? likeCount : 0)
-                .unlikeCount(unlikeCount != null ? unlikeCount : 0)
                 .build();
     }
 
@@ -275,7 +274,6 @@ public class ReviewServiceV2 {
                 .reviewRatingCount(reviewRatingCount)
                 .mainRating(Math.round(averageRating * 10) / 10.0)
                 .likeCount(likeCount)
-                .unlikeCount(unlikeCount)
                 .build();
     }
 
