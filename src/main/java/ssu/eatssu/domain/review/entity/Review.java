@@ -99,8 +99,6 @@ public class Review extends BaseTimeEntity {
 
         if (isLike) {
             menu.increaseLikeCount();
-        } else {
-            menu.increaseUnlikeCount();
         }
     }
 
@@ -109,8 +107,6 @@ public class Review extends BaseTimeEntity {
 
         if (reviewMenuLike.getIsLike()) {
             reviewMenuLike.getMenu().decreaseLikeCount();
-        } else {
-            reviewMenuLike.getMenu().decreaseUnlikeCount();
         }
     }
 

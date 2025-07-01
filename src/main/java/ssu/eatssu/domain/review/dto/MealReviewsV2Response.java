@@ -23,10 +23,6 @@ public class MealReviewsV2Response implements ReviewInformationResponse {
 
     @Schema(description = "좋아요 개수", example = "4.4")
     private Integer likeCount;
-
-    @Schema(description = "싫어요 개수", example = "4.4")
-    private Integer unlikeCount;
-
     @Schema(description = "평점 별 갯수")
     private ReviewRatingCount reviewRatingCount;
 

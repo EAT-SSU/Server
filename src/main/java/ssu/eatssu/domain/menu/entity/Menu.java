@@ -104,13 +104,6 @@ public class Menu {
         this.likeCount++;
     }
 
-    public void increaseUnlikeCount() {
-        if (this.unlikeCount == null) {
-            this.unlikeCount = 0;
-        }
-        this.unlikeCount++;
-    }
-
     public void decreaseLikeCount() {
         if (this.likeCount == null) {
             this.likeCount = 0;
@@ -118,28 +111,17 @@ public class Menu {
         this.likeCount--;
     }
 
-    public void decreaseUnlikeCount() {
-        if (this.unlikeCount == null) {
-            this.unlikeCount = 0;
-        }
-        unlikeCount--;
-    }
-
     public void changeLikeStatus(Boolean isLike) {
         if (isLike) {
-            decreaseUnlikeCount();
             increaseLikeCount();
         } else {
             decreaseLikeCount();
-            increaseUnlikeCount();
         }
     }
 
     public void cancelLike(Boolean isLike) {
         if (isLike) {
             decreaseLikeCount();
-        } else {
-            decreaseUnlikeCount();
         }
     }
 }

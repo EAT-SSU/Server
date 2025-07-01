@@ -43,6 +43,8 @@ public class MealReviewResponse {
 
     @Schema(description = "좋아요한 메뉴명 리스트", example = "[\"메뉴1\", \"메뉴2\"]")
     private List<String> likedMenuNames;
+    @Schema(description = "메뉴명 리스트", example = "['고구마치즈돈까스', '막국수', '미니밥','단무지', '요구르트']")
+    private List<String> menuNames;
 
     public static MealReviewResponse from(Review review, Long userId) {
         List<String> imageUrls = new ArrayList<>();
@@ -59,6 +61,7 @@ public class MealReviewResponse {
                                                               .writtenAt(review.getCreatedDate().toLocalDate())
                                                               .content(review.getContent())
                                                               .imageUrls(imageUrls)
+                                                              .menuNames(review.getMeal().getMenuNames())
                                                               .likedMenuNames(likedMenuNames);
 
         if (review.getUser() == null) {

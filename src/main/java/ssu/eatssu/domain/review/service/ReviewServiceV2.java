@@ -14,6 +14,7 @@ import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
+import ssu.eatssu.domain.review.dto.CreateMenuReviewRequest;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuLikeRequest;
@@ -22,14 +23,19 @@ import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewDetail;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
+import ssu.eatssu.domain.review.dto.ValidMenuForViewResponse;
 import ssu.eatssu.domain.review.entity.Review;
+import ssu.eatssu.domain.review.entity.ReviewImage;
+import ssu.eatssu.domain.review.repository.ReviewImageRepository;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
+import ssu.eatssu.domain.review.utils.MenuFilterUtil;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -51,12 +57,13 @@ public class ReviewServiceV2 {
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
     private final MealMenuRepository mealMenuRepository;
+    private final ReviewImageRepository reviewImageRepository;
 
     /**
-     * 리뷰 생성
+     * meal에 대한 리뷰 생성
      */
     @Transactional
-    public void createReview(CustomUserDetails userDetails, CreateMealReviewRequest request) {
+    public void createMealReview(CustomUserDetails userDetails, CreateMealReviewRequest request) {
         User user = userRepository.findById(userDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
@@ -74,6 +81,27 @@ public class ReviewServiceV2 {
         }
 
         reviewRepository.save(review);
+    }
+
+    /**
+     * menu에 대한 리뷰 작성
+     */
+    @Transactional
+    public void createMenuReview(CustomUserDetails userDetails, CreateMenuReviewRequest request) {
+        User user = userRepository.findById(userDetails.getId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        Menu menu = menuRepository.findById(request.getMenuId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+
+        Review review = request.toReviewEntity(user, menu);
+        review.addReviewMenuLike(menu, request.getMenuLike().getIsLike());
+        reviewRepository.save(review);
+
+        ReviewImage reviewImage = new ReviewImage(review, request.getImageUrl());
+        reviewImageRepository.save(reviewImage);
+
+        menu.addReview(review);
     }
 
     /**
@@ -210,7 +238,6 @@ public class ReviewServiceV2 {
                                        .orElse(0.0);
 
         Integer likeCount = menu.getLikeCount();
-        Integer unlikeCount = menu.getUnlikeCount();
 
         ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 
@@ -221,7 +248,6 @@ public class ReviewServiceV2 {
                 .reviewRatingCount(reviewRatingCount)
                 .mainRating(Math.round(averageRating * 10) / 10.0)
                 .likeCount(likeCount != null ? likeCount : 0)
-                .unlikeCount(unlikeCount != null ? unlikeCount : 0)
                 .build();
     }
 
@@ -275,7 +301,6 @@ public class ReviewServiceV2 {
                 .reviewRatingCount(reviewRatingCount)
                 .mainRating(Math.round(averageRating * 10) / 10.0)
                 .likeCount(likeCount)
-                .unlikeCount(unlikeCount)
                 .build();
     }
 
@@ -346,4 +371,17 @@ public class ReviewServiceV2 {
     }
 
 
+    public ValidMenuForViewResponse validMenuForReview(Long mealId) {
+        Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
+        List<String> menuNames = meal.getMenuNames();
+        List<String> validMenuNames = new ArrayList<>();
+        for (String menu : menuNames) {
+            if (!MenuFilterUtil.isExcludedFromReview(menu)) {
+                validMenuNames.add(menu);
+            }
+        }
+
+        return ValidMenuForViewResponse.builder()
+                                       .menuList(validMenuNames).build();
+    }
 }
