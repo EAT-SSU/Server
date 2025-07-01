@@ -9,6 +9,7 @@ import ssu.eatssu.domain.review.entity.ReviewMenuLike;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
@@ -45,6 +46,9 @@ public class MyMealReviewResponse {
                                             .map(like -> like.getMenu().getName())
                                             .toList();
 
+        List<String> menuNames = review.getMeal() == null ? Collections.singletonList(review.getMenu()
+                                                                                            .getName()) : review.getMeal().getMenuNames();;
+
         return MyMealReviewResponse
                 .builder()
                 .reviewId(review.getId())
@@ -53,7 +57,7 @@ public class MyMealReviewResponse {
                 .content(review.getContent())
                 .imageUrls(imgUrlList)
                 .likedMenuNames(likedMenuNames)
-                .menuNames(review.getMeal().getMenuNames())
+                .menuNames(menuNames)
                 .build();
     }
 }
