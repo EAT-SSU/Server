@@ -86,6 +86,7 @@ public class ReviewServiceV2 {
     /**
      * menu에 대한 리뷰 작성
      */
+    @Transactional
     public void createMenuReview(CustomUserDetails userDetails, CreateMenuReviewRequest request) {
         User user = userRepository.findById(userDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
