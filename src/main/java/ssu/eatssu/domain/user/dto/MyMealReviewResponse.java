@@ -47,8 +47,8 @@ public class MyMealReviewResponse {
                                             .toList();
 
         List<String> menuNames = review.getMeal() == null ? Collections.singletonList(review.getMenu()
-                                                                                            .getName()) : review.getMeal().getMenuNames();;
-
+                                                                                            .getName()) : review.getMeal()
+                                                                                                                .getMenuNames();
         return MyMealReviewResponse
                 .builder()
                 .reviewId(review.getId())
