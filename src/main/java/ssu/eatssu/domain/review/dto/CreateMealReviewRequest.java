@@ -11,7 +11,7 @@ import ssu.eatssu.domain.user.entity.User;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Schema(title = "리뷰 작성")
+@Schema(title = "meal에 대한 리뷰 작성")
 @Getter
 @AllArgsConstructor
 public class CreateMealReviewRequest {

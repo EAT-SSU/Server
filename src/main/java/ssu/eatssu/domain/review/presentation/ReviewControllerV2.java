@@ -27,17 +27,16 @@ import org.springframework.web.bind.annotation.RestController;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
+import ssu.eatssu.domain.review.dto.CreateMenuReviewRequest;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewDetail;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
-import ssu.eatssu.domain.review.dto.UploadReviewRequest;
-import ssu.eatssu.domain.review.service.ReviewService;
+import ssu.eatssu.domain.review.dto.ValidMenuForViewResponse;
 import ssu.eatssu.domain.review.service.ReviewServiceV2;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
-import ssu.eatssu.domain.slice.service.SliceService;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
@@ -47,8 +46,6 @@ import ssu.eatssu.global.handler.response.BaseResponse;
 @Tag(name = "Review V2", description = "리뷰 V2 API")
 public class ReviewControllerV2 {
     private final ReviewServiceV2 reviewServiceV2;
-    private final ReviewService reviewService;
-    private final SliceService sliceService;
 
     @Operation(summary = "meal(식단)에 대한 리뷰 작성", description = "리뷰를 작성하는 API 입니다.")
     @ApiResponses(value = {
@@ -61,7 +58,7 @@ public class ReviewControllerV2 {
     public BaseResponse<?> createMealReview(
             @RequestBody CreateMealReviewRequest createMealReviewRequest,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        reviewServiceV2.createReview(customUserDetails, createMealReviewRequest);
+        reviewServiceV2.createMealReview(customUserDetails, createMealReviewRequest);
         return BaseResponse.success();
     }
 
@@ -207,11 +204,10 @@ public class ReviewControllerV2 {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
-    @PostMapping("/menu/{menuId}")
-    public BaseResponse<?> createMenuReview(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
-                                            @RequestBody UploadReviewRequest uploadReviewRequest,
+    @PostMapping("/menu")
+    public BaseResponse<?> createMenuReview(@RequestBody CreateMenuReviewRequest createMenuReviewRequest,
                                             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        reviewService.uploadReview(customUserDetails, menuId, uploadReviewRequest);
+       reviewServiceV2.createMenuReview(customUserDetails,createMenuReviewRequest);
         return BaseResponse.success();
     }
 
@@ -229,6 +225,19 @@ public class ReviewControllerV2 {
                                                                                       lastReviewId,
                                                                                       pageable);
         return BaseResponse.success(myReviews);
+    }
+
+    @Operation(summary = "식단 id를 통해 리뷰 작성할 수 있는 메뉴들 조회", description = "리뷰 작성할 수 있는 메뉴들 조회하는 API입니다. (노션 문서 > 리뷰v2 기능명세서> 리뷰에 제외되는 메뉴 참고")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 작성할 수 있는 메뉴들 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @GetMapping("/meal/valid-for-review/{mealId}")
+    public BaseResponse<ValidMenuForViewResponse> getValidMenuForReview(
+            @Parameter(description = "mealId")
+            @PathVariable("mealId") Long mealId) {
+        ValidMenuForViewResponse validMenuForViewResponse = reviewServiceV2.validMenuForReview(mealId);
+        return BaseResponse.success(validMenuForViewResponse);
     }
 
 
