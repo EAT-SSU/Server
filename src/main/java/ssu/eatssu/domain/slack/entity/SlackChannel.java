@@ -11,7 +11,7 @@ public enum SlackChannel {
     SERVER_ERROR("C092J4J6F0U");
 
     @Getter
-    private String krName;
+    private final String krName;
 
     SlackChannel(String krName) {
         this.krName = krName;

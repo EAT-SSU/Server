@@ -57,23 +57,23 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE
             , CascadeType.REFRESH})
-    private List<Review> reviews = new ArrayList<>();
+    private final List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
-    private List<Report> reviewReports = new ArrayList<>();
+    private final List<Report> reviewReports = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
-    private List<Inquiry> userInquiries = new ArrayList<>();
+    private final List<Inquiry> userInquiries = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL}, orphanRemoval = true)
-    private List<ReviewLike> reviewLikes = new ArrayList<>();
+    private final List<ReviewLike> reviewLikes = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
     private Department department;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL}, orphanRemoval = true)
-    private List<PartnershipLike> partnershipLikes = new ArrayList<>();
+    private final List<PartnershipLike> partnershipLikes = new ArrayList<>();
 
     /**
      * Oauth 회원가입 용 생성자
