@@ -238,7 +238,6 @@ public class ReviewServiceV2 {
                                        .orElse(0.0);
 
         Integer likeCount = menu.getLikeCount();
-        Integer unlikeCount = menu.getUnlikeCount();
 
         ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 
@@ -372,7 +371,7 @@ public class ReviewServiceV2 {
     }
 
 
-    public ValidMenuForViewResponse ValidMenuForReview(Long mealId) {
+    public ValidMenuForViewResponse validMenuForReview(Long mealId) {
         Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
         List<String> menuNames = meal.getMenuNames();
         List<String> validMenuNames = new ArrayList<>();

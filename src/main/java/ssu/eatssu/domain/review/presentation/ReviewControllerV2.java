@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.PageRequest;
@@ -35,12 +34,9 @@ import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewDetail;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
-import ssu.eatssu.domain.review.dto.UploadReviewRequest;
 import ssu.eatssu.domain.review.dto.ValidMenuForViewResponse;
-import ssu.eatssu.domain.review.service.ReviewService;
 import ssu.eatssu.domain.review.service.ReviewServiceV2;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
-import ssu.eatssu.domain.slice.service.SliceService;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
@@ -50,8 +46,6 @@ import ssu.eatssu.global.handler.response.BaseResponse;
 @Tag(name = "Review V2", description = "리뷰 V2 API")
 public class ReviewControllerV2 {
     private final ReviewServiceV2 reviewServiceV2;
-    private final ReviewService reviewService;
-    private final SliceService sliceService;
 
     @Operation(summary = "meal(식단)에 대한 리뷰 작성", description = "리뷰를 작성하는 API 입니다.")
     @ApiResponses(value = {
@@ -242,7 +236,7 @@ public class ReviewControllerV2 {
     public BaseResponse<ValidMenuForViewResponse> getValidMenuForReview(
             @Parameter(description = "mealId")
             @PathVariable("mealId") Long mealId) {
-        ValidMenuForViewResponse validMenuForViewResponse = reviewServiceV2.ValidMenuForReview(mealId);
+        ValidMenuForViewResponse validMenuForViewResponse = reviewServiceV2.validMenuForReview(mealId);
         return BaseResponse.success(validMenuForViewResponse);
     }
 
