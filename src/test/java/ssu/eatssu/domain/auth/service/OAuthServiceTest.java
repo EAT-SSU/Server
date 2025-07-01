@@ -14,14 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import ssu.eatssu.domain.auth.dto.AppleLoginRequest;
 import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
 import ssu.eatssu.domain.auth.dto.OAuthInfo;
@@ -36,10 +28,16 @@ import ssu.eatssu.domain.user.entity.UserStatus;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.user.service.UserService;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.ArgumentMatchers.anyString;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -66,7 +64,7 @@ class OAuthServiceTest {
     private String createMockAppleIdentityToken(String email, String providerId) {
         try {
             SecretKey key = KeyGenerator.getInstance("HmacSHA256").generateKey();
-            
+
             Map<String, Object> claims = new HashMap<>();
             claims.put("iss", "https://appleid.apple.com");
             claims.put("aud", "com.example.testapp");
@@ -75,18 +73,18 @@ class OAuthServiceTest {
             claims.put("sub", providerId);
             claims.put("email", email);
             claims.put("email_verified", "true");
-            
+
             Map<String, Object> header = new HashMap<>();
             header.put("kid", "test-key-id");
             header.put("alg", "HS256");
-            
+
             return Jwts.builder()
-                    .setHeader(header)
-                    .setClaims(claims)
-                    .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + 3600000))
-                    .signWith(key, SignatureAlgorithm.HS256)
-                    .compact();
+                       .setHeader(header)
+                       .setClaims(claims)
+                       .setIssuedAt(new Date())
+                       .setExpiration(new Date(System.currentTimeMillis() + 3600000))
+                       .signWith(key, SignatureAlgorithm.HS256)
+                       .compact();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("모의 Apple Identity Token 생성에 실패했습니다", e);
         }
@@ -107,7 +105,7 @@ class OAuthServiceTest {
         assertThat(tokens).isNotNull();
         assertThat(tokens.accessToken()).isNotBlank();
         assertThat(tokens.refreshToken()).isNotBlank();
-        
+
         User savedUser = userRepository.findByProviderId(providerId).orElse(null);
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getEmail()).isEqualTo(email);
@@ -126,7 +124,7 @@ class OAuthServiceTest {
         User existingUser = userService.join(email, OAuthProvider.KAKAO, providerId);
         existingUser.updateNickname("테스트닉네임");
         userRepository.save(existingUser);
-        
+
         KakaoLoginRequest request = new KakaoLoginRequest(email, providerId);
 
         // when
@@ -136,7 +134,7 @@ class OAuthServiceTest {
         assertThat(tokens).isNotNull();
         assertThat(tokens.accessToken()).isNotBlank();
         assertThat(tokens.refreshToken()).isNotBlank();
-        
+
         long userCount = userRepository.count();
         assertThat(userCount).isEqualTo(1);
     }
@@ -149,7 +147,7 @@ class OAuthServiceTest {
         String providerId = "apple123";
         String identityToken = "mock.identity.token";
         AppleLoginRequest request = new AppleLoginRequest(identityToken);
-        
+
         OAuthInfo mockOAuthInfo = new OAuthInfo(email, providerId);
         given(appleAuthenticator.getOAuthInfoByIdentityToken(identityToken)).willReturn(mockOAuthInfo);
 
@@ -160,7 +158,7 @@ class OAuthServiceTest {
         assertThat(tokens).isNotNull();
         assertThat(tokens.accessToken()).isNotBlank();
         assertThat(tokens.refreshToken()).isNotBlank();
-        
+
         User savedUser = userRepository.findByProviderId(providerId).orElse(null);
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getEmail()).isEqualTo(email);
@@ -175,11 +173,11 @@ class OAuthServiceTest {
         String email = "existing@apple.com";
         String providerId = "existing_apple123";
         String identityToken = "mock.identity.token";
-        
+
         User existingUser = userService.join(email, OAuthProvider.APPLE, providerId);
         existingUser.updateNickname("기존애플사용자");
         userRepository.save(existingUser);
-        
+
         AppleLoginRequest request = new AppleLoginRequest(identityToken);
         OAuthInfo mockOAuthInfo = new OAuthInfo(email, providerId);
         given(appleAuthenticator.getOAuthInfoByIdentityToken(identityToken)).willReturn(mockOAuthInfo);
@@ -191,7 +189,7 @@ class OAuthServiceTest {
         assertThat(tokens).isNotNull();
         assertThat(tokens.accessToken()).isNotBlank();
         assertThat(tokens.refreshToken()).isNotBlank();
-        
+
         long userCount = userRepository.count();
         assertThat(userCount).isEqualTo(1);
     }
@@ -204,11 +202,11 @@ class OAuthServiceTest {
         String realEmail = "user@icloud.com";
         String providerId = "apple_private123";
         String identityToken = "mock.identity.token";
-        
+
         User existingUser = userService.join(privateEmail, OAuthProvider.APPLE, providerId);
         existingUser.updateNickname("프라이빗사용자");
         userRepository.save(existingUser);
-        
+
         AppleLoginRequest request = new AppleLoginRequest(identityToken);
         OAuthInfo mockOAuthInfo = new OAuthInfo(realEmail, providerId);
         given(appleAuthenticator.getOAuthInfoByIdentityToken(identityToken)).willReturn(mockOAuthInfo);
@@ -218,7 +216,7 @@ class OAuthServiceTest {
 
         // then
         assertThat(tokens).isNotNull();
-        
+
         User updatedUser = userRepository.findByProviderId(providerId).orElse(null);
         assertThat(updatedUser).isNotNull();
         assertThat(updatedUser.getEmail()).isEqualTo(realEmail);
@@ -232,11 +230,11 @@ class OAuthServiceTest {
         String privateEmail = "xyz789@privaterelay.appleid.com";
         String providerId = "apple_real123";
         String identityToken = "mock.identity.token";
-        
+
         User existingUser = userService.join(realEmail, OAuthProvider.APPLE, providerId);
         existingUser.updateNickname("실제사용자");
         userRepository.save(existingUser);
-        
+
         AppleLoginRequest request = new AppleLoginRequest(identityToken);
         OAuthInfo mockOAuthInfo = new OAuthInfo(privateEmail, providerId);
         given(appleAuthenticator.getOAuthInfoByIdentityToken(identityToken)).willReturn(mockOAuthInfo);
@@ -246,7 +244,7 @@ class OAuthServiceTest {
 
         // then
         assertThat(tokens).isNotNull();
-        
+
         User updatedUser = userRepository.findByProviderId(providerId).orElse(null);
         assertThat(updatedUser).isNotNull();
         assertThat(updatedUser.getEmail()).isEqualTo(realEmail);
@@ -260,13 +258,13 @@ class OAuthServiceTest {
         String providerId = "refresh123";
         KakaoLoginRequest request = new KakaoLoginRequest(email, providerId);
         Tokens originalTokens = oAuthService.kakaoLogin(request);
-        
+
         User user = userRepository.findByProviderId(providerId).orElseThrow();
         CustomUserDetails userDetails = new CustomUserDetails(user);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-            userDetails, 
-            userDetails.getCredentials(), 
-            userDetails.getAuthorities()
+                userDetails,
+                userDetails.getCredentials(),
+                userDetails.getAuthorities()
         );
 
         // when
@@ -286,7 +284,7 @@ class OAuthServiceTest {
         String providerId = "valid123";
         KakaoLoginRequest request = new KakaoLoginRequest(email, providerId);
         Tokens tokens = oAuthService.kakaoLogin(request);
-        
+
         ValidRequest validRequest = new ValidRequest(tokens.accessToken());
 
         // when
@@ -352,7 +350,7 @@ class OAuthServiceTest {
         assertThat(tokens).isNotNull();
         assertThat(tokens.accessToken()).isNotBlank();
         assertThat(tokens.refreshToken()).isNotBlank();
-        
+
         User savedUser = userRepository.findByProviderId(providerId).orElse(null);
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getProviderId()).isEqualTo(providerId);
@@ -365,10 +363,10 @@ class OAuthServiceTest {
         // given
         String email = "first@kakao.com";
         String providerId = "duplicate123";
-        
+
         KakaoLoginRequest firstRequest = new KakaoLoginRequest(email, providerId);
         oAuthService.kakaoLogin(firstRequest);
-        
+
         KakaoLoginRequest secondRequest = new KakaoLoginRequest("different@email.com", providerId);
 
         // when
@@ -378,7 +376,7 @@ class OAuthServiceTest {
         assertThat(secondTokens).isNotNull();
         long userCount = userRepository.count();
         assertThat(userCount).isEqualTo(1);
-        
+
         User user = userRepository.findByProviderId(providerId).orElse(null);
         assertThat(user).isNotNull();
         assertThat(user.getEmail()).isEqualTo(email);
@@ -395,7 +393,7 @@ class OAuthServiceTest {
         // given
         String providerId = "apple_private_test";
         String identityToken = "mock.identity.token";
-        
+
         AppleLoginRequest request = new AppleLoginRequest(identityToken);
         OAuthInfo mockOAuthInfo = new OAuthInfo(privateEmail, providerId);
         given(appleAuthenticator.getOAuthInfoByIdentityToken(identityToken)).willReturn(mockOAuthInfo);
@@ -405,7 +403,7 @@ class OAuthServiceTest {
 
         // then
         assertThat(tokens).isNotNull();
-        
+
         User savedUser = userRepository.findByProviderId(providerId).orElse(null);
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getEmail()).isEqualTo(privateEmail);
@@ -418,7 +416,7 @@ class OAuthServiceTest {
         String email = "realtest@icloud.com";
         String providerId = "001234.abcd1234abcd1234abcd1234abcd1234.1234";
         String realIdentityToken = createMockAppleIdentityToken(email, providerId);
-        
+
         AppleLoginRequest request = new AppleLoginRequest(realIdentityToken);
         OAuthInfo mockOAuthInfo = new OAuthInfo(email, providerId);
         given(appleAuthenticator.getOAuthInfoByIdentityToken(realIdentityToken)).willReturn(mockOAuthInfo);
@@ -430,7 +428,7 @@ class OAuthServiceTest {
         assertThat(tokens).isNotNull();
         assertThat(tokens.accessToken()).isNotBlank();
         assertThat(tokens.refreshToken()).isNotBlank();
-        
+
         User savedUser = userRepository.findByProviderId(providerId).orElse(null);
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getEmail()).isEqualTo(email);
@@ -445,7 +443,7 @@ class OAuthServiceTest {
         String privateEmail = "real123test@privaterelay.appleid.com";
         String providerId = "001234.private1234private1234private1234.5678";
         String realIdentityToken = createMockAppleIdentityToken(privateEmail, providerId);
-        
+
         AppleLoginRequest request = new AppleLoginRequest(realIdentityToken);
         OAuthInfo mockOAuthInfo = new OAuthInfo(privateEmail, providerId);
         given(appleAuthenticator.getOAuthInfoByIdentityToken(realIdentityToken)).willReturn(mockOAuthInfo);
@@ -457,7 +455,7 @@ class OAuthServiceTest {
         assertThat(tokens).isNotNull();
         assertThat(tokens.accessToken()).isNotBlank();
         assertThat(tokens.refreshToken()).isNotBlank();
-        
+
         User savedUser = userRepository.findByProviderId(providerId).orElse(null);
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getEmail()).isEqualTo(privateEmail);
@@ -472,15 +470,15 @@ class OAuthServiceTest {
         String privateEmail = "update123test@privaterelay.appleid.com";
         String realEmail = "updated.user@icloud.com";
         String providerId = "001234.update1234update1234update1234.9012";
-        
+
         // 기존 사용자를 프라이빗 이메일로 생성
         User existingUser = userService.join(privateEmail, OAuthProvider.APPLE, providerId);
         existingUser.updateNickname("업데이트테스트사용자");
         userRepository.save(existingUser);
-        
+
         // 실제 이메일이 포함된 Identity Token 생성
         String realIdentityToken = createMockAppleIdentityToken(realEmail, providerId);
-        
+
         AppleLoginRequest request = new AppleLoginRequest(realIdentityToken);
         OAuthInfo mockOAuthInfo = new OAuthInfo(realEmail, providerId);
         given(appleAuthenticator.getOAuthInfoByIdentityToken(realIdentityToken)).willReturn(mockOAuthInfo);
@@ -490,13 +488,13 @@ class OAuthServiceTest {
 
         // then
         assertThat(tokens).isNotNull();
-        
+
         User updatedUser = userRepository.findByProviderId(providerId).orElse(null);
         assertThat(updatedUser).isNotNull();
         assertThat(updatedUser.getEmail()).isEqualTo(realEmail); // 프라이빗 이메일에서 실제 이메일로 업데이트
         assertThat(updatedUser.getProvider()).isEqualTo(OAuthProvider.APPLE);
         assertThat(updatedUser.getProviderId()).isEqualTo(providerId);
-        
+
         long userCount = userRepository.count();
         assertThat(userCount).isEqualTo(1); // 사용자는 한 명만 존재
     }
@@ -505,7 +503,7 @@ class OAuthServiceTest {
     @DisplayName("다양한 실제 Identity Token 패턴 테스트")
     @ValueSource(strings = {
             "test1@icloud.com",
-            "user.name@me.com", 
+            "user.name@me.com",
             "developer@mac.com",
             "testuser123@privaterelay.appleid.com",
             "a1b2c3d4e5@privaterelay.appleid.com"
@@ -514,7 +512,7 @@ class OAuthServiceTest {
         // given
         String providerId = "001234.pattern" + email.hashCode() + ".test";
         String realIdentityToken = createMockAppleIdentityToken(email, providerId);
-        
+
         AppleLoginRequest request = new AppleLoginRequest(realIdentityToken);
         OAuthInfo mockOAuthInfo = new OAuthInfo(email, providerId);
         given(appleAuthenticator.getOAuthInfoByIdentityToken(realIdentityToken)).willReturn(mockOAuthInfo);
@@ -526,7 +524,7 @@ class OAuthServiceTest {
         assertThat(tokens).isNotNull();
         assertThat(tokens.accessToken()).isNotBlank();
         assertThat(tokens.refreshToken()).isNotBlank();
-        
+
         User savedUser = userRepository.findByProviderId(providerId).orElse(null);
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getEmail()).isEqualTo(email);

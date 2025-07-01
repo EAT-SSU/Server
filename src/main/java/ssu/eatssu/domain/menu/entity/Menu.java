@@ -42,10 +42,10 @@ public class Menu {
 
     // TODO : 삭제되어야 함
     @Embedded
-    private Reviews reviews = new Reviews();
+    private final Reviews reviews = new Reviews();
 
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
-    private List<MealMenu> mealMenus = new ArrayList<>();
+    private final List<MealMenu> mealMenus = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_category_id")

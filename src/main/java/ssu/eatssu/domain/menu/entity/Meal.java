@@ -46,7 +46,7 @@ public class Meal {
     private Integer price;
 
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<MealMenu> mealMenus = new ArrayList<>();
+    private final List<MealMenu> mealMenus = new ArrayList<>();
 
     public Meal(Date date, TimePart timePart, Restaurant restaurant) {
         this.date = date;
