@@ -14,6 +14,7 @@ import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
+import ssu.eatssu.domain.review.dto.CreateMenuReviewRequest;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuLikeRequest;
@@ -22,7 +23,10 @@ import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewDetail;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
+import ssu.eatssu.domain.review.dto.UploadReviewRequest;
 import ssu.eatssu.domain.review.entity.Review;
+import ssu.eatssu.domain.review.entity.ReviewImage;
+import ssu.eatssu.domain.review.repository.ReviewImageRepository;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
@@ -51,12 +55,13 @@ public class ReviewServiceV2 {
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
     private final MealMenuRepository mealMenuRepository;
+    private final ReviewImageRepository reviewImageRepository;
 
     /**
-     * 리뷰 생성
+     * meal에 대한 리뷰 생성
      */
     @Transactional
-    public void createReview(CustomUserDetails userDetails, CreateMealReviewRequest request) {
+    public void createMealReview(CustomUserDetails userDetails, CreateMealReviewRequest request) {
         User user = userRepository.findById(userDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
@@ -74,6 +79,26 @@ public class ReviewServiceV2 {
         }
 
         reviewRepository.save(review);
+    }
+
+    /**
+     * menu에 대한 리뷰 작성
+     */
+    public void createMenuReview(CustomUserDetails userDetails, CreateMenuReviewRequest request) {
+        User user = userRepository.findById(userDetails.getId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        Menu menu = menuRepository.findById(request.getMenuId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+
+        Review review = request.toReviewEntity(user, menu);
+        review.addReviewMenuLike(menu, request.getMenuLike().getIsLike());
+        reviewRepository.save(review);
+
+        ReviewImage reviewImage = new ReviewImage(review, request.getImageUrl());
+        reviewImageRepository.save(reviewImage);
+
+        menu.addReview(review);
     }
 
     /**

@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
+import ssu.eatssu.domain.review.dto.CreateMenuReviewRequest;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
@@ -61,7 +62,7 @@ public class ReviewControllerV2 {
     public BaseResponse<?> createMealReview(
             @RequestBody CreateMealReviewRequest createMealReviewRequest,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        reviewServiceV2.createReview(customUserDetails, createMealReviewRequest);
+        reviewServiceV2.createMealReview(customUserDetails, createMealReviewRequest);
         return BaseResponse.success();
     }
 
@@ -207,11 +208,10 @@ public class ReviewControllerV2 {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
-    @PostMapping("/menu/{menuId}")
-    public BaseResponse<?> createMenuReview(@Parameter(description = "menuId") @PathVariable("menuId") Long menuId,
-                                            @RequestBody UploadReviewRequest uploadReviewRequest,
+    @PostMapping("/menu")
+    public BaseResponse<?> createMenuReview(@RequestBody CreateMenuReviewRequest createMenuReviewRequest,
                                             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        reviewService.uploadReview(customUserDetails, menuId, uploadReviewRequest);
+       reviewServiceV2.createMenuReview(customUserDetails,createMenuReviewRequest);
         return BaseResponse.success();
     }
 
