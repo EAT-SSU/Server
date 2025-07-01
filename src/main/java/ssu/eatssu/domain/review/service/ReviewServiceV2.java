@@ -23,17 +23,19 @@ import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewDetail;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
-import ssu.eatssu.domain.review.dto.UploadReviewRequest;
+import ssu.eatssu.domain.review.dto.ValidMenuForViewResponse;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewImage;
 import ssu.eatssu.domain.review.repository.ReviewImageRepository;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
+import ssu.eatssu.domain.review.utils.MenuFilterUtil;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -369,4 +371,17 @@ public class ReviewServiceV2 {
     }
 
 
+    public ValidMenuForViewResponse ValidMenuForReview(Long mealId) {
+        Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
+        List<String> menuNames = meal.getMenuNames();
+        List<String> validMenuNames = new ArrayList<>();
+        for (String menu : menuNames) {
+            if (!MenuFilterUtil.isExcludedFromReview(menu)) {
+                validMenuNames.add(menu);
+            }
+        }
+
+        return ValidMenuForViewResponse.builder()
+                                       .menuList(validMenuNames).build();
+    }
 }

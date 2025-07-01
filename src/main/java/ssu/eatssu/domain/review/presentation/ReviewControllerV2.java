@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +36,7 @@ import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewDetail;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.UploadReviewRequest;
+import ssu.eatssu.domain.review.dto.ValidMenuForViewResponse;
 import ssu.eatssu.domain.review.service.ReviewService;
 import ssu.eatssu.domain.review.service.ReviewServiceV2;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
@@ -229,6 +231,19 @@ public class ReviewControllerV2 {
                                                                                       lastReviewId,
                                                                                       pageable);
         return BaseResponse.success(myReviews);
+    }
+
+    @Operation(summary = "식단 id를 통해 리뷰 작성할 수 있는 메뉴들 조회", description = "리뷰 작성할 수 있는 메뉴들 조회하는 API입니다. (노션 문서 > 리뷰v2 기능명세서> 리뷰에 제외되는 메뉴 참고")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 작성할 수 있는 메뉴들 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 메뉴", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @GetMapping("/meal/valid-for-review/{mealId}")
+    public BaseResponse<ValidMenuForViewResponse> getValidMenuForReview(
+            @Parameter(description = "mealId")
+            @PathVariable("mealId") Long mealId) {
+        ValidMenuForViewResponse validMenuForViewResponse = reviewServiceV2.ValidMenuForReview(mealId);
+        return BaseResponse.success(validMenuForViewResponse);
     }
 
 
