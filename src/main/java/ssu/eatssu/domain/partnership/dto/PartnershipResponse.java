@@ -24,6 +24,7 @@ public class PartnershipResponse {
     private Double latitude;
     private List<String> collegeNames;
     private List<String> departmentNames;
+    private Integer likeCount;
 
     public static PartnershipResponse fromEntity(Partnership partnership) {
         List<String> collegeNames = partnership.getPartnershipColleges().stream()
@@ -44,7 +45,8 @@ public class PartnershipResponse {
                 partnership.getLongitude(),
                 partnership.getLatitude(),
                 collegeNames,
-                departmentNames
+                departmentNames,
+                partnership.getLikes().size()
         );
     }
 }
