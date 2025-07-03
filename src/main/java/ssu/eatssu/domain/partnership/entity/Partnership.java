@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,17 +48,6 @@ public class Partnership {
 
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "restaurant_type", nullable = false)
-    private RestaurantType restaurantType;
-
-    @Column(name = "longitude", nullable = false)
-    private Double longitude; // 경도 == x축
-
-    @Column(name = "latitude", nullable = false)
-    private Double latitude; // 위도 == y축
-
     @Builder.Default
     @OneToMany(mappedBy = "partnership", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartnershipCollege> partnershipColleges = new ArrayList<>();
@@ -66,7 +56,7 @@ public class Partnership {
     @OneToMany(mappedBy = "partnership", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartnershipDepartment> partnershipDepartments = new ArrayList<>();
 
-    @Builder.Default
-    @OneToMany(mappedBy = "partnership", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PartnershipLike> likes = new ArrayList<>();
+    @OneToOne(mappedBy = "partnership")
+    private PartnershipRestaurant restaurant;
+
 }

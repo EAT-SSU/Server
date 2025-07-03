@@ -28,10 +28,10 @@ public class PartnershipLike {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partnership_id")
-    private Partnership partnership;
+    private PartnershipRestaurant partnershipRestaurant;
 
-    public PartnershipLike(User user, Partnership partnership) {
+    public PartnershipLike(User user, PartnershipRestaurant partnershipRestaurant) {
         this.user = user;
-        this.partnership = partnership;
+        this.partnershipRestaurant = partnershipRestaurant;
     }
 }
