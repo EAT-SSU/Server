@@ -49,8 +49,8 @@ public class PartnershipController {
             @ApiResponse(responseCode = "200", description = "제휴 조회 성공"),
     })
     @GetMapping
-    public BaseResponse<List<PartnershipResponse>> getAllPartnerships() {
-        return BaseResponse.success(partnershipService.getAllPartnerships());
+    public BaseResponse<List<PartnershipResponse>> getAllPartnerships( @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return BaseResponse.success(partnershipService.getAllPartnerships(userDetails));
     }
 
     @Operation(summary = "개별 제휴 조회", description = "개별 제휴를 조회하는 API 입니다.")

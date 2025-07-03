@@ -61,9 +61,10 @@ public class PartnershipService {
         partnershipRepository.save(partnership);
     }
 
-    public List<PartnershipResponse> getAllPartnerships() {
+    public List<PartnershipResponse> getAllPartnerships(CustomUserDetails customUserDetails) {
         List<Partnership> partnerships = partnershipRepository.findAll();
-        return partnerships.stream().map(PartnershipResponse::fromEntity)
+        return partnerships.stream()
+                           .map(partnership -> PartnershipResponse.fromEntity(partnership, customUserDetails.getId()))
                            .collect(Collectors.toList());
     }
 
@@ -101,20 +102,20 @@ public class PartnershipService {
         }
     }
 
-    public List<PartnershipResponse> getUserLikedPartnerships(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
+    public List<PartnershipResponse> getUserLikedPartnerships(CustomUserDetails customUserDetails) {
+        User user = userRepository.findById(customUserDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         List<PartnershipLike> likes = partnershipLikeRepository.findAllByUser(user);
         return likes
                 .stream()
                 .map(PartnershipLike::getPartnership)
-                .map(PartnershipResponse::fromEntity)
+                .map(partnership -> PartnershipResponse.fromEntity(partnership, customUserDetails.getId()))
                 .collect(Collectors.toList());
     }
 
-    public List<PartnershipResponse> getUserDepartmentPartnerships(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
+    public List<PartnershipResponse> getUserDepartmentPartnerships(CustomUserDetails customUserDetails) {
+        User user = userRepository.findById(customUserDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         Department department = user.getDepartment();
@@ -126,7 +127,7 @@ public class PartnershipService {
         return partnershipRepository
                 .findRelevantPartnerships(college, department)
                 .stream()
-                .map(PartnershipResponse::fromEntity)
+                .map(partnership -> PartnershipResponse.fromEntity(partnership, customUserDetails.getId()))
                 .collect(Collectors.toList());
     }
 }

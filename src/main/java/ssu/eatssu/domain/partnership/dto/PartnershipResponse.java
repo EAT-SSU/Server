@@ -25,14 +25,17 @@ public class PartnershipResponse {
     private List<String> collegeNames;
     private List<String> departmentNames;
     private Integer likeCount;
+    private Boolean isLiked;
 
-    public static PartnershipResponse fromEntity(Partnership partnership) {
+    public static PartnershipResponse fromEntity(Partnership partnership,Long userId) {
         List<String> collegeNames = partnership.getPartnershipColleges().stream()
                                                .map(pc -> pc.getCollege().getName())
                                                .collect(Collectors.toList());
         List<String> departmentNames = partnership.getPartnershipDepartments().stream()
                                                   .map(pc -> pc.getDepartment().getName())
                                                   .collect(Collectors.toList());
+        Boolean isLiked = partnership.getLikes().stream()
+                                     .anyMatch(like -> like.getUser().getId().equals(userId));
 
         return new PartnershipResponse(
                 partnership.getId(),
@@ -46,7 +49,8 @@ public class PartnershipResponse {
                 partnership.getLatitude(),
                 collegeNames,
                 departmentNames,
-                partnership.getLikes().size()
+                partnership.getLikes().size(),
+                isLiked
         );
     }
 }
