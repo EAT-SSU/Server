@@ -27,11 +27,11 @@ public class PartnershipLike {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "partnership_id")
-    private Partnership partnership;
+    @JoinColumn(name = "partnership_restaurant_id")
+    private PartnershipRestaurant partnershipRestaurant;
 
-    public PartnershipLike(User user, Partnership partnership) {
+    public PartnershipLike(User user, PartnershipRestaurant partnershipRestaurant) {
         this.user = user;
-        this.partnership = partnership;
+        this.partnershipRestaurant = partnershipRestaurant;
     }
 }
