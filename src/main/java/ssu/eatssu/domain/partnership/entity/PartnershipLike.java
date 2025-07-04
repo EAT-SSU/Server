@@ -27,7 +27,7 @@ public class PartnershipLike {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "partnership_id")
+    @JoinColumn(name = "partnership_restaurant_id")
     private PartnershipRestaurant partnershipRestaurant;
 
     public PartnershipLike(User user, PartnershipRestaurant partnershipRestaurant) {

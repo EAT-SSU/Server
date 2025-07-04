@@ -14,6 +14,7 @@ import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class PartnershipRestaurant {
     private String storeName;
 
     @OneToMany(mappedBy = "partnershipRestaurant")
+    @BatchSize(size = 20)
     private List<PartnershipLike> likes;
     @OneToMany(mappedBy = "partnershipRestaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Partnership> partnerships = new ArrayList<>();

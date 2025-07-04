@@ -61,7 +61,7 @@ public class PartnershipService {
     }
 
     public List<PartnershipResponse> getAllPartnerships(CustomUserDetails customUserDetails) {
-        return partnerShipRestaurantRepository.findAll().stream()
+        return partnerShipRestaurantRepository.findAllWithDetails().stream()
                                               .map(restaurant -> PartnershipResponse.fromEntity(restaurant,
                                                                                                 customUserDetails.getId()))
                                               .collect(Collectors.toList());
@@ -110,7 +110,7 @@ public class PartnershipService {
         User user = userRepository.findById(customUserDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-        List<PartnershipLike> likes = partnershipLikeRepository.findAllByUser(user);
+        List<PartnershipLike> likes = partnershipLikeRepository.findAllByUserWithDetails(user);
 
         return likes.stream()
                     .flatMap(like -> {
