@@ -10,7 +10,7 @@ import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipLike;
 import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
-import ssu.eatssu.domain.partnership.persistence.PartnerShipRestaurantRepository;
+import ssu.eatssu.domain.partnership.persistence.PartnershipRestaurantRepository;
 import ssu.eatssu.domain.partnership.persistence.PartnershipLikeRepository;
 import ssu.eatssu.domain.partnership.persistence.PartnershipRepository;
 import ssu.eatssu.domain.user.department.entity.College;
@@ -30,6 +30,7 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.MISSING_USER
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_COLLEGE;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_PARTNERSHIP;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_PARTNERSHIP_RESTAURANT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
 @Service
@@ -40,23 +41,20 @@ public class PartnershipService {
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
     private final PartnershipLikeRepository partnershipLikeRepository;
-    private final PartnerShipRestaurantRepository partnerShipRestaurantRepository;
+    private final PartnershipRestaurantRepository partnerShipRestaurantRepository;
 
     @Transactional
     public void createPartnership(CreatePartnershipRequest request) {
-        Partnership partnership = request.toPartnershipEntity();
+        PartnershipRestaurant partnershipRestaurant = partnerShipRestaurantRepository.findById(request.getStoreId())
+                .orElseThrow(()->new BaseException(NOT_FOUND_PARTNERSHIP_RESTAURANT));
+        Partnership partnership = request.toPartnershipEntity(partnershipRestaurant);
 
-        if ("college".equalsIgnoreCase(request.getTargetType())) {
-            College college = collegeRepository.findByName(request.getTargetName())
-                                               .orElseThrow(() -> new BaseException(NOT_FOUND_COLLEGE));
-            partnership.setPartnershipCollege(college);
-        } else if ("department".equalsIgnoreCase(request.getTargetType())) {
-            Department department = departmentRepository.findByName(request.getTargetName())
-                                                        .orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
-            partnership.setPartnershipDepartment(department);
-        } else {
-            throw new BaseException(INVALID_TARGET_TYPE);
-        }
+        College college = collegeRepository.findByName(request.getCollege())
+                                           .orElseThrow(() -> new BaseException(NOT_FOUND_COLLEGE));
+        partnership.setPartnershipCollege(college);
+        Department department = departmentRepository.findByName(request.getDepartment())
+                                                    .orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
+        partnership.setPartnershipDepartment(department);
         partnershipRepository.save(partnership);
     }
 

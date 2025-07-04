@@ -36,4 +36,8 @@ public class Department {
 
     @OneToMany(mappedBy = "partnershipDepartment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Partnership> partnerships = new ArrayList<>();
+
+    public Department(String name) {
+        this.name = name;
+    }
 }

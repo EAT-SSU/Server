@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.partnership.entity.Partnership;
@@ -32,4 +33,8 @@ public class College {
 
     @OneToMany(mappedBy = "partnershipCollege", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Partnership> partnerships = new ArrayList<>();
+
+    public College(String name) {
+        this.name = name;
+    }
 }
