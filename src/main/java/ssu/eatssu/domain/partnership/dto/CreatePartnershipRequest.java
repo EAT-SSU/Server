@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipType;
-import ssu.eatssu.domain.partnership.entity.RestaurantType;
 
 import java.time.LocalDate;
 
@@ -27,23 +26,12 @@ public class CreatePartnershipRequest {
     private LocalDate startDate;
     @Schema(description = "제휴 종료 날짜", example = "2025-07-30")
     private LocalDate endDate;
-    @Schema(description = "제휴 가게 종류(RESTAURANT, CAFE)", example = "RESTAURANT")
-    private RestaurantType restaurantType;
-    @Schema(description = "경도(x축)", example = "126.9566592")
-    private Double longitude;
-    @Schema(description = "위도(y축)", example = "37.4949404")
-    private Double latitude;
-
     public Partnership toPartnershipEntity() {
         return Partnership.builder()
                           .partnershipType(partnershipType)
-                          .storeName(storeName)
                           .description(description)
                           .startDate(startDate)
                           .endDate(endDate)
-                          .restaurantType(restaurantType)
-                          .longitude(longitude)
-                          .latitude(latitude)
                           .build();
     }
 }

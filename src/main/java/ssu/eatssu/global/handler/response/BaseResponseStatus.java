@@ -58,6 +58,7 @@ public enum BaseResponseStatus {
     NOT_FOUND_COLLEGE(false, HttpStatus.NOT_FOUND, 40408, "해당 대학을 찾을 수 없습니다."),
     NOT_FOUND_DEPARTMENT(false, HttpStatus.NOT_FOUND, 40409, "해당 학과를 찾을 수 없습니다."),
     NOT_FOUND_PARTNERSHIP(false, HttpStatus.NOT_FOUND, 40410, "해당 제휴를 찾을 수 없습니다."),
+    NOT_FOUND_PARTNERSHIP_RESTAURANT(false, HttpStatus.NOT_FOUND, 40410, "해당 제휴 식당을 찾을 수 없습니다."),
 
     /**
      * 405 METHOD_NOT_ALLOWED 지원하지 않은 method 호출

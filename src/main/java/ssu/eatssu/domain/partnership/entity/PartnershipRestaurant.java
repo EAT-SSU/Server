@@ -1,5 +1,6 @@
 package ssu.eatssu.domain.partnership.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,10 +35,11 @@ public class PartnershipRestaurant {
 
     @Column(name = "latitude", nullable = false)
     private Double latitude; // 위도 == y축
-    @OneToOne
-    @JoinColumn(name = "partnership_id")
-    private Partnership partnership;
+    @Column(name = "store_name", nullable = false)
+    private String storeName;
 
-    @OneToMany(mappedBy = "restaurant")
+    @OneToMany(mappedBy = "partnershipRestaurant")
     private List<PartnershipLike> likes;
+    @OneToMany(mappedBy = "partnershipRestaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Partnership> partnerships = new ArrayList<>();
 }

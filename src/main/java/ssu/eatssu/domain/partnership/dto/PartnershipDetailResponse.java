@@ -3,6 +3,7 @@ package ssu.eatssu.domain.partnership.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ssu.eatssu.domain.partnership.entity.Partnership;
+import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
 import ssu.eatssu.domain.partnership.entity.PartnershipType;
 import ssu.eatssu.domain.partnership.entity.RestaurantType;
 
@@ -27,7 +28,9 @@ public class PartnershipDetailResponse {
     private int partnershipLikeCount;
     private boolean likedByUser;
 
-    public static PartnershipDetailResponse fromEntity(Partnership partnership, boolean likedByUser) {
+    public static PartnershipDetailResponse fromEntity(PartnershipRestaurant partnershipRestaurant,
+                                                       Partnership partnership,
+                                                       boolean likedByUser) {
         List<String> collegeNames = partnership.getPartnershipColleges().stream()
                                                .map(pc -> pc.getCollege().getName())
                                                .collect(Collectors.toList());
@@ -38,16 +41,16 @@ public class PartnershipDetailResponse {
         return new PartnershipDetailResponse(
                 partnership.getId(),
                 partnership.getPartnershipType(),
-                partnership.getStoreName(),
+                partnershipRestaurant.getStoreName(),
                 partnership.getDescription(),
                 partnership.getStartDate(),
                 partnership.getEndDate(),
-                partnership.getRestaurantType(),
-                partnership.getLongitude(),
-                partnership.getLatitude(),
+                partnershipRestaurant.getRestaurantType(),
+                partnershipRestaurant.getLongitude(),
+                partnershipRestaurant.getLatitude(),
                 collegeNames,
                 departmentNames,
-                partnership.getLikes().size(),
+                partnershipRestaurant.getLikes().size(),
                 likedByUser
         );
     }
