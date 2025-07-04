@@ -8,8 +8,6 @@ import ssu.eatssu.domain.partnership.dto.CreatePartnershipRequest;
 import ssu.eatssu.domain.partnership.dto.PartnershipDetailResponse;
 import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
 import ssu.eatssu.domain.partnership.entity.Partnership;
-import ssu.eatssu.domain.partnership.entity.PartnershipCollege;
-import ssu.eatssu.domain.partnership.entity.PartnershipDepartment;
 import ssu.eatssu.domain.partnership.entity.PartnershipLike;
 import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
 import ssu.eatssu.domain.partnership.persistence.PartnerShipRestaurantRepository;
@@ -32,7 +30,6 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.MISSING_USER
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_COLLEGE;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_PARTNERSHIP;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_PARTNERSHIP_RESTAURANT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
 @Service
@@ -52,13 +49,11 @@ public class PartnershipService {
         if ("college".equalsIgnoreCase(request.getTargetType())) {
             College college = collegeRepository.findByName(request.getTargetName())
                                                .orElseThrow(() -> new BaseException(NOT_FOUND_COLLEGE));
-            PartnershipCollege partnershipCollege = new PartnershipCollege(partnership, college);
-            partnership.getPartnershipColleges().add(partnershipCollege);
+            partnership.setPartnershipCollege(college);
         } else if ("department".equalsIgnoreCase(request.getTargetType())) {
             Department department = departmentRepository.findByName(request.getTargetName())
                                                         .orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
-            PartnershipDepartment partnershipDepartment = new PartnershipDepartment(partnership, department);
-            partnership.getPartnershipDepartments().add(partnershipDepartment);
+            partnership.setPartnershipDepartment(department);
         } else {
             throw new BaseException(INVALID_TARGET_TYPE);
         }
@@ -66,16 +61,12 @@ public class PartnershipService {
     }
 
     public List<PartnershipResponse> getAllPartnerships(CustomUserDetails customUserDetails) {
-        List<Partnership> partnerships = partnershipRepository.findAll();
-        return partnerships.stream()
-                           .map(partnership -> {
-                               PartnershipRestaurant partnershipRestaurant = partnership.getPartnershipRestaurant();
-                               return PartnershipResponse.fromEntity(partnershipRestaurant,
-                                                                     partnership,
-                                                                     customUserDetails.getId());
-                           })
-                           .collect(Collectors.toList());
+        return partnerShipRestaurantRepository.findAll().stream()
+                                              .map(restaurant -> PartnershipResponse.fromEntity(restaurant,
+                                                                                                customUserDetails.getId()))
+                                              .collect(Collectors.toList());
     }
+
 
     public PartnershipDetailResponse getPartnership(Long partnershipId, CustomUserDetails userDetails) {
         Partnership partnership = partnershipRepository.findById(partnershipId)
@@ -124,7 +115,10 @@ public class PartnershipService {
         return likes.stream()
                     .flatMap(like -> {
                         PartnershipRestaurant restaurant = like.getPartnershipRestaurant();
-                        return restaurant.getPartnerships().stream().map(partnership-> PartnershipResponse.fromEntity(restaurant, partnership, customUserDetails.getId()));
+                        return restaurant.getPartnerships()
+                                         .stream()
+                                         .map(partnership -> PartnershipResponse.fromEntity(restaurant,
+                                                                                            customUserDetails.getId()));
                     }).collect(Collectors.toList());
     }
 
@@ -146,7 +140,6 @@ public class PartnershipService {
                     PartnershipRestaurant partnershipRestaurant = partnership.getPartnershipRestaurant();
 
                     return PartnershipResponse.fromEntity(partnershipRestaurant,
-                                                          partnership,
                                                           customUserDetails.getId());
                 })
                 .collect(Collectors.toList());

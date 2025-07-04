@@ -1,6 +1,5 @@
 package ssu.eatssu.domain.partnership.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,18 +10,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
+import ssu.eatssu.domain.user.department.entity.College;
+import ssu.eatssu.domain.user.department.entity.Department;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -48,16 +45,23 @@ public class Partnership {
 
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
-    @Builder.Default
-    @OneToMany(mappedBy = "partnership", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PartnershipCollege> partnershipColleges = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "partnership", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PartnershipDepartment> partnershipDepartments = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "partnership_college_id")
+    private College partnershipCollege;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="partnership_restaurant_id")
+    @JoinColumn(name = "partnership_department_id")
+    private Department partnershipDepartment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "partnership_restaurant_id")
     private PartnershipRestaurant partnershipRestaurant;
 
+    public void setPartnershipCollege(College partnershipCollege) {
+        this.partnershipCollege = partnershipCollege;
+    }
+
+    public void setPartnershipDepartment(Department partnershipDepartment) {
+        this.partnershipDepartment = partnershipDepartment;
+    }
 }

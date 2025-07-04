@@ -1,59 +1,41 @@
 package ssu.eatssu.domain.partnership.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
-import ssu.eatssu.domain.partnership.entity.PartnershipType;
 import ssu.eatssu.domain.partnership.entity.RestaurantType;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
+@Builder
 @AllArgsConstructor
 public class PartnershipResponse {
-    private Long id;
-    private PartnershipType partnershipType;
     private String storeName;
-    private String description;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private RestaurantType restaurantType;
     private Double longitude;
     private Double latitude;
-    private List<String> collegeNames;
-    private List<String> departmentNames;
-    private Integer likeCount;
-    private Boolean isLiked;
+    private RestaurantType restaurantType;
+    private List<PartnershipInfo> partnershipInfos;
 
-    public static PartnershipResponse fromEntity(PartnershipRestaurant partnershipRestaurant,
-                                                 Partnership partnership,
-                                                 Long userId) {
-        List<String> collegeNames = partnership.getPartnershipColleges().stream()
-                                               .map(pc -> pc.getCollege().getName())
-                                               .collect(Collectors.toList());
-        List<String> departmentNames = partnership.getPartnershipDepartments().stream()
-                                                  .map(pc -> pc.getDepartment().getName())
-                                                  .collect(Collectors.toList());
-        Boolean isLiked = partnershipRestaurant.getLikes().stream()
-                                               .anyMatch(like -> like.getUser().getId().equals(userId));
+    public static PartnershipResponse fromEntity(PartnershipRestaurant restaurant, Long userId) {
+        boolean isLiked = restaurant.getLikes().stream()
+                                    .anyMatch(like -> like.getUser().getId().equals(userId));
 
-        return new PartnershipResponse(
-                partnership.getId(),
-                partnership.getPartnershipType(),
-                partnershipRestaurant.getStoreName(),
-                partnership.getDescription(),
-                partnership.getStartDate(),
-                partnership.getEndDate(),
-                partnershipRestaurant.getRestaurantType(),
-                partnershipRestaurant.getLongitude(),
-                partnershipRestaurant.getLatitude(),
-                collegeNames,
-                departmentNames,
-                partnershipRestaurant.getLikes().size(),
-                isLiked
-        );
+        List<PartnershipInfo> infos = restaurant.getPartnerships().stream()
+                                                .map(partnership -> PartnershipInfo.fromEntity(partnership,
+                                                                                               restaurant,
+                                                                                               isLiked))
+                                                .collect(Collectors.toList());
+
+        return PartnershipResponse.builder()
+                                  .storeName(restaurant.getStoreName())
+                                  .longitude(restaurant.getLongitude())
+                                  .latitude(restaurant.getLatitude())
+                                  .restaurantType(restaurant.getRestaurantType())
+                                  .partnershipInfos(infos)
+                                  .build();
     }
 }
+

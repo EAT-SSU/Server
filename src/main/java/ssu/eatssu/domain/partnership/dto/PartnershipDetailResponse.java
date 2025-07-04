@@ -8,8 +8,6 @@ import ssu.eatssu.domain.partnership.entity.PartnershipType;
 import ssu.eatssu.domain.partnership.entity.RestaurantType;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
@@ -23,20 +21,14 @@ public class PartnershipDetailResponse {
     private RestaurantType restaurantType;
     private Double longitude;
     private Double latitude;
-    private List<String> collegeNames;
-    private List<String> departmentNames;
+    private String collegeName;
+    private String departmentName;
     private int partnershipLikeCount;
     private boolean likedByUser;
 
     public static PartnershipDetailResponse fromEntity(PartnershipRestaurant partnershipRestaurant,
                                                        Partnership partnership,
                                                        boolean likedByUser) {
-        List<String> collegeNames = partnership.getPartnershipColleges().stream()
-                                               .map(pc -> pc.getCollege().getName())
-                                               .collect(Collectors.toList());
-        List<String> departmentNames = partnership.getPartnershipDepartments().stream()
-                                                  .map(pc -> pc.getDepartment().getName())
-                                                  .collect(Collectors.toList());
 
         return new PartnershipDetailResponse(
                 partnership.getId(),
@@ -48,8 +40,9 @@ public class PartnershipDetailResponse {
                 partnershipRestaurant.getRestaurantType(),
                 partnershipRestaurant.getLongitude(),
                 partnershipRestaurant.getLatitude(),
-                collegeNames,
-                departmentNames,
+                partnership.getPartnershipCollege() == null ? null : partnership.getPartnershipCollege().getName(),
+                partnership.getPartnershipDepartment() == null ? null : partnership.getPartnershipDepartment()
+                                                                                   .getName(),
                 partnershipRestaurant.getLikes().size(),
                 likedByUser
         );
