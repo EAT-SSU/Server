@@ -13,7 +13,7 @@ import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ssu.eatssu.domain.partnership.entity.PartnershipDepartment;
+import ssu.eatssu.domain.partnership.entity.Partnership;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +34,10 @@ public class Department {
     @JoinColumn(name = "college_id")
     private College college;
 
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PartnershipDepartment> partnershipDepartments = new ArrayList<>();
+    @OneToMany(mappedBy = "partnershipDepartment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Partnership> partnerships = new ArrayList<>();
+
+    public Department(String name) {
+        this.name = name;
+    }
 }
