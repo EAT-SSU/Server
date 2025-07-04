@@ -8,9 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,7 +39,7 @@ public class PartnershipRestaurant {
 
     @OneToMany(mappedBy = "partnershipRestaurant")
     @BatchSize(size = 20)
-    private List<PartnershipLike> likes;
+    private List<PartnershipLike> likes = new ArrayList<>();
     @OneToMany(mappedBy = "partnershipRestaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Partnership> partnerships = new ArrayList<>();
 }
