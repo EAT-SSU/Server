@@ -207,7 +207,7 @@ public class ReviewControllerV2 {
     @PostMapping("/menu")
     public BaseResponse<?> createMenuReview(@RequestBody CreateMenuReviewRequest createMenuReviewRequest,
                                             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-       reviewServiceV2.createMenuReview(customUserDetails,createMenuReviewRequest);
+        reviewServiceV2.createMenuReview(customUserDetails, createMenuReviewRequest);
         return BaseResponse.success();
     }
 

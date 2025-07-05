@@ -8,7 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.partnership.entity.Partnership;
@@ -29,10 +28,10 @@ public class College {
     private String name;
 
     @OneToMany(mappedBy = "college", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Department> departments = new ArrayList<>();
+    private final List<Department> departments = new ArrayList<>();
 
     @OneToMany(mappedBy = "partnershipCollege", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Partnership> partnerships = new ArrayList<>();
+    private final List<Partnership> partnerships = new ArrayList<>();
 
     public College(String name) {
         this.name = name;

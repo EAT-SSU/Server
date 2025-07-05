@@ -25,8 +25,7 @@ import org.springframework.web.context.request.async.AsyncRequestTimeoutExceptio
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import ssu.eatssu.domain.slack.entity.SlackMessageFormat;
-import ssu.eatssu.domain.slack.service.SlackService;
+import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponse;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
@@ -38,7 +37,7 @@ import ssu.eatssu.global.handler.response.BaseResponseStatus;
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-    private final SlackService slackService;
+    private final SlackErrorNotifier slackErrorNotifier;
     @Value("${server.env:unknown}")
     private String serverEnv;
 
@@ -47,13 +46,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<BaseResponse<Void>> handleBaseException(BaseException e) {
-        sendErrorToSlack(e);
+        slackErrorNotifier.notify(e);
         return ResponseEntity.status(e.getStatus().getHttpStatus()).body(BaseResponse.fail(e.getStatus()));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<Void>> handleAllUnhandledException(Exception ex) {
-        sendErrorToSlack(ex);
+        slackErrorNotifier.notify(new BaseException(BaseResponseStatus.BAD_REQUEST));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                              .body(BaseResponse.fail(BaseResponseStatus.INTERNAL_SERVER_ERROR));
     }
@@ -241,7 +240,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         HttpStatus status = HttpStatus.valueOf(statusCode.value());
 
         if (status.is4xxClientError() || status.is5xxServerError()) {
-            sendErrorToSlack(ex);
+            slackErrorNotifier.notify(new BaseException(BaseResponseStatus.BAD_REQUEST));
         }
 
         BaseResponseStatus responseStatus = status.is4xxClientError()
@@ -249,19 +248,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 : BaseResponseStatus.INTERNAL_SERVER_ERROR;
 
         return ResponseEntity.status(status).body(BaseResponse.fail(responseStatus));
-    }
-
-    private void sendErrorToSlack(Exception ex) {
-        if (!("dev".equals(serverEnv) || "prod".equals(serverEnv))) {
-            return;
-        }
-
-        try {
-            String message = SlackMessageFormat.sendServerError(ex);
-            slackService.sendSlackMessage(message, ssu.eatssu.domain.slack.entity.SlackChannel.SERVER_ERROR);
-        } catch (Exception slackEx) {
-            log.warn("슬랙 전송 실패: {}", slackEx.getMessage());
-        }
     }
 
 

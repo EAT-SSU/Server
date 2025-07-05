@@ -28,25 +28,19 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Menu {
 
+    // TODO : 삭제되어야 함
+    @Embedded
+    private final Reviews reviews = new Reviews();
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
+    private final List<MealMenu> mealMenus = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "menu_id")
     private Long id;
-
     private String name;
-
     private Integer price;
-
     @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
-
-    // TODO : 삭제되어야 함
-    @Embedded
-    private final Reviews reviews = new Reviews();
-
-    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
-    private final List<MealMenu> mealMenus = new ArrayList<>();
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_category_id")
     private MenuCategory category;
@@ -57,7 +51,7 @@ public class Menu {
     private Integer likeCount = 0;
 
     @Column(name = "unlike_count")
-    private Integer unlikeCount = 0;
+    private final Integer unlikeCount = 0;
 
     private Menu(String name, Restaurant restaurant, Integer price, MenuCategory category) {
         this.name = name;
