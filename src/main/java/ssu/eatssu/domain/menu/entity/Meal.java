@@ -28,25 +28,20 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Meal {
 
+    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private final List<MealMenu> mealMenus = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "meal_id")
     private Long id;
-
     @DateTimeFormat(pattern = "yyyyMMdd")
     @Temporal(TemporalType.DATE)
     private Date date;
-
     @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
-
     @Enumerated(EnumType.STRING)
     private TimePart timePart;
-
     private Integer price;
-
-    @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private final List<MealMenu> mealMenus = new ArrayList<>();
 
     public Meal(Date date, TimePart timePart, Restaurant restaurant) {
         this.date = date;

@@ -6,8 +6,6 @@ import lombok.Getter;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
 import ssu.eatssu.domain.partnership.entity.PartnershipType;
-import ssu.eatssu.domain.user.department.entity.College;
-import ssu.eatssu.domain.user.department.entity.Department;
 
 import java.time.LocalDate;
 
@@ -29,6 +27,7 @@ public class CreatePartnershipRequest {
     private LocalDate startDate;
     @Schema(description = "제휴 종료 날짜", example = "2025-07-30")
     private LocalDate endDate;
+
     public Partnership toPartnershipEntity(PartnershipRestaurant partnershipRestaurant) {
         return Partnership.builder()
                           .partnershipRestaurant(partnershipRestaurant)

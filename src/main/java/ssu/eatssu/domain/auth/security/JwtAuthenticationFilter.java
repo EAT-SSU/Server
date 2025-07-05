@@ -23,14 +23,13 @@ import java.util.List;
 public class JwtAuthenticationFilter extends GenericFilterBean {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_TYPE = "Bearer";
-    private final JwtTokenProvider jwtTokenProvider;
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
     private static final List<String> AUTH_WHITELIST = List.of(
             "/", "/oauths/kakao", "/oauths/apple", "/menus", "/meals", "/admin/login",
             "/reviews", "/reviews/menus", "/reviews/meals", "/v2/reviews/statistics",
-             "/v2/reviews/menus", "/v2/reviews/meals", "/actuator", "/error-test"
+            "/v2/reviews/menus", "/v2/reviews/meals", "/actuator", "/error-test"
                                                               );
-
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws
@@ -57,6 +56,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
         chain.doFilter(request, response);
     }
+
     private boolean isWhiteListed(String requestURI) {
         return AUTH_WHITELIST.stream().anyMatch(pattern -> pathMatcher.match(pattern, requestURI));
     }

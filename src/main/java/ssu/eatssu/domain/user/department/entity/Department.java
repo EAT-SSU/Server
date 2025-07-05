@@ -35,7 +35,7 @@ public class Department {
     private College college;
 
     @OneToMany(mappedBy = "partnershipDepartment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Partnership> partnerships = new ArrayList<>();
+    private final List<Partnership> partnerships = new ArrayList<>();
 
     public Department(String name) {
         this.name = name;
