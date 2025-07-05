@@ -12,6 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
+import ssu.eatssu.global.handler.response.BaseException;
+import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,7 +28,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     private static final List<String> AUTH_WHITELIST = List.of(
             "/", "/oauths/kakao", "/oauths/apple", "/menus", "/meals", "/admin/login",
             "/reviews", "/reviews/menus", "/reviews/meals", "/v2/reviews/statistics",
-            "/partnerships", "/v2/reviews/menus", "/v2/reviews/meals", "/actuator", "/error-test"
+             "/v2/reviews/menus", "/v2/reviews/meals", "/actuator", "/error-test"
                                                               );
 
 
@@ -44,11 +46,13 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
         String token = resolveToken(httpRequest);
 
-        if (token != null) {
-            if (jwtTokenProvider.validateToken(token)) {
+        try {
+            if (token != null && jwtTokenProvider.validateToken(token)) {
                 Authentication authentication = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } catch (Exception e) {
+            throw new BaseException(BaseResponseStatus.INVALID_TOKEN);
         }
 
         chain.doFilter(request, response);
