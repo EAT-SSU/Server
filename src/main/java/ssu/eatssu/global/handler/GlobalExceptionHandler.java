@@ -52,7 +52,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<Void>> handleAllUnhandledException(Exception ex) {
-        slackErrorNotifier.notify(ex);
+        slackErrorNotifier.notify(new BaseException(BaseResponseStatus.BAD_REQUEST));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                              .body(BaseResponse.fail(BaseResponseStatus.INTERNAL_SERVER_ERROR));
     }
@@ -240,7 +240,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         HttpStatus status = HttpStatus.valueOf(statusCode.value());
 
         if (status.is4xxClientError() || status.is5xxServerError()) {
-            slackErrorNotifier.notify(ex);
+            slackErrorNotifier.notify(new BaseException(BaseResponseStatus.BAD_REQUEST));
         }
 
         BaseResponseStatus responseStatus = status.is4xxClientError()

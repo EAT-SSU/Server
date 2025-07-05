@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.slack.entity.SlackChannel;
 import ssu.eatssu.domain.slack.entity.SlackMessageFormat;
+import ssu.eatssu.global.handler.response.BaseException;
 
 @Service
 @Slf4j
@@ -17,8 +18,8 @@ public class SlackErrorNotifier {
         this.slackService = slackService;
     }
 
-    public void notify(Exception ex) {
-        if (!("dev".equals(serverEnv) || "prod".equals(serverEnv))) {
+    public void notify(BaseException ex) {
+        if (!("dev".equals(serverEnv) || "prod".equals(serverEnv) || "local".equals(serverEnv))) {
             return;
         }
         try {

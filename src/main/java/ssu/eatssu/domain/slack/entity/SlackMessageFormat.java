@@ -6,6 +6,7 @@ import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.review.entity.Report;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.entity.User;
+import ssu.eatssu.global.handler.response.BaseException;
 
 import java.text.MessageFormat;
 
@@ -68,20 +69,20 @@ public class SlackMessageFormat {
     }
 
 
-    public static String sendServerError(Exception ex) {
+    public static String sendServerError(BaseException ex) {
         MessageFormat messageFormat = new MessageFormat(
                 """
                         ===================
                         *서버 에러 발생*
-                        - 예외 클래스: {0}
+                        - 예외 상태코드: {0}
                         - 예외 메시지: {1}
                         - 개발환경: {2}
                         ===================
                         """
         );
         Object[] args = {
-                ex.getClass().getName(),
-                ex.getMessage(),
+                ex.getStatus(),
+                ex.getStatus().getMessage(),
                 serverEnv,
         };
         return messageFormat.format(args);
