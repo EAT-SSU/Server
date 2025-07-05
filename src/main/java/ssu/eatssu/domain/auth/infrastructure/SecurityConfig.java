@@ -14,6 +14,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ssu.eatssu.domain.auth.security.JwtAuthenticationFilter;
 import ssu.eatssu.domain.auth.security.JwtTokenProvider;
+import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.JwtAccessDeniedHandler;
 import ssu.eatssu.global.handler.JwtAuthenticationEntryPoint;
 
@@ -39,6 +40,7 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final SlackErrorNotifier slackErrorNotifier;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -56,7 +58,7 @@ public class SecurityConfig {
                         .requestMatchers(RESOURCE_LIST).permitAll()
                         .requestMatchers(ADMIN_PAGE_LIST).hasRole("ADMIN")
                         .anyRequest().authenticated()
-                        .and().addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+                        .and().addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, slackErrorNotifier),
                                                UsernamePasswordAuthenticationFilter.class))
                 .exceptionHandling()
                 .accessDeniedHandler(jwtAccessDeniedHandler)
