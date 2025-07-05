@@ -9,35 +9,56 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
+import ssu.eatssu.global.handler.response.BaseException;
+import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends GenericFilterBean {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_TYPE = "Bearer";
-
     private final JwtTokenProvider jwtTokenProvider;
+    private static final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private static final List<String> AUTH_WHITELIST = List.of(
+            "/", "/oauths/kakao", "/oauths/apple", "/menus", "/meals", "/admin/login",
+            "/reviews", "/reviews/menus", "/reviews/meals", "/v2/reviews/statistics",
+             "/v2/reviews/menus", "/v2/reviews/meals", "/actuator", "/error-test"
+                                                              );
+
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws
             IOException,
             ServletException {
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String requestURI = httpRequest.getRequestURI();
 
-        // 1. Request Header 에서 JWT 토큰 추출
-        String token = resolveToken((HttpServletRequest) request);
+        if (isWhiteListed(requestURI)) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-        // 2. validateToken 으로 토큰 유효성 검사
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext 에 저장
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = resolveToken(httpRequest);
+
+        try {
+            if (token != null && jwtTokenProvider.validateToken(token)) {
+                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (Exception e) {
+            throw new BaseException(BaseResponseStatus.INVALID_TOKEN);
         }
 
         chain.doFilter(request, response);
+    }
+    private boolean isWhiteListed(String requestURI) {
+        return AUTH_WHITELIST.stream().anyMatch(pattern -> pathMatcher.match(pattern, requestURI));
     }
 
     // Request Header 에서 토큰 정보 추출
