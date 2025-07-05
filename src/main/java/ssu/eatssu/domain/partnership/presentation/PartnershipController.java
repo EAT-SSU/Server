@@ -49,7 +49,7 @@ public class PartnershipController {
             @ApiResponse(responseCode = "200", description = "제휴 조회 성공"),
     })
     @GetMapping
-    public BaseResponse<List<PartnershipResponse>> getAllPartnerships( @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public BaseResponse<List<PartnershipResponse>> getAllPartnerships(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(partnershipService.getAllPartnerships(userDetails));
     }
 

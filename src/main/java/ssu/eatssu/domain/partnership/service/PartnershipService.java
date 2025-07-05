@@ -10,9 +10,9 @@ import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipLike;
 import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
-import ssu.eatssu.domain.partnership.persistence.PartnershipRestaurantRepository;
 import ssu.eatssu.domain.partnership.persistence.PartnershipLikeRepository;
 import ssu.eatssu.domain.partnership.persistence.PartnershipRepository;
+import ssu.eatssu.domain.partnership.persistence.PartnershipRestaurantRepository;
 import ssu.eatssu.domain.user.department.entity.College;
 import ssu.eatssu.domain.user.department.entity.Department;
 import ssu.eatssu.domain.user.department.persistence.CollegeRepository;
@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.INVALID_TARGET_TYPE;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.MISSING_USER_DEPARTMENT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_COLLEGE;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
@@ -46,7 +45,8 @@ public class PartnershipService {
     @Transactional
     public void createPartnership(CreatePartnershipRequest request) {
         PartnershipRestaurant partnershipRestaurant = partnerShipRestaurantRepository.findById(request.getStoreId())
-                .orElseThrow(()->new BaseException(NOT_FOUND_PARTNERSHIP_RESTAURANT));
+                                                                                     .orElseThrow(() -> new BaseException(
+                                                                                             NOT_FOUND_PARTNERSHIP_RESTAURANT));
         Partnership partnership = request.toPartnershipEntity(partnershipRestaurant);
 
         College college = collegeRepository.findByName(request.getCollege())

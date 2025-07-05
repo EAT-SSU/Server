@@ -32,48 +32,35 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
 
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE
+            , CascadeType.REFRESH})
+    private final List<Review> reviews = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+    private final List<Report> reviewReports = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+    private final List<Inquiry> userInquiries = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    private final List<ReviewLike> reviewLikes = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    private final List<PartnershipLike> partnershipLikes = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
-
     @Enumerated(EnumType.STRING)
     private Role role;
-
     @Column(unique = true)
     private String email;
-
     private String nickname;
-
     @Enumerated(EnumType.STRING)
     private OAuthProvider provider;
-
     private String providerId;
-
     private String credentials;
-
     @Enumerated(EnumType.STRING)
     private UserStatus status;
-
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE
-            , CascadeType.REFRESH})
-    private final List<Review> reviews = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
-    private final List<Report> reviewReports = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
-    private final List<Inquiry> userInquiries = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL}, orphanRemoval = true)
-    private final List<ReviewLike> reviewLikes = new ArrayList<>();
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
     private Department department;
-
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL}, orphanRemoval = true)
-    private final List<PartnershipLike> partnershipLikes = new ArrayList<>();
 
     /**
      * Oauth 회원가입 용 생성자

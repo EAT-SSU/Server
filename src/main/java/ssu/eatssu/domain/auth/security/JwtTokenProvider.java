@@ -3,6 +3,8 @@ package ssu.eatssu.domain.auth.security;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -158,13 +160,22 @@ public class JwtTokenProvider {
     }
 
     //토큰 유효성 검증
-    public boolean validateToken(String token) throws BaseException {
+    public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+            Date expiration = claims.getExpiration();
+            if (expiration.before(new Date())) {
+                log.warn("토큰 만료됨");
+                return false;
+            }
             return true;
-        } catch (Exception e) {
-            log.warn("토큰 유효성 검증 실패: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            log.warn("ExpiredJwtException: {}", e.getMessage());
+            return false;
+        } catch (JwtException | IllegalArgumentException e) {
+            log.warn("JWT 검증 실패: {}", e.getMessage());
             return false;
         }
     }
+
 }
