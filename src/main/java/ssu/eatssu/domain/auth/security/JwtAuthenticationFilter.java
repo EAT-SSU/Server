@@ -47,7 +47,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         String requestURI = httpRequest.getRequestURI();
 
         if (isWhiteListed(requestURI)) {
-            log.info("화이트리스트 통과: {}", requestURI);
             chain.doFilter(request, response);
             return;
         }
@@ -55,12 +54,10 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         String token = resolveToken(httpRequest);
 
         if (token == null) {
-            log.warn("토큰 없음: {}", requestURI);
             httpResponse.setStatus(HttpStatus.FORBIDDEN.value());
             httpResponse.setContentType("application/json;charset=UTF-8");
             httpResponse.setCharacterEncoding("UTF-8");
-            httpResponse.getWriter().write("{\"success\":false,\"code\":403,\"message\":\"유효하지 않은 토큰입니다.\"}");
-            slackErrorNotifier.notify(new BaseException(BaseResponseStatus.INVALID_TOKEN));
+            httpResponse.getWriter().write("{\"success\":false,\"code\":401,\"message\":\"유효하지 않은 토큰입니다.\"}");
             return;
         }
 
@@ -69,7 +66,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             httpResponse.setStatus(HttpStatus.FORBIDDEN.value());
             httpResponse.setContentType("application/json;charset=UTF-8");
             httpResponse.setCharacterEncoding("UTF-8");
-            httpResponse.getWriter().write("{\"success\":false,\"code\":403,\"message\":\"유효하지 않은 토큰입니다.\"}");
+            httpResponse.getWriter().write("{\"success\":false,\"code\":401,\"message\":\"유효하지 않은 토큰입니다.\"}");
             slackErrorNotifier.notify(new BaseException(BaseResponseStatus.INVALID_TOKEN));
             return;
         }
