@@ -41,3 +41,6 @@ out/
 
 ### Docker Tar files ###
 /eat-ssu.tar
+
+### env file ###
+.env
