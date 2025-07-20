@@ -19,7 +19,7 @@ public class SlackErrorNotifier {
     }
 
     public void notify(BaseException ex) {
-        if (!("dev".equals(serverEnv) || "prod".equals(serverEnv))) {
+        if ("prod".equals(serverEnv)) {
             return;
         }
         try {
