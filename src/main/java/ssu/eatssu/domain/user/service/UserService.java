@@ -23,7 +23,6 @@ import ssu.eatssu.global.handler.response.BaseException;
 import java.util.UUID;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.DUPLICATE_NICKNAME;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.MISSING_USER_DEPARTMENT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 
@@ -105,14 +104,12 @@ public class UserService {
         user.updateDepartment(department);
     }
 
-
-
     public DepartmentResponse getDepartment(CustomUserDetails userDetails) {
         User user = userRepository.findById(userDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
         Department department = user.getDepartment();
         if (department == null) {
-            throw new BaseException(MISSING_USER_DEPARTMENT);
+            return new DepartmentResponse("");
         }
         return new DepartmentResponse(department.getName());
     }
