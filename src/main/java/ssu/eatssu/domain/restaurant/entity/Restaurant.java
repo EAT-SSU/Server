@@ -14,7 +14,8 @@ public enum Restaurant {
     DORMITORY("DORMITORY", 5500),
     FOOD_COURT("FOOD_COURT", null),
     SNACK_CORNER("SNACK_CORNER", null),
-    HAKSIK("HAKSIK", 5000);
+    HAKSIK("HAKSIK", 5000),
+    FACULTY("FACULTY",null);
 
     private final String restaurantName;
     private final Integer restaurantPrice;
