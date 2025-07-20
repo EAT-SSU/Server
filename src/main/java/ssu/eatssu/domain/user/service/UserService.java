@@ -105,11 +105,7 @@ public class UserService {
         user.updateDepartment(department);
     }
 
-    public Boolean validateDepartmentExists(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        return user.getDepartment() != null;
-    }
+
 
     public DepartmentResponse getDepartment(CustomUserDetails userDetails) {
         User user = userRepository.findById(userDetails.getId())
