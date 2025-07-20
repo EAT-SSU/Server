@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.partnership.dto.CreatePartnershipRequest;
-import ssu.eatssu.domain.partnership.dto.PartnershipDetailResponse;
 import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
 import ssu.eatssu.domain.partnership.service.PartnershipService;
 import ssu.eatssu.global.handler.response.BaseResponse;
@@ -53,19 +52,6 @@ public class PartnershipController {
         return BaseResponse.success(partnershipService.getAllPartnerships(userDetails));
     }
 
-    @Operation(summary = "개별 제휴 조회", description = "개별 제휴를 조회하는 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "제휴 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 제휴", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-    })
-    @GetMapping("/{partnershipId}")
-    public BaseResponse<PartnershipDetailResponse> getPartnership(
-            @PathVariable Long partnershipId,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return BaseResponse.success(partnershipService.getPartnership(partnershipId, userDetails));
-    }
 
     @Operation(summary = "제휴 찜 등록하기/취소하기", description = "제휴 찜 등록하기/취소하기(토글) API 입니다.")
     @ApiResponses(value = {

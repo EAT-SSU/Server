@@ -167,17 +167,6 @@ public class UserController {
         return BaseResponse.success(partnershipService.getUserDepartmentPartnerships(userDetails));
     }
 
-    @Operation(summary = "학과 기입 여부 체크", description = """
-            학과 기입 여부 체크 API 입니다.<br><br>
-            학과를 기입했으면 true, 아니면 false 를 반환합니다
-            """)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "학과 기입함")
-    })
-    @GetMapping("/validate/department")
-    public BaseResponse<Boolean> validateDepartmentExists(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return BaseResponse.success(userService.validateDepartmentExists(userDetails));
-    }
 
     @Operation(summary = "유저의 학과 조회", description = "유저의 학과를 조회하는 API 입니다.")
     @ApiResponses(value = {
