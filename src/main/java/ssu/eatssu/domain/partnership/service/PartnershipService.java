@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.partnership.dto.CreatePartnershipRequest;
-import ssu.eatssu.domain.partnership.dto.PartnershipDetailResponse;
 import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipLike;
@@ -65,22 +64,6 @@ public class PartnershipService {
                                               .collect(Collectors.toList());
     }
 
-
-    public PartnershipDetailResponse getPartnership(Long partnershipId, CustomUserDetails userDetails) {
-        Partnership partnership = partnershipRepository.findById(partnershipId)
-                                                       .orElseThrow(() -> new BaseException(NOT_FOUND_PARTNERSHIP));
-        PartnershipRestaurant partnershipRestaurant = partnership.getPartnershipRestaurant();
-
-        boolean likedByUser = false;
-        if (userDetails != null) {
-            User user = userRepository.findById(userDetails.getId())
-                                      .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-            likedByUser = partnershipLikeRepository.findByUserAndPartnershipRestaurant(user, partnershipRestaurant)
-                                                   .isPresent();
-        }
-
-        return PartnershipDetailResponse.fromEntity(partnershipRestaurant, partnership, likedByUser);
-    }
 
     @Transactional
     public void togglePartnershipLike(Long partnershipId, CustomUserDetails userDetails) {
