@@ -108,10 +108,7 @@ public class UserService {
         User user = userRepository.findById(userDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
         Department department = user.getDepartment();
-        if (department == null) {
-            return new DepartmentResponse("");
-        }
-        return new DepartmentResponse(department.getName());
+        return new DepartmentResponse(department != null ? department.getName() : "");
     }
 
     private boolean isForbiddenNickname(String nickname) {
