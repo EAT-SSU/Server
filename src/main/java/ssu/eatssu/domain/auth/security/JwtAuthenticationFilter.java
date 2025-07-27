@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         String token = resolveToken(httpRequest);
 
         if (token == null) {
-            httpResponse.setStatus(HttpStatus.FORBIDDEN.value());
+            httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
             httpResponse.setContentType("application/json;charset=UTF-8");
             httpResponse.setCharacterEncoding("UTF-8");
             httpResponse.getWriter().write("{\"success\":false,\"code\":401,\"message\":\"유효하지 않은 토큰입니다.\"}");
@@ -63,7 +63,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
         if (!jwtTokenProvider.validateToken(token)) {
             log.warn("토큰 유효하지 않음: {}", requestURI);
-            httpResponse.setStatus(HttpStatus.FORBIDDEN.value());
+            httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
             httpResponse.setContentType("application/json;charset=UTF-8");
             httpResponse.setCharacterEncoding("UTF-8");
             httpResponse.getWriter().write("{\"success\":false,\"code\":401,\"message\":\"유효하지 않은 토큰입니다.\"}");
