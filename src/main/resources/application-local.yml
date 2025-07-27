@@ -29,8 +29,8 @@ spring:
 jwt:
   secret:
     key: ${EATSSU_JWT_SECRET_LOCAL}
-  token-validity-in-seconds: 86400
-  refresh-token-validity-in-seconds: 604800
+  token-validity-in-seconds: 10
+  refresh-token-validity-in-seconds: 30
 
 cloud:
   aws:
