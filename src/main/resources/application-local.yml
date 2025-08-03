@@ -1,74 +1,62 @@
-## port number
 server:
   port: 9000
   env: local
 
 
 spring:
-  ## Database
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${EATSSU_DB_URL_DEV}
     username: ${EATSSU_DB_USERNAME}
     password: ${EATSSU_DB_PASSWORD}
 
-  ## JPA
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
-        hibernate:
-            jdbc:
-            lob:
-                non_contextual_creation: true
-            format_sql: true
-            show_sql: false
+      hibernate:
+        jdbc:
+        lob:
+          non_contextual_creation: true
+        format_sql: true
+        show_sql: false
 
   servlet:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
 
-## Auth
 jwt:
   secret:
     key: ${EATSSU_JWT_SECRET_LOCAL}
-  token-validity-in-seconds: 86400
-  refresh-token-validity-in-seconds: 259200
+  token-validity-in-seconds: 10
+  refresh-token-validity-in-seconds: 30
 
-#S3
 cloud:
   aws:
     credentials:
       accessKey: ${EATSSU_AWS_ACCESS_KEY_DEV}
       secretKey: ${EATSSU_AWS_SECRET_KEY_DEV}
     s3:
-        bucket: eatssu-bucket
+      bucket: eatssu-bucket
     region:
-        static: ap-northeast-2
+      static: ap-northeast-2
     stack:
-        auto: false
+      auto: false
 
-#Slack
 slack:
   token: ${EATSSU_SLACK_TOKEN}
 
-#Swagger
 swagger:
   url: http://localhost:9000
   description: Test Server Swagger API
 
 springdoc:
   swagger-ui:
-    # Swagger UI
     path: /swagger-ui.html
-    # Group
     groups-order: DESC
-    # API
     operationsSorter: method
-    # Swagger UI
     disable-swagger-default-url: true
-    # API
     display-request-duration: true
   api-docs:
     path: /v3/api-docs

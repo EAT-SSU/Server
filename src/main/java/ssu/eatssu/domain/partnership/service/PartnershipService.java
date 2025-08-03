@@ -1,25 +1,17 @@
 package ssu.eatssu.domain.partnership.service;
 
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.partnership.dto.CreatePartnershipRequest;
-import ssu.eatssu.domain.partnership.dto.PartnershipDetailResponse;
 import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
 import ssu.eatssu.domain.partnership.entity.Partnership;
-import ssu.eatssu.domain.partnership.entity.PartnershipCollege;
-import ssu.eatssu.domain.partnership.entity.PartnershipDepartment;
 import ssu.eatssu.domain.partnership.entity.PartnershipLike;
+import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
 import ssu.eatssu.domain.partnership.persistence.PartnershipLikeRepository;
 import ssu.eatssu.domain.partnership.persistence.PartnershipRepository;
+import ssu.eatssu.domain.partnership.persistence.PartnershipRestaurantRepository;
 import ssu.eatssu.domain.user.department.entity.College;
 import ssu.eatssu.domain.user.department.entity.Department;
 import ssu.eatssu.domain.user.department.persistence.CollegeRepository;
@@ -28,101 +20,109 @@ import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.MISSING_USER_DEPARTMENT;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_COLLEGE;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_PARTNERSHIP;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_PARTNERSHIP_RESTAURANT;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
+
 @Service
 @RequiredArgsConstructor
 public class PartnershipService {
-	private final PartnershipRepository partnershipRepository;
-	private final CollegeRepository collegeRepository;
-	private final DepartmentRepository departmentRepository;
-	private final UserRepository userRepository;
-	private final PartnershipLikeRepository partnershipLikeRepository;
+    private final PartnershipRepository partnershipRepository;
+    private final CollegeRepository collegeRepository;
+    private final DepartmentRepository departmentRepository;
+    private final UserRepository userRepository;
+    private final PartnershipLikeRepository partnershipLikeRepository;
+    private final PartnershipRestaurantRepository partnerShipRestaurantRepository;
 
-	@Transactional
-	public void createPartnership(CreatePartnershipRequest request) {
-		Partnership partnership = request.toPartnershipEntity();
+    @Transactional
+    public void createPartnership(CreatePartnershipRequest request) {
+        PartnershipRestaurant partnershipRestaurant = partnerShipRestaurantRepository.findById(request.getStoreId())
+                                                                                     .orElseThrow(() -> new BaseException(
+                                                                                             NOT_FOUND_PARTNERSHIP_RESTAURANT));
+        Partnership partnership = request.toPartnershipEntity(partnershipRestaurant);
 
-		if ("college".equalsIgnoreCase(request.getTargetType())) {
-			College college = collegeRepository.findByName(request.getTargetName())
-											   .orElseThrow(() -> new BaseException(NOT_FOUND_COLLEGE));
-			PartnershipCollege partnershipCollege = new PartnershipCollege(partnership, college);
-			partnership.getPartnershipColleges().add(partnershipCollege);
-		} else if ("department".equalsIgnoreCase(request.getTargetType())) {
-			Department department = departmentRepository.findByName(request.getTargetName())
-														.orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
-			PartnershipDepartment partnershipDepartment = new PartnershipDepartment(partnership, department);
-			partnership.getPartnershipDepartments().add(partnershipDepartment);
-		} else {
-			throw new BaseException(INVALID_TARGET_TYPE);
-		}
-		partnershipRepository.save(partnership);
-	}
+        College college = collegeRepository.findByName(request.getCollege())
+                                           .orElseThrow(() -> new BaseException(NOT_FOUND_COLLEGE));
+        partnership.setPartnershipCollege(college);
+        Department department = departmentRepository.findByName(request.getDepartment())
+                                                    .orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
+        partnership.setPartnershipDepartment(department);
+        partnershipRepository.save(partnership);
+    }
 
-	public List<PartnershipResponse> getAllPartnerships() {
-		List<Partnership> partnerships = partnershipRepository.findAll();
-		return partnerships.stream().map(PartnershipResponse::fromEntity)
-						   .collect(Collectors.toList());
-	}
+    public List<PartnershipResponse> getAllPartnerships(CustomUserDetails customUserDetails) {
+        return partnerShipRestaurantRepository.findAllWithDetails().stream()
+                                              .map(restaurant -> PartnershipResponse.fromEntity(restaurant,
+                                                                                                customUserDetails.getId()))
+                                              .collect(Collectors.toList());
+    }
 
-	public PartnershipDetailResponse getPartnership(Long partnershipId, CustomUserDetails userDetails) {
-		Partnership partnership = partnershipRepository.findById(partnershipId)
-													   .orElseThrow(() -> new BaseException(NOT_FOUND_PARTNERSHIP));
 
-		boolean likedByUser = false;
-		if (userDetails != null) {
-			User user = userRepository.findById(userDetails.getId())
-									  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-			likedByUser = partnershipLikeRepository.findByUserAndPartnership(user, partnership).isPresent();
-		}
+    @Transactional
+    public void togglePartnershipLike(Long partnershipId, CustomUserDetails userDetails) {
+        Partnership partnership = partnershipRepository.findById(partnershipId)
+                                                       .orElseThrow(() -> new BaseException(NOT_FOUND_PARTNERSHIP));
+        User user = userRepository.findById(userDetails.getId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        PartnershipRestaurant partnershipRestaurant = partnership.getPartnershipRestaurant();
 
-		return PartnershipDetailResponse.fromEntity(partnership, likedByUser);
-	}
+        Optional<PartnershipLike> optionalPartnershipLike = partnershipLikeRepository.findByUserAndPartnershipRestaurant(
+                user,
+                partnershipRestaurant);
+        if (optionalPartnershipLike.isPresent()) {
+            PartnershipLike partnershipLike = optionalPartnershipLike.get();
+            partnershipRestaurant.getLikes().remove(partnershipLike);
+            partnershipLikeRepository.delete(partnershipLike);
+        } else {
+            PartnershipLike partnershipLike = new PartnershipLike(user, partnershipRestaurant);
+            partnershipRestaurant.getLikes().add(partnershipLike);
+            partnershipLikeRepository.save(partnershipLike);
+        }
+    }
 
-	@Transactional
-	public void togglePartnershipLike(Long partnershipId, CustomUserDetails userDetails) {
-		Partnership partnership = partnershipRepository.findById(partnershipId)
-													   .orElseThrow(() -> new BaseException(NOT_FOUND_PARTNERSHIP));
-		User user = userRepository.findById(userDetails.getId())
-								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+    public List<PartnershipResponse> getUserLikedPartnerships(CustomUserDetails customUserDetails) {
+        User user = userRepository.findById(customUserDetails.getId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-		Optional<PartnershipLike> optionalPartnershipLike = partnershipLikeRepository.findByUserAndPartnership(user,
-			partnership);
-		if (optionalPartnershipLike.isPresent()) {
-			PartnershipLike partnershipLike = optionalPartnershipLike.get();
-			partnership.getLikes().remove(partnershipLike);
-			partnershipLikeRepository.delete(partnershipLike);
-		} else {
-			PartnershipLike partnershipLike = new PartnershipLike(user, partnership);
-			partnership.getLikes().add(partnershipLike);
-			partnershipLikeRepository.save(partnershipLike);
-		}
-	}
+        List<PartnershipLike> likes = partnershipLikeRepository.findAllByUserWithDetails(user);
 
-	public List<PartnershipResponse> getUserLikedPartnerships(CustomUserDetails userDetails) {
-		User user = userRepository.findById(userDetails.getId())
-								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        return likes.stream()
+                    .flatMap(like -> {
+                        PartnershipRestaurant restaurant = like.getPartnershipRestaurant();
+                        return restaurant.getPartnerships()
+                                         .stream()
+                                         .map(partnership -> PartnershipResponse.fromEntity(restaurant,
+                                                                                            customUserDetails.getId()));
+                    }).collect(Collectors.toList());
+    }
 
-		List<PartnershipLike> likes = partnershipLikeRepository.findAllByUser(user);
-		return likes
-			.stream()
-			.map(PartnershipLike::getPartnership)
-			.map(PartnershipResponse::fromEntity)
-			.collect(Collectors.toList());
-	}
 
-	public List<PartnershipResponse> getUserDepartmentPartnerships(CustomUserDetails userDetails) {
-		User user = userRepository.findById(userDetails.getId())
-								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+    public List<PartnershipResponse> getUserDepartmentPartnerships(CustomUserDetails customUserDetails) {
+        User user = userRepository.findById(customUserDetails.getId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-		Department department = user.getDepartment();
-		if (department == null) {
-			throw new BaseException(MISSING_USER_DEPARTMENT);
-		}
-		College college = department.getCollege();
+        Department department = user.getDepartment();
+        if (department == null) {
+            throw new BaseException(MISSING_USER_DEPARTMENT);
+        }
+        College college = department.getCollege();
 
-		return partnershipRepository
-			.findRelevantPartnerships(college, department)
-			.stream()
-			.map(PartnershipResponse::fromEntity)
-			.collect(Collectors.toList());
-	}
+        return partnershipRepository
+                .findRelevantPartnerships(college, department)
+                .stream()
+                .map(partnership -> {
+                    PartnershipRestaurant partnershipRestaurant = partnership.getPartnershipRestaurant();
+
+                    return PartnershipResponse.fromEntity(partnershipRestaurant,
+                                                          customUserDetails.getId());
+                })
+                .collect(Collectors.toList());
+    }
 }

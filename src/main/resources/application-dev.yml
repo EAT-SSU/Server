@@ -25,12 +25,12 @@ spring:
     hibernate:
       ddl-auto: none
     properties:
-        hibernate:
-            jdbc:
-            lob:
-                non_contextual_creation: true
-            format_sql: false
-            show_sql: true
+      hibernate:
+        jdbc:
+        lob:
+          non_contextual_creation: true
+        format_sql: false
+        show_sql: true
 
   servlet:
     multipart:
@@ -41,8 +41,8 @@ spring:
 jwt:
   secret:
     key: ${EATSSU_JWT_SECRET_DEV}
-  token-validity-in-seconds: 86400
-  refresh-token-validity-in-seconds: 604800
+  token-validity-in-seconds: 60
+  refresh-token-validity-in-seconds: 180
 
 #S3
 cloud:
@@ -51,11 +51,11 @@ cloud:
       accessKey: ${EATSSU_AWS_ACCESS_KEY_DEV}
       secretKey: ${EATSSU_AWS_SECRET_KEY_DEV}
     s3:
-        bucket: eatssu-bucket
+      bucket: eatssu-bucket
     region:
-        static: ap-northeast-2
+      static: ap-northeast-2
     stack:
-        auto: false
+      auto: false
 
 #Slack
 slack:

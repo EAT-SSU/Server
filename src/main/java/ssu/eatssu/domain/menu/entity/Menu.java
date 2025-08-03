@@ -1,8 +1,5 @@
 package ssu.eatssu.domain.menu.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -23,124 +20,102 @@ import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.Reviews;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Menu {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "menu_id")
-	private Long id;
+    // TODO : 삭제되어야 함
+    @Embedded
+    private final Reviews reviews = new Reviews();
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
+    private final List<MealMenu> mealMenus = new ArrayList<>();
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "menu_id")
+    private Long id;
+    private String name;
+    private Integer price;
+    @Enumerated(EnumType.STRING)
+    private Restaurant restaurant;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "menu_category_id")
+    private MenuCategory category;
 
-	private String name;
+    private boolean isDiscontinued = false;
 
-	private Integer price;
+    @Column(name = "like_count")
+    private Integer likeCount = 0;
 
-	@Enumerated(EnumType.STRING)
-	private Restaurant restaurant;
+    @Column(name = "unlike_count")
+    private final Integer unlikeCount = 0;
 
-	// TODO : 삭제되어야 함
-	@Embedded
-	private Reviews reviews = new Reviews();
+    private Menu(String name, Restaurant restaurant, Integer price, MenuCategory category) {
+        this.name = name;
+        this.restaurant = restaurant;
+        this.price = price;
+        this.category = category;
+    }
 
-	@OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
-	private List<MealMenu> mealMenus = new ArrayList<>();
+    public static Menu createVariable(String name, Restaurant restaurant) {
+        int price = 0;
+        return new Menu(name, restaurant, price, null);
+    }
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "menu_category_id")
-	private MenuCategory category;
+    public static Menu createFixed(String name, Restaurant restaurant, Integer price,
+                                   MenuCategory category) {
+        return new Menu(name, restaurant, price, category);
+    }
 
-	private boolean isDiscontinued = false;
+    public void addReview(Review review) {
+        reviews.add(review);
+    }
 
-	@Column(name = "like_count")
-	private Integer likeCount = 0;
+    public int getTotalReviewCount() {
+        return reviews.size();
+    }
 
-	@Column(name = "unlike_count")
-	private Integer unlikeCount = 0;
+    public void update(String name, Integer price) {
+        this.name = name;
+        this.price = price;
+    }
 
-	private Menu(String name, Restaurant restaurant, Integer price, MenuCategory category) {
-		this.name = name;
-		this.restaurant = restaurant;
-		this.price = price;
-		this.category = category;
-	}
+    public void changeDiscontinuedStatus() {
+        this.isDiscontinued = !this.isDiscontinued;
+    }
 
-	public static Menu createVariable(String name, Restaurant restaurant) {
-		int price = 0;
-		return new Menu(name, restaurant, price, null);
-	}
+    public boolean isContinued() {
+        return !this.isDiscontinued;
+    }
 
-	public static Menu createFixed(String name, Restaurant restaurant, Integer price,
-		MenuCategory category) {
-		return new Menu(name, restaurant, price, category);
-	}
+    public void increaseLikeCount() {
+        if (this.likeCount == null) {
+            this.likeCount = 0;
+        }
+        this.likeCount++;
+    }
 
-	public void addReview(Review review) {
-		reviews.add(review);
-	}
+    public void decreaseLikeCount() {
+        if (this.likeCount == null) {
+            this.likeCount = 0;
+        }
+        this.likeCount--;
+    }
 
-	public int getTotalReviewCount() {
-		return reviews.size();
-	}
+    public void changeLikeStatus(Boolean isLike) {
+        if (isLike) {
+            increaseLikeCount();
+        } else {
+            decreaseLikeCount();
+        }
+    }
 
-	public void update(String name, Integer price) {
-		this.name = name;
-		this.price = price;
-	}
-
-	public void changeDiscontinuedStatus() {
-		this.isDiscontinued = !this.isDiscontinued;
-	}
-
-	public boolean isContinued() {
-		return !this.isDiscontinued;
-	}
-
-	public void increaseLikeCount()
-	{
-		if(this.likeCount==null){
-			this.likeCount=0;
-		}
-		this.likeCount++;
-	}
-
-	public void increaseUnlikeCount() {
-		if(this.unlikeCount==null){
-			this.unlikeCount=0;
-		}
-		this.unlikeCount++;
-	}
-
-	public void decreaseLikeCount() {
-		if(this.likeCount==null){
-			this.likeCount=0;
-		}
-		this.likeCount--;
-	}
-
-	public void decreaseUnlikeCount() {
-		if(this.unlikeCount==null){
-			this.unlikeCount=0;
-		}
-		unlikeCount--;
-	}
-
-	public void changeLikeStatus(Boolean isLike) {
-		if (isLike) {
-			decreaseUnlikeCount();
-			increaseLikeCount();
-		} else {
-			decreaseLikeCount();
-			increaseUnlikeCount();
-		}
-	}
-
-	public void cancelLike(Boolean isLike) {
-		if (isLike) {
-			decreaseLikeCount();
-		} else {
-			decreaseUnlikeCount();
-		}
-	}
+    public void cancelLike(Boolean isLike) {
+        if (isLike) {
+            decreaseLikeCount();
+        }
+    }
 }
