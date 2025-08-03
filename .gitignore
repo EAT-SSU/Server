@@ -42,14 +42,5 @@ out/
 ### Docker Tar files ###
 /eat-ssu.tar
 
-### SDKMAN ###
-.sdkmanrc
-
-### Junie guideline ###
-.junie
-
-### Cursor guideline ###
-eatssu-server-rule.mdc
-
-### Copilot guildline ###
-copilot-instructions.md
+### env file ###
+.env

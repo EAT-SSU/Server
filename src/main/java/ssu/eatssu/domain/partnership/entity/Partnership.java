@@ -1,25 +1,25 @@
 package ssu.eatssu.domain.partnership.entity;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.hibernate.annotations.Where;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
+import ssu.eatssu.domain.user.department.entity.College;
+import ssu.eatssu.domain.user.department.entity.Department;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -28,46 +28,40 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Where(clause = "end_date >= CURRENT_DATE")
 public class Partnership {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "partnership_id")
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "partnership_id")
+    private Long id;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "partnership_type", nullable = false)
-	private PartnershipType partnershipType;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "partnership_type", nullable = false)
+    private PartnershipType partnershipType;
 
-	@Column(name = "store_name", nullable = false)
-	private String storeName;
+    @Column(name = "description", nullable = false)
+    private String description;
 
-	@Column(name = "description", nullable = false)
-	private String description;
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
 
-	@Column(name = "start_date", nullable = false)
-	private LocalDate startDate;
+    @Column(name = "end_date", nullable = false)
+    private LocalDate endDate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "partnership_college_id")
+    private College partnershipCollege;
 
-	@Column(name = "end_date", nullable = false)
-	private LocalDate endDate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "partnership_department_id")
+    private Department partnershipDepartment;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "restaurant_type", nullable = false)
-	private RestaurantType restaurantType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "partnership_restaurant_id")
+    private PartnershipRestaurant partnershipRestaurant;
 
-	@Column(name = "longitude", nullable = false)
-	private Double longitude; // 경도 == x축
+    public void setPartnershipCollege(College partnershipCollege) {
+        this.partnershipCollege = partnershipCollege;
+    }
 
-	@Column(name = "latitude", nullable = false)
-	private Double latitude; // 위도 == y축
-
-	@Builder.Default
-	@OneToMany(mappedBy = "partnership", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<PartnershipCollege> partnershipColleges = new ArrayList<>();
-
-	@Builder.Default
-	@OneToMany(mappedBy = "partnership", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<PartnershipDepartment> partnershipDepartments = new ArrayList<>();
-
-	@Builder.Default
-	@OneToMany(mappedBy = "partnership", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<PartnershipLike> likes = new ArrayList<>();
+    public void setPartnershipDepartment(Department partnershipDepartment) {
+        this.partnershipDepartment = partnershipDepartment;
+    }
 }

@@ -1,21 +1,11 @@
 package ssu.eatssu.domain.review.service;
 
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
@@ -24,306 +14,374 @@ import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
+import ssu.eatssu.domain.review.dto.CreateMenuReviewRequest;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuLikeRequest;
 import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
+import ssu.eatssu.domain.review.dto.ReviewDetail;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
+import ssu.eatssu.domain.review.dto.ValidMenuForViewResponse;
 import ssu.eatssu.domain.review.entity.Review;
-import ssu.eatssu.domain.review.entity.ReviewLike;
-import ssu.eatssu.domain.review.repository.ReviewLikeRepository;
+import ssu.eatssu.domain.review.entity.ReviewImage;
+import ssu.eatssu.domain.review.repository.ReviewImageRepository;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
+import ssu.eatssu.domain.review.utils.MenuFilterUtil;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MEAL;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.REVIEW_PERMISSION_DENIED;
+
 @RequiredArgsConstructor
 @Service
 public class ReviewServiceV2 {
-	private final UserRepository userRepository;
-	private final ReviewRepository reviewRepository;
-	private final MenuRepository menuRepository;
-	private final MealRepository mealRepository;
-	private final MealMenuRepository mealMenuRepository;
-	private final ReviewLikeRepository reviewLikeRepository;
+    private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
+    private final MenuRepository menuRepository;
+    private final MealRepository mealRepository;
+    private final MealMenuRepository mealMenuRepository;
+    private final ReviewImageRepository reviewImageRepository;
 
-	/**
-	 * 리뷰 생성
-	 */
-	@Transactional
-	public void createReview(CustomUserDetails userDetails, CreateMealReviewRequest request) {
-		User user = userRepository.findById(userDetails.getId())
-								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+    /**
+     * meal에 대한 리뷰 생성
+     */
+    @Transactional
+    public void createMealReview(CustomUserDetails userDetails, CreateMealReviewRequest request) {
+        User user = userRepository.findById(userDetails.getId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-		Meal meal = mealRepository.findById(request.getMealId())
-								  .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
+        Meal meal = mealRepository.findById(request.getMealId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
 
-		Review review = request.toReviewEntity(user, meal);
+        Review review = request.toReviewEntity(user, meal);
 
-		request.getImageUrls().forEach(review::addReviewImage);
+        request.getImageUrls().forEach(review::addReviewImage);
 
-		for (MenuLikeRequest menuLike : request.getMenuLikes()) {
-			Menu menu = menuRepository.findById(menuLike.getMenuId())
-									  .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
-			review.addReviewMenuLike(menu, menuLike.getIsLike());
-		}
+        for (MenuLikeRequest menuLike : request.getMenuLikes()) {
+            Menu menu = menuRepository.findById(menuLike.getMenuId())
+                                      .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+            review.addReviewMenuLike(menu, menuLike.getIsLike());
+        }
 
-		reviewRepository.save(review);
-	}
+        reviewRepository.save(review);
+    }
 
-	/**
-	 * 특정 식당 리뷰 조회
-	 */
-	public RestaurantReviewResponse findRestaurantReviews(Restaurant restaurant) {
-		List<Meal> meals = mealRepository.findByRestaurant(restaurant);
-		List<Review> reviews = reviewRepository.findByMealIn(meals);
-		List<Menu> menus = mealMenuRepository.findMenusByMeals(meals);
+    /**
+     * menu에 대한 리뷰 작성
+     */
+    @Transactional
+    public void createMenuReview(CustomUserDetails userDetails, CreateMenuReviewRequest request) {
+        User user = userRepository.findById(userDetails.getId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-		Double averageRating = Optional.ofNullable(reviews)
-			.orElse(Collections.emptyList())
-			.stream()
-			.filter(Objects::nonNull)
-			.map(Review::getRating)
-			.filter(Objects::nonNull)
-			.mapToInt(Integer::intValue)
-			.average()
-			.orElse(0.0);
+        Menu menu = menuRepository.findById(request.getMenuId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
 
-		Integer likeCount = Optional.ofNullable(menus)
-			.orElse(Collections.emptyList())
-			.stream()
-			.filter(Objects::nonNull)
-			.map(Menu::getLikeCount)
-			.filter(Objects::nonNull)
-			.mapToInt(Integer::intValue)
-			.sum();
+        Review review = request.toReviewEntity(user, menu);
+        review.addReviewMenuLike(menu, request.getMenuLike().getIsLike());
+        reviewRepository.save(review);
 
+        ReviewImage reviewImage = new ReviewImage(review, request.getImageUrl());
+        reviewImageRepository.save(reviewImage);
 
-		Integer unlikeCount = Optional.ofNullable(menus)
-			.orElse(Collections.emptyList())
-			.stream()
-			.filter(Objects::nonNull)
-			.map(Menu::getUnlikeCount)
-			.filter(Objects::nonNull)
-			.mapToInt(Integer::intValue)
-			.sum();
+        menu.addReview(review);
+    }
 
-		ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
+    /**
+     * 특정 식당 리뷰 조회
+     */
+    public RestaurantReviewResponse findRestaurantReviews(Restaurant restaurant) {
+        List<Meal> meals = mealRepository.findByRestaurant(restaurant);
+        List<Review> reviews = reviewRepository.findByMealIn(meals);
+        List<Menu> menus = mealMenuRepository.findMenusByMeals(meals);
 
-		return RestaurantReviewResponse.builder()
-									   .totalReviewCount(reviews.size())
-									   .reviewRatingCount(reviewRatingCount)
-									   .mainRating(Math.round(averageRating * 10) / 10.0)
-									   .likeCount(likeCount)
-									   .unlikeCount(unlikeCount)
-									   .build();
-	}
+        Double averageRating = Optional.ofNullable(reviews)
+                                       .orElse(Collections.emptyList())
+                                       .stream()
+                                       .filter(Objects::nonNull)
+                                       .map(Review::getRating)
+                                       .filter(Objects::nonNull)
+                                       .mapToInt(Integer::intValue)
+                                       .average()
+                                       .orElse(0.0);
 
-	/**
-	 * 특정 식단 리뷰 리스트 조회
-	 */
-	public SliceResponse<MealReviewResponse> findReviews(Long mealId, Long lastReviewId, Pageable pageable,
-		CustomUserDetails userDetails) {
-		if (!mealRepository.existsById(mealId)) {
-			throw new BaseException(NOT_FOUND_MEAL);
-		}
-
-		List<Long> menuIds = mealMenuRepository.findMenuIdsByMealId(mealId);
-		if (menuIds.isEmpty()) {
-			return SliceResponse.empty();
-		}
-
-		List<Long> mealIds = mealMenuRepository.findMealIdsByMenuIds(menuIds);
-		if (mealIds.isEmpty()) {
-			return SliceResponse.empty();
-		}
-
-		Page<Review> pageReviews = reviewRepository.findReviewsByMealIds(mealIds, lastReviewId, pageable);
-
-		Long userId = (userDetails != null) ? userDetails.getId() : null;
-		List<MealReviewResponse> mealReviewResponses =
-			pageReviews.getContent().stream().map(review -> MealReviewResponse.from(review,
-				userId)).collect(Collectors.toList());
-
-		return SliceResponse.<MealReviewResponse>builder()
-							.numberOfElements(pageReviews.getNumberOfElements())
-							.hasNext(pageReviews.hasNext())
-							.dataList(mealReviewResponses)
-							.build();
-	}
-
-	/**
-	 * 특정 Menu 리뷰 조회
-	 */
-	public MenuReviewsV2Response findMenuReviews(Long menuId) {
-		Menu menu = menuRepository.findById(menuId).orElseThrow(()-> new BaseException(NOT_FOUND_MENU));
-		List<Review> reviews = reviewRepository.findAllByMenu(menu);
-
-		Double averageRating = Optional.ofNullable(reviews)
-			.orElse(Collections.emptyList())
-			.stream()
-			.filter(Objects::nonNull)
-			.map(Review::getRating)
-			.filter(Objects::nonNull)
-			.mapToInt(Integer::intValue)
-			.average()
-			.orElse(0.0);
-
-		Integer likeCount = menu.getLikeCount();
+        Integer likeCount = Optional.ofNullable(menus)
+                                    .orElse(Collections.emptyList())
+                                    .stream()
+                                    .filter(Objects::nonNull)
+                                    .map(Menu::getLikeCount)
+                                    .filter(Objects::nonNull)
+                                    .mapToInt(Integer::intValue)
+                                    .sum();
 
 
-		Integer unlikeCount = menu.getUnlikeCount();
+        Integer unlikeCount = Optional.ofNullable(menus)
+                                      .orElse(Collections.emptyList())
+                                      .stream()
+                                      .filter(Objects::nonNull)
+                                      .map(Menu::getUnlikeCount)
+                                      .filter(Objects::nonNull)
+                                      .mapToInt(Integer::intValue)
+                                      .sum();
 
-		ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
+        ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 
-		return MenuReviewsV2Response.builder()
-			.totalReviewCount((long)reviews.size())
-			.reviewRatingCount(reviewRatingCount)
-			.mainRating(Math.round(averageRating * 10) / 10.0)
-			.likeCount(likeCount)
-			.unlikeCount(unlikeCount)
-			.build();
-	}
+        return RestaurantReviewResponse.builder()
+                                       .totalReviewCount(reviews.size())
+                                       .reviewRatingCount(reviewRatingCount)
+                                       .mainRating(Math.round(averageRating * 10) / 10.0)
+                                       .likeCount(likeCount)
+                                       .unlikeCount(unlikeCount)
+                                       .build();
+    }
 
-	/**
-	 * 특정 Meal 리뷰 조회
-	 */
-	public MealReviewsV2Response findMealReviews(Long mealId) {
-		Meal meal = mealRepository.findById(mealId).orElseThrow(()-> new BaseException(NOT_FOUND_MEAL));
-		List<Review> reviews = reviewRepository.findAllByMeal(meal);
-		List<Menu> menus = mealMenuRepository.findMenusByMeal(meal);
+    /**
+     * 특정 식단 리뷰 리스트 조회
+     */
+    public SliceResponse<MealReviewResponse> findMealReviewList(Long mealId, Long lastReviewId, Pageable pageable,
+                                                                CustomUserDetails userDetails) {
+        if (!mealRepository.existsById(mealId)) {
+            throw new BaseException(NOT_FOUND_MEAL);
+        }
 
-		Double averageRating = Optional.ofNullable(reviews)
-			.orElse(Collections.emptyList())
-			.stream()
-			.filter(Objects::nonNull)
-			.map(Review::getRating)
-			.filter(Objects::nonNull)
-			.mapToInt(Integer::intValue)
-			.average()
-			.orElse(0.0);
+        List<Long> menuIds = mealMenuRepository.findMenuIdsByMealId(mealId);
+        if (menuIds.isEmpty()) {
+            return SliceResponse.empty();
+        }
 
-		Integer likeCount = Optional.ofNullable(menus)
-			.orElse(Collections.emptyList())
-			.stream()
-			.filter(Objects::nonNull)
-			.map(Menu::getLikeCount)
-			.filter(Objects::nonNull)
-			.mapToInt(Integer::intValue)
-			.sum();
+        List<Long> mealIds = mealMenuRepository.findMealIdsByMenuIds(menuIds);
+        if (mealIds.isEmpty()) {
+            return SliceResponse.empty();
+        }
+
+        Page<Review> pageReviews = reviewRepository.findReviewsByMealIds(mealIds, lastReviewId, pageable);
+
+        Long userId = (userDetails != null) ? userDetails.getId() : null;
+        List<MealReviewResponse> mealReviewResponses =
+                pageReviews.getContent()
+                           .stream()
+                           .map(review -> MealReviewResponse.from(review,
+                                                                  userId))
+                           .collect(Collectors.toList());
+
+        return SliceResponse.<MealReviewResponse>builder()
+                            .numberOfElements(pageReviews.getNumberOfElements())
+                            .hasNext(pageReviews.hasNext())
+                            .dataList(mealReviewResponses)
+                            .build();
+    }
+
+    /**
+     * 특정 메뉴 리뷰 리스트 조회
+     */
+
+    public SliceResponse<ReviewDetail> findMenuReviewList(Long menuId,
+                                                          Pageable pageable,
+                                                          Long lastReviewId,
+                                                          CustomUserDetails userDetails) {
+        Slice<Review> sliceReviews = null;
+        Menu menu = menuRepository.findById(menuId)
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+        sliceReviews = reviewRepository.findAllByMenuOrderByIdDesc(menu, lastReviewId,
+                                                                   pageable);
+
+        Long userId = (userDetails != null) ? userDetails.getId() : null;
+        return convertToReviewDetail(sliceReviews, userId);
+    }
+
+    private SliceResponse<ReviewDetail> convertToReviewDetail(Slice<Review> sliceReviews,
+                                                              Long userId) {
+        List<ReviewDetail> reviewDetails = sliceReviews.getContent().stream()
+                                                       .map(review -> ReviewDetail.from(review, userId))
+                                                       .collect(Collectors.toList());
+
+        return SliceResponse.<ReviewDetail>builder()
+                            .numberOfElements(sliceReviews.getNumberOfElements())
+                            .hasNext(sliceReviews.hasNext())
+                            .dataList(reviewDetails)
+                            .build();
+    }
 
 
-		Integer unlikeCount = Optional.ofNullable(menus)
-			.orElse(Collections.emptyList())
-			.stream()
-			.filter(Objects::nonNull)
-			.map(Menu::getUnlikeCount)
-			.filter(Objects::nonNull)
-			.mapToInt(Integer::intValue)
-			.sum();
+    /**
+     * 특정 Menu 리뷰 조회
+     */
+    public MenuReviewsV2Response findMenuReviews(Long menuId) {
+        Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+        List<Review> reviews = reviewRepository.findAllByMenu(menu);
 
-		ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
+        double averageRating = Optional.ofNullable(reviews)
+                                       .orElse(Collections.emptyList())
+                                       .stream()
+                                       .filter(Objects::nonNull)
+                                       .map(Review::getRating)
+                                       .filter(Objects::nonNull)
+                                       .mapToInt(Integer::intValue)
+                                       .average()
+                                       .orElse(0.0);
 
-		return MealReviewsV2Response.builder()
-			.totalReviewCount((long)reviews.size())
-			.reviewRatingCount(reviewRatingCount)
-			.mainRating(Math.round(averageRating * 10) / 10.0)
-			.likeCount(likeCount)
-			.unlikeCount(unlikeCount)
-			.build();
-	}
+        Integer likeCount = menu.getLikeCount();
 
-	/**
-	 * 리뷰 수정
-	 */
-	@Transactional
-	public void updateReview(CustomUserDetails userDetails, Long reviewId, UpdateMealReviewRequest request) {
-		User user = userRepository.findById(userDetails.getId())
-								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 
-		Review review = reviewRepository.findById(reviewId)
-										.orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
+        return MenuReviewsV2Response
+                .builder()
+                .menuName(menu.getName())
+                .totalReviewCount((long) reviews.size())
+                .reviewRatingCount(reviewRatingCount)
+                .mainRating(Math.round(averageRating * 10) / 10.0)
+                .likeCount(likeCount != null ? likeCount : 0)
+                .build();
+    }
 
-		if (review.isNotWrittenBy(user)) {
-			throw new BaseException(REVIEW_PERMISSION_DENIED);
-		}
+    /**
+     * 특정 Meal 리뷰 조회
+     */
+    public MealReviewsV2Response findMealReviews(Long mealId) {
+        Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
+        List<Review> reviews = reviewRepository.findAllByMeal(meal);
+        List<Menu> menus = mealMenuRepository.findMenusByMeal(meal);
 
-		Map<Menu, Boolean> menuLikes = request.getMenuLikes().stream()
-											  .collect(Collectors.toMap(
-												  menuLike -> menuRepository.findById(menuLike.getMenuId())
-																			.orElseThrow(() -> new BaseException(
-																				NOT_FOUND_MENU)),
-												  MenuLikeRequest::getIsLike));
+        Double averageRating = Optional.ofNullable(reviews)
+                                       .orElse(Collections.emptyList())
+                                       .stream()
+                                       .filter(Objects::nonNull)
+                                       .map(Review::getRating)
+                                       .filter(Objects::nonNull)
+                                       .mapToInt(Integer::intValue)
+                                       .average()
+                                       .orElse(0.0);
 
-		review.update(request.getContent(), request.getRating(), menuLikes);
-		reviewRepository.save(review);
-	}
+        Integer likeCount = Optional.ofNullable(menus)
+                                    .orElse(Collections.emptyList())
+                                    .stream()
+                                    .filter(Objects::nonNull)
+                                    .map(Menu::getLikeCount)
+                                    .filter(Objects::nonNull)
+                                    .mapToInt(Integer::intValue)
+                                    .sum();
 
-	/**
-	 * 리뷰 삭제
-	 */
-	@Transactional
-	public void deleteReview(CustomUserDetails userDetails, Long reviewId) {
-		User user = userRepository.findById(userDetails.getId())
-								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-		Review review = reviewRepository.findById(reviewId)
-										.orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
+        Integer unlikeCount = Optional.ofNullable(menus)
+                                      .orElse(Collections.emptyList())
+                                      .stream()
+                                      .filter(Objects::nonNull)
+                                      .map(Menu::getUnlikeCount)
+                                      .filter(Objects::nonNull)
+                                      .mapToInt(Integer::intValue)
+                                      .sum();
 
-		if (review.isNotWrittenBy(user)) {
-			throw new BaseException(REVIEW_PERMISSION_DENIED);
-		}
+        ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 
-		review.resetMenuLikes();
-		reviewRepository.delete(review);
-	}
+        return MealReviewsV2Response
+                .builder()
+                .menuNames(menus.stream()
+                                .filter(Objects::nonNull)
+                                .map(Menu::getName)
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toList()))
+                .totalReviewCount((long) reviews.size())
+                .reviewRatingCount(reviewRatingCount)
+                .mainRating(Math.round(averageRating * 10) / 10.0)
+                .likeCount(likeCount)
+                .build();
+    }
 
-	/**
-	 * 내 리뷰 리스트 조회
-	 */
-	public SliceResponse<MyMealReviewResponse> findMyReviews(CustomUserDetails userDetails, Long lastReviewId,
-		Pageable pageable) {
-		User user = userRepository.findById(userDetails.getId())
-								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+    /**
+     * 리뷰 수정
+     */
+    @Transactional
+    public void updateReview(CustomUserDetails userDetails, Long reviewId, UpdateMealReviewRequest request) {
+        User user = userRepository.findById(userDetails.getId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-		Slice<Review> sliceReviews = reviewRepository.findByUserOrderByIdDesc(user, lastReviewId,
-			pageable);
+        Review review = reviewRepository.findById(reviewId)
+                                        .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
 
-		List<MyMealReviewResponse> myMealReviewResponses = sliceReviews.getContent().stream()
-																	   .map(MyMealReviewResponse::from).toList();
+        if (review.isNotWrittenBy(user)) {
+            throw new BaseException(REVIEW_PERMISSION_DENIED);
+        }
 
-		return SliceResponse.<MyMealReviewResponse>builder()
-							.numberOfElements(sliceReviews.getNumberOfElements())
-							.hasNext(sliceReviews.hasNext())
-							.dataList(myMealReviewResponses)
-							.build();
-	}
+        Map<Menu, Boolean> menuLikes = request.getMenuLikes().stream()
+                                              .collect(Collectors.toMap(
+                                                      menuLike -> menuRepository.findById(menuLike.getMenuId())
+                                                                                .orElseThrow(() -> new BaseException(
+                                                                                        NOT_FOUND_MENU)),
+                                                      MenuLikeRequest::getIsLike));
 
-	/**
-	 * 리뷰 좋아요 누르기/취소하기
-	 */
-	@Transactional
-	public void toggleReviewLike(CustomUserDetails userDetails, Long reviewId) {
-		User user = userRepository.findById(userDetails.getId())
-								  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-		Review review = reviewRepository.findById(reviewId)
-										.orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
+        review.update(request.getContent(), request.getRating(), menuLikes);
+        reviewRepository.save(review);
+    }
 
-		Optional<ReviewLike> optionalReviewLike = reviewLikeRepository.findByReviewAndUser(review, user);
-		if (optionalReviewLike.isPresent()) {
-			// 이미 좋아요 한 경우 -> 좋아요 취소 처리
-			ReviewLike reviewLike = optionalReviewLike.get();
-			review.getReviewLikes().remove(reviewLike);
-			reviewLikeRepository.delete(reviewLike);
-		} else {
-			// 좋아요 하지 않은 경우 -> 좋아요 추가 처리
-			ReviewLike reviewLike = ReviewLike.create(user, review);
-			review.getReviewLikes().add(reviewLike);
-			reviewLikeRepository.save(reviewLike);
-		}
-	}
+    /**
+     * 리뷰 삭제
+     */
+    @Transactional
+    public void deleteReview(CustomUserDetails userDetails, Long reviewId) {
+        User user = userRepository.findById(userDetails.getId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        Review review = reviewRepository.findById(reviewId)
+                                        .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
+
+        if (review.isNotWrittenBy(user)) {
+            throw new BaseException(REVIEW_PERMISSION_DENIED);
+        }
+
+        review.resetMenuLikes();
+        reviewRepository.delete(review);
+    }
+
+    /**
+     * 내 리뷰 리스트 조회
+     */
+    public SliceResponse<MyMealReviewResponse> findMyReviews(CustomUserDetails userDetails, Long lastReviewId,
+                                                             Pageable pageable) {
+        User user = userRepository.findById(userDetails.getId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        Slice<Review> sliceReviews = reviewRepository.findByUserOrderByIdDesc(user, lastReviewId,
+                                                                              pageable);
+
+        List<MyMealReviewResponse> myMealReviewResponses = sliceReviews.getContent().stream()
+                                                                       .map(MyMealReviewResponse::from).toList();
+
+        return SliceResponse.<MyMealReviewResponse>builder()
+                            .numberOfElements(sliceReviews.getNumberOfElements())
+                            .hasNext(sliceReviews.hasNext())
+                            .dataList(myMealReviewResponses)
+                            .build();
+    }
+
+
+    public ValidMenuForViewResponse validMenuForReview(Long mealId) {
+        Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
+        List<String> menuNames = meal.getMenuNames();
+        List<String> validMenuNames = new ArrayList<>();
+        for (String menu : menuNames) {
+            if (!MenuFilterUtil.isExcludedFromReview(menu)) {
+                validMenuNames.add(menu);
+            }
+        }
+
+        return ValidMenuForViewResponse.builder()
+                                       .menuList(validMenuNames).build();
+    }
 }

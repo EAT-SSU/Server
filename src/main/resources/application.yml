@@ -1,11 +1,40 @@
 spring:
   profiles:
-    # include : prod
-    # include : dev
-    include : local
-    # include: test
+    active: local
+  config:
+    import: optional:file:.env[.properties]
 
 user:
   forbidden-nicknames:
     - EAT-SSU
     - EATSSU
+    - 잇슈
+    - 읻슈
+    - 잍슈
+    - 잇쓔
+    - 잇쓲
+    - 잇씨유
+    - 잇슈우
+    - 잇슈웅
+    - eat-ssu
+    - eatssu
+    - eatsu
+    - e4tssu
+    - 3at-ssu
+    - ea7-ssu
+    - "e @t-ssu"
+    - e.at.ssu
+    - e-a-t-s-s-u
+    - e_a_t_s_s_u
+    - "e a t ssu"
+    - eat_ssu
+    - eatssu_
+    - eatssu123
+    - "e @tssu"
+    - ēat-ssu
+    - 3atssu
+    - "eat$u"
+    - eat5su
+    - "eats$u"
+    - eats-u
+    - E4T슈

@@ -21,19 +21,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReviewImage {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "review_image_id")
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "review_image_id")
+    private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "review_id")
-	private Review review;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "review_id")
+    private Review review;
 
-	private String imageUrl;
+    private String imageUrl;
 
-	public ReviewImage(Review review, String imageUrl) {
-		this.review = review;
-		this.imageUrl = imageUrl;
-	}
+    public ReviewImage(Review review, String imageUrl) {
+        this.review = review;
+        this.imageUrl = imageUrl;
+    }
 }
