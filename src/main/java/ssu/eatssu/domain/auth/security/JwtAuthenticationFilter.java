@@ -62,7 +62,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         }
 
         if (!jwtTokenProvider.validateToken(token)) {
-            log.warn("토큰 유효하지 않음: {}", requestURI);
             httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
             httpResponse.setContentType("application/json;charset=UTF-8");
             httpResponse.setCharacterEncoding("UTF-8");
