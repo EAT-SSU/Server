@@ -14,9 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
-import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
-import ssu.eatssu.global.handler.response.BaseException;
-import ssu.eatssu.global.handler.response.BaseResponseStatus;
+
+
 
 import java.io.IOException;
 import java.util.List;
@@ -37,7 +36,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             "/favicon.ico", "/error/**", "/webjars/**", "/h2-console/**"
                                                               );
     private final JwtTokenProvider jwtTokenProvider;
-    private final SlackErrorNotifier slackErrorNotifier;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -66,7 +64,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             httpResponse.setContentType("application/json;charset=UTF-8");
             httpResponse.setCharacterEncoding("UTF-8");
             httpResponse.getWriter().write("{\"success\":false,\"code\":401,\"message\":\"유효하지 않은 토큰입니다.\"}");
-            slackErrorNotifier.notify(new BaseException(BaseResponseStatus.INVALID_TOKEN));
+            httpResponse.getWriter().write("{\"success\":false,\"code\":401,\"message\":\"유효하지 않은 토큰입니다.\"}");
             return;
         }
 
