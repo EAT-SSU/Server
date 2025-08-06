@@ -239,7 +239,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         HttpStatus status = HttpStatus.valueOf(statusCode.value());
 
-        if (status.is4xxClientError() || status.is5xxServerError()) {
+        if (status.is5xxServerError()) {
             slackErrorNotifier.notify(new BaseException(BaseResponseStatus.BAD_REQUEST));
         }
 
