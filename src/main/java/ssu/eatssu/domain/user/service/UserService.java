@@ -10,9 +10,13 @@ import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.config.UserProperties;
+import ssu.eatssu.domain.user.department.entity.College;
 import ssu.eatssu.domain.user.department.entity.Department;
+import ssu.eatssu.domain.user.department.persistence.CollegeRepository;
 import ssu.eatssu.domain.user.department.persistence.DepartmentRepository;
 import ssu.eatssu.domain.user.dto.DepartmentResponse;
+import ssu.eatssu.domain.user.dto.GetCollegeResponse;
+import ssu.eatssu.domain.user.dto.GetDepartmentResponse;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
 import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
@@ -20,11 +24,13 @@ import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 
+import java.util.List;
 import java.util.UUID;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.DUPLICATE_NICKNAME;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.VALIDATION_ERROR;
 
 @Slf4j
 @Service
@@ -37,6 +43,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final DepartmentRepository departmentRepository;
     private final UserProperties userProperties;
+    private final CollegeRepository collegeRepository;
 
     public User join(String email, OAuthProvider provider, String providerId) {
         String credentials = createCredentials(provider, providerId);
@@ -109,6 +116,26 @@ public class UserService {
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
         Department department = user.getDepartment();
         return new DepartmentResponse(department != null ? department.getName() : "");
+    }
+
+    public List<GetCollegeResponse> getCollegeList() {
+        List<College> colleges = collegeRepository.findAll();
+        return colleges.stream().map(college -> GetCollegeResponse.builder()
+                                                                  .id(college.getId())
+                                                                  .name(college.getName())
+                                                                  .build())
+                       .toList();
+    }
+
+    public List<GetDepartmentResponse> getDepartmentList(Long collegeId) {
+        College college = collegeRepository.findById(collegeId)
+                                           .orElseThrow(() -> new BaseException(VALIDATION_ERROR));
+        List<Department> departments = departmentRepository.findByCollege(college);
+        return departments.stream().map(department -> GetDepartmentResponse.builder()
+                                                                  .id(department.getId())
+                                                                  .name(department.getName())
+                                                                  .build())
+                       .toList();
     }
 
     private boolean isForbiddenNickname(String nickname) {

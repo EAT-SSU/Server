@@ -31,6 +31,8 @@ import ssu.eatssu.domain.review.service.ReviewServiceV2;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.slice.service.SliceService;
 import ssu.eatssu.domain.user.dto.DepartmentResponse;
+import ssu.eatssu.domain.user.dto.GetCollegeResponse;
+import ssu.eatssu.domain.user.dto.GetDepartmentResponse;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.MyReviewDetail;
@@ -199,4 +201,27 @@ public class UserController {
                                                                                       pageable);
         return BaseResponse.success(myReviews);
     }
+
+    @Operation(summary = "단과대 조회", description = "숭실대학교 단과대학 들을 조회하는 API입니다.(토큰 불필요)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "단과대 리스트 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @GetMapping("/lookup/colleges")
+    public BaseResponse<List<GetCollegeResponse>> getColleges() {
+        List<GetCollegeResponse> getCollegeResponses = userService.getCollegeList();
+        return BaseResponse.success(getCollegeResponses);
+    }
+
+    @Operation(summary = "단과대에 따른 학과 조회", description = "단과대학을 입력하면 단과대에 속한 숭실대학교 학과를 조회하는 API입니다.(토큰 불필요)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "단과대 리스트 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @GetMapping("/lookup/departments")
+    public BaseResponse<List<GetDepartmentResponse>> getDepartments(@RequestParam Long collegeId) {
+        List<GetDepartmentResponse> getCollegeResponses = userService.getDepartmentList(collegeId);
+        return BaseResponse.success(getCollegeResponses);
+    }
+
 }
