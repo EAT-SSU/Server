@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -27,9 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
 import ssu.eatssu.domain.partnership.service.PartnershipService;
+import ssu.eatssu.domain.review.service.ReviewServiceV2;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.slice.service.SliceService;
 import ssu.eatssu.domain.user.dto.DepartmentResponse;
+import ssu.eatssu.domain.user.dto.GetCollegeResponse;
+import ssu.eatssu.domain.user.dto.GetDepartmentResponse;
+import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.MyReviewDetail;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
@@ -48,6 +53,7 @@ public class UserController {
     private final UserService userService;
     private final SliceService sliceService;
     private final PartnershipService partnershipService;
+    private final ReviewServiceV2 reviewServiceV2;
 
     @Operation(summary = "이메일 중복 체크", description = """
             이메일 중복 체크 API 입니다.<br><br>
@@ -96,6 +102,16 @@ public class UserController {
     @DeleteMapping("")
     public BaseResponse<Boolean> withdraw(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(userService.withdraw(userDetails));
+    }
+    @Operation(summary = "유저 탈퇴 v2", description = "유저 탈퇴 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저 탈퇴 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @DeleteMapping("/v2")
+    public BaseResponse<Boolean> withdrawV2(@RequestParam @NotBlank String nickname, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        userService.withdrawV2(nickname.trim(),userDetails);
+        return BaseResponse.success(true);
     }
 
     @Operation(summary = "내가 쓴 리뷰 리스트 조회", description = "내가 쓴 리뷰 리스트를 조회하는 API 입니다.")
@@ -180,4 +196,42 @@ public class UserController {
     public BaseResponse<DepartmentResponse> getDepartment(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(userService.getDepartment(userDetails));
     }
+
+    @Operation(summary = "내가 쓴 리뷰 리스트 조회", description = "내가 쓴 리뷰 리스트를 조회하는 API V2 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "내가 쓴 리뷰 리스트 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @GetMapping("/v2/reviews")
+    public BaseResponse<SliceResponse<MyMealReviewResponse>> getMyReviews(
+            @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY) @RequestParam(required = false) Long lastReviewId,
+            @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        SliceResponse<MyMealReviewResponse> myReviews = reviewServiceV2.findMyReviews(customUserDetails,
+                                                                                      lastReviewId,
+                                                                                      pageable);
+        return BaseResponse.success(myReviews);
+    }
+
+    @Operation(summary = "단과대 조회", description = "숭실대학교 단과대학 들을 조회하는 API입니다.(토큰 불필요)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "단과대 리스트 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 단과대", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @GetMapping("/lookup/colleges")
+    public BaseResponse<List<GetCollegeResponse>> getColleges() {
+        List<GetCollegeResponse> getCollegeResponses = userService.getCollegeList();
+        return BaseResponse.success(getCollegeResponses);
+    }
+
+    @Operation(summary = "단과대에 따른 학과 조회", description = "단과대학을 입력하면 단과대에 속한 숭실대학교 학과를 조회하는 API입니다.(토큰 불필요)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "단과대 리스트 조회 성공"),
+    })
+    @GetMapping("/lookup/departments")
+    public BaseResponse<List<GetDepartmentResponse>> getDepartments(@RequestParam Long collegeId) {
+        List<GetDepartmentResponse> getCollegeResponses = userService.getDepartmentList(collegeId);
+        return BaseResponse.success(getCollegeResponses);
+    }
+
 }
