@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.config.UserProperties;
 import ssu.eatssu.domain.user.department.entity.College;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.DUPLICATE_NICKNAME;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.INVALID_NICKNAME;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.VALIDATION_ERROR;
@@ -78,6 +80,20 @@ public class UserService {
         userRepository.delete(user);
 
         return true;
+    }
+
+    public void withdrawV2(String nickName, CustomUserDetails userDetails) {
+        User userCredentials = userRepository.findById(userDetails.getId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        User userByNickname = userRepository.findByNickname(nickName).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        if(!userCredentials.equals(userByNickname)) {
+            throw new BaseException(INVALID_NICKNAME);
+        }
+
+        userCredentials.getReviews().forEach(Review::clearUser);
+        userCredentials.getUserInquiries().forEach(Inquiry::clearUser);
+        userRepository.delete(userCredentials);
     }
 
     public Boolean validateDuplicatedEmail(String email) {
