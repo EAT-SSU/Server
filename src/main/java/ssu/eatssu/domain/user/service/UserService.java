@@ -83,17 +83,16 @@ public class UserService {
     }
 
     public void withdrawV2(String nickName, CustomUserDetails userDetails) {
-        User userCredentials = userRepository.findById(userDetails.getId())
+        User user = userRepository.findById(userDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        User userByNickname = userRepository.findByNickname(nickName).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-        if(!userCredentials.equals(userByNickname)) {
+        if (!user.getNickname().equals(nickName)) {
             throw new BaseException(INVALID_NICKNAME);
         }
 
-        userCredentials.getReviews().forEach(Review::clearUser);
-        userCredentials.getUserInquiries().forEach(Inquiry::clearUser);
-        userRepository.delete(userCredentials);
+        user.getReviews().forEach(Review::clearUser);
+        user.getUserInquiries().forEach(Inquiry::clearUser);
+        userRepository.delete(user);
     }
 
     public Boolean validateDuplicatedEmail(String email) {

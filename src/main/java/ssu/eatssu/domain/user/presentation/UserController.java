@@ -216,7 +216,7 @@ public class UserController {
     @Operation(summary = "단과대 조회", description = "숭실대학교 단과대학 들을 조회하는 API입니다.(토큰 불필요)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "단과대 리스트 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 단과대", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/lookup/colleges")
     public BaseResponse<List<GetCollegeResponse>> getColleges() {
@@ -227,7 +227,6 @@ public class UserController {
     @Operation(summary = "단과대에 따른 학과 조회", description = "단과대학을 입력하면 단과대에 속한 숭실대학교 학과를 조회하는 API입니다.(토큰 불필요)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "단과대 리스트 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/lookup/departments")
     public BaseResponse<List<GetDepartmentResponse>> getDepartments(@RequestParam Long collegeId) {
