@@ -115,14 +115,10 @@ public class PartnershipService {
         College college = department.getCollege();
 
         return partnershipRepository
-                .findRelevantPartnerships(college, department)
+                .findRestaurantsWithMyPartnerships(college, department)
                 .stream()
-                .map(partnership -> {
-                    PartnershipRestaurant partnershipRestaurant = partnership.getPartnershipRestaurant();
-
-                    return PartnershipResponse.fromEntity(partnershipRestaurant,
-                                                          customUserDetails.getId());
-                })
+                .map(partnership -> PartnershipResponse.fromEntity(partnership,
+                                                               customUserDetails.getId()))
                 .collect(Collectors.toList());
     }
 }

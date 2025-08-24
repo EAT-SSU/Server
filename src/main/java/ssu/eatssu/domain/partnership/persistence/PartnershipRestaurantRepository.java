@@ -10,7 +10,7 @@ public interface PartnershipRestaurantRepository extends JpaRepository<Partnersh
     @Query("SELECT DISTINCT pr FROM PartnershipRestaurant pr " +
             "LEFT JOIN FETCH pr.partnerships p " +
             "LEFT JOIN FETCH p.partnershipCollege " +
-            "LEFT JOIN FETCH p.partnershipDepartment " +
-            "WHERE CURRENT_DATE BETWEEN p.startDate AND p.endDate")
+            "LEFT JOIN FETCH p.partnershipDepartment "+
+            "WHERE p.startDate <= CURRENT_DATE and (p.endDate is null or p.endDate >= CURRENT_DATE)")
     List<PartnershipRestaurant> findAllWithDetails();
 }
