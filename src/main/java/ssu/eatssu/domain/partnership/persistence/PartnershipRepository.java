@@ -13,7 +13,7 @@ public interface PartnershipRepository extends JpaRepository<Partnership, Long> 
     @Query("SELECT DISTINCT p FROM Partnership p " +
             "LEFT JOIN p.partnershipCollege pc " +
             "LEFT JOIN p.partnershipDepartment pd " +
-            "WHERE (pc = :college OR pd = :department OR (pc IS NOT NULL AND pc.name = '총학'))")
+            "WHERE (pc = :college OR pd = :department OR (pc IS NOT NULL AND pc.name = '총학')) and CURRENT_DATE BETWEEN p.startDate AND p.endDate")
     List<Partnership> findRelevantPartnerships(@Param("college") College college,
                                                @Param("department") Department department);
 }
