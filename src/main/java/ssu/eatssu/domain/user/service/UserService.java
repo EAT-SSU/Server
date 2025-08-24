@@ -120,7 +120,7 @@ public class UserService {
     public void registerDepartment(UpdateDepartmentRequest request, CustomUserDetails userDetails) {
         User user = userRepository.findById(userDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        Department department = departmentRepository.findByName(request.getDepartmentName())
+        Department department = departmentRepository.findById(request.getDepartmentId())
                                                     .orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
 
         user.updateDepartment(department);
