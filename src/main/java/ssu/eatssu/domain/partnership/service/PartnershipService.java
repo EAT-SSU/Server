@@ -117,8 +117,8 @@ public class PartnershipService {
         return partnershipRepository
                 .findRestaurantsWithMyPartnerships(college, department)
                 .stream()
-                .map(partnership -> PartnershipResponse.fromEntity(partnership,
-                                                               customUserDetails.getId()))
+                .map(partnershipRestaurant -> PartnershipResponse.fromEntity(partnershipRestaurant,
+                                                                             customUserDetails.getId()))
                 .collect(Collectors.toList());
     }
 }
