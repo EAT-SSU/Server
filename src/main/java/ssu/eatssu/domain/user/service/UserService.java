@@ -129,8 +129,7 @@ public class UserService {
     public DepartmentResponse getDepartment(CustomUserDetails userDetails) {
         User user = userRepository.findById(userDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        Department department = user.getDepartment();
-        return new DepartmentResponse(department != null ? department.getName() : "");
+        return DepartmentResponse.from(user.getDepartment());
     }
 
     public List<GetCollegeResponse> getCollegeList() {
