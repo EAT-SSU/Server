@@ -68,7 +68,7 @@ public class UserService {
     public MyPageResponse findMyPage(CustomUserDetails userDetails) {
         User user = userRepository.findById(userDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        return new MyPageResponse(user.getNickname(), user.getProvider());
+        return MyPageResponse.from(user);
     }
 
     public boolean withdraw(CustomUserDetails userDetails) {
