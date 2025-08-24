@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -102,16 +101,6 @@ public class UserController {
     @DeleteMapping("")
     public BaseResponse<Boolean> withdraw(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(userService.withdraw(userDetails));
-    }
-    @Operation(summary = "유저 탈퇴 v2", description = "유저 탈퇴 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "유저 탈퇴 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
-    @DeleteMapping("/v2")
-    public BaseResponse<Boolean> withdrawV2(@RequestParam @NotBlank String nickname, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        userService.withdrawV2(nickname.trim(),userDetails);
-        return BaseResponse.success(true);
     }
 
     @Operation(summary = "내가 쓴 리뷰 리스트 조회", description = "내가 쓴 리뷰 리스트를 조회하는 API 입니다.")

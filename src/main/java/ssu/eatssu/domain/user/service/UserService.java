@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
-import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.config.UserProperties;
 import ssu.eatssu.domain.user.department.entity.College;
@@ -29,7 +28,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.DUPLICATE_NICKNAME;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.INVALID_NICKNAME;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.VALIDATION_ERROR;
@@ -68,7 +66,7 @@ public class UserService {
     public MyPageResponse findMyPage(CustomUserDetails userDetails) {
         User user = userRepository.findById(userDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        return new MyPageResponse(user.getNickname(), user.getProvider());
+        return MyPageResponse.from(user);
     }
 
     public boolean withdraw(CustomUserDetails userDetails) {
@@ -80,19 +78,6 @@ public class UserService {
         userRepository.delete(user);
 
         return true;
-    }
-
-    public void withdrawV2(String nickName, CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-
-        if (!user.getNickname().equals(nickName)) {
-            throw new BaseException(INVALID_NICKNAME);
-        }
-
-        user.getReviews().forEach(Review::clearUser);
-        user.getUserInquiries().forEach(Inquiry::clearUser);
-        userRepository.delete(user);
     }
 
     public Boolean validateDuplicatedEmail(String email) {
@@ -120,7 +105,7 @@ public class UserService {
     public void registerDepartment(UpdateDepartmentRequest request, CustomUserDetails userDetails) {
         User user = userRepository.findById(userDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        Department department = departmentRepository.findByName(request.getDepartmentName())
+        Department department = departmentRepository.findById(request.getDepartmentId())
                                                     .orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
 
         user.updateDepartment(department);
@@ -129,8 +114,7 @@ public class UserService {
     public DepartmentResponse getDepartment(CustomUserDetails userDetails) {
         User user = userRepository.findById(userDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        Department department = user.getDepartment();
-        return new DepartmentResponse(department != null ? department.getName() : "");
+        return DepartmentResponse.from(user.getDepartment());
     }
 
     public List<GetCollegeResponse> getCollegeList() {
