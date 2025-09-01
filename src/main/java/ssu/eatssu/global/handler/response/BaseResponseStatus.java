@@ -105,4 +105,8 @@ public enum BaseResponseStatus {
         this.code = code;
         this.message = message;
     }
+
+    public static boolean sendSlackNotification(BaseResponseStatus baseResponseStatus) {
+        return baseResponseStatus.httpStatus.is5xxServerError();
+    }
 }
