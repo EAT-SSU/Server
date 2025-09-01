@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateDepartmentRequest {
-    @Schema(description = "학과 이름", example = "소프트")
-    private String departmentName;
+    @Schema(description = "학과 id", example = "1")
+    private Long departmentId;
 }
