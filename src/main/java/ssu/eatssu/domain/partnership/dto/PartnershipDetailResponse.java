@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
-import ssu.eatssu.domain.partnership.entity.PartnershipType;
 import ssu.eatssu.domain.partnership.entity.RestaurantType;
 
 import java.time.LocalDate;
@@ -13,7 +12,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class PartnershipDetailResponse {
     private Long id;
-    private PartnershipType partnershipType;
     private String storeName;
     private String description;
     private LocalDate startDate;
@@ -32,7 +30,6 @@ public class PartnershipDetailResponse {
 
         return new PartnershipDetailResponse(
                 partnership.getId(),
-                partnership.getPartnershipType(),
                 partnershipRestaurant.getStoreName(),
                 partnership.getDescription(),
                 partnership.getStartDate(),
