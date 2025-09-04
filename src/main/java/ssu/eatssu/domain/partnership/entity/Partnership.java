@@ -32,11 +32,7 @@ public class Partnership {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "partnership_id")
     private Long id;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "partnership_type", nullable = false)
-    private PartnershipType partnershipType;
-
+    
     @Column(name = "description", nullable = false)
     private String description;
 
