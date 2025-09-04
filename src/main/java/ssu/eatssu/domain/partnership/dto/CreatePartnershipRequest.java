@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
-import ssu.eatssu.domain.partnership.entity.PartnershipType;
 
 import java.time.LocalDate;
 
@@ -15,8 +14,6 @@ import java.time.LocalDate;
 public class CreatePartnershipRequest {
     @Schema(description = "제휴 가게 식별자", example = "1")
     private Long storeId;
-    @Schema(description = "제휴 종류(DRINK, DISCOUNT, SIDE, OTHER)", example = "DISCOUNT")
-    private PartnershipType partnershipType;
     @Schema(description = "단과대", example = "IT대")
     private String college;
     @Schema(description = "학과", example = "컴퓨터학부")
@@ -31,7 +28,6 @@ public class CreatePartnershipRequest {
     public Partnership toPartnershipEntity(PartnershipRestaurant partnershipRestaurant) {
         return Partnership.builder()
                           .partnershipRestaurant(partnershipRestaurant)
-                          .partnershipType(partnershipType)
                           .description(description)
                           .startDate(startDate)
                           .endDate(endDate)
