@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Getter;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
-import ssu.eatssu.domain.partnership.entity.PartnershipType;
 
 import java.time.LocalDate;
 
@@ -12,7 +11,6 @@ import java.time.LocalDate;
 @Getter
 public class PartnershipInfo {
     private Long id;
-    private PartnershipType partnershipType;
     private String collegeName;
     private String departmentName;
     private Integer likeCount;
@@ -26,7 +24,6 @@ public class PartnershipInfo {
                                              boolean isLiked) {
         return PartnershipInfo.builder()
                               .id(partnership.getId())
-                              .partnershipType(partnership.getPartnershipType())
                               .description(partnership.getDescription())
                               .startDate(partnership.getStartDate())
                               .endDate(partnership.getEndDate())
