@@ -6,9 +6,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${EATSSU_DB_URL_DEV}
-    username: ${EATSSU_DB_USERNAME}
-    password: ${EATSSU_DB_PASSWORD}
+    url: jdbc:mysql://eatssu-db.cf0ackgagqzb.ap-northeast-2.rds.amazonaws.com/dev
+    username: admin
+    password: ssu2023!
 
   jpa:
     hibernate:

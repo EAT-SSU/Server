@@ -34,12 +34,10 @@ public class JpaLoadCollectionRatingCalculator implements RatingCalculator {
         long totalReviewCount = mealTotalReviewCount(meal);
 
         if (totalReviewCount == 0)
-            return new RatingAverages(null, null, null);
+            return new RatingAverages(null);
 
         return RatingAverages.builder()
                              .mainRating(averageRating(mealTotalMainRating(meal), totalReviewCount))
-                             .amountRating(averageRating(mealTotalAmountRating(meal), totalReviewCount))
-                             .tasteRating(averageRating(mealTotalTasteRating(meal), totalReviewCount))
                              .build();
     }
 
@@ -48,13 +46,11 @@ public class JpaLoadCollectionRatingCalculator implements RatingCalculator {
         int totalReviewCount = menu.getTotalReviewCount();
 
         if (totalReviewCount == 0) {
-            return new RatingAverages(null, null, null);
+            return new RatingAverages(null);
         }
 
         return RatingAverages.builder()
                              .mainRating(averageRating(menuTotalMainRating(menu), totalReviewCount))
-                             .amountRating(averageRating(menuTotalAmountRating(menu), totalReviewCount))
-                             .tasteRating(averageRating(menuTotalTasteRating(menu), totalReviewCount))
                              .build();
     }
 
@@ -101,35 +97,11 @@ public class JpaLoadCollectionRatingCalculator implements RatingCalculator {
                    .reduce(null, this::sum);
     }
 
-    // 식단 양 평점 총합
-    public Integer mealTotalAmountRating(Meal meal) {
-        return meal.getMealMenus().stream()
-                   .map(MealMenu::getMenu)
-                   .map(menu -> menu.getReviews().getTotalAmountRating())
-                   .reduce(null, this::sum);
-    }
-
-    // 식단 맛 평점 총합
-    public Integer mealTotalTasteRating(Meal meal) {
-        return meal.getMealMenus().stream()
-                   .map(MealMenu::getMenu)
-                   .map(menu -> menu.getReviews().getTotalTasteRating())
-                   .reduce(null, this::sum);
-    }
 
     // 메뉴 메인 평점 총합
     public Integer menuTotalMainRating(Menu menu) {
         return menu.getReviews().getTotalMainRating();
     }
 
-    // 메뉴 양 평점 총합
-    public Integer menuTotalAmountRating(Menu menu) {
-        return menu.getReviews().getTotalAmountRating();
-    }
-
-    // 메뉴 맛 평점 총합
-    public Integer menuTotalTasteRating(Menu menu) {
-        return menu.getReviews().getTotalTasteRating();
-    }
 
 }

@@ -56,8 +56,6 @@ public class ReviewDetail {
         ReviewDetailBuilder builder = ReviewDetail.builder()
                                                   .reviewId(review.getId())
                                                   .mainRating(review.getRatings().getMainRating())
-                                                  .amountRating(review.getRatings().getAmountRating())
-                                                  .tasteRating(review.getRatings().getTasteRating())
                                                   .writedAt(review.getCreatedDate().toLocalDate())
                                                   .content(review.getContent())
                                                   .imageUrls(imageUrls)
