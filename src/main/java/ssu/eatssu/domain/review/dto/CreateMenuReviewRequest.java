@@ -29,13 +29,6 @@ public class CreateMenuReviewRequest {
     private String imageUrl;
     private MenuLikeRequest menuLike;
 
-    public CreateMenuReviewRequest(int mainRating, String content) {
-        Assert.isTrue(mainRating >= 1 && mainRating <= 5, "평점은 1에서 5 사이 여야 합니다.");
-        Assert.notNull(content, "리뷰는 null이 될 수 없습니다.");
-        this.mainRating = mainRating;
-        this.content = content;
-    }
-
     public Review toReviewEntity(User user, Menu menu) {
         Ratings ratings = Ratings.of(this.mainRating);
         return Review.builder()
