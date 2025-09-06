@@ -38,17 +38,13 @@ public class ReviewRatingService implements RatingCalculator {
     @Override
     public RatingAverages mealAverageRatings(Meal meal) {
         Double mainRatingAverage = mealRatingCalculator.getMainRatingAverage(meal.getId());
-        Double amountRatingAverage = mealRatingCalculator.getAmountRatingAverage(meal.getId());
-        Double tasteRatingAverage = mealRatingCalculator.getTasteRatingAverage(meal.getId());
-        return new RatingAverages(mainRatingAverage, amountRatingAverage, tasteRatingAverage);
+        return new RatingAverages(mainRatingAverage);
     }
 
     @Override
     public RatingAverages menuAverageRatings(Menu menu) {
         Double mainRatingAverage = menuRatingCalculator.getMainRatingAverage(menu.getId());
-        Double amountRatingAverage = menuRatingCalculator.getAmountRatingAverage(menu.getId());
-        Double tasteRatingAverage = menuRatingCalculator.getTasteRatingAverage(menu.getId());
-        return new RatingAverages(mainRatingAverage, amountRatingAverage, tasteRatingAverage);
+        return new RatingAverages(mainRatingAverage);
     }
 
     @Override

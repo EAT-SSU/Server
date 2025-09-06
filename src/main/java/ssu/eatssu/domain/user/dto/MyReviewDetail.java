@@ -53,13 +53,9 @@ public class MyReviewDetail {
 
         Ratings ratings = review.getRatings();
         int mainRating = 0;
-        int amountRating = 0;
-        int tasteRating = 0;
 
         if (ratings != null) {
             mainRating = ratings.getMainRating() != null ? ratings.getMainRating() : 0;
-            amountRating = ratings.getAmountRating() != null ? ratings.getAmountRating() : 0;
-            tasteRating = ratings.getTasteRating() != null ? ratings.getTasteRating() : 0;
         }
 
         String menuName = review.getMenu() != null ? review.getMenu().getName() : null;
@@ -68,8 +64,6 @@ public class MyReviewDetail {
         return MyReviewDetail.builder()
                              .reviewId(review.getId())
                              .mainRating(mainRating)
-                             .amountRating(amountRating)
-                             .tasteRating(tasteRating)
                              .writeDate(writeDate)
                              .content(review.getContent())
                              .imgUrlList(imgUrlList)

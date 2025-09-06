@@ -37,8 +37,6 @@ public class MealReviewsResponse implements ReviewInformationResponse {
         return MealReviewsResponse.builder()
                                   .menuNames(menuNames)
                                   .mainRating(ratingAverages.mainRating())
-                                  .amountRating(ratingAverages.amountRating())
-                                  .tasteRating(ratingAverages.tasteRating())
                                   .totalReviewCount(totalReviewCount)
                                   .reviewRatingCount(reviewRatingCount)
                                   .build();
