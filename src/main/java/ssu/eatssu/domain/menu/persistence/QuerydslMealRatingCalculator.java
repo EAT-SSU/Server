@@ -32,29 +32,6 @@ public class QuerydslMealRatingCalculator {
                 .fetchOne();
     }
 
-    public Double getTasteRatingAverage(Long mealId) {
-        List<Long> menuIds = mealMenuQueryRepository.getMenuIds(mealId);
-        return queryFactory
-                .select(review.ratings.tasteRating.avg())
-                .from(review)
-                .join(review.menu, menu)
-                .where(
-                        menuIdIn(menuIds)
-                      )
-                .fetchOne();
-    }
-
-    public Double getAmountRatingAverage(Long mealId) {
-        List<Long> menuIds = mealMenuQueryRepository.getMenuIds(mealId);
-        return queryFactory
-                .select(review.ratings.amountRating.avg())
-                .from(review)
-                .join(review.menu, menu)
-                .where(
-                        menuIdIn(menuIds)
-                      )
-                .fetchOne();
-    }
 
     private BooleanExpression menuIdIn(List<Long> menuIds) {
         return menuIds != null && !menuIds.isEmpty() ? menu.id.in(menuIds) : null;

@@ -42,19 +42,5 @@ public class Reviews {
                            .mapToInt(review -> review.getRatings().getMainRating())
                            .sum();
     }
-
-    public int getTotalAmountRating() {
-        return this.reviews.stream()
-                           .filter(review -> review.getRatings() != null)
-                           .mapToInt(review -> review.getRatings().getAmountRating())
-                           .sum();
-    }
-
-    public int getTotalTasteRating() {
-        return this.reviews.stream()
-                           .filter(review -> review.getRatings() != null)
-                           .mapToInt(review -> review.getRatings().getTasteRating()).sum();
-    }
-
 }
 

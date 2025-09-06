@@ -21,12 +21,6 @@ public class UploadReviewRequest {
     @Schema(description = "평점-메인", example = "4")
     private Integer mainRating;
 
-    @Schema(description = "평점-양", example = "4")
-    private Integer amountRating;
-
-    @Schema(description = "평점-맛", example = "4")
-    private Integer tasteRating;
-
     @Max(150)
     @Schema(description = "한줄평", example = "맛있어용")
     private String content;
@@ -34,19 +28,15 @@ public class UploadReviewRequest {
     @Schema(description = "리뷰 이미지 URL", example = "https://s3.~~~.jpg")
     private String imageUrl;
 
-    public UploadReviewRequest(int mainRating, int amountRating, int tasteRating, String content) {
+    public UploadReviewRequest(int mainRating, String content) {
         Assert.isTrue(mainRating >= 1 && mainRating <= 5, "평점은 1에서 5 사이 여야 합니다.");
-        Assert.isTrue(amountRating >= 1 && amountRating <= 5, "평점은 1에서 5 사이 여야 합니다.");
-        Assert.isTrue(tasteRating >= 1 && tasteRating <= 5, "평점은 1에서 5 사이 여야 합니다.");
         Assert.notNull(content, "리뷰는 null이 될 수 없습니다.");
         this.mainRating = mainRating;
-        this.amountRating = amountRating;
-        this.tasteRating = tasteRating;
         this.content = content;
     }
 
     public Review toReviewEntity(User user, Menu menu) {
-        Ratings ratings = Ratings.of(this.mainRating, this.amountRating, this.tasteRating);
+        Ratings ratings = Ratings.of(this.mainRating);
         return Review.builder()
                      .user(user)
                      .content(this.content)

@@ -37,8 +37,6 @@ public class MenuReviewResponse implements ReviewInformationResponse {
                                  .menuName(menu.getName())
                                  .totalReviewCount(menu.getTotalReviewCount())
                                  .mainRating(ratingAverages.mainRating())
-                                 .amountRating(ratingAverages.amountRating())
-                                 .tasteRating(ratingAverages.tasteRating())
                                  .reviewRatingCount(reviewRatingCount)
                                  .build();
     }

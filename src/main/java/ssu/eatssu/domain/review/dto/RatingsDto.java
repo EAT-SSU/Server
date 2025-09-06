@@ -8,12 +8,5 @@ public record RatingsDto(Ratings ratings) {
         return ratings.getMainRating();
     }
 
-    public Integer getTasteRating() {
-        return ratings.getTasteRating();
-    }
-
-    public Integer getAmountRating() {
-        return ratings.getAmountRating();
-    }
 
 }
