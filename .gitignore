@@ -44,3 +44,5 @@ out/
 
 ### env file ###
 .env
+
+/src/main/resources/application-local.yml
