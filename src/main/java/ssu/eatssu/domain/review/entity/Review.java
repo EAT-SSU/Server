@@ -74,9 +74,9 @@ public class Review extends BaseTimeEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewLike> reviewLikes = new ArrayList<>();
 
-    public void update(String content, Integer mainRate, Integer amountRate, Integer tasteRate) {
+    public void update(String content, Integer mainRate) {
         this.content = content;
-        this.ratings = Ratings.of(mainRate, amountRate, tasteRate);
+        this.ratings = Ratings.of(mainRate);
     }
 
     // TODO : this.user가 null이면?

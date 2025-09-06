@@ -26,27 +26,7 @@ public class QuerydslMenuRatingCalculator {
                 .fetchOne();
     }
 
-    public Double getTasteRatingAverage(Long menuId) {
-        return queryFactory
-                .select(review.ratings.tasteRating.avg())
-                .from(review)
-                .join(review.menu, menu)
-                .where(
-                        menuIdEq(menuId)
-                      )
-                .fetchOne();
-    }
 
-    public Double getAmountRatingAverage(Long menuId) {
-        return queryFactory
-                .select(review.ratings.amountRating.avg())
-                .from(review)
-                .join(review.menu, menu)
-                .where(
-                        menuIdEq(menuId)
-                      )
-                .fetchOne();
-    }
 
     private BooleanExpression menuIdEq(Long menuId) {
         return menu.id.eq(menuId);

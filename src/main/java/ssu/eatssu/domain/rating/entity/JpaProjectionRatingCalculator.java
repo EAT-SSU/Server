@@ -42,18 +42,14 @@ public class JpaProjectionRatingCalculator implements RatingCalculator {
         long totalReviewCount = mealTotalReviewCount(meal);
 
         if (totalReviewCount == 0)
-            return new RatingAverages(null, null, null);
+            return new RatingAverages(null);
 
         Collection<RatingsDto> mealRatings = reviewRepository.findByMenu_MealMenus_Meal(meal, RatingsDto.class);
 
         Integer totalMainRating = mealRatings.stream().mapToInt(RatingsDto::getMainRating).sum();
-        Integer totalTasteRating = mealRatings.stream().mapToInt(RatingsDto::getTasteRating).sum();
-        Integer totalAmountRating = mealRatings.stream().mapToInt(RatingsDto::getAmountRating).sum();
 
         return RatingAverages.builder()
                              .mainRating(averageRating(totalMainRating, totalReviewCount))
-                             .tasteRating(averageRating(totalTasteRating, totalReviewCount))
-                             .amountRating(averageRating(totalAmountRating, totalReviewCount))
                              .build();
     }
 

@@ -132,8 +132,7 @@ public class ReviewService {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
 
-        review.update(request.content(), request.mainRating(), request.amountRating(),
-                      request.tasteRating());
+        review.update(request.content(), request.mainRating());
     }
 
     public void deleteReview(CustomUserDetails userDetails, Long reviewId) {

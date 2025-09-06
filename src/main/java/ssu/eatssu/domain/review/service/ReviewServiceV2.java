@@ -115,8 +115,11 @@ public class ReviewServiceV2 {
         Double averageRating = Optional.ofNullable(reviews)
                                        .orElse(Collections.emptyList())
                                        .stream()
-                                       .filter(Objects::nonNull)
-                                       .map(Review::getRating)
+                                       .map(r -> {
+                                           Integer main = (r.getRatings() != null) ? r.getRatings()
+                                                                                      .getMainRating() : null;
+                                           return (main != null) ? main : r.getRating();
+                                       })
                                        .filter(Objects::nonNull)
                                        .mapToInt(Integer::intValue)
                                        .average()
@@ -230,8 +233,11 @@ public class ReviewServiceV2 {
         double averageRating = Optional.ofNullable(reviews)
                                        .orElse(Collections.emptyList())
                                        .stream()
-                                       .filter(Objects::nonNull)
-                                       .map(Review::getRating)
+                                       .map(r -> {
+                                           Integer main = (r.getRatings() != null) ? r.getRatings()
+                                                                                      .getMainRating() : null;
+                                           return (main != null) ? main : r.getRating();
+                                       })
                                        .filter(Objects::nonNull)
                                        .mapToInt(Integer::intValue)
                                        .average()
@@ -240,6 +246,7 @@ public class ReviewServiceV2 {
         Integer likeCount = menu.getLikeCount();
 
         ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
+
 
         return MenuReviewsV2Response
                 .builder()
@@ -262,8 +269,11 @@ public class ReviewServiceV2 {
         Double averageRating = Optional.ofNullable(reviews)
                                        .orElse(Collections.emptyList())
                                        .stream()
-                                       .filter(Objects::nonNull)
-                                       .map(Review::getRating)
+                                       .map(r -> {
+                                           Integer main = (r.getRatings() != null) ? r.getRatings()
+                                                                                      .getMainRating() : null;
+                                           return (main != null) ? main : r.getRating();
+                                       })
                                        .filter(Objects::nonNull)
                                        .mapToInt(Integer::intValue)
                                        .average()
