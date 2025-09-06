@@ -85,7 +85,7 @@ class ReviewServiceTest {
     private Review 리뷰_생성_요청(CustomUserDetails userDetails) {
         // given
         Menu menu = createMenu();
-        ReviewCreateRequest request = new ReviewCreateRequest(4, 4, 4, "굿");
+        ReviewCreateRequest request = new ReviewCreateRequest(4, "굿");
 
         // when
         Review createdReview = reviewService.createReview(userDetails, menu.getId(),
