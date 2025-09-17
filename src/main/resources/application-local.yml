@@ -7,8 +7,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${EATSSU_DB_URL_DEV}
-    username: admin
-    password: ssu2023!
+    username: ${EATSSU_DB_USERNAME}
+    password: ${EATSSU_DB_PASSWORD}
 
   jpa:
     hibernate:
