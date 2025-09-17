@@ -6,7 +6,7 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://eatssu-db.cf0ackgagqzb.ap-northeast-2.rds.amazonaws.com/dev
+    url: ${EATSSU_DB_URL_DEV}
     username: admin
     password: ssu2023!
 
