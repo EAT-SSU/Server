@@ -35,7 +35,6 @@ import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -382,16 +381,22 @@ public class ReviewServiceV2 {
 
 
     public ValidMenuForViewResponse validMenuForReview(Long mealId) {
-        Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
-        List<String> menuNames = meal.getMenuNames();
-        List<String> validMenuNames = new ArrayList<>();
-        for (String menu : menuNames) {
-            if (!MenuFilterUtil.isExcludedFromReview(menu)) {
-                validMenuNames.add(menu);
-            }
-        }
+        Meal meal = mealRepository.findById(mealId)
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
+
+        List<Menu> menus = mealMenuRepository.findMenusByMeal(meal);
+
+        List<ValidMenuForViewResponse.MenuDto> validMenus = menus.stream()
+                                                                 .filter(menu -> !MenuFilterUtil.isExcludedFromReview(
+                                                                         menu.getName()))
+                                                                 .map(menu -> ValidMenuForViewResponse.MenuDto.builder()
+                                                                                                              .menuId(menu.getId())
+                                                                                                              .name(menu.getName())
+                                                                                                              .build())
+                                                                 .collect(Collectors.toList());
 
         return ValidMenuForViewResponse.builder()
-                                       .menuList(validMenuNames).build();
+                                       .menuList(validMenus)
+                                       .build();
     }
 }
