@@ -12,6 +12,6 @@ public interface PartnershipRestaurantRepository extends JpaRepository<Partnersh
             LEFT JOIN FETCH pr.partnerships p
             LEFT JOIN FETCH p.partnershipCollege
             LEFT JOIN FETCH p.partnershipDepartment
-            WHERE p.startDate >= current_date - 7 and (p.endDate is null or p.endDate >= CURRENT_DATE)""")
+            WHERE p.endDate is null or p.endDate >= CURRENT_DATE""")
     List<PartnershipRestaurant> findAllWithDetails();
 }
