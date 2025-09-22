@@ -26,7 +26,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
-@Where(clause = "start_date <= CURRENT_DATE AND end_date >= CURRENT_DATE")
+@Where(clause = "end_date >= CURRENT_DATE")
 public class Partnership {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
