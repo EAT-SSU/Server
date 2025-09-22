@@ -28,7 +28,7 @@ public class PartnershipInfo {
                               .startDate(partnership.getStartDate())
                               .endDate(partnership.getEndDate())
                               .collegeName(partnership.getPartnershipCollege() == null && partnership.getPartnershipDepartment() == null
-                                                ? "총학"
+                                                ? "총학생회"
                                                 : (partnership.getPartnershipCollege() != null ? partnership.getPartnershipCollege().getName() : null))
                               .departmentName(partnership.getPartnershipDepartment() != null ? partnership.getPartnershipDepartment().getName() : null)
                               .likeCount(restaurant.getLikes() != null ? restaurant.getLikes().size() : 0)
