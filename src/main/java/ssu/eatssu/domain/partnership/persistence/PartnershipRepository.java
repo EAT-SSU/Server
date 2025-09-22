@@ -23,7 +23,7 @@ public interface PartnershipRepository extends JpaRepository<Partnership, Long> 
             or pd = :department
             or (pc is null and pd is null)
           )
-          and p.startDate <= current_date
+          and p.startDate >= current_date - 7
           and (p.endDate is null or p.endDate >= current_date)
         """)
     List<PartnershipRestaurant> findRestaurantsWithMyPartnerships(
