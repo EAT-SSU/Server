@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 public class MealReviewsV2Response implements ReviewInformationResponse {
     @Schema(description = "메뉴명 리스트", example = "['고구마치즈돈까스', '막국수', '미니밥','단무지', '요구르트']")
-    private List<String> menuNames;
+    private List<MenuIdNameDto> menuNames;
 
     @Schema(description = "리뷰 개수", example = "15")
     private Long totalReviewCount;
@@ -26,7 +26,7 @@ public class MealReviewsV2Response implements ReviewInformationResponse {
     @Schema(description = "평점 별 갯수")
     private ReviewRatingCount reviewRatingCount;
 
-    public static MealReviewsV2Response of(Long totalReviewCount, List<String> menuNames,
+    public static MealReviewsV2Response of(Long totalReviewCount, List<MenuIdNameDto> menuNames,
                                            RatingAverages ratingAverages, ReviewRatingCount reviewRatingCount) {
 
         return MealReviewsV2Response.builder()

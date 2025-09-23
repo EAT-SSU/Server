@@ -17,6 +17,7 @@ import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.CreateMenuReviewRequest;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
+import ssu.eatssu.domain.review.dto.MenuIdNameDto;
 import ssu.eatssu.domain.review.dto.MenuLikeRequest;
 import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
@@ -322,7 +323,10 @@ public class ReviewServiceV2 {
                 .builder()
                 .menuNames(validMenus.stream()
                                 .filter(Objects::nonNull)
-                                .map(ValidMenuForViewResponse.MenuDto::getName)
+                                .map(menu -> new MenuIdNameDto(
+                                        menu.getMenuId(),
+                                        menu.getName()
+                                ))
                                 .filter(Objects::nonNull)
                                 .collect(Collectors.toList()))
                 .totalReviewCount((long) reviews.size())
