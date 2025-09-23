@@ -4,13 +4,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import ssu.eatssu.domain.review.dto.MenuIdNameLikeDto;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewMenuLike;
+import ssu.eatssu.domain.review.utils.MenuFilterUtil;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Builder
@@ -31,24 +35,51 @@ public class MyMealReviewResponse {
 
     @Schema(description = "리뷰 이미지 url 리스트", example = "[\"imgurl1\", \"imgurl2\"]")
     private List<String> imageUrls;
-
-    @Schema(description = "좋아요한 메뉴명 리스트", example = "[\"메뉴1\", \"메뉴2\"]")
-    private List<String> likedMenuNames;
-    @Schema(description = "메뉴명 리스트", example = "['고구마치즈돈까스', '막국수', '미니밥','단무지', '요구르트']")
-    private List<String> menuNames;
+    @Schema(description = "메뉴 리스트", example = "[\n" +
+            "      {\n" +
+            "        \"menuId\": 3143,\n" +
+            "        \"name\": \"생고기제육볶음\"\n" +
+            "        \"isLike\" : true,\n" +
+            "      },\n" +
+            "      {\n" +
+            "        \"menuId\": 3144,\n" +
+            "        \"name\": \"오징어초무침\",\n" +
+            "        \"isLike\" : false,\n" +
+            "      }\n" +
+            "    ]")
+    private List<MenuIdNameLikeDto> menuList;
 
     public static MyMealReviewResponse from(Review review) {
         List<String> imgUrlList = new ArrayList<>();
         review.getReviewImages().forEach(i -> imgUrlList.add(i.getImageUrl()));
 
-        List<String> likedMenuNames = review.getMenuLikes().stream()
-                                            .filter(ReviewMenuLike::getIsLike)
-                                            .map(like -> like.getMenu().getName())
-                                            .toList();
+        Set<Long> likedMenuIds = review.getMenuLikes().stream()
+                                       .filter(ReviewMenuLike::getIsLike)
+                                       .map(like -> like.getMenu().getId())
+                                       .collect(Collectors.toSet());
 
-        List<String> menuNames = review.getMeal() == null ? Collections.singletonList(review.getMenu()
-                                                                                            .getName()) : review.getMeal()
-                                                                                                                .getMenuNames();
+
+        List<MenuIdNameLikeDto> menuNames;
+
+        if (review.getMeal() != null) {
+            menuNames = review.getMeal().getMenus().stream()
+                              .filter(menu -> !MenuFilterUtil.isExcludedFromReview(menu.getName()))
+                              .map(menu -> new MenuIdNameLikeDto(
+                                      menu.getId(),
+                                      menu.getName(),
+                                      likedMenuIds.contains(menu.getId())
+                              ))
+                              .toList();
+        } else {
+            menuNames = Collections.singletonList(
+                    new MenuIdNameLikeDto(
+                            review.getMenu().getId(),
+                            review.getMenu().getName(),
+                            likedMenuIds.contains(review.getMenu().getId())
+                    )
+                                                 );
+        }
+
         return MyMealReviewResponse
                 .builder()
                 .reviewId(review.getId())
@@ -56,8 +87,7 @@ public class MyMealReviewResponse {
                 .writtenAt(review.getCreatedDate().toLocalDate())
                 .content(review.getContent())
                 .imageUrls(imgUrlList)
-                .likedMenuNames(likedMenuNames)
-                .menuNames(menuNames)
+                .menuList(menuNames)
                 .build();
     }
 }
