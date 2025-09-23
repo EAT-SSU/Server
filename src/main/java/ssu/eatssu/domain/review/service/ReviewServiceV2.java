@@ -161,29 +161,7 @@ public class ReviewServiceV2 {
     public SliceResponse<MealReviewResponse> findMealReviewList(Long mealId, Long lastReviewId, Pageable pageable,
                                                                 CustomUserDetails userDetails) {
 
-        Meal meal = mealRepository.findById(mealId).orElseThrow(()->new BaseException(NOT_FOUND_MEAL));
-        if (!mealRepository.existsById(mealId)) {
-            throw new BaseException(NOT_FOUND_MEAL);
-        }
-
-        List<Long> validMenuIds = mealMenuRepository.findMenusByMeal(meal)
-                                                    .stream()
-                                                    .filter(menu -> !MenuFilterUtil.isExcludedFromReview(menu.getName())) // 공통메뉴 제외
-                                                    .map(Menu::getId)
-                                                    .toList();
-
-        if (validMenuIds.isEmpty()) {
-            return SliceResponse.empty();
-        }
-
-        List<Long> mealIds = mealMenuRepository.findMealIdsByMenuIds(validMenuIds);
-        if (mealIds.isEmpty()) {
-            return SliceResponse.empty();
-        }
-
-        Page<Review> pageReviews = reviewRepository.findReviewsByMealIds(mealIds, lastReviewId, pageable);
-
-        Long userId = (userDetails != null) ? userDetails.getId() : null;
+        Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
 
         List<Menu> menus = mealMenuRepository.findMenusByMeal(meal);
 
@@ -195,6 +173,22 @@ public class ReviewServiceV2 {
                                                                                                               .name(menu.getName())
                                                                                                               .build())
                                                                  .collect(Collectors.toList());
+
+
+        if (validMenus.isEmpty()) {
+            return SliceResponse.empty();
+        }
+
+        List<Long> validMenuIds = validMenus.stream().map(ValidMenuForViewResponse.MenuDto::getMenuId).toList();
+        List<Long> mealIds = mealMenuRepository.findMealIdsByMenuIds(validMenuIds);
+        if (mealIds.isEmpty()) {
+            return SliceResponse.empty();
+        }
+
+        Page<Review> pageReviews = reviewRepository.findReviewsByMealIds(mealIds, lastReviewId, pageable);
+
+        Long userId = (userDetails != null) ? userDetails.getId() : null;
+
 
         List<MealReviewResponse> mealReviewResponses =
                 pageReviews.getContent()
@@ -321,7 +315,7 @@ public class ReviewServiceV2 {
 
         return MealReviewsV2Response
                 .builder()
-                .menuNames(validMenus.stream()
+                .menuList(validMenus.stream()
                                 .filter(Objects::nonNull)
                                 .map(menu -> new MenuIdNameDto(
                                         menu.getMenuId(),

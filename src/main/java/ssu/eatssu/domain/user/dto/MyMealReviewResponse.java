@@ -35,8 +35,7 @@ public class MyMealReviewResponse {
 
     @Schema(description = "리뷰 이미지 url 리스트", example = "[\"imgurl1\", \"imgurl2\"]")
     private List<String> imageUrls;
-
-    @Schema(description = "좋아요한 메뉴명 리스트", example = "[\n" +
+    @Schema(description = "메뉴 리스트", example = "[\n" +
             "      {\n" +
             "        \"menuId\": 3143,\n" +
             "        \"name\": \"생고기제육볶음\"\n" +
@@ -48,20 +47,7 @@ public class MyMealReviewResponse {
             "        \"isLike\" : false,\n" +
             "      }\n" +
             "    ]")
-    private List<MenuIdNameLikeDto> likedMenuNames;
-    @Schema(description = "메뉴명 리스트", example = "[\n" +
-            "      {\n" +
-            "        \"menuId\": 3143,\n" +
-            "        \"name\": \"생고기제육볶음\"\n" +
-            "        \"isLike\" : true,\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"menuId\": 3144,\n" +
-            "        \"name\": \"오징어초무침\",\n" +
-            "        \"isLike\" : false,\n" +
-            "      }\n" +
-            "    ]")
-    private List<MenuIdNameLikeDto> menuNames;
+    private List<MenuIdNameLikeDto> menuList;
 
     public static MyMealReviewResponse from(Review review) {
         List<String> imgUrlList = new ArrayList<>();
@@ -72,15 +58,6 @@ public class MyMealReviewResponse {
                                        .map(like -> like.getMenu().getId())
                                        .collect(Collectors.toSet());
 
-        // 좋아요 메뉴 DTO
-        List<MenuIdNameLikeDto> likedMenuNames = review.getMenuLikes().stream()
-                                                       .filter(ReviewMenuLike::getIsLike)
-                                                       .map(like -> new MenuIdNameLikeDto(
-                                                               like.getMenu().getId(),
-                                                               like.getMenu().getName(),
-                                                               true // 좋아요이므로 무조건 true
-                                                       ))
-                                                       .toList();
 
         List<MenuIdNameLikeDto> menuNames;
 
@@ -110,8 +87,7 @@ public class MyMealReviewResponse {
                 .writtenAt(review.getCreatedDate().toLocalDate())
                 .content(review.getContent())
                 .imageUrls(imgUrlList)
-                .likedMenuNames(likedMenuNames)
-                .menuNames(menuNames)
+                .menuList(menuNames)
                 .build();
     }
 }
