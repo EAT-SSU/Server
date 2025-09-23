@@ -165,12 +165,17 @@ public class ReviewServiceV2 {
             throw new BaseException(NOT_FOUND_MEAL);
         }
 
-        List<Long> menuIds = mealMenuRepository.findMenuIdsByMealId(mealId);
-        if (menuIds.isEmpty()) {
+        List<Long> validMenuIds = mealMenuRepository.findMenusByMeal(meal)
+                                                    .stream()
+                                                    .filter(menu -> !MenuFilterUtil.isExcludedFromReview(menu.getName())) // 공통메뉴 제외
+                                                    .map(Menu::getId)
+                                                    .toList();
+
+        if (validMenuIds.isEmpty()) {
             return SliceResponse.empty();
         }
 
-        List<Long> mealIds = mealMenuRepository.findMealIdsByMenuIds(menuIds);
+        List<Long> mealIds = mealMenuRepository.findMealIdsByMenuIds(validMenuIds);
         if (mealIds.isEmpty()) {
             return SliceResponse.empty();
         }
