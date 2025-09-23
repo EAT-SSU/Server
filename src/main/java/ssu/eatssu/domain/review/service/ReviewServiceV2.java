@@ -17,6 +17,7 @@ import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.CreateMenuReviewRequest;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
+import ssu.eatssu.domain.review.dto.MenuIdNameDto;
 import ssu.eatssu.domain.review.dto.MenuLikeRequest;
 import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
@@ -159,16 +160,27 @@ public class ReviewServiceV2 {
      */
     public SliceResponse<MealReviewResponse> findMealReviewList(Long mealId, Long lastReviewId, Pageable pageable,
                                                                 CustomUserDetails userDetails) {
-        if (!mealRepository.existsById(mealId)) {
-            throw new BaseException(NOT_FOUND_MEAL);
-        }
 
-        List<Long> menuIds = mealMenuRepository.findMenuIdsByMealId(mealId);
-        if (menuIds.isEmpty()) {
+        Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
+
+        List<Menu> menus = mealMenuRepository.findMenusByMeal(meal);
+
+        List<ValidMenuForViewResponse.MenuDto> validMenus = menus.stream()
+                                                                 .filter(menu -> !MenuFilterUtil.isExcludedFromReview(
+                                                                         menu.getName()))
+                                                                 .map(menu -> ValidMenuForViewResponse.MenuDto.builder()
+                                                                                                              .menuId(menu.getId())
+                                                                                                              .name(menu.getName())
+                                                                                                              .build())
+                                                                 .collect(Collectors.toList());
+
+
+        if (validMenus.isEmpty()) {
             return SliceResponse.empty();
         }
 
-        List<Long> mealIds = mealMenuRepository.findMealIdsByMenuIds(menuIds);
+        List<Long> validMenuIds = validMenus.stream().map(ValidMenuForViewResponse.MenuDto::getMenuId).toList();
+        List<Long> mealIds = mealMenuRepository.findMealIdsByMenuIds(validMenuIds);
         if (mealIds.isEmpty()) {
             return SliceResponse.empty();
         }
@@ -176,11 +188,13 @@ public class ReviewServiceV2 {
         Page<Review> pageReviews = reviewRepository.findReviewsByMealIds(mealIds, lastReviewId, pageable);
 
         Long userId = (userDetails != null) ? userDetails.getId() : null;
+
+
         List<MealReviewResponse> mealReviewResponses =
                 pageReviews.getContent()
                            .stream()
                            .map(review -> MealReviewResponse.from(review,
-                                                                  userId))
+                                                                  userId,validMenus))
                            .collect(Collectors.toList());
 
         return SliceResponse.<MealReviewResponse>builder()
@@ -265,6 +279,15 @@ public class ReviewServiceV2 {
         List<Review> reviews = reviewRepository.findAllByMeal(meal);
         List<Menu> menus = mealMenuRepository.findMenusByMeal(meal);
 
+        List<ValidMenuForViewResponse.MenuDto> validMenus = menus.stream()
+                                                                 .filter(menu -> !MenuFilterUtil.isExcludedFromReview(
+                                                                         menu.getName()))
+                                                                 .map(menu -> ValidMenuForViewResponse.MenuDto.builder()
+                                                                                                              .menuId(menu.getId())
+                                                                                                              .name(menu.getName())
+                                                                                                              .build())
+                                                                 .toList();
+
         Double averageRating = Optional.ofNullable(reviews)
                                        .orElse(Collections.emptyList())
                                        .stream()
@@ -288,22 +311,16 @@ public class ReviewServiceV2 {
                                     .sum();
 
 
-        Integer unlikeCount = Optional.ofNullable(menus)
-                                      .orElse(Collections.emptyList())
-                                      .stream()
-                                      .filter(Objects::nonNull)
-                                      .map(Menu::getUnlikeCount)
-                                      .filter(Objects::nonNull)
-                                      .mapToInt(Integer::intValue)
-                                      .sum();
-
         ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 
         return MealReviewsV2Response
                 .builder()
-                .menuNames(menus.stream()
+                .menuList(validMenus.stream()
                                 .filter(Objects::nonNull)
-                                .map(Menu::getName)
+                                .map(menu -> new MenuIdNameDto(
+                                        menu.getMenuId(),
+                                        menu.getName()
+                                ))
                                 .filter(Objects::nonNull)
                                 .collect(Collectors.toList()))
                 .totalReviewCount((long) reviews.size())
