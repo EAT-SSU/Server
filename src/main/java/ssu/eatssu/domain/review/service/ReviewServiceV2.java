@@ -265,6 +265,15 @@ public class ReviewServiceV2 {
         List<Review> reviews = reviewRepository.findAllByMeal(meal);
         List<Menu> menus = mealMenuRepository.findMenusByMeal(meal);
 
+        List<ValidMenuForViewResponse.MenuDto> validMenus = menus.stream()
+                                                                 .filter(menu -> !MenuFilterUtil.isExcludedFromReview(
+                                                                         menu.getName()))
+                                                                 .map(menu -> ValidMenuForViewResponse.MenuDto.builder()
+                                                                                                              .menuId(menu.getId())
+                                                                                                              .name(menu.getName())
+                                                                                                              .build())
+                                                                 .toList();
+
         Double averageRating = Optional.ofNullable(reviews)
                                        .orElse(Collections.emptyList())
                                        .stream()
@@ -288,22 +297,13 @@ public class ReviewServiceV2 {
                                     .sum();
 
 
-        Integer unlikeCount = Optional.ofNullable(menus)
-                                      .orElse(Collections.emptyList())
-                                      .stream()
-                                      .filter(Objects::nonNull)
-                                      .map(Menu::getUnlikeCount)
-                                      .filter(Objects::nonNull)
-                                      .mapToInt(Integer::intValue)
-                                      .sum();
-
         ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 
         return MealReviewsV2Response
                 .builder()
-                .menuNames(menus.stream()
+                .menuNames(validMenus.stream()
                                 .filter(Objects::nonNull)
-                                .map(Menu::getName)
+                                .map(ValidMenuForViewResponse.MenuDto::getName)
                                 .filter(Objects::nonNull)
                                 .collect(Collectors.toList()))
                 .totalReviewCount((long) reviews.size())
