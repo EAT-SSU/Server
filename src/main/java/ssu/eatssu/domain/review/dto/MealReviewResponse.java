@@ -46,13 +46,16 @@ public class MealReviewResponse {
     @Schema(description = "메뉴명 리스트", example = "['고구마치즈돈까스', '막국수', '미니밥','단무지', '요구르트']")
     private List<String> menuNames;
 
-    public static MealReviewResponse from(Review review, Long userId) {
+    public static MealReviewResponse from(Review review, Long userId, List<ValidMenuForViewResponse.MenuDto> validMenus) {
         List<String> imageUrls = new ArrayList<>();
         review.getReviewImages().forEach(i -> imageUrls.add(i.getImageUrl()));
 
         List<String> likedMenuNames = review.getMenuLikes().stream()
                                             .filter(ReviewMenuLike::getIsLike)
                                             .map(like -> like.getMenu().getName())
+                                            .filter(name -> validMenus.stream()
+                                                                      .map(ValidMenuForViewResponse.MenuDto::getName)
+                                                                      .anyMatch(validName -> validName.equals(name)))
                                             .collect(Collectors.toList());
 
         MealReviewResponseBuilder builder = MealReviewResponse.builder()
@@ -61,7 +64,9 @@ public class MealReviewResponse {
                                                               .writtenAt(review.getCreatedDate().toLocalDate())
                                                               .content(review.getContent())
                                                               .imageUrls(imageUrls)
-                                                              .menuNames(review.getMeal().getMenuNames())
+                                                              .menuNames(validMenus.stream()
+                                                                                   .map(ValidMenuForViewResponse.MenuDto::getName)
+                                                                                   .toList())
                                                               .likedMenuNames(likedMenuNames);
 
         if (review.getUser() == null) {

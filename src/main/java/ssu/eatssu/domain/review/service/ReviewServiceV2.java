@@ -159,6 +159,8 @@ public class ReviewServiceV2 {
      */
     public SliceResponse<MealReviewResponse> findMealReviewList(Long mealId, Long lastReviewId, Pageable pageable,
                                                                 CustomUserDetails userDetails) {
+
+        Meal meal = mealRepository.findById(mealId).orElseThrow(()->new BaseException(NOT_FOUND_MEAL));
         if (!mealRepository.existsById(mealId)) {
             throw new BaseException(NOT_FOUND_MEAL);
         }
@@ -176,11 +178,23 @@ public class ReviewServiceV2 {
         Page<Review> pageReviews = reviewRepository.findReviewsByMealIds(mealIds, lastReviewId, pageable);
 
         Long userId = (userDetails != null) ? userDetails.getId() : null;
+
+        List<Menu> menus = mealMenuRepository.findMenusByMeal(meal);
+
+        List<ValidMenuForViewResponse.MenuDto> validMenus = menus.stream()
+                                                                 .filter(menu -> !MenuFilterUtil.isExcludedFromReview(
+                                                                         menu.getName()))
+                                                                 .map(menu -> ValidMenuForViewResponse.MenuDto.builder()
+                                                                                                              .menuId(menu.getId())
+                                                                                                              .name(menu.getName())
+                                                                                                              .build())
+                                                                 .collect(Collectors.toList());
+
         List<MealReviewResponse> mealReviewResponses =
                 pageReviews.getContent()
                            .stream()
                            .map(review -> MealReviewResponse.from(review,
-                                                                  userId))
+                                                                  userId,validMenus))
                            .collect(Collectors.toList());
 
         return SliceResponse.<MealReviewResponse>builder()
