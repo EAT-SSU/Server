@@ -6,7 +6,7 @@ name: EAT-SSU Server 개발 & 운영 서버 배포 파이프라인
 
 on:
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "develop" ]
 
 permissions:
   contents: read
