@@ -15,6 +15,9 @@ RUN ./gradlew clean build --no-daemon
 FROM --platform=linux/amd64 openjdk:17-jdk-slim
 WORKDIR /app
 
+# 로그 디렉토리 미리 생성
+RUN mkdir -p /app/logs
+
 # 빌드 단계에서 생성된 JAR 파일 복사 (파일명이 프로젝트에 따라 달라질 수 있으므로 와일드카드 사용)
 COPY --from=builder /home/gradle/project/build/libs/*.jar app.jar
 

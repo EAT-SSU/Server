@@ -1,6 +1,8 @@
 package ssu.eatssu.global.log;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -11,11 +13,15 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Aspect
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class ControllerLogAspect {
+
+    private final ObjectMapper objectMapper;
 
     @Pointcut("within(@org.springframework.web.bind.annotation.RestController *)")
     public void restController() {}
@@ -29,14 +35,32 @@ public class ControllerLogAspect {
         String uri = request.getRequestURI();
         String method = request.getMethod();
 
-        Object[] args = joinPoint.getArgs();
+        String argsJson = Arrays.stream(joinPoint.getArgs())
+                .map(arg -> {
+                    try {
+                        return objectMapper.writeValueAsString(arg);
+                    } catch (Exception e) {
+                        return String.valueOf(arg);
+                    }
+                })
+                .collect(Collectors.joining(", "));
 
-        log.info("REQUEST {} {} args={}", method, uri, Arrays.toString(args));
+        log.info("REQUEST {} {} args=[{}]", method, uri, argsJson);
 
         try {
-            Object result = joinPoint.proceed(); 
+            Object result = joinPoint.proceed();
             long time = System.currentTimeMillis() - start;
-            log.info("RESPONSE {} {} ({} ms) result={}", method, uri, time, result);
+
+            String resultJson;
+            try {
+                resultJson = objectMapper.writeValueAsString(result);
+            } catch (Exception e) {
+                resultJson = String.valueOf(result);
+            }
+
+            resultJson = truncate(resultJson, 200);
+
+            log.info("RESPONSE {} {} ({} ms) result={}", method, uri, time, resultJson);
             return result;
         } catch (Throwable e) {
             long time = System.currentTimeMillis() - start;
@@ -44,4 +68,12 @@ public class ControllerLogAspect {
             throw e;
         }
     }
+
+    private String truncate(String input, int maxLength) {
+        if (input == null) return null;
+        return input.length() <= maxLength
+                ? input
+                : input.substring(0, maxLength) + "...(truncated)";
+    }
 }
+
