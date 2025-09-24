@@ -87,7 +87,7 @@ jobs:
 
       - name: dev 서버 docker-compose.yml 복사
         uses: appleboy/scp-action@master
-        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
+#        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
         with:
           host: ${{ secrets.HOST_DEV }}
           username: ${{ secrets.USERNAME }}
