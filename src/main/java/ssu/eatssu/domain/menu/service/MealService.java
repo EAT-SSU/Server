@@ -39,8 +39,15 @@ public class MealService {
     public MenusInMealResponse getMenusInMealByMealId(Long mealId) {
         Meal meal = mealRepository.findById(mealId)
                                   .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MEAL));
+        List<Menu> menus = meal.getMealMenus().stream()
+                .map(MealMenu::getMenu)
+                .toList();
 
-        return MenusInMealResponse.from(meal);
+        if (menus.isEmpty()) {
+            log.warn("Meal[{}] has no menus.", mealId);
+        }
+
+        return MenusInMealResponse.from(menus);
     }
 
     public List<MealDetailResponse> getMealDetailsByDateAndRestaurantAndTimePart(
