@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  eat-ssu:
+    image: ${DOCKER_REPO}/${IMAGE_NAME}:latest
+    ports:
+      - "9000:9000"
+    environment:
+      - EATSSU_DB_URL=${EATSSU_DB_URL}
+      - EATSSU_DB_USERNAME=${EATSSU_DB_USERNAME}
+      - EATSSU_DB_PASSWORD=${EATSSU_DB_PASSWORD}
+      - EATSSU_JWT_SECRET=${EATSSU_JWT_SECRET}
+      - EATSSU_AWS_ACCESS_KEY=${EATSSU_AWS_ACCESS_KEY}
+      - EATSSU_AWS_SECRET_KEY=${EATSSU_AWS_SECRET_KEY}
+      - EATSSU_SLACK_TOKEN=${EATSSU_SLACK_TOKEN}
+    volumes:
+      - eatssu-data:/app/data
+      - /home/ubuntu/eatssu/logs:/app/logs
+
+volumes:
+  eatssu-data:
