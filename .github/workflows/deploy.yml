@@ -148,8 +148,8 @@ jobs:
             export EATSSU_AWS_SECRET_KEY=${{ secrets.EATSSU_AWS_SECRET_KEY_DEV }}
             export EATSSU_SLACK_TOKEN=${{ secrets.EATSSU_SLACK_TOKEN }}
 
-            sudo docker-compose down
-            sudo docker-compose pull
-            sudo docker-compose up -d --remove-orphans
+            sudo docker compose down
+            sudo docker compose pull
+            sudo docker compose up -d --remove-orphans
             sudo docker image prune -f
       
