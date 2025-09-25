@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.MealMenu;
+import ssu.eatssu.domain.menu.entity.Menu;
 
 import java.util.List;
 
@@ -18,9 +19,8 @@ public class MenusInMealResponse {
     @Schema(description = "식단 속 메뉴 목록", example = "[]")
     private List<BriefMenuResponse> briefMenus;
 
-    public static MenusInMealResponse from(Meal meal) {
-        List<BriefMenuResponse> menusInformation = meal.getMealMenus().stream()
-                                                       .map(MealMenu::getMenu)
+    public static MenusInMealResponse from(List<Menu> menus) {
+        List<BriefMenuResponse> menusInformation =  menus.stream()
                                                        .map(BriefMenuResponse::new)
                                                        .toList();
 

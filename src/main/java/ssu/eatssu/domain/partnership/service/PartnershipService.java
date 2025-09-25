@@ -1,6 +1,8 @@
 package ssu.eatssu.domain.partnership.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
@@ -19,6 +21,7 @@ import ssu.eatssu.domain.user.department.persistence.DepartmentRepository;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
+import ssu.eatssu.global.log.event.LogEvent;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +43,7 @@ public class PartnershipService {
     private final UserRepository userRepository;
     private final PartnershipLikeRepository partnershipLikeRepository;
     private final PartnershipRestaurantRepository partnerShipRestaurantRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void createPartnership(CreatePartnershipRequest request) {
@@ -68,22 +72,30 @@ public class PartnershipService {
     @Transactional
     public void togglePartnershipLike(Long partnershipId, CustomUserDetails userDetails) {
         Partnership partnership = partnershipRepository.findById(partnershipId)
-                                                       .orElseThrow(() -> new BaseException(NOT_FOUND_PARTNERSHIP));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_PARTNERSHIP));
         User user = userRepository.findById(userDetails.getId())
-                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
         PartnershipRestaurant partnershipRestaurant = partnership.getPartnershipRestaurant();
 
-        Optional<PartnershipLike> optionalPartnershipLike = partnershipLikeRepository.findByUserAndPartnershipRestaurant(
-                user,
-                partnershipRestaurant);
+        Optional<PartnershipLike> optionalPartnershipLike =
+                partnershipLikeRepository.findByUserAndPartnershipRestaurant(user, partnershipRestaurant);
+
         if (optionalPartnershipLike.isPresent()) {
             PartnershipLike partnershipLike = optionalPartnershipLike.get();
             partnershipRestaurant.getLikes().remove(partnershipLike);
             partnershipLikeRepository.delete(partnershipLike);
+
+            eventPublisher.publishEvent(LogEvent.of(
+                    String.format("User[%d] canceled like on PartnershipRestaurant[%d]",
+                            user.getId(), partnershipRestaurant.getId())));
         } else {
             PartnershipLike partnershipLike = new PartnershipLike(user, partnershipRestaurant);
             partnershipRestaurant.getLikes().add(partnershipLike);
             partnershipLikeRepository.save(partnershipLike);
+
+            eventPublisher.publishEvent(LogEvent.of(
+                    String.format("User[%d] liked PartnershipRestaurant[%d]",
+                            user.getId(), partnershipRestaurant.getId())));
         }
     }
 

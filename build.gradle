@@ -80,6 +80,7 @@ def generated = 'src/main/generated'
 
 tasks.withType(JavaCompile) {
     options.getGeneratedSourceOutputDirectory().set(file(generated))
+    options.compilerArgs += ['-parameters']
 }
 
 sourceSets {

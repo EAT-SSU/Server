@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 색상 출력 지원 -->
+    <conversionRule conversionWord="clr"
+                    converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+
+    <!-- 로그 형식 설정 예시 :2025-09-25 12:34:56.789 [INFO] [http-nio-9000-ex] [reqId=123e4567] [com.eatssu.api.UserController] - 내용
+    Thread : 동시성 문제 관련 사용, Request : 요청 단위 -->
+    <property name="LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %clr([%level]) [%thread] [reqId=%X{requestId}] %cyan(%logger{36}) - %msg%n"/>
+
+    <!-- 콘솔 출력 (stdout) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 비동기 래핑 -->
+    <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="CONSOLE"/>
+    </appender>
+
+    <!-- Root Logger -->
+    <root level="INFO">
+        <appender-ref ref="ASYNC_CONSOLE"/>
+    </root>
+</configuration>

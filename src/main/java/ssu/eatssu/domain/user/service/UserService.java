@@ -3,6 +3,7 @@ package ssu.eatssu.domain.user.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
+import ssu.eatssu.global.log.event.LogEvent;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,6 +46,7 @@ public class UserService {
     private final DepartmentRepository departmentRepository;
     private final UserProperties userProperties;
     private final CollegeRepository collegeRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public User join(String email, OAuthProvider provider, String providerId) {
         String credentials = createCredentials(provider, providerId);
@@ -61,6 +64,11 @@ public class UserService {
         }
 
         user.updateNickname(request.nickname());
+
+        eventPublisher.publishEvent(LogEvent.of(
+                String.format("User nickname updated: userId=%d, newNickname=%s",
+                        user.getId(), request.nickname()))
+        );
     }
 
     public MyPageResponse findMyPage(CustomUserDetails userDetails) {
@@ -76,6 +84,11 @@ public class UserService {
         user.getReviews().forEach(Review::clearUser);
         user.getUserInquiries().forEach(inquiry -> inquiry.clearUser());
         userRepository.delete(user);
+
+        eventPublisher.publishEvent(LogEvent.of(
+                String.format("User withdrawn: userId=%d",
+                        user.getId())
+        ));
 
         return true;
     }
