@@ -14,7 +14,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.global.log.annotation.LogMask;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -62,7 +66,13 @@ public class ControllerLogAspect {
                     String name = (paramNames != null && i < paramNames.length) ? paramNames[i] : "arg" + i;
                     Object arg = args[i];
                     try {
-                        String value = objectMapper.writeValueAsString(arg);
+                        String value;
+                        if (arg != null) {
+                            Map<String, Object> safeMap = toSafeMap(arg);
+                            value = objectMapper.writeValueAsString(safeMap);
+                        } else {
+                            value = "null";
+                        }
                         if (value.length() > 200) value = value.substring(0, 200) + "...(truncated)";
                         return name + "=" + value;
                     } catch (Exception e) {
@@ -96,5 +106,22 @@ public class ControllerLogAspect {
             log.error("EXCEPTION {} {} ({} ms) cause={}", method, uri, time, e.getMessage(), e);
             throw e;
         }
+    }
+
+    private Map<String, Object> toSafeMap(Object arg) {
+        Map<String, Object> result = new HashMap<>();
+        for (Field field : arg.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(arg);
+                if (field.isAnnotationPresent(LogMask.class)) {
+                    value = "***";
+                }
+                result.put(field.getName(), value);
+            } catch (IllegalAccessException e) {
+                result.put(field.getName(), "ERROR");
+            }
+        }
+        return result;
     }
 }
