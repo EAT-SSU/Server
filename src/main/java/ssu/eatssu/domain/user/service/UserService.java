@@ -86,10 +86,8 @@ public class UserService {
         userRepository.delete(user);
 
         eventPublisher.publishEvent(LogEvent.of(
-                String.format("User withdrawn: userId=%d, email=%s, nickname=%s",
-                        user.getId(),
-                        user.getEmail(),
-                        user.getNickname())
+                String.format("User withdrawn: userId=%d",
+                        user.getId())
         ));
 
         return true;
