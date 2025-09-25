@@ -32,8 +32,12 @@ public class InquiryService {
         Inquiry saved = inquiryRepository.save(inquiry);
 
         eventPublisher.publishEvent(LogEvent.of(String.format(
-                "Inquiry created: id=%d, userId=%d, email=%s, content=%s",
-                saved.getId(), user.getId(), request.getEmail(), request.getContent())));
+                "Inquiry created: id=%d, userId=%d, email=%s, status=%s",
+                saved.getId(),
+                user.getId(),
+                request.getEmail(),
+                saved.getStatus()
+        )));
 
         return saved;
     }

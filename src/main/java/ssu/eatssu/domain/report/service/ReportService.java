@@ -41,8 +41,14 @@ public class ReportService {
         reportRepository.save(report);
 
         eventPublisher.publishEvent(LogEvent.of(
-                String.format("Report created: reportId=%d, reviewId=%d, userId=%d, status=%s",
-                        report.getId(), review.getId(), user.getId(), report.getStatus())
+                String.format(
+                        "Report created: reportId=%d, reviewId=%d, userId=%d, reportType=%s, status=%s",
+                        report.getId(),
+                        report.getReview().getId(),
+                        report.getUser().getId(),
+                        report.getReportType(),
+                        report.getStatus()
+                )
         ));
 
         return report;
