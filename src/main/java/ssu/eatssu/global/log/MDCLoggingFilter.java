@@ -2,7 +2,7 @@ package ssu.eatssu.global.log;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
-import org.jboss.logging.MDC;
+import org.slf4j.MDC;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ public class MDCLoggingFilter implements Filter {
         if (requestId == null) {
             requestId = UUID.randomUUID().toString().replace("-", "");
         }
-        MDC.put("request_id", requestId);
+        MDC.put("requestId", requestId);
         try {
             chain.doFilter(request, response);
         } finally {
