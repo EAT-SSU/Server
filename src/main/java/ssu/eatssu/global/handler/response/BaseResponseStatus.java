@@ -31,6 +31,7 @@ public enum BaseResponseStatus {
     EXISTED_MEAL(false, HttpStatus.BAD_REQUEST, 40011, "이미 존재하는 식단입니다."),
     INVALID_TARGET_TYPE(false, HttpStatus.BAD_REQUEST, 40012, "잘못된 targetType 입니다."),
     MISSING_USER_DEPARTMENT(false, HttpStatus.BAD_REQUEST, 40013, "사용자의 학과 정보가 없습니다."),
+    RECENT_REPORT_ON_REVIEW(false, HttpStatus.BAD_REQUEST, 40014, "24시간 이내에 동일 댓글을 신고했습니다."),
 
     /**
      * 401 UNAUTHORIZED 권한없음(인증 실패)
