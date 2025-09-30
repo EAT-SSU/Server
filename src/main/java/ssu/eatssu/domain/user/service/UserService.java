@@ -131,10 +131,10 @@ public class UserService {
                                            .orElseThrow(() -> new BaseException(VALIDATION_ERROR));
         List<Department> departments = departmentRepository.findByCollege(college);
         return departments.stream().map(department -> GetDepartmentResponse.builder()
-                                                                  .id(department.getId())
-                                                                  .name(department.getName())
-                                                                  .build())
-                       .toList();
+                                                                           .id(department.getId())
+                                                                           .name(department.getName())
+                                                                           .build())
+                          .toList();
     }
 
     private boolean isForbiddenNickname(String nickname) {

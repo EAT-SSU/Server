@@ -33,6 +33,8 @@ public class Menu {
     private final Reviews reviews = new Reviews();
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
     private final List<MealMenu> mealMenus = new ArrayList<>();
+    @Column(name = "unlike_count")
+    private final Integer unlikeCount = 0;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "menu_id")
@@ -44,14 +46,9 @@ public class Menu {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_category_id")
     private MenuCategory category;
-
     private boolean isDiscontinued = false;
-
     @Column(name = "like_count")
     private Integer likeCount = 0;
-
-    @Column(name = "unlike_count")
-    private final Integer unlikeCount = 0;
 
     private Menu(String name, Restaurant restaurant, Integer price, MenuCategory category) {
         this.name = name;

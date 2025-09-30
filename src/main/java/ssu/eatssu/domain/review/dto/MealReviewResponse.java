@@ -43,19 +43,19 @@ public class MealReviewResponse {
     private List<String> imageUrls;
 
     @Schema(description = "메뉴 리스트", example = """
-    [
-      {
-        "menuId": 3143,
-        "name": "생고기제육볶음",
-        "isLike": true
-      },
-      {
-        "menuId": 3144,
-        "name": "오징어초무침",
-        "isLike": false
-      }
-    ]
-    """)
+            [
+              {
+                "menuId": 3143,
+                "name": "생고기제육볶음",
+                "isLike": true
+              },
+              {
+                "menuId": 3144,
+                "name": "오징어초무침",
+                "isLike": false
+              }
+            ]
+            """)
     private List<MenuIdNameLikeDto> menuList;
 
     public static MealReviewResponse from(Review review,
