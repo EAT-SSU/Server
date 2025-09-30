@@ -9,10 +9,10 @@ public record ReportCreateRequest(
         @Schema(description = "신고할 리뷰 id", example = "4")
         Long reviewId,
 
-        @Schema(description = "신고 타입", example = "BAD_WORD")
+        @Schema(description = "신고 타입", example = "NO_ASSOCIATE_CONTENT")
         ReportType reportType,
 
-        @Schema(description = "신고 내용", example = "음란성, 욕설 등 부적절한 내용")
+        @Schema(description = "신고 내용", example = "리뷰 작성 취지에 맞지 않는 내용")
         String content) {
 
 }
