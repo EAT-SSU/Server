@@ -34,7 +34,7 @@ public class Menu {
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
     private final List<MealMenu> mealMenus = new ArrayList<>();
     @Column(name = "unlike_count")
-    private final Integer unlikeCount = 0;
+    private Integer unlikeCount = 0;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "menu_id")

@@ -321,7 +321,6 @@ public class ReviewServiceV2 {
                                             menu.getMenuId(),
                                             menu.getName()
                                     ))
-                                    .filter(Objects::nonNull)
                                     .collect(Collectors.toList()))
                 .totalReviewCount((long) reviews.size())
                 .reviewRatingCount(reviewRatingCount)
