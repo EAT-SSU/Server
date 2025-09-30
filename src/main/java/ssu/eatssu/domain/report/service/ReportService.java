@@ -17,8 +17,9 @@ import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.log.event.LogEvent;
 
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
+import java.time.LocalDateTime;
+
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service
@@ -36,6 +37,10 @@ public class ReportService {
 
         Review review = reviewRepository.findById(request.reviewId())
                 .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
+
+        if(reportRepository.existsRecentReport(user.getId(), review.getId(), LocalDateTime.now().minusHours(24))){
+            throw new BaseException(RECENT_REPORT_ON_REVIEW);
+        }
 
         Report report = Report.create(user, review, request, ReportStatus.PENDING);
         reportRepository.save(report);

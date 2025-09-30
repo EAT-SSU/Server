@@ -39,7 +39,7 @@ public class ReviewDetail {
     private Integer rating;
 
     @Schema(description = "리뷰 작성 날짜(format = yyyy-MM-dd)", example = "2023-04-07")
-    private LocalDate writedAt;
+    private LocalDate writtenAt;
 
     @Schema(description = "리뷰 내용", example = "맛있습니당")
     private String content;
@@ -61,7 +61,7 @@ public class ReviewDetail {
         ReviewDetailBuilder builder = ReviewDetail.builder()
                                                   .reviewId(review.getId())
                                                   .rating(review.getRatings().getMainRating())
-                                                  .writedAt(review.getCreatedDate().toLocalDate())
+                                                  .writtenAt(review.getCreatedDate().toLocalDate())
                                                   .content(review.getContent())
                                                   .imageUrls(imageUrls)
                                                   .menu(new MenuIdNameLikeDto(menu.getId(),menu.getName(),likedMenuIds.contains(menu.getId())));
