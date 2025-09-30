@@ -10,12 +10,13 @@ import java.time.LocalDateTime;
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
     @Query("""
-    SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END
+    SELECT count(r) > 0
     FROM Report r
     WHERE r.user.id = :userId
       AND r.review.id = :reviewId
-      AND r.createdDate >= CURRENT_TIMESTAMP - 1
+      AND r.createdDate >= :threshold
 """)
     boolean existsRecentReport(@Param("userId") Long userId,
-                               @Param("reviewId") Long reviewId);
+                               @Param("reviewId") Long reviewId,
+                               @Param("threshold") LocalDateTime threshold);
 }
