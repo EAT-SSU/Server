@@ -23,6 +23,7 @@ public class MenuFilterUtil {
         }
 
         if (menuName.contains("밥")
+                && !menuName.contains("자장밥")
                 && !menuName.contains("볶음밥")
                 && !menuName.contains("비빔밥")) {
             return true;
