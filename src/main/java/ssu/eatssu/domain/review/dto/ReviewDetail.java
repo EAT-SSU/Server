@@ -32,13 +32,7 @@ public class ReviewDetail {
     private String writerNickname;
 
     @Schema(description = "평점-메인", example = "4")
-    private Integer mainRating;
-
-    @Schema(description = "평점-양", example = "4")
-    private Integer amountRating;
-
-    @Schema(description = "평점-맛", example = "4")
-    private Integer tasteRating;
+    private Integer rating;
 
     @Schema(description = "리뷰 작성 날짜(format = yyyy-MM-dd)", example = "2023-04-07")
     private LocalDate writedAt;
@@ -55,7 +49,7 @@ public class ReviewDetail {
 
         ReviewDetailBuilder builder = ReviewDetail.builder()
                                                   .reviewId(review.getId())
-                                                  .mainRating(review.getRatings().getMainRating())
+                                                  .rating(review.getRatings().getMainRating())
                                                   .writedAt(review.getCreatedDate().toLocalDate())
                                                   .content(review.getContent())
                                                   .imageUrls(imageUrls)
