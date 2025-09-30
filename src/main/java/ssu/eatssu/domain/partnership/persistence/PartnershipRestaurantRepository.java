@@ -8,10 +8,11 @@ import java.util.List;
 
 public interface PartnershipRestaurantRepository extends JpaRepository<PartnershipRestaurant, Long> {
     @Query("""
-            SELECT DISTINCT pr FROM PartnershipRestaurant pr
-            LEFT JOIN FETCH pr.partnerships p
-            LEFT JOIN FETCH p.partnershipCollege
-            LEFT JOIN FETCH p.partnershipDepartment
-            WHERE p.endDate is null or p.endDate >= CURRENT_DATE""")
+        SELECT DISTINCT pr FROM PartnershipRestaurant pr
+        JOIN FETCH pr.partnerships p
+        LEFT JOIN FETCH p.partnershipCollege
+        LEFT JOIN FETCH p.partnershipDepartment
+        WHERE p.endDate IS NULL OR p.endDate >= CURRENT_DATE
+    """)
     List<PartnershipRestaurant> findAllWithDetails();
 }

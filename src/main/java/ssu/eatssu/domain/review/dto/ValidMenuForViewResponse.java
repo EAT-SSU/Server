@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.List;
 @Schema(title = "리뷰에 포함되는 메뉴")
 @AllArgsConstructor
 public class ValidMenuForViewResponse {
-    @Schema(description = "리뷰에 포함되는 메뉴 리스트", example = "[김치볶음밥, 고구마치즈돈까스, 김자반]")
+    @Schema(description = "리뷰에 포함되는 메뉴 리스트")
     private List<MenuDto> menuList;
 
     @Getter

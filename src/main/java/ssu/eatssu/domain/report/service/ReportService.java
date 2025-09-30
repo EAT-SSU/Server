@@ -1,6 +1,7 @@
 package ssu.eatssu.domain.report.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
@@ -14,9 +15,11 @@ import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
+import ssu.eatssu.global.log.event.LogEvent;
 
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
+import java.time.LocalDateTime;
+
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service
@@ -26,17 +29,36 @@ public class ReportService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final ReportRepository reportRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Report reportReview(CustomUserDetails userDetails, ReportCreateRequest request) {
         User user = userRepository.findById(userDetails.getId())
-                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
         Review review = reviewRepository.findById(request.reviewId())
-                                        .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_REVIEW));
+
+        if(reportRepository.existsRecentReport(user.getId(), review.getId(), LocalDateTime.now().minusHours(24))){
+            throw new BaseException(RECENT_REPORT_ON_REVIEW);
+        }
 
         Report report = Report.create(user, review, request, ReportStatus.PENDING);
-        return reportRepository.save(report);
+        reportRepository.save(report);
+
+        eventPublisher.publishEvent(LogEvent.of(
+                String.format(
+                        "Report created: reportId=%d, reviewId=%d, userId=%d, reportType=%s, status=%s",
+                        report.getId(),
+                        report.getReview().getId(),
+                        report.getUser().getId(),
+                        report.getReportType(),
+                        report.getStatus()
+                )
+        ));
+
+        return report;
     }
+
 
     public ReportTypeList getReportType() {
         return ReportTypeList.get();

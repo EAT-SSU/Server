@@ -46,3 +46,7 @@ out/
 .env
 
 /src/main/resources/application-local.yml
+
+### DS File ###
+.DS_Store
+*/.DS_Store

@@ -10,6 +10,7 @@ import ssu.eatssu.domain.review.entity.ReviewMenuLike;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -41,19 +42,41 @@ public class MealReviewResponse {
     @Schema(description = "리뷰 이미지 url 리스트", example = "[\"imgurl1\", \"imgurl2\"]")
     private List<String> imageUrls;
 
-    @Schema(description = "좋아요한 메뉴명 리스트", example = "[\"메뉴1\", \"메뉴2\"]")
-    private List<String> likedMenuNames;
-    @Schema(description = "메뉴명 리스트", example = "['고구마치즈돈까스', '막국수', '미니밥','단무지', '요구르트']")
-    private List<String> menuNames;
+    @Schema(description = "메뉴 리스트", example = """
+            [
+              {
+                "menuId": 3143,
+                "name": "생고기제육볶음",
+                "isLike": true
+              },
+              {
+                "menuId": 3144,
+                "name": "오징어초무침",
+                "isLike": false
+              }
+            ]
+            """)
+    private List<MenuIdNameLikeDto> menuList;
 
-    public static MealReviewResponse from(Review review, Long userId) {
+    public static MealReviewResponse from(Review review,
+                                          Long userId,
+                                          List<ValidMenuForViewResponse.MenuDto> validMenus) {
         List<String> imageUrls = new ArrayList<>();
         review.getReviewImages().forEach(i -> imageUrls.add(i.getImageUrl()));
 
-        List<String> likedMenuNames = review.getMenuLikes().stream()
-                                            .filter(ReviewMenuLike::getIsLike)
-                                            .map(like -> like.getMenu().getName())
-                                            .collect(Collectors.toList());
+        // 좋아요한 메뉴 ID 모음
+        Set<Long> likedMenuIds = review.getMenuLikes().stream()
+                                       .filter(ReviewMenuLike::getIsLike)
+                                       .map(like -> like.getMenu().getId())
+                                       .collect(Collectors.toSet());
+
+        List<MenuIdNameLikeDto> menuNames = validMenus.stream()
+                                                      .map(valid -> new MenuIdNameLikeDto(
+                                                              valid.getMenuId(),
+                                                              valid.getName(),
+                                                              likedMenuIds.contains(valid.getMenuId())
+                                                      ))
+                                                      .toList();
 
         MealReviewResponseBuilder builder = MealReviewResponse.builder()
                                                               .reviewId(review.getId())
@@ -61,8 +84,7 @@ public class MealReviewResponse {
                                                               .writtenAt(review.getCreatedDate().toLocalDate())
                                                               .content(review.getContent())
                                                               .imageUrls(imageUrls)
-                                                              .menuNames(review.getMeal().getMenuNames())
-                                                              .likedMenuNames(likedMenuNames);
+                                                              .menuList(menuNames);
 
         if (review.getUser() == null) {
             return builder.writerId(null)
@@ -82,5 +104,6 @@ public class MealReviewResponse {
                       .writerNickname(review.getUser().getNickname())
                       .isWriter(false)
                       .build();
+
     }
 }
