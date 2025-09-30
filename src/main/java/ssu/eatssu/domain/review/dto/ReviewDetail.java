@@ -31,7 +31,7 @@ public class ReviewDetail {
     @Schema(description = "작성자 닉네임", example = "숭시리시리")
     private String writerNickname;
 
-    @Schema(description = "평점-메인", example = "4")
+    @Schema(description = "평점", example = "4")
     private Integer rating;
 
     @Schema(description = "리뷰 작성 날짜(format = yyyy-MM-dd)", example = "2023-04-07")
