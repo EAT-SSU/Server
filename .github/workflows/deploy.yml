@@ -3,8 +3,6 @@ name: EAT-SSU Server 개발 & 운영 서버 배포 파이프라인
 on:
   push:
     branches: [ "main", "develop", "hotfix/deploy-prod-fail", "hotfix/deploy-dev-fail" ]
-  pull_request:
-    branches: [ "develop" ]
 
 permissions:
   contents: read
@@ -32,7 +30,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: dev 프로필 설정
-#        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
+        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
         run: |
           echo "spring:
             profiles:
@@ -66,7 +64,7 @@ jobs:
           docker push ${{ secrets.DOCKER_REPO }}/eatssu-prod
 
       - name: dev 서버 용 Docker 빌드 및 푸시
-#        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
+        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
         run: |
           docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/eatssu-dev .
           docker push ${{ secrets.DOCKER_REPO }}/eatssu-dev
@@ -101,7 +99,7 @@ jobs:
       - name: dev 서버에 배포
         uses: appleboy/ssh-action@master
         id: deploy-dev
-#        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
+        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
         with:
           host: ${{ secrets.HOST_DEV }}
           username: ${{ secrets.USERNAME }}
@@ -123,4 +121,4 @@ jobs:
             -e EATSSU_AWS_SECRET_KEY_DEV="${{ secrets.EATSSU_AWS_SECRET_KEY_DEV }}" \
             -e EATSSU_SLACK_TOKEN="${{ secrets.EATSSU_SLACK_TOKEN }}" \
             ${{ secrets.DOCKER_REPO }}/eatssu-dev
-#            sudo docker image prune -f
+            sudo docker image prune -f
