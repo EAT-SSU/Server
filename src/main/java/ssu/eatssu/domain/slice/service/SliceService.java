@@ -11,6 +11,7 @@ import ssu.eatssu.domain.menu.entity.constants.MenuType;
 import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.review.dto.ReviewDetail;
+import ssu.eatssu.domain.review.dto.ReviewDetailV1;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
@@ -22,6 +23,7 @@ import ssu.eatssu.global.handler.response.BaseException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
@@ -50,6 +52,31 @@ public class SliceService {
         return convertToMyReviewDetail(sliceReviews);
     }
 
+    public SliceResponse<ReviewDetailV1> findReviewsV1(MenuType menuType,
+                                                       Long menuId,
+                                                       Long mealId,
+                                                       Pageable pageable,
+                                                       Long lastReviewId,
+                                                       CustomUserDetails userDetails) {
+        Slice<Review> sliceReviews = null;
+        if (menuType == MenuType.FIXED) {
+            Menu menu = menuRepository.findById(menuId)
+                                      .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+            sliceReviews = reviewRepository.findAllByMenuOrderByIdDesc(menu, lastReviewId,
+                                                                       pageable);
+        }
+
+        if (menuType == MenuType.VARIABLE) {
+            Meal meal = mealRepository.findById(mealId)
+                                      .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+            sliceReviews = reviewRepository.findAllByMealOrderByIdDesc(meal, lastReviewId,
+                                                                       pageable);
+        }
+
+        Long userId = (userDetails != null) ? userDetails.getId() : null;
+        return convertToReviewDetailV1(sliceReviews, userId);
+    }
+
     public SliceResponse<ReviewDetail> findReviews(MenuType menuType,
                                                    Long menuId,
                                                    Long mealId,
@@ -72,7 +99,22 @@ public class SliceService {
         }
 
         Long userId = (userDetails != null) ? userDetails.getId() : null;
+        assert sliceReviews != null;
         return convertToReviewDetail(sliceReviews, userId);
+    }
+
+    private SliceResponse<ReviewDetailV1> convertToReviewDetailV1(Slice<Review> sliceReviews,
+                                                              Long userId) {
+
+        List<ReviewDetailV1> reviewDetails = sliceReviews.getContent().stream()
+                                                       .map(review -> ReviewDetailV1.from(review, userId))
+                                                       .collect(Collectors.toList());
+
+        return SliceResponse.<ReviewDetailV1>builder()
+                            .numberOfElements(sliceReviews.getNumberOfElements())
+                            .hasNext(sliceReviews.hasNext())
+                            .dataList(reviewDetails)
+                            .build();
     }
 
     private SliceResponse<ReviewDetail> convertToReviewDetail(Slice<Review> sliceReviews,
