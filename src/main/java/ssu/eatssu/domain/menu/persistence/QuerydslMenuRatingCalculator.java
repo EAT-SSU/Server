@@ -27,7 +27,6 @@ public class QuerydslMenuRatingCalculator {
     }
 
 
-
     private BooleanExpression menuIdEq(Long menuId) {
         return menu.id.eq(menuId);
     }

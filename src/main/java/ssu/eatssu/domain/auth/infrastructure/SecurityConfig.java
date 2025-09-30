@@ -14,7 +14,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ssu.eatssu.domain.auth.security.JwtAuthenticationFilter;
 import ssu.eatssu.domain.auth.security.JwtTokenProvider;
-import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.JwtAccessDeniedHandler;
 import ssu.eatssu.global.handler.JwtAuthenticationEntryPoint;
 
