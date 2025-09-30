@@ -123,4 +123,4 @@ jobs:
             -e EATSSU_AWS_SECRET_KEY_DEV="${{ secrets.EATSSU_AWS_SECRET_KEY_DEV }}" \
             -e EATSSU_SLACK_TOKEN="${{ secrets.EATSSU_SLACK_TOKEN }}" \
             ${{ secrets.DOCKER_REPO }}/eatssu-dev
-            sudo docker image prune -f
+#            sudo docker image prune -f
