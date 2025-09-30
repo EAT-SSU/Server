@@ -17,7 +17,7 @@ public class RestaurantReviewResponse {
     private ReviewRatingCount reviewRatingCount;
 
     @Schema(description = "리뷰 평점", example = "4.4")
-    private Double mainRating;
+    private Double rating;
 
     @Schema(description = "좋아요 개수", example = "15")
     private Integer likeCount;

@@ -4,5 +4,5 @@ import lombok.Builder;
 
 @Builder
 public record GetDepartmentResponse(Long id,
-                                   String name) {
+                                    String name) {
 }

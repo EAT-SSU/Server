@@ -18,8 +18,8 @@ public class MealReviewsV2Response implements ReviewInformationResponse {
     @Schema(description = "리뷰 개수", example = "15")
     private Long totalReviewCount;
 
-    @Schema(description = "평점-메인", example = "4.4")
-    private Double mainRating;
+    @Schema(description = "평점", example = "4.4")
+    private Double rating;
 
     @Schema(description = "좋아요 개수", example = "4.4")
     private Integer likeCount;
@@ -31,7 +31,7 @@ public class MealReviewsV2Response implements ReviewInformationResponse {
 
         return MealReviewsV2Response.builder()
                                     .menuList(menuNames)
-                                    .mainRating(ratingAverages.mainRating())
+                                    .rating(ratingAverages.mainRating())
                                     .totalReviewCount(totalReviewCount)
                                     .reviewRatingCount(reviewRatingCount)
                                     .build();

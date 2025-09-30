@@ -172,7 +172,7 @@ public class ReviewServiceV2 {
         return RestaurantReviewResponse.builder()
                                        .totalReviewCount(reviews.size())
                                        .reviewRatingCount(reviewRatingCount)
-                                       .mainRating(Math.round(averageRating * 10) / 10.0)
+                                       .rating(Math.round(averageRating * 10) / 10.0)
                                        .likeCount(likeCount)
                                        .unlikeCount(unlikeCount)
                                        .build();
@@ -222,7 +222,7 @@ public class ReviewServiceV2 {
                 pageReviews.getContent()
                            .stream()
                            .map(review -> MealReviewResponse.from(review,
-                                                                  userId,validMenus))
+                                                                  userId, validMenus))
                            .collect(Collectors.toList());
 
         return SliceResponse.<MealReviewResponse>builder()
@@ -298,7 +298,7 @@ public class ReviewServiceV2 {
                 .menuName(menu.getName())
                 .totalReviewCount((long) reviews.size())
                 .reviewRatingCount(reviewRatingCount)
-                .mainRating(Math.round(averageRating * 10) / 10.0)
+                .rating(Math.round(averageRating * 10) / 10.0)
                 .likeCount(likeCount != null ? likeCount : 0)
                 .build();
     }
@@ -359,16 +359,15 @@ public class ReviewServiceV2 {
         return MealReviewsV2Response
                 .builder()
                 .menuList(validMenus.stream()
-                                .filter(Objects::nonNull)
-                                .map(menu -> new MenuIdNameDto(
-                                        menu.getMenuId(),
-                                        menu.getName()
-                                ))
-                                .filter(Objects::nonNull)
-                                .collect(Collectors.toList()))
+                                    .filter(Objects::nonNull)
+                                    .map(menu -> new MenuIdNameDto(
+                                            menu.getMenuId(),
+                                            menu.getName()
+                                    ))
+                                    .collect(Collectors.toList()))
                 .totalReviewCount((long) reviews.size())
                 .reviewRatingCount(reviewRatingCount)
-                .mainRating(Math.round(averageRating * 10) / 10.0)
+                .rating(Math.round(averageRating * 10) / 10.0)
                 .likeCount(likeCount)
                 .build();
     }

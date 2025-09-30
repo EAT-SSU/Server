@@ -19,19 +19,16 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class College {
+    @OneToMany(mappedBy = "college", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Department> departments = new ArrayList<>();
+    @OneToMany(mappedBy = "partnershipCollege", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Partnership> partnerships = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "college_id")
     private Long id;
-
     @Column(nullable = false, unique = true)
     private String name;
-
-    @OneToMany(mappedBy = "college", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<Department> departments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "partnershipCollege", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<Partnership> partnerships = new ArrayList<>();
 
     public College(String name) {
         this.name = name;
