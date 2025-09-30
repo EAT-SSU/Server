@@ -64,4 +64,10 @@ public class Meal {
     public void addMealMenu(MealMenu mealMenu) {
         mealMenus.add(mealMenu);
     }
+
+    public List<Menu> getMenus() {
+        return mealMenus.stream()
+                        .map(MealMenu::getMenu)
+                        .toList();
+    }
 }
