@@ -33,6 +33,7 @@ import ssu.eatssu.domain.review.dto.MealReviewsResponse;
 import ssu.eatssu.domain.review.dto.MenuReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewCreateRequest;
 import ssu.eatssu.domain.review.dto.ReviewDetail;
+import ssu.eatssu.domain.review.dto.ReviewDetailV1;
 import ssu.eatssu.domain.review.dto.ReviewUpdateRequest;
 import ssu.eatssu.domain.review.dto.SavedReviewImage;
 import ssu.eatssu.domain.review.dto.UploadReviewRequest;
@@ -66,7 +67,7 @@ public class ReviewController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("")
-    public BaseResponse<SliceResponse<ReviewDetail>> getReviews(
+    public BaseResponse<SliceResponse<ReviewDetailV1>> getReviews(
             @Parameter(description = "타입(변동메뉴(식단)/고정메뉴)") @RequestParam("menuType") MenuType menuType,
             @Parameter(description = "menuId(고정메뉴)") @RequestParam(value = "menuId", required = false) Long menuId,
             @Parameter(description = "mealId(변동메뉴)") @RequestParam(value = "mealId", required = false) Long mealId,
@@ -74,7 +75,7 @@ public class ReviewController {
             @RequestParam(value = "lastReviewId", required = false) Long lastReviewId,
             @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        SliceResponse<ReviewDetail> myReviews = sliceService.findReviews(menuType, menuId, mealId,
+        SliceResponse<ReviewDetailV1> myReviews = sliceService.findReviewsV1(menuType, menuId, mealId,
                                                                          pageable, lastReviewId, customUserDetails);
 
         return BaseResponse.success(myReviews);

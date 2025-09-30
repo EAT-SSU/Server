@@ -20,6 +20,10 @@ public class CreateMenuReviewRequest {
     private Long menuId;
     @Schema(description = "평점-메인", example = "4")
     private Integer mainRating;
+    @Schema(description = "평점-맛", example = "4")
+    private Integer amountRating;
+    @Schema(description = "평점-양", example = "4")
+    private Integer tasteRating;
     @Max(150)
     @Schema(description = "한줄평", example = "맛있어용")
     private String content;
@@ -29,7 +33,7 @@ public class CreateMenuReviewRequest {
     private MenuLikeRequest menuLike;
 
     public Review toReviewEntity(User user, Menu menu) {
-        Ratings ratings = Ratings.of(this.mainRating);
+        Ratings ratings = Ratings.of(this.mainRating,this.amountRating,this.tasteRating);
         return Review.builder()
                      .user(user)
                      .content(this.content)
