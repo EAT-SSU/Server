@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.PageRequest;
@@ -56,7 +57,7 @@ public class ReviewControllerV2 {
     })
     @PostMapping("/meal")
     public BaseResponse<?> createMealReview(
-            @RequestBody CreateMealReviewRequest createMealReviewRequest,
+            @Valid @RequestBody CreateMealReviewRequest createMealReviewRequest,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         reviewServiceV2.createMealReview(customUserDetails, createMealReviewRequest);
         return BaseResponse.success();
@@ -205,7 +206,7 @@ public class ReviewControllerV2 {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
     @PostMapping("/menu")
-    public BaseResponse<?> createMenuReview(@RequestBody CreateMenuReviewRequest createMenuReviewRequest,
+    public BaseResponse<?> createMenuReview(@Valid @RequestBody CreateMenuReviewRequest createMenuReviewRequest,
                                             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         reviewServiceV2.createMenuReview(customUserDetails, createMenuReviewRequest);
         return BaseResponse.success();
