@@ -1,5 +1,6 @@
 package ssu.eatssu.domain.review.utils;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -19,27 +20,16 @@ public class MenuFilterUtil {
         if (menuName == null || menuName.isBlank()) return true;
         menuName = menuName.trim();
 
-        // 여러 메뉴가 한 줄에 있을 수 있으니 split
         String[] items = menuName.split("[+,&/\\s]+");
 
-        boolean allExcluded = true;
-        for (String item : items) {
-            String trimmed = item.trim();
-            if (trimmed.isBlank()) continue;
-
-            if (!isExcludedSingle(trimmed)) {
-                allExcluded = false;
-                break;
-            }
-        }
-
-        return allExcluded;
+        return Arrays.stream(items)
+                     .map(String::trim)
+                     .filter(s -> !s.isBlank())
+                     .allMatch(MenuFilterUtil::isExcludedSingle);
     }
 
     private static boolean isExcludedSingle(String name) {
-        for (String keyword : EXCLUDED_KEYWORDS) {
-            if (name.equals(keyword)) return true;
-        }
+        if (EXCLUDED_KEYWORDS.contains(name)) return true;
 
         if (SINGLE_KIMCHI_PATTERN.matcher(name).find()) return true;
         if (SINGLE_BAP_PATTERN.matcher(name).find()) return true;
