@@ -7,11 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.review.entity.Review;
-import ssu.eatssu.domain.review.entity.ReviewImage;
 import ssu.eatssu.domain.user.entity.User;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Schema(title = "menu에 대한 리뷰 작성 (리뷰v2)")
 @Getter
@@ -37,10 +35,5 @@ public class CreateMenuReviewRequestV2 {
                      .content(content)
                      .rating(rating)
                      .build();
-    }
-    public List<ReviewImage> createReviewImages(Review review) {
-        return imageUrls.stream()
-                        .map(imageUrl -> new ReviewImage(review, imageUrl))
-                        .collect(Collectors.toList());
     }
 }

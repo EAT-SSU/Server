@@ -16,7 +16,6 @@ import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
-import ssu.eatssu.domain.review.dto.CreateMenuReviewRequest;
 import ssu.eatssu.domain.review.dto.CreateMenuReviewRequestV2;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
@@ -29,7 +28,6 @@ import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.ValidMenuForViewResponse;
 import ssu.eatssu.domain.review.entity.Review;
-import ssu.eatssu.domain.review.entity.ReviewImage;
 import ssu.eatssu.domain.review.repository.ReviewImageRepository;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.review.utils.MenuFilterUtil;
@@ -119,11 +117,11 @@ public class ReviewServiceV2 {
 
         eventPublisher.publishEvent(LogEvent.of(
                 String.format("MenuReview created: reviewId=%d, menuId=%d, userId=%d, isLike=%s, imageUrl=%s",
-                        review.getId(),
-                        menu.getId(),
-                        user.getId(),
-                        request.getMenuLike(),
-                        request.getImageUrls().size())
+                              review.getId(),
+                              menu.getId(),
+                              user.getId(),
+                              request.getMenuLike().getIsLike(),
+                              request.getImageUrls().size())
         ));
     }
 
