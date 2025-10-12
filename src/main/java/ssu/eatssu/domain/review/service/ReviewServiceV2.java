@@ -17,6 +17,7 @@ import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.CreateMenuReviewRequest;
+import ssu.eatssu.domain.review.dto.CreateMenuReviewRequestV2;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuIdNameDto;
@@ -101,19 +102,18 @@ public class ReviewServiceV2 {
      * menu에 대한 리뷰 작성
      */
     @Transactional
-    public void createMenuReview(CustomUserDetails userDetails, CreateMenuReviewRequest request) {
+    public void createMenuReview(CustomUserDetails userDetails, CreateMenuReviewRequestV2 request) {
         User user = userRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-        Menu menu = menuRepository.findById(request.getMenuId())
+        Menu menu = menuRepository.findById(request.getMenuLike().getMenuId())
                 .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
 
         Review review = request.toReviewEntity(user, menu);
         review.addReviewMenuLike(menu, request.getMenuLike().getIsLike());
+        request.getImageUrls().forEach(review::addReviewImage);
         reviewRepository.save(review);
 
-        ReviewImage reviewImage = new ReviewImage(review, request.getImageUrl());
-        reviewImageRepository.save(reviewImage);
 
         menu.addReview(review);
 
@@ -122,8 +122,8 @@ public class ReviewServiceV2 {
                         review.getId(),
                         menu.getId(),
                         user.getId(),
-                        request.getMenuLike().getIsLike(),
-                        request.getImageUrl())
+                        request.getMenuLike(),
+                        request.getImageUrls().size())
         ));
     }
 
