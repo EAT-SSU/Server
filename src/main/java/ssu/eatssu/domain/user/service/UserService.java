@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.domain.auth.util.RandomNicknameUtil;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.config.UserProperties;
 import ssu.eatssu.domain.user.department.entity.College;
@@ -47,10 +48,11 @@ public class UserService {
     private final UserProperties userProperties;
     private final CollegeRepository collegeRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final RandomNicknameUtil randomNicknameUtil;
 
     public User join(String email, OAuthProvider provider, String providerId) {
         String credentials = createCredentials(provider, providerId);
-        String nickname = createNickname();
+        String nickname = randomNicknameUtil.generate();
         User user = User.create(email, nickname, provider, providerId, credentials);
         return userRepository.save(user);
     }
@@ -102,12 +104,6 @@ public class UserService {
             return false;
         }
         return !userRepository.existsByNickname(nickname);
-    }
-
-    public String createNickname() {
-        String uuid = UUID.randomUUID().toString();
-        String shortUUID = uuid.substring(0, 4);
-        return "user-" + shortUUID;
     }
 
     private String createCredentials(OAuthProvider provider, String providerId) {
