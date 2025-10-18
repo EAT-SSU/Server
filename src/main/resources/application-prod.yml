@@ -63,7 +63,7 @@ slack:
 
 #Swagger
 swagger:
-  url: https://eat-ssu.store
+  url: https://eat-ssu.tech
   description: Prod-Server url
 
 springdoc:
