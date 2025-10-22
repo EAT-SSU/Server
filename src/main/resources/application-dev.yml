@@ -63,7 +63,7 @@ slack:
 
 #Swagger
 swagger:
-  url: https://dev.eat-ssu.store
+  url: ${EATSSU_DEV_DOMAIN}
   description: Test Server Swagger API
 
 springdoc:
