@@ -1,5 +1,12 @@
 package ssu.eatssu.domain.review.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -23,11 +30,10 @@ import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.user.entity.BaseTimeEntity;
 import ssu.eatssu.domain.user.entity.User;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+/*
+*  251001 이정민
+* 해당 엔티티의 rating은 reviewV1, reviewV2 api의 유지를 위해 지우지 마셔야 합니다.
+* */
 @Entity
 @Getter
 @Setter
@@ -40,13 +46,12 @@ public class Review extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
     private Long id;
-    @Column(length = 300)
-    private String content;
 
-    // TODO : 삭제되어야 함
+    private String content;
     @Embedded
     private Ratings ratings;
 
+    // v2용 rating
     private Integer rating;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -70,13 +75,13 @@ public class Review extends BaseTimeEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewMenuLike> menuLikes = new ArrayList<>();
 
-    // @TODO: 리뷰v2 배포 이후 제거 해야함
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewLike> reviewLikes = new ArrayList<>();
 
-    public void update(String content, Integer mainRate) {
+    public void update(String content, Integer mainRate, Integer amountRate, Integer tasteRate) {
         this.content = content;
-        this.ratings = Ratings.of(mainRate);
+        this.rating = mainRate;
+        this.ratings = Ratings.of(mainRate, amountRate, tasteRate);
     }
 
     // TODO : this.user가 null이면?
@@ -99,14 +104,6 @@ public class Review extends BaseTimeEntity {
 
         if (isLike) {
             menu.increaseLikeCount();
-        }
-    }
-
-    public void removeReviewMenuLike(ReviewMenuLike reviewMenuLike) {
-        this.menuLikes.remove(reviewMenuLike);
-
-        if (reviewMenuLike.getIsLike()) {
-            reviewMenuLike.getMenu().decreaseLikeCount();
         }
     }
 

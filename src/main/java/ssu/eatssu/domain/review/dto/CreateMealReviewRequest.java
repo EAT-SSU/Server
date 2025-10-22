@@ -1,6 +1,8 @@
 package ssu.eatssu.domain.review.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ssu.eatssu.domain.menu.entity.Meal;
@@ -18,6 +20,8 @@ public class CreateMealReviewRequest {
     @Schema(description = "식단 식별자", example = "123")
     private Long mealId;
     @Schema(description = "평점", example = "4")
+    @Min(1)
+    @Max(5)
     private Integer rating;
     private List<MenuLikeRequest> menuLikes;
     @Schema(description = "한줄평", example = "맛있어용")
