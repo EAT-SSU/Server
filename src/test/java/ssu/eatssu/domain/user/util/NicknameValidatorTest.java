@@ -1,13 +1,9 @@
 package ssu.eatssu.domain.user.util;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import ssu.eatssu.domain.user.config.UserProperties;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
-
-import java.util.regex.Pattern;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -44,7 +40,7 @@ class NicknameValidatorTest {
         assertThatThrownBy(()->nicknameValidator.validateNickname(input))
                 .isInstanceOf(BaseException.class)
                 .extracting("status")
-                .isEqualTo(BaseResponseStatus.ADMIN_MANGER_NICKNAME);
+                .isEqualTo(BaseResponseStatus.ADMIN_MANAGER_NICKNAME);
     }
 
     @ParameterizedTest

@@ -2,7 +2,6 @@ package ssu.eatssu.domain.user.util;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ssu.eatssu.domain.user.config.UserProperties;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
@@ -73,14 +72,14 @@ public class NicknameValidator {
         }
 
         // 서비스 브랜드명 포함 닉네임
-        if(SERVICE_NAME_BRAND.contains(nickname)){
+        if(SERVICE_NAME_BRAND.stream().anyMatch(nickname::equalsIgnoreCase)){
             throw new BaseException(BaseResponseStatus.SERVICE_BRAND_NICKNAME);
         }
 
         // 운영자, 관리자 혼동 닉네임
         if (ADMIN_LIKE_WORDS.stream()
                 .anyMatch(word -> nickname.toLowerCase().contains(word.toLowerCase()))) {
-            throw new BaseException(BaseResponseStatus.ADMIN_MANGER_NICKNAME);
+            throw new BaseException(BaseResponseStatus.ADMIN_MANAGER_NICKNAME);
         }
 
         // 부적절한 길이
