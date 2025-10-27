@@ -11,7 +11,27 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class NicknameValidatorTest {
 
-    private NicknameValidator nicknameValidator = new NicknameValidator(new UserProperties());
+    private NicknameValidator nicknameValidator = new NicknameValidator();
+
+    @ParameterizedTest
+    @ValueSource(strings = {"잇슈","EAT-SSU","eatssu"})
+    void 단독으로_브랜드명_사용_시_예외가_발생한다(String input) {
+        // when & then
+        assertThatThrownBy(()->nicknameValidator.validateNickname(input))
+                .isInstanceOf(BaseException.class)
+                .extracting("status")
+                .isEqualTo(BaseResponseStatus.SERVICE_BRAND_NICKNAME);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"이슈 운영자","서버 관리자","admin입니다"})
+    void 관리자로_혼동될_수_있는_단어를_포함하면_예외가_발생한다(String input) {
+        // when & then
+        assertThatThrownBy(()->nicknameValidator.validateNickname(input))
+                .isInstanceOf(BaseException.class)
+                .extracting("status")
+                .isEqualTo(BaseResponseStatus.ADMIN_MANGER_NICKNAME);
+    }
 
     @ParameterizedTest
     @ValueSource(strings = {"유효한 닉네임","available nic","가능한-닉네임","유-효-한-닉-네-임","유 효 한 닉 1 2 a"})

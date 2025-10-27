@@ -6,18 +6,34 @@ import ssu.eatssu.domain.user.config.UserProperties;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
+import java.util.Set;
+
 @Component
 @RequiredArgsConstructor
 public class NicknameValidator {
 
-    private final UserProperties userProperties;
+    private static final Set<String> SERVICE_NAME_BRAND = Set.of(
+            "EAT-SSU", "EATSSU", "잇슈", "읻슈", "잍슈", "잇쓔", "잇쓲", "잇씨유", "잇슈우", "잇슈웅",
+            "eat-ssu", "eatssu", "eatsu", "e4tssu", "3at-ssu", "ea7-ssu", "e @t-ssu", "e.at.ssu", "e-a-t-s-s-u", "e_a_t_s_s_u",
+            "e a t ssu", "eat_ssu", "eatssu_", "eatssu123", "e @tssu", "ēat-ssu", "3atssu", "eat$u", "eat5su", "eats$u",
+            "eats-u", "E4T슈"
+    );
+
+    private static final Set<String> ADMIN_LIKE_WORDS = Set.of(
+            "admin", "manager", "운영자", "관리자", "system"
+    );
 
     public void validateNickname(String nickname){
 
-        // 금지된 닉네임
-        if(userProperties.getForbiddenNicknames().stream()
-                .anyMatch(forbidden -> forbidden.equalsIgnoreCase(nickname))){
-            throw new BaseException(BaseResponseStatus.FORBIDDEN_NICKNAME);
+        // 서비스 브랜드명 포함 닉네임
+        if(SERVICE_NAME_BRAND.contains(nickname)){
+            throw new BaseException(BaseResponseStatus.SERVICE_BRAND_NICKNAME);
+        }
+
+        // 운영자, 관리자 혼동 닉네임
+        if (ADMIN_LIKE_WORDS.stream()
+                .anyMatch(word -> nickname.toLowerCase().contains(word.toLowerCase()))) {
+            throw new BaseException(BaseResponseStatus.ADMIN_MANGER_NICKNAME);
         }
 
         // 부적절한 길이
