@@ -43,7 +43,9 @@ public enum BaseResponseStatus {
     INVALID_END_OF_NICKNAME(false,HttpStatus.BAD_REQUEST,40019,"마지막 글자는 한글, 영문, 숫자만 사용할 수 있습니다."),
     INVALID_SYMBOL_NICKNAME(false,HttpStatus.BAD_REQUEST,40020,"한글, 영문, 숫자, 공백, 하이폰(-)만 사용할 수 있습니다."),
     INVALID_NICKNAME_LENGTH(false,HttpStatus.BAD_REQUEST,40021,"닉네임은 1자 이상 16자 이하로 입력해 주세요."),
-    FORBIDDEN_NICKNAME(false,HttpStatus.BAD_REQUEST,40022,"금지된 닉네임입니다. ex) EAT-SSU, 이슈, 잇슈"),
+    SERVICE_BRAND_NICKNAME(false,HttpStatus.BAD_REQUEST,40022,"서비스명/브랜드명 단독 닉네임은 사용할 수 없어요. ex) EAT-SSU, 이슈, 잇슈"),
+    ADMIN_MANAGER_NICKNAME(false,HttpStatus.BAD_REQUEST,40023,"관리자로 혼동될 수 있는 닉네임은 사용할 수 없어요. ex) admin, 운영자"),
+    PROFANITY_NICKNAME(false,HttpStatus.BAD_REQUEST,40024,"욕설, 비속어 등의 표현이 포함된 닉네임은 사용할 수 없어요."),
 
     /**
      * 401 UNAUTHORIZED 권한없음(인증 실패)
