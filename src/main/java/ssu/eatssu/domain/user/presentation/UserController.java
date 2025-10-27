@@ -67,17 +67,17 @@ public class UserController {
         return BaseResponse.success(userService.validateDuplicatedEmail(email));
     }
 
-    @Operation(summary = "닉네임 중복 체크", description = """
-            닉네임 중복 체크 API 입니다.<br><br>
-            중복되지 않은 닉네임이면 true 를 반환합니다
+    @Operation(summary = "닉네임 중복 및 유효성 체크", description = """
+            닉네임 중복 및 유효성 체크 API 입니다.<br><br>
+            유효하고 중복되지 않은 닉네임이면 true 를 반환합니다
             """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "중복되지 않은 닉네임")
+            @ApiResponse(responseCode = "200", description = "유효하고 중복되지 않은 닉네임")
     })
     @GetMapping("/validate/nickname")
-    public BaseResponse<Boolean> validateDuplicatedNickname(@Parameter(description = "닉네임")
+    public BaseResponse<Boolean> validateNickname(@Parameter(description = "닉네임")
                                                             @RequestParam(value = "nickname") String nickname) {
-        return BaseResponse.success(userService.validateDuplicatedNickname(nickname));
+        return BaseResponse.success(userService.validateNickname(nickname));
     }
 
     @Operation(summary = "닉네임 수정", description = "닉네임 수정 API 입니다.")

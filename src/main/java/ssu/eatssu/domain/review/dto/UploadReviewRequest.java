@@ -2,6 +2,7 @@ package ssu.eatssu.domain.review.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ public class UploadReviewRequest {
     @Schema(description = "평점-양", example = "4")
     private Integer amountRating;
 
-    @Max(150)
+    @Size(max = 150)
     @Schema(description = "한줄평", example = "맛있어용")
     private String content;
 

@@ -33,17 +33,22 @@ public class SlackMessageFormat {
                         - 리뷰 작성자 ID : {3}
                         - 리뷰 작성자 닉네임 : {4}
                         - 리뷰 메뉴: {5}
-                        - 리뷰 내용: {6}
-                        - 리뷰 날짜: {7}
+                        - 리뷰 식단 ID: {6}
+                        - 리뷰 내용: {7}
+                        - 리뷰 날짜: {8}
                         *신고 INFO*
-                        - 신고사유: {8}
-                        - 신고내용: {9}
-                        - 신고 날짜: {10}
+                        - 신고사유: {9}
+                        - 신고내용: {10}
+                        - 신고 날짜: {11}
                         ===================
                         """
         );
+
+        String menuName = review.getMenu() != null ? review.getMenu().getName() : "";
+        String mealId = review.getMeal() != null ? String.valueOf(review.getMeal().getId()) : "";
+
         Object[] args = {reporter.getId(), reporter.getNickname(), review.getId(), review.getUser().getId(),
-                review.getUser().getNickname(), review.getMenu().getName(), review.getContent(),
+                review.getUser().getNickname(), menuName, mealId, review.getContent(),
                 review.getModifiedDate().toString(), report.getReportType().getDescription(), report.getContent(),
                 report.getCreatedDate()};
         return messageFormat.format(args);
