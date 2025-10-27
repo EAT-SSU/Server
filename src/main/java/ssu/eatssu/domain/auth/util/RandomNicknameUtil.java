@@ -40,9 +40,6 @@ public class RandomNicknameUtil {
         String prefix = PREFIX[random.nextInt(PREFIX.length)];
         String category = MENU_NAME[random.nextInt(MENU_NAME.length)];
 
-        int randomNumber = ThreadLocalRandom.current().nextInt(1000, 10000);
-        String uuidPart = String.valueOf(randomNumber);
-
-        return prefix + "-" + category + "-" + uuidPart;
+        return prefix + category;
     }
 }
