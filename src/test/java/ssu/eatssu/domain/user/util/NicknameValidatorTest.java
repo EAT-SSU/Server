@@ -1,10 +1,13 @@
 package ssu.eatssu.domain.user.util;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import ssu.eatssu.domain.user.config.UserProperties;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
+
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -12,6 +15,17 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 class NicknameValidatorTest {
 
     private NicknameValidator nicknameValidator = new NicknameValidator();
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ㅅㅂ","뻐킹","미친사람"})
+    void 비속어_포함_시_예외가_발생한다(String input) {
+        // when & then
+        assertThatThrownBy(()->nicknameValidator.validateNickname(input))
+                .isInstanceOf(BaseException.class)
+                .extracting("status")
+                .isEqualTo(BaseResponseStatus.PROFANITY_NICKNAME);
+    }
+
 
     @ParameterizedTest
     @ValueSource(strings = {"잇슈","EAT-SSU","eatssu"})
