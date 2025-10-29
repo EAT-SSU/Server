@@ -12,16 +12,21 @@ import ssu.eatssu.domain.menu.persistence.MealMenuRepository;
 import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.presentation.dto.request.CreateMealRequest;
 import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateWithPriceRequest;
+import ssu.eatssu.domain.menu.presentation.dto.response.MealAvgDto;
 import ssu.eatssu.domain.menu.presentation.dto.response.MealDetailResponse;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenusInMealResponse;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
+import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_SUPPORT_RESTAURANT;
 
@@ -34,6 +39,7 @@ public class MealService {
     private final MealRepository mealRepository;
     private final MealMenuRepository mealMenuRepository;
     private final MealRatingService mealRatingService;
+    private final ReviewRepository reviewRepository;
     private final MenuService menuService;
 
     public MenusInMealResponse getMenusInMealByMealId(Long mealId) {
@@ -57,9 +63,19 @@ public class MealService {
 
         List<Meal> meals = findMealsByDateAndTimePartAndRestaurant(date, timePart, restaurant);
 
+        if (meals.isEmpty()) return Collections.emptyList();
+
+        List<Long> mealIds = meals.stream().map(Meal::getId).toList();
+        Map<Long, Double> avgMap = reviewRepository.findAvgRatingsByMealIds(mealIds).stream()
+                                                   .collect(Collectors.toMap(MealAvgDto::getMealId,
+                                                                             MealAvgDto::getAvgRating));
+
         return meals.stream()
-                    .map(meal -> MealDetailResponse.from(meal,
-                                                         mealRatingService.getMainRatingAverage(meal.getId())))
+                    .map(meal -> {
+                        double rating = avgMap.getOrDefault(meal.getId(), 0.0);
+                        rating = Math.round(rating * 100) / 100.0;
+                        return MealDetailResponse.from(meal, rating);
+                    })
                     .toList();
     }
 

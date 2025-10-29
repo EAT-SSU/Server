@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.menu.presentation.dto.response.MealAvgDto;
 import ssu.eatssu.domain.review.entity.Review;
 
 import java.util.Collection;
@@ -31,4 +32,15 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
     Page<Review> findReviewsByMealIds(@Param("mealIds") List<Long> mealIds,
                                       @Param("lastReviewId") Long lastReviewId,
                                       Pageable pageable);
+
+    @Query("""
+                select m.id as mealId,
+                       coalesce(avg(coalesce(r.ratings.mainRating, r.rating)), 0)
+                       as avgRating
+                from Meal m
+                left join Review r on r.meal = m
+                where m.id in :mealIds
+                group by m.id
+            """)
+    List<MealAvgDto> findAvgRatingsByMealIds(@Param("mealIds") List<Long> mealIds);
 }
