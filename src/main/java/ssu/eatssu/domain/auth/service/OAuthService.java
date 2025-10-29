@@ -13,6 +13,7 @@ import ssu.eatssu.domain.auth.dto.ValidRequest;
 import ssu.eatssu.domain.auth.entity.AppleAuthenticator;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.JwtTokenProvider;
+import ssu.eatssu.domain.auth.util.RandomNicknameUtil;
 import ssu.eatssu.domain.user.dto.Tokens;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
@@ -27,8 +28,6 @@ import static ssu.eatssu.domain.auth.entity.OAuthProvider.KAKAO;
 @RequiredArgsConstructor
 public class OAuthService {
 
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String BEARER_TYPE = "Bearer";
     private final UserService userService;
     private final UserRepository userRepository;
     private final AppleAuthenticator appleAuthenticator;

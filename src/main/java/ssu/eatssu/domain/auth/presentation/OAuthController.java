@@ -54,8 +54,7 @@ public class OAuthController {
             가입된 회원일 경우 카카오 로그인, 미가입 회원일 경우 회원가입 후 자동 로그인됩니다.
             """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "애플 회원가입/로그인 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+            @ApiResponse(responseCode = "200", description = "애플 회원가입/로그인 성공")
     })
     @PostMapping("/apple")
     public BaseResponse<Tokens> appleLogin(@Valid @RequestBody AppleLoginRequest request) {

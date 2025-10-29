@@ -29,6 +29,7 @@ import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.CreateMenuReviewRequest;
+import ssu.eatssu.domain.review.dto.CreateMenuReviewRequestV2;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
@@ -206,9 +207,9 @@ public class ReviewControllerV2 {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
     })
     @PostMapping("/menu")
-    public BaseResponse<?> createMenuReview(@Valid @RequestBody CreateMenuReviewRequest createMenuReviewRequest,
+    public BaseResponse<?> createMenuReview(@Valid @RequestBody CreateMenuReviewRequestV2 createMenuReviewRequestV2,
                                             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        reviewServiceV2.createMenuReview(customUserDetails, createMenuReviewRequest);
+        reviewServiceV2.createMenuReview(customUserDetails, createMenuReviewRequestV2);
         return BaseResponse.success();
     }
 

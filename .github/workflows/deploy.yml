@@ -93,6 +93,7 @@ jobs:
             -e EATSSU_AWS_ACCESS_KEY_PROD="${{ secrets.EATSSU_AWS_ACCESS_KEY_PROD }}" \
             -e EATSSU_AWS_SECRET_KEY_PROD="${{ secrets.EATSSU_AWS_SECRET_KEY_PROD }}" \
             -e EATSSU_SLACK_TOKEN="${{ secrets.EATSSU_SLACK_TOKEN }}" \
+            -e EATSSU_PROD_DOMAIN="${{ secrets.EATSSU_PROD_DOMAIN }}" \
             ${{ secrets.DOCKER_REPO }}/eatssu-prod
             sudo docker image prune -f
 
@@ -120,5 +121,6 @@ jobs:
             -e EATSSU_AWS_ACCESS_KEY_DEV="${{ secrets.EATSSU_AWS_ACCESS_KEY_DEV }}" \
             -e EATSSU_AWS_SECRET_KEY_DEV="${{ secrets.EATSSU_AWS_SECRET_KEY_DEV }}" \
             -e EATSSU_SLACK_TOKEN="${{ secrets.EATSSU_SLACK_TOKEN }}" \
+            -e EATSSU_DEV_DOMAIN="${{ secrets.EATSSU_DEV_DOMAIN }}" \
             ${{ secrets.DOCKER_REPO }}/eatssu-dev
             sudo docker image prune -f
