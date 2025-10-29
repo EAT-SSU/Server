@@ -26,8 +26,7 @@ import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -68,7 +67,7 @@ public class SliceService {
 
         if (menuType == MenuType.VARIABLE) {
             Meal meal = mealRepository.findById(mealId)
-                                      .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
+                                      .orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
             sliceReviews = reviewRepository.findAllByMealOrderByIdDesc(meal, lastReviewId,
                                                                        pageable);
         }
