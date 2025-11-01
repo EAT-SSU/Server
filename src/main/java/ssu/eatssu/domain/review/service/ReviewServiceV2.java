@@ -14,6 +14,7 @@ import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.persistence.MealMenuRepository;
 import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
+import ssu.eatssu.domain.menu.service.MealRatingService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.CreateMenuReviewRequestV2;
@@ -62,6 +63,8 @@ public class ReviewServiceV2 {
     private final MealMenuRepository mealMenuRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final ApplicationEventPublisher eventPublisher;
+
+    private final MealRatingService mealRatingService;
 
     /**
      * meal에 대한 리뷰 생성
@@ -215,12 +218,11 @@ public class ReviewServiceV2 {
 
         Long userId = (userDetails != null) ? userDetails.getId() : null;
 
-
         List<MealReviewResponse> mealReviewResponses =
                 pageReviews.getContent()
                            .stream()
                            .map(review -> MealReviewResponse.from(review,
-                                                                  userId, validMenus))
+                                                                  userId, validMenus,mealRatingService.getMainRatingAverage(review.getMeal().getId())))
                            .collect(Collectors.toList());
 
         return SliceResponse.<MealReviewResponse>builder()
@@ -325,18 +327,7 @@ public class ReviewServiceV2 {
             log.warn("No valid menus for review found in mealId={}", mealId);
         }
 
-        Double averageRating = Optional.ofNullable(reviews)
-                                       .orElse(Collections.emptyList())
-                                       .stream()
-                                       .map(r -> {
-                                           Integer main = (r.getRatings() != null) ? r.getRatings()
-                                                                                      .getMainRating() : null;
-                                           return (main != null) ? main : r.getRating();
-                                       })
-                                       .filter(Objects::nonNull)
-                                       .mapToInt(Integer::intValue)
-                                       .average()
-                                       .orElse(0.0);
+        Double averageRating = mealRatingService.getMainRatingAverage(meal.getId());
 
         if (!reviews.isEmpty() && averageRating == 0.0) {
             log.warn("All reviews have null/invalid ratings for mealId={}", mealId);
