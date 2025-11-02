@@ -103,17 +103,17 @@ public class NicknameValidator {
         }
 
         // 한글 영어가 아닌 것으로 시작
-        if (nickname.matches("^[^A-Za-z가-힣].*")) {
+        if (nickname.matches("^[^A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ].*")) {
             throw new BaseException(BaseResponseStatus.INVALID_START_OF_NICKNAME);
         }
 
         // 한글 영어가 아닌 것으로 마무리
-        if (nickname.matches(".*[^A-Za-z가-힣]$")) {
+        if (nickname.matches(".*[^A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ]$")) {
             throw new BaseException(BaseResponseStatus.INVALID_END_OF_NICKNAME);
         }
 
         // 한글, 숫자, 영어, 하이폰(-), 공백을 제외한 것이 포함됨.
-        if (!nickname.matches("^[A-Za-z0-9가-힣- ]+$")){
+        if (!nickname.matches("^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ- ]+$")){
             throw new BaseException(BaseResponseStatus.INVALID_SYMBOL_NICKNAME);
         }
     }
