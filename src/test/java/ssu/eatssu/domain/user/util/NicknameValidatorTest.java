@@ -44,7 +44,7 @@ class NicknameValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"유효한 닉네임","available nic","가능한-닉네임","유-효-한-닉-네-임","유 효 한 닉 1 2 a"})
+    @ValueSource(strings = {"유효한 닉네임","available nic","가능한-닉네임","유-효-한-닉-네-임","유 효 한 닉 1 2 a","ㅇㅅㅎㅇㅌ"})
     void 유효한_이름을_입력하면_예외가_발생하지_않는다(String input) {
         // when & then
         assertDoesNotThrow(()-> nicknameValidator.validateNickname(input));
