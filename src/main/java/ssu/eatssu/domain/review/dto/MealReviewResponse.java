@@ -31,7 +31,7 @@ public class MealReviewResponse {
     private String writerNickname;
 
     @Schema(description = "평점", example = "4")
-    private Integer rating;
+    private Double rating;
 
     @Schema(description = "리뷰 작성 날짜(format = yyyy-MM-dd)", example = "2023-04-07")
     private LocalDate writtenAt;
@@ -60,7 +60,7 @@ public class MealReviewResponse {
 
     public static MealReviewResponse from(Review review,
                                           Long userId,
-                                          List<ValidMenuForViewResponse.MenuDto> validMenus) {
+                                          List<ValidMenuForViewResponse.MenuDto> validMenus,Double rating) {
         List<String> imageUrls = new ArrayList<>();
         review.getReviewImages().forEach(i -> imageUrls.add(i.getImageUrl()));
 
@@ -77,10 +77,9 @@ public class MealReviewResponse {
                                                               likedMenuIds.contains(valid.getMenuId())
                                                       ))
                                                       .toList();
-
         MealReviewResponseBuilder builder = MealReviewResponse.builder()
                                                               .reviewId(review.getId())
-                                                              .rating(review.getRating())
+                                                              .rating(rating)
                                                               .writtenAt(review.getCreatedDate().toLocalDate())
                                                               .content(review.getContent())
                                                               .imageUrls(imageUrls)

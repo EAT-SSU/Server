@@ -67,23 +67,44 @@ public class UserController {
         return BaseResponse.success(userService.validateDuplicatedEmail(email));
     }
 
-    @Operation(summary = "닉네임 중복 체크", description = """
-            닉네임 중복 체크 API 입니다.<br><br>
-            중복되지 않은 닉네임이면 true 를 반환합니다
+    @Operation(summary = "닉네임 중복 및 유효성 체크", description = """
+            닉네임 중복 및 유효성 체크 API 입니다.<br><br>
+            유효하고 중복되지 않은 닉네임이면 true 를 반환합니다
             """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "중복되지 않은 닉네임")
+            @ApiResponse(responseCode = "200", description = "유효하고 중복되지 않은 닉네임"),
+            @ApiResponse(responseCode = "400", description = "숫자로만 이루어진 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "연속된 공백을 포함하는 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "연속된 하이폰을 사용하는 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "첫 글자가 한글,영문,숫자가 아닌 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "마지막 글자가 한글,영문,숫자가 아닌 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "한글,영문,숫자,공백,하이폰(-)이외의 문자를 쓴 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "닉네임이 1자 이상 16이하가 아닌 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "서비스명/브랜드명 단독 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "관리자로 혼동될 수 있는 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "욕설/비속어가 이름에 포함되는 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/validate/nickname")
-    public BaseResponse<Boolean> validateDuplicatedNickname(@Parameter(description = "닉네임")
+    public BaseResponse<Boolean> validateNickname(@Parameter(description = "닉네임")
                                                             @RequestParam(value = "nickname") String nickname) {
-        return BaseResponse.success(userService.validateDuplicatedNickname(nickname));
+        return BaseResponse.success(userService.validateNickname(nickname));
     }
 
     @Operation(summary = "닉네임 수정", description = "닉네임 수정 API 입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "닉네임 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "숫자로만 이루어진 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "연속된 공백을 포함하는 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "연속된 하이폰을 사용하는 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "첫 글자가 한글,영문,숫자가 아닌 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "마지막 글자가 한글,영문,숫자가 아닌 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "한글,영문,숫자,공백,하이폰(-)이외의 문자를 쓴 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "닉네임이 1자 이상 16이하가 아닌 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "서비스명/브랜드명 단독 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "관리자로 혼동될 수 있는 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "욕설/비속어가 이름에 포함되는 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "409", description = "중복된 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @PatchMapping("/nickname")
     public BaseResponse<?> updateNickname(

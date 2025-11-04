@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.domain.auth.util.RandomNicknameUtil;
 import ssu.eatssu.domain.review.entity.Review;
-import ssu.eatssu.domain.user.config.UserProperties;
 import ssu.eatssu.domain.user.department.entity.College;
 import ssu.eatssu.domain.user.department.entity.Department;
 import ssu.eatssu.domain.user.department.persistence.CollegeRepository;
@@ -23,11 +23,11 @@ import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
 import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
+import ssu.eatssu.domain.user.util.NicknameValidator;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.log.event.LogEvent;
 
 import java.util.List;
-import java.util.UUID;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.DUPLICATE_NICKNAME;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_DEPARTMENT;
@@ -44,13 +44,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final DepartmentRepository departmentRepository;
-    private final UserProperties userProperties;
     private final CollegeRepository collegeRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final RandomNicknameUtil randomNicknameUtil;
+    private final NicknameValidator nicknameValidator;
 
     public User join(String email, OAuthProvider provider, String providerId) {
         String credentials = createCredentials(provider, providerId);
-        String nickname = createNickname();
+        String nickname = randomNicknameUtil.generate();
         User user = User.create(email, nickname, provider, providerId, credentials);
         return userRepository.save(user);
     }
@@ -59,7 +60,10 @@ public class UserService {
         User user = userRepository.findById(userDetails.getId())
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-        if (isForbiddenNickname(request.nickname()) || userRepository.existsByNickname(request.nickname())) {
+        nicknameValidator.validateNickname(request.nickname());
+
+        // 닉네임 생성 직전 다른 사람이 생성한 경우.
+        if (userRepository.existsByNickname(request.nickname())) {
             throw new BaseException(DUPLICATE_NICKNAME);
         }
 
@@ -97,17 +101,11 @@ public class UserService {
         return !userRepository.existsByEmail(email);
     }
 
-    public Boolean validateDuplicatedNickname(String nickname) {
-        if (isForbiddenNickname(nickname)) {
-            return false;
-        }
-        return !userRepository.existsByNickname(nickname);
-    }
+    public Boolean validateNickname(String nickname) {
 
-    public String createNickname() {
-        String uuid = UUID.randomUUID().toString();
-        String shortUUID = uuid.substring(0, 4);
-        return "user-" + shortUUID;
+        nicknameValidator.validateNickname(nickname);
+
+        return !userRepository.existsByNickname(nickname);
     }
 
     private String createCredentials(OAuthProvider provider, String providerId) {
@@ -148,10 +146,5 @@ public class UserService {
                                                                            .name(department.getName())
                                                                            .build())
                           .toList();
-    }
-
-    private boolean isForbiddenNickname(String nickname) {
-        return userProperties.getForbiddenNicknames().stream()
-                             .anyMatch(forbidden -> forbidden.equalsIgnoreCase(nickname));
     }
 }
