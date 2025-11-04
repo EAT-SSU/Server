@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.log.annotation.LogMask;
 
 import java.lang.reflect.Field;
@@ -103,9 +104,20 @@ public class ControllerLogAspect {
             return result;
         } catch (Throwable e) {
             long time = System.currentTimeMillis() - start;
-            log.error("EXCEPTION {} {} ({} ms) cause={}", method, uri, time, e.getMessage(), e);
+            String causeMessage = getCauseMessage(e);
+            String exceptionType = e.getClass().getSimpleName();
+            log.error("EXCEPTION {} {} ({} ms) type={} cause={}", method, uri, time, exceptionType, causeMessage, e);
             throw e;
         }
+    }
+
+    private String getCauseMessage(Throwable e) {
+        if (e instanceof BaseException) {
+            BaseException baseException = (BaseException) e;
+            return baseException.getStatus().getMessage();
+        }
+        String message = e.getMessage();
+        return message != null ? message : e.getClass().getSimpleName();
     }
 
     private Map<String, Object> toSafeMap(Object arg) {
