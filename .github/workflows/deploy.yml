@@ -83,9 +83,10 @@ jobs:
             sudo docker rm -f $(docker ps -qa)
             sudo docker pull ${{ secrets.DOCKER_REPO }}/eatssu-prod
             sudo docker run -d -p 9000:9000 \
-            --log-driver=json-file \
-            --log-opt max-size=20m \
-            --log-opt max-file=5 \
+            --log-driver=awslogs \
+            --log-opt awslogs-region=ap-northeast-2 \
+            --log-opt awslogs-group=prod-ec2-group \
+            --log-opt awslogs-stream=prod-$(date +%Y%m%d-%H%M%S) \
             -e EATSSU_DB_URL_PROD="${{ secrets.EATSSU_DB_URL_PROD }}" \
             -e EATSSU_DB_USERNAME="${{ secrets.EATSSU_DB_USERNAME }}" \
             -e EATSSU_DB_PASSWORD="${{ secrets.EATSSU_DB_PASSWORD }}" \
@@ -111,9 +112,10 @@ jobs:
             sudo docker rm -f $(docker ps -qa)
             sudo docker pull ${{ secrets.DOCKER_REPO }}/eatssu-dev
             sudo docker run -d -p 9000:9000 \
-            --log-driver=json-file \
-            --log-opt max-size=20m \
-            --log-opt max-file=5 \
+            --log-driver=awslogs \
+            --log-opt awslogs-region=ap-northeast-2 \
+            --log-opt awslogs-group=dev-ec2-group \
+            --log-opt awslogs-stream=dev-$(date +%Y%m%d-%H%M%S) \
             -e EATSSU_DB_URL_DEV="${{ secrets.EATSSU_DB_URL_DEV }}" \
             -e EATSSU_DB_USERNAME="${{ secrets.EATSSU_DB_USERNAME }}" \
             -e EATSSU_DB_PASSWORD="${{ secrets.EATSSU_DB_PASSWORD }}" \
