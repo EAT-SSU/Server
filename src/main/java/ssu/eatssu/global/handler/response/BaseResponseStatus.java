@@ -34,6 +34,20 @@ public enum BaseResponseStatus {
     RECENT_REPORT_ON_REVIEW(false, HttpStatus.BAD_REQUEST, 40014, "24시간 이내에 동일 댓글을 신고했습니다."),
 
     /**
+     * 닉네임 관련
+     */
+    NUMBER_ONLY_NICKNAME(false,HttpStatus.BAD_REQUEST,40015,"숫자로만 이루어진 닉네임은 사용할 수 없습니다."),
+    CONSECUTIVE_SPACES_NICKNAME(false,HttpStatus.BAD_REQUEST,40016,"연속된 공백은 사용할 수 없습니다."),
+    CONSECUTIVE_HYPHEN_NICKNAME(false,HttpStatus.BAD_REQUEST,40017,"연속된 하이폰(-)은 사용할 수 없습니다."),
+    INVALID_START_OF_NICKNAME(false,HttpStatus.BAD_REQUEST,40018,"첫 글자는 한글, 영문, 숫자만 사용할 수 있습니다."),
+    INVALID_END_OF_NICKNAME(false,HttpStatus.BAD_REQUEST,40019,"마지막 글자는 한글, 영문, 숫자만 사용할 수 있습니다."),
+    INVALID_SYMBOL_NICKNAME(false,HttpStatus.BAD_REQUEST,40020,"한글, 영문, 숫자, 공백, 하이폰(-)만 사용할 수 있습니다."),
+    INVALID_NICKNAME_LENGTH(false,HttpStatus.BAD_REQUEST,40021,"닉네임은 1자 이상 16자 이하로 입력해 주세요."),
+    SERVICE_BRAND_NICKNAME(false,HttpStatus.BAD_REQUEST,40022,"서비스명/브랜드명 단독 닉네임은 사용할 수 없어요. ex) EAT-SSU, 이슈, 잇슈"),
+    ADMIN_MANAGER_NICKNAME(false,HttpStatus.BAD_REQUEST,40023,"관리자로 혼동될 수 있는 닉네임은 사용할 수 없어요. ex) admin, 운영자"),
+    PROFANITY_NICKNAME(false,HttpStatus.BAD_REQUEST,40024,"욕설, 비속어 등의 표현이 포함된 닉네임은 사용할 수 없어요."),
+
+    /**
      * 401 UNAUTHORIZED 권한없음(인증 실패)
      */
     UNAUTHORIZED(false, HttpStatus.UNAUTHORIZED, 401, "인증에 실패했습니다."),

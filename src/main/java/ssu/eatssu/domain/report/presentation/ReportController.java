@@ -46,7 +46,8 @@ public class ReportController {
     @PostMapping("")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰 신고 성공", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 리뷰", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     public BaseResponse<Void> reportReview(@RequestBody ReportCreateRequest createReportRequest,
                                            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
