@@ -73,55 +73,40 @@ public class SlackMessageFormat {
         return messageFormat.format(args);
     }
 
-    public static String sendServerError(BaseException ex, String method, String uri, String userId, String args) {
-        MessageFormat messageFormat = new MessageFormat(
-                """
-                        ===================
-                        *서버 에러 발생*
-                        - 예외 상태코드: {0}
-                        - 예외 메시지: {1}
-                        - 개발환경: {2}
-                        *요청 정보*
-                        - HTTP Method: {3}
-                        - URI: {4}
-                        - User ID: {5}
-                        - 요청 파라미터: {6}
-                        ===================
-                        """
-        );
-        Object[] formatArgs = {
-                ex.getStatus(),
-                ex.getStatus().getMessage(),
-                serverEnv,
-                method,
-                uri,
-                userId,
-                args != null && args.length() > 500 ? args.substring(0, 500) + "...(truncated)" : args
-        };
-        return messageFormat.format(formatArgs);
-    }
-
     public static String sendServerError(Throwable ex, String method, String uri, String userId, String args) {
-        MessageFormat messageFormat = new MessageFormat(
-                """
+        final String messageTemplate = """
                         ===================
                         *서버 에러 발생*
-                        - 예외 타입: {0}
-                        - 예외 메시지: {1}
-                        - 개발환경: {2}
+                        - {0}: {1}
+                        - 예외 메시지: {2}
+                        - 개발환경: {3}
                         *요청 정보*
-                        - HTTP Method: {3}
-                        - URI: {4}
-                        - User ID: {5}
-                        - 요청 파라미터: {6}
+                        - HTTP Method: {4}
+                        - URI: {5}
+                        - User ID: {6}
+                        - 요청 파라미터: {7}
                         ===================
-                        """
-        );
-        String exceptionType = ex.getClass().getSimpleName();
-        String exceptionMessage = ex.getMessage() != null ? ex.getMessage() : "메시지 없음";
+                        """;
+        MessageFormat messageFormat = new MessageFormat(messageTemplate);
+
+        String errorTypeLabel;
+        Object errorTypeValue;
+        String errorMessage;
+
+        if (ex instanceof BaseException baseException) {
+            errorTypeLabel = "예외 상태코드";
+            errorTypeValue = baseException.getStatus();
+            errorMessage = baseException.getStatus().getMessage();
+        } else {
+            errorTypeLabel = "예외 타입";
+            errorTypeValue = ex.getClass().getSimpleName();
+            errorMessage = ex.getMessage() != null ? ex.getMessage() : "메시지 없음";
+        }
+
         Object[] formatArgs = {
-                exceptionType,
-                exceptionMessage,
+                errorTypeLabel,
+                errorTypeValue,
+                errorMessage,
                 serverEnv,
                 method,
                 uri,
