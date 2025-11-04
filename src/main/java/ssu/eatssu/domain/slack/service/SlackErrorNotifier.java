@@ -18,12 +18,18 @@ public class SlackErrorNotifier {
         this.slackService = slackService;
     }
 
-    public void notify(BaseException ex) {
+    public void notify(Throwable ex, String method, String uri, String userId, String args) {
         if (!"prod".equals(serverEnv)) {
             return;
         }
         try {
-            String message = SlackMessageFormat.sendServerError(ex);
+            String message;
+            if (ex instanceof BaseException) {
+                BaseException baseException = (BaseException) ex;
+                message = SlackMessageFormat.sendServerError(baseException, method, uri, userId, args);
+            } else {
+                message = SlackMessageFormat.sendServerError(ex, method, uri, userId, args);
+            }
             slackService.sendSlackMessage(message, SlackChannel.SERVER_ERROR);
         } catch (Exception slackEx) {
             log.warn("슬랙 전송 실패: {}", slackEx.getMessage());

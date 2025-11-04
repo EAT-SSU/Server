@@ -14,7 +14,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.response.BaseException;
+import ssu.eatssu.global.handler.response.BaseResponseStatus;
 import ssu.eatssu.global.log.annotation.LogMask;
 
 import java.lang.reflect.Field;
@@ -31,6 +33,7 @@ import java.util.stream.IntStream;
 public class ControllerLogAspect {
 
     private final ObjectMapper objectMapper;
+    private final SlackErrorNotifier slackErrorNotifier;
 
     @Pointcut("within(@org.springframework.web.bind.annotation.RestController *)")
     public void restController() {}
@@ -49,14 +52,16 @@ public class ControllerLogAspect {
         Object[] args = joinPoint.getArgs();
 
         // 요청자
-        String userIdLog = IntStream.range(0, args.length)
+        String userId = IntStream.range(0, args.length)
                 .filter(i -> args[i] instanceof CustomUserDetails)
                 .mapToObj(i -> {
                     CustomUserDetails user = (CustomUserDetails) args[i];
-                    return "userId=" + user.getId();
+                    return String.valueOf(user.getId());
                 })
                 .findFirst()
-                .orElse("userId=anonymous");
+                .orElse("anonymous");
+
+        String userIdLog = "userId=" + userId;
 
         // 나머지 요청 인자
         String otherArgsJson = IntStream.range(0, args.length)
@@ -107,6 +112,8 @@ public class ControllerLogAspect {
             String causeMessage = getCauseMessage(e);
             String exceptionType = e.getClass().getSimpleName();
             log.error("EXCEPTION {} {} ({} ms) type={} cause={}", method, uri, time, exceptionType, causeMessage, e);
+
+            slackErrorNotifier.notify(e, method, uri, userId, argsJson);
             throw e;
         }
     }

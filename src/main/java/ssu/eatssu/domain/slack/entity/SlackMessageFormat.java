@@ -73,8 +73,7 @@ public class SlackMessageFormat {
         return messageFormat.format(args);
     }
 
-
-    public static String sendServerError(BaseException ex) {
+    public static String sendServerError(BaseException ex, String method, String uri, String userId, String args) {
         MessageFormat messageFormat = new MessageFormat(
                 """
                         ===================
@@ -82,14 +81,53 @@ public class SlackMessageFormat {
                         - 예외 상태코드: {0}
                         - 예외 메시지: {1}
                         - 개발환경: {2}
+                        *요청 정보*
+                        - HTTP Method: {3}
+                        - URI: {4}
+                        - User ID: {5}
+                        - 요청 파라미터: {6}
                         ===================
                         """
         );
-        Object[] args = {
+        Object[] formatArgs = {
                 ex.getStatus(),
                 ex.getStatus().getMessage(),
                 serverEnv,
+                method,
+                uri,
+                userId,
+                args != null && args.length() > 500 ? args.substring(0, 500) + "...(truncated)" : args
         };
-        return messageFormat.format(args);
+        return messageFormat.format(formatArgs);
+    }
+
+    public static String sendServerError(Throwable ex, String method, String uri, String userId, String args) {
+        MessageFormat messageFormat = new MessageFormat(
+                """
+                        ===================
+                        *서버 에러 발생*
+                        - 예외 타입: {0}
+                        - 예외 메시지: {1}
+                        - 개발환경: {2}
+                        *요청 정보*
+                        - HTTP Method: {3}
+                        - URI: {4}
+                        - User ID: {5}
+                        - 요청 파라미터: {6}
+                        ===================
+                        """
+        );
+        String exceptionType = ex.getClass().getSimpleName();
+        String exceptionMessage = ex.getMessage() != null ? ex.getMessage() : "메시지 없음";
+        Object[] formatArgs = {
+                exceptionType,
+                exceptionMessage,
+                serverEnv,
+                method,
+                uri,
+                userId,
+                args != null && args.length() > 500 ? args.substring(0, 500) + "...(truncated)" : args
+        };
+        return messageFormat.format(formatArgs);
     }
 }
