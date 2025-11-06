@@ -18,7 +18,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByProviderId(String providerId);
 
     Optional<User> findByNickname(String nickname);
-
-    @Query(value = "SELECT * FROM user WHERE nickname REGEXP '^user-.{4}$'", nativeQuery = true)
-    List<User> findByNicknameLikeUserPattern();
 }
