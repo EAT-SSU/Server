@@ -84,7 +84,7 @@ public class SlackMessageFormat {
                         - HTTP Method: {4}
                         - URI: {5}
                         - User ID: {6}
-                        - 요청 파라미터: {7}
+                        - 로그 내용 (파라미터 정보 포함): {7}
                         ===================
                         """;
         MessageFormat messageFormat = new MessageFormat(messageTemplate);
