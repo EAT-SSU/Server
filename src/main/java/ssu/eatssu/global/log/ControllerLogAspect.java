@@ -9,6 +9,8 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -51,15 +53,7 @@ public class ControllerLogAspect {
         String[] paramNames = methodSignature.getParameterNames();
         Object[] args = joinPoint.getArgs();
 
-        // 요청자
-        String userId = IntStream.range(0, args.length)
-                .filter(i -> args[i] instanceof CustomUserDetails)
-                .mapToObj(i -> {
-                    CustomUserDetails user = (CustomUserDetails) args[i];
-                    return String.valueOf(user.getId());
-                })
-                .findFirst()
-                .orElse("anonymous");
+        String userId = getUserIdFromSecurityContext();
 
         String userIdLog = "userId=" + userId;
 
@@ -125,6 +119,19 @@ public class ControllerLogAspect {
         }
         String message = e.getMessage();
         return message != null ? message : e.getClass().getSimpleName();
+    }
+
+    private String getUserIdFromSecurityContext() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+                return String.valueOf(userDetails.getId());
+            }
+        } catch (Exception e) {
+            log.debug("SecurityContext에서 userId를 가져오는 중 오류 발생: {}", e.getMessage());
+        }
+        return "anonymous";
     }
 
     private Map<String, Object> toSafeMap(Object arg) {
