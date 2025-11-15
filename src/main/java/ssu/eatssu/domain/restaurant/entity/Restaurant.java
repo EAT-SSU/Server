@@ -10,7 +10,7 @@ import java.util.Arrays;
 @Getter
 public enum Restaurant {
 
-    DODAM("DODAM", 7000),
+    DODAM("DODAM", 6000),
     DORMITORY("DORMITORY", 5500),
     FOOD_COURT("FOOD_COURT", null),
     SNACK_CORNER("SNACK_CORNER", null),
