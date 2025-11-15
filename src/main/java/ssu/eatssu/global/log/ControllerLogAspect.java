@@ -122,14 +122,10 @@ public class ControllerLogAspect {
     }
 
     private String getUserIdFromSecurityContext() {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-                return String.valueOf(userDetails.getId());
-            }
-        } catch (Exception e) {
-            log.debug("SecurityContext에서 userId를 가져오는 중 오류 발생: {}", e.getMessage());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            return String.valueOf(userDetails.getId());
         }
         return "anonymous";
     }
