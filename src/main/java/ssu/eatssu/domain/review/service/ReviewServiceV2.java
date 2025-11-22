@@ -15,6 +15,7 @@ import ssu.eatssu.domain.menu.persistence.MealMenuRepository;
 import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.menu.service.MealRatingService;
+import ssu.eatssu.domain.rating.entity.RatingCalculator;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.CreateMenuReviewRequestV2;
@@ -23,6 +24,7 @@ import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuIdNameDto;
 import ssu.eatssu.domain.review.dto.MenuLikeRequest;
 import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
+import ssu.eatssu.domain.review.dto.RatingAverages;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewDetail;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
@@ -61,9 +63,8 @@ public class ReviewServiceV2 {
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
     private final MealMenuRepository mealMenuRepository;
-    private final ReviewImageRepository reviewImageRepository;
     private final ApplicationEventPublisher eventPublisher;
-
+    private final RatingCalculator ratingCalculator;
     private final MealRatingService mealRatingService;
 
     /**
@@ -327,13 +328,16 @@ public class ReviewServiceV2 {
             log.warn("No valid menus for review found in mealId={}", mealId);
         }
 
-        Double averageRating = mealRatingService.getMainRatingAverage(meal.getId());
+        long reviewCount = ratingCalculator.mealTotalReviewCount(meal);
 
-        if (!reviews.isEmpty() && averageRating == 0.0) {
+        RatingAverages averageRating = ratingCalculator.mealAverageRatings(meal);
+        ReviewRatingCount ratingCountMap = ratingCalculator.mealRatingCount(meal);
+
+        if (!reviews.isEmpty() && averageRating.mainRating() == 0.0) {
             log.warn("All reviews have null/invalid ratings for mealId={}", mealId);
         }
 
-        Integer likeCount = Optional.ofNullable(menus)
+        Integer likeCount = Optional.of(menus)
                                     .orElse(Collections.emptyList())
                                     .stream()
                                     .filter(Objects::nonNull)
@@ -342,8 +346,6 @@ public class ReviewServiceV2 {
                                     .mapToInt(Integer::intValue)
                                     .sum();
 
-
-        ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 
         return MealReviewsV2Response
                 .builder()
@@ -354,9 +356,9 @@ public class ReviewServiceV2 {
                                             menu.getName()
                                     ))
                                     .collect(Collectors.toList()))
-                .totalReviewCount((long) reviews.size())
-                .reviewRatingCount(reviewRatingCount)
-                .rating(Math.round(averageRating * 10) / 10.0)
+                .totalReviewCount(reviewCount)
+                .reviewRatingCount(ratingCountMap)
+                .rating(averageRating.mainRating())
                 .likeCount(likeCount)
                 .build();
     }
