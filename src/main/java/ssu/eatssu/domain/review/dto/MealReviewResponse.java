@@ -3,6 +3,7 @@ package ssu.eatssu.domain.review.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,19 +64,29 @@ public class MealReviewResponse {
         List<String> imageUrls = new ArrayList<>();
         review.getReviewImages().forEach(i -> imageUrls.add(i.getImageUrl()));
 
-        // 좋아요한 메뉴 ID 모음
-        Set<Long> likedMenuIds = review.getMenuLikes().stream()
-                                       .filter(ReviewMenuLike::getIsLike)
-                                       .map(like -> like.getMenu().getId())
-                                       .collect(Collectors.toSet());
+        List<MenuIdNameLikeDto> menuNames;
+        if (review.getMeal() != null) {
+            Set<Long> likedMenuIds = review.getMenuLikes().stream()
+                .filter(ReviewMenuLike::getIsLike)
+                .map(like -> like.getMenu().getId())
+                .collect(Collectors.toSet());
 
-        List<MenuIdNameLikeDto> menuNames = validMenus.stream()
-                                                      .map(valid -> new MenuIdNameLikeDto(
-                                                              valid.getMenuId(),
-                                                              valid.getName(),
-                                                              likedMenuIds.contains(valid.getMenuId())
-                                                      ))
-                                                      .toList();
+            menuNames = validMenus.stream()
+                .map(valid -> new MenuIdNameLikeDto(
+                    valid.getMenuId(),
+                    valid.getName(),
+                    likedMenuIds.contains(valid.getMenuId())
+                ))
+                .toList();
+        } else if (review.getMenu() != null) {
+            menuNames = Collections.singletonList(
+                new MenuIdNameLikeDto(review.getMenu().getId(),
+                    review.getMenu().getName(),
+                    false)
+            );
+        } else {
+            menuNames = Collections.emptyList();
+        }
         MealReviewResponseBuilder builder = MealReviewResponse.builder()
                                                               .reviewId(review.getId())
                                                               .rating(rating)
