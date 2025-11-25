@@ -223,7 +223,7 @@ public class ReviewServiceV2 {
                 pageReviews.getContent()
                            .stream()
                            .map(review -> MealReviewResponse.from(review,
-                                                                  userId, validMenus,mealRatingService.getMainRatingAverage(review.getMeal().getId())))
+                               userId, validMenus, review.getRating()))
                            .collect(Collectors.toList());
 
         return SliceResponse.<MealReviewResponse>builder()
