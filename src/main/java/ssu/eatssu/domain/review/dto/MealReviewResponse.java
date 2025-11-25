@@ -87,9 +87,13 @@ public class MealReviewResponse {
         } else {
             menuNames = Collections.emptyList();
         }
+        Integer resolvedRating = (review.getRating() != null)
+            ? review.getRating()
+            : (review.getRatings() != null ? review.getRatings().getMainRating() : null);
+
         MealReviewResponseBuilder builder = MealReviewResponse.builder()
                                                               .reviewId(review.getId())
-                                                              .rating(rating)
+            .rating(resolvedRating)
                                                               .writtenAt(review.getCreatedDate().toLocalDate())
                                                               .content(review.getContent())
                                                               .imageUrls(imageUrls)
