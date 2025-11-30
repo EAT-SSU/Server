@@ -1,17 +1,17 @@
 package ssu.eatssu.domain.review.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewMenuLike;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Builder
@@ -31,7 +31,7 @@ public class MealReviewResponse {
     private String writerNickname;
 
     @Schema(description = "평점", example = "4")
-    private Double rating;
+    private Integer rating;
 
     @Schema(description = "리뷰 작성 날짜(format = yyyy-MM-dd)", example = "2023-04-07")
     private LocalDate writtenAt;
@@ -60,26 +60,40 @@ public class MealReviewResponse {
 
     public static MealReviewResponse from(Review review,
                                           Long userId,
-                                          List<ValidMenuForViewResponse.MenuDto> validMenus,Double rating) {
+        List<ValidMenuForViewResponse.MenuDto> validMenus, Integer rating) {
         List<String> imageUrls = new ArrayList<>();
         review.getReviewImages().forEach(i -> imageUrls.add(i.getImageUrl()));
 
-        // 좋아요한 메뉴 ID 모음
-        Set<Long> likedMenuIds = review.getMenuLikes().stream()
-                                       .filter(ReviewMenuLike::getIsLike)
-                                       .map(like -> like.getMenu().getId())
-                                       .collect(Collectors.toSet());
+        List<MenuIdNameLikeDto> menuNames;
+        if (review.getMeal() != null) {
+            Set<Long> likedMenuIds = review.getMenuLikes().stream()
+                .filter(ReviewMenuLike::getIsLike)
+                .map(like -> like.getMenu().getId())
+                .collect(Collectors.toSet());
 
-        List<MenuIdNameLikeDto> menuNames = validMenus.stream()
-                                                      .map(valid -> new MenuIdNameLikeDto(
-                                                              valid.getMenuId(),
-                                                              valid.getName(),
-                                                              likedMenuIds.contains(valid.getMenuId())
-                                                      ))
-                                                      .toList();
+            menuNames = validMenus.stream()
+                .map(valid -> new MenuIdNameLikeDto(
+                    valid.getMenuId(),
+                    valid.getName(),
+                    likedMenuIds.contains(valid.getMenuId())
+                ))
+                .toList();
+        } else if (review.getMenu() != null) {
+            menuNames = Collections.singletonList(
+                new MenuIdNameLikeDto(review.getMenu().getId(),
+                    review.getMenu().getName(),
+                    false)
+            );
+        } else {
+            menuNames = Collections.emptyList();
+        }
+        Integer resolvedRating = (review.getRating() != null)
+            ? review.getRating()
+            : (review.getRatings() != null ? review.getRatings().getMainRating() : null);
+
         MealReviewResponseBuilder builder = MealReviewResponse.builder()
                                                               .reviewId(review.getId())
-                                                              .rating(rating)
+            .rating(resolvedRating)
                                                               .writtenAt(review.getCreatedDate().toLocalDate())
                                                               .content(review.getContent())
                                                               .imageUrls(imageUrls)
