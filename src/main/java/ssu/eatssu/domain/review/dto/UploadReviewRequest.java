@@ -12,8 +12,6 @@ import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.entity.User;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Schema(title = "리뷰 작성")
@@ -31,8 +29,8 @@ public class UploadReviewRequest {
     @Schema(description = "한줄평", example = "맛있어용")
     private String content;
 
-    @Schema(description = "리뷰 이미지 URL", example = "[\"https://s3.~~~.jpg\",\"https://s3.~~~.jpg\"]")
-    private List<String> imageUrls;
+    @Schema(description = "리뷰 이미지 URL", example = "https://s3.~~~.jpg")
+    private String imageUrl;
 
     public UploadReviewRequest(int mainRating, String content) {
         Assert.isTrue(mainRating >= 1 && mainRating <= 5, "평점은 1에서 5 사이 여야 합니다.");
