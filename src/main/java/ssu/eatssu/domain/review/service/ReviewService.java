@@ -112,10 +112,8 @@ public class ReviewService {
                                   .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
 
         Review review = request.toReviewEntity(user, menu);
+        request.getImageUrls().forEach(review::addReviewImage);
         reviewRepository.save(review);
-
-        ReviewImage reviewImage = new ReviewImage(review, request.getImageUrl());
-        reviewImageRepository.save(reviewImage);
 
         menu.addReview(review);
     }
