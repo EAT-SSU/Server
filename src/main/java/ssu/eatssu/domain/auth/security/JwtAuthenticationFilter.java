@@ -31,8 +31,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             "/v2/reviews/menus/**", "/v2/reviews/meals/**", "/actuator/**", "/error-test/**",
             "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**",
             "/oauths/valid/token", "/admin/img/**", "/css/**", "/js/**",
-            "/favicon.ico", "/error/**", "/webjars/**", "/h2-console/**"
-                                                              );
+            "/favicon.ico", "/error/**", "/webjars/**", "/h2-console/**",
+            "/oauths/v2/kakao", "/oauths/v2/apple");
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
