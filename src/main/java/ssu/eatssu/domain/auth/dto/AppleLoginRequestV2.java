@@ -10,6 +10,6 @@ public record AppleLoginRequestV2(
         @LogMask
         @Schema(description = "identityToken", example = "eyJraWQiOiJXNldjT0tCIiwiYWxnIjoi...")
         String identityToken,
-        @Schema(description = "deviceType", example = "iOS")
+        @Schema(description = "deviceType", example = "IOS")
         DeviceType deviceType
 ) {}

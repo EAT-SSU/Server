@@ -16,6 +16,6 @@ public record KakaoLoginRequestV2(
         @LogMask
         @Schema(description = "providerId", example = "10378247832195")
         String providerId,
-        @Schema(description = "deviceType", example = "iOS")
+        @Schema(description = "deviceType", example = "IOS")
         DeviceType deviceType
 ) {}
