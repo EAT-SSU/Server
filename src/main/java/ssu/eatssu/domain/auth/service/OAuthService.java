@@ -6,10 +6,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ssu.eatssu.domain.auth.dto.AppleLoginRequest;
-import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
-import ssu.eatssu.domain.auth.dto.OAuthInfo;
-import ssu.eatssu.domain.auth.dto.ValidRequest;
+import ssu.eatssu.domain.auth.dto.*;
 import ssu.eatssu.domain.auth.entity.AppleAuthenticator;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.JwtTokenProvider;
@@ -41,11 +38,30 @@ public class OAuthService {
         return generateOauthJwtTokens(user.getEmail(), KAKAO, request.providerId());
     }
 
+    public Tokens kakaoLoginV2(KakaoLoginRequestV2 request) {
+        User user = userRepository.findByProviderId(request.providerId())
+                .orElseGet(() -> userService.joinV2(request.email(), KAKAO, request.providerId(),request.deviceType()));
+
+        return generateOauthJwtTokens(user.getEmail(), KAKAO, request.providerId());
+    }
+
+
     public Tokens appleLogin(AppleLoginRequest request) {
         OAuthInfo oAuthInfo = appleAuthenticator.getOAuthInfoByIdentityToken(request.identityToken());
 
         User user = userRepository.findByProviderId(oAuthInfo.providerId())
                                   .orElseGet(() -> userService.join(oAuthInfo.email(), APPLE, oAuthInfo.providerId()));
+
+        updateAppleUserEmail(user, oAuthInfo.email());
+
+        return generateOauthJwtTokens(user.getEmail(), APPLE, oAuthInfo.providerId());
+    }
+
+    public Tokens appleLoginV2(AppleLoginRequestV2 request) {
+        OAuthInfo oAuthInfo = appleAuthenticator.getOAuthInfoByIdentityToken(request.identityToken());
+
+        User user = userRepository.findByProviderId(oAuthInfo.providerId())
+                .orElseGet(() -> userService.joinV2(oAuthInfo.email(), APPLE, oAuthInfo.providerId(),request.deviceType()));
 
         updateAppleUserEmail(user, oAuthInfo.email());
 
