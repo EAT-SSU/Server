@@ -21,6 +21,7 @@ import ssu.eatssu.domain.user.dto.GetDepartmentResponse;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
 import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
+import ssu.eatssu.domain.user.entity.DeviceType;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.user.util.NicknameValidator;
@@ -53,6 +54,13 @@ public class UserService {
         String credentials = createCredentials(provider, providerId);
         String nickname = randomNicknameUtil.generate();
         User user = User.create(email, nickname, provider, providerId, credentials);
+        return userRepository.save(user);
+    }
+
+    public User joinV2(String email, OAuthProvider provider, String providerId, DeviceType deviceType) {
+        String credentials = createCredentials(provider, providerId);
+        String nickname = randomNicknameUtil.generate();
+        User user = User.createV2(email, nickname, provider, providerId, credentials, deviceType);
         return userRepository.save(user);
     }
 
