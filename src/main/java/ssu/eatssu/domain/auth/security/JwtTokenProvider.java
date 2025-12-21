@@ -146,7 +146,7 @@ public class JwtTokenProvider {
         UserPrincipalDto userPrincipalDto = objectMapper.readValue(claims.getSubject(), UserPrincipalDto.class);
 
         CustomUserDetails principal = new CustomUserDetails(userPrincipalDto.getId(), userPrincipalDto.getEmail(), "",
-                                                            authorities.get(0));
+                                                            authorities.get(0),userPrincipalDto.getDeviceType());
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
