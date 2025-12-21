@@ -1,5 +1,17 @@
 package ssu.eatssu.domain.review.service;
 
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MEAL;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.REVIEW_PERMISSION_DENIED;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,13 +35,13 @@ import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuIdNameDto;
 import ssu.eatssu.domain.review.dto.MenuLikeRequest;
 import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
+import ssu.eatssu.domain.review.dto.RatingAverages;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewDetail;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.ValidMenuForViewResponse;
 import ssu.eatssu.domain.review.entity.Review;
-import ssu.eatssu.domain.review.repository.ReviewImageRepository;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.review.utils.MenuFilterUtil;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
@@ -38,19 +50,6 @@ import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.log.event.LogEvent;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MEAL;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.REVIEW_PERMISSION_DENIED;
 
 @Slf4j
 @Service
@@ -61,9 +60,7 @@ public class ReviewServiceV2 {
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
     private final MealMenuRepository mealMenuRepository;
-    private final ReviewImageRepository reviewImageRepository;
     private final ApplicationEventPublisher eventPublisher;
-
     private final MealRatingService mealRatingService;
 
     /**
@@ -207,14 +204,8 @@ public class ReviewServiceV2 {
             return SliceResponse.empty();
         }
 
-        List<Long> validMenuIds = validMenus.stream().map(ValidMenuForViewResponse.MenuDto::getMenuId).toList();
-        List<Long> mealIds = mealMenuRepository.findMealIdsByMenuIds(validMenuIds);
-        if (mealIds.isEmpty()) {
-            log.warn("No related mealIds found for validMenuIds={} in mealId={}", validMenuIds, mealId);
-            return SliceResponse.empty();
-        }
-
-        Page<Review> pageReviews = reviewRepository.findReviewsByMealIds(mealIds, lastReviewId, pageable);
+        Page<Review> pageReviews = reviewRepository.findMealAndMenuReviews(mealId, lastReviewId,
+            pageable);
 
         Long userId = (userDetails != null) ? userDetails.getId() : null;
 
@@ -222,7 +213,7 @@ public class ReviewServiceV2 {
                 pageReviews.getContent()
                            .stream()
                            .map(review -> MealReviewResponse.from(review,
-                                                                  userId, validMenus,mealRatingService.getMainRatingAverage(review.getMeal().getId())))
+                               userId, validMenus, review.getRating()))
                            .collect(Collectors.toList());
 
         return SliceResponse.<MealReviewResponse>builder()
@@ -308,15 +299,15 @@ public class ReviewServiceV2 {
      */
     public MealReviewsV2Response findMealReviews(Long mealId) {
         Meal meal = mealRepository.findById(mealId).orElseThrow(() -> new BaseException(NOT_FOUND_MEAL));
-        List<Review> reviews = reviewRepository.findAllByMeal(meal);
+        List<Review> combinedReviews = reviewRepository.findAllMealAndMenuReviews(mealId);
         List<Menu> menus = mealMenuRepository.findMenusByMeal(meal);
         if (menus.isEmpty()) {
             log.warn("No menus found for mealId={}", meal.getId());
         }
 
         List<ValidMenuForViewResponse.MenuDto> validMenus = menus.stream()
-                                                                 .filter(menu -> !MenuFilterUtil.isExcludedFromReview(
-                                                                         menu.getName()))
+//                                                                 .filter(menu -> !MenuFilterUtil.isExcludedFromReview(
+//                                                                         menu.getName()))
                                                                  .map(menu -> ValidMenuForViewResponse.MenuDto.builder()
                                                                                                               .menuId(menu.getId())
                                                                                                               .name(menu.getName())
@@ -327,13 +318,32 @@ public class ReviewServiceV2 {
             log.warn("No valid menus for review found in mealId={}", mealId);
         }
 
-        Double averageRating = mealRatingService.getMainRatingAverage(meal.getId());
+        long reviewCount = combinedReviews.size();
 
-        if (!reviews.isEmpty() && averageRating == 0.0) {
+        Double mainRatingAverage = combinedReviews.stream()
+            .map(review -> {
+                Integer main = (review.getRatings() != null) ? review.getRatings()
+                    .getMainRating() : null;
+                return (main != null) ? main : review.getRating();
+            })
+            .filter(Objects::nonNull)
+            .mapToInt(Integer::intValue)
+            .average()
+            .stream()
+            .boxed()
+            .findFirst()
+            .orElse(null);
+
+        RatingAverages averageRating = RatingAverages.builder()
+            .mainRating(mainRatingAverage)
+            .build();
+        ReviewRatingCount ratingCountMap = ReviewRatingCount.from(combinedReviews);
+
+        if (!combinedReviews.isEmpty() && averageRating.mainRating() == null) {
             log.warn("All reviews have null/invalid ratings for mealId={}", mealId);
         }
 
-        Integer likeCount = Optional.ofNullable(menus)
+        Integer likeCount = Optional.of(menus)
                                     .orElse(Collections.emptyList())
                                     .stream()
                                     .filter(Objects::nonNull)
@@ -342,8 +352,6 @@ public class ReviewServiceV2 {
                                     .mapToInt(Integer::intValue)
                                     .sum();
 
-
-        ReviewRatingCount reviewRatingCount = ReviewRatingCount.from(reviews);
 
         return MealReviewsV2Response
                 .builder()
@@ -354,9 +362,9 @@ public class ReviewServiceV2 {
                                             menu.getName()
                                     ))
                                     .collect(Collectors.toList()))
-                .totalReviewCount((long) reviews.size())
-                .reviewRatingCount(reviewRatingCount)
-                .rating(Math.round(averageRating * 10) / 10.0)
+                .totalReviewCount(reviewCount)
+                .reviewRatingCount(ratingCountMap)
+                .rating(averageRating.mainRating())
                 .likeCount(likeCount)
                 .build();
     }

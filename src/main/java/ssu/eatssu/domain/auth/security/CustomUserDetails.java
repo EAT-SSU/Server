@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ssu.eatssu.domain.user.entity.DeviceType;
 import ssu.eatssu.domain.user.entity.User;
 
 import java.util.ArrayList;
@@ -17,12 +18,14 @@ public class CustomUserDetails implements UserDetails {
     private final String email;
     private final String credentials;
     private final GrantedAuthority role;
+    private final DeviceType deviceType;
 
     public CustomUserDetails(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.credentials = user.getCredentials();
         this.role = user.getRole();
+        this.deviceType = user.getDeviceType();
     }
 
     @Override

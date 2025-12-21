@@ -1,18 +1,17 @@
 package ssu.eatssu.domain.review.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewMenuLike;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Builder
@@ -58,9 +57,13 @@ public class ReviewDetail {
                                        .map(like -> like.getMenu().getId())
                                        .collect(Collectors.toSet());
 
+        Integer rating = (review.getRating() != null)
+            ? review.getRating()
+            : review.getRatings().getMainRating();
+
         ReviewDetailBuilder builder = ReviewDetail.builder()
                                                   .reviewId(review.getId())
-                                                  .rating(review.getRatings().getMainRating())
+            .rating(rating)
                                                   .writtenAt(review.getCreatedDate().toLocalDate())
                                                   .content(review.getContent())
                                                   .imageUrls(imageUrls)

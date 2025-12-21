@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ssu.eatssu.domain.auth.dto.AppleLoginRequest;
-import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
-import ssu.eatssu.domain.auth.dto.ValidRequest;
+import ssu.eatssu.domain.auth.dto.*;
 import ssu.eatssu.domain.auth.service.OAuthService;
 import ssu.eatssu.domain.user.dto.Tokens;
 import ssu.eatssu.global.handler.response.BaseResponse;
@@ -31,6 +29,7 @@ public class OAuthController {
 
     private final OAuthService oauthService;
 
+    // TODO : 로그인 & 회원 가입 마이그레이션 이후에 지울 것.
     @Operation(summary = "카카오 회원가입, 로그인 [인증 토큰 필요 X]", description = """
             카카오 회원가입, 로그인 API 입니다.<br><br>
             가입된 회원일 경우 카카오 로그인, 미가입 회원일 경우 회원가입 후 자동 로그인됩니다.
@@ -49,6 +48,25 @@ public class OAuthController {
         return BaseResponse.success(tokens);
     }
 
+    @Operation(summary = "카카오 회원가입, 로그인 V2 [인증 토큰 필요 X]", description = """
+            카카오 회원가입, 로그인 V2 API 입니다.<br><br>
+            가입된 회원일 경우 카카오 로그인, 미가입 회원일 경우 회원가입 후 자동 로그인됩니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "카카오 회원가입/로그인 성공")
+    })
+    @PostMapping("/v2/kakao")
+    public BaseResponse<Tokens> kakaoLoginV2(@Valid @RequestBody KakaoLoginRequestV2 request) {
+        long startTime = System.currentTimeMillis();
+        Tokens tokens = oauthService.kakaoLoginV2(request);
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+        log.info("OAuthWarmupRunner 완료 - 소요 시간: {} ms", duration);
+
+        return BaseResponse.success(tokens);
+    }
+
+    // TODO : 로그인 & 회원 가입 마이그레이션 이후에 지울 것.
     @Operation(summary = "애플 회원가입, 로그인 [인증 토큰 필요 X]", description = """
             애플 로그인, 회원가입 API 입니다.<br><br>
             가입된 회원일 경우 카카오 로그인, 미가입 회원일 경우 회원가입 후 자동 로그인됩니다.
@@ -59,6 +77,19 @@ public class OAuthController {
     @PostMapping("/apple")
     public BaseResponse<Tokens> appleLogin(@Valid @RequestBody AppleLoginRequest request) {
         Tokens tokens = oauthService.appleLogin(request);
+        return BaseResponse.success(tokens);
+    }
+
+    @Operation(summary = "애플 회원가입, 로그인 V2 [인증 토큰 필요 X]", description = """
+            애플 로그인, 회원가입 API V2 입니다.<br><br>
+            가입된 회원일 경우 카카오 로그인, 미가입 회원일 경우 회원가입 후 자동 로그인됩니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "애플 회원가입/로그인 성공")
+    })
+    @PostMapping("/v2/apple")
+    public BaseResponse<Tokens> appleLoginV2(@Valid @RequestBody AppleLoginRequestV2 request) {
+        Tokens tokens = oauthService.appleLoginV2(request);
         return BaseResponse.success(tokens);
     }
 

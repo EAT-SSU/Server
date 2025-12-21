@@ -11,14 +11,12 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.response.BaseException;
-import ssu.eatssu.global.handler.response.BaseResponseStatus;
 import ssu.eatssu.global.log.annotation.LogMask;
 
 import java.lang.reflect.Field;
@@ -26,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 
 @Aspect
 @Component
@@ -54,10 +51,11 @@ public class ControllerLogAspect {
         Object[] args = joinPoint.getArgs();
 
         String userId = getUserIdFromSecurityContext();
+        String deviceType = getDeviceTypeFromSecurityContext();
 
-        String userIdLog = "userId=" + userId;
+        String userLog = "userId=" + userId + ", deviceType=" + deviceType;
 
-        // 나머지 요청 인자
+        // 나머지 요청 인자 조합
         String otherArgsJson = IntStream.range(0, args.length)
                 .filter(i -> !(args[i] instanceof HttpServletRequest))
                 .filter(i -> !(args[i] instanceof CustomUserDetails))
@@ -81,7 +79,7 @@ public class ControllerLogAspect {
                 })
                 .collect(Collectors.joining(", "));
 
-        String argsJson = userIdLog + (otherArgsJson.isEmpty() ? "" : ", " + otherArgsJson);
+        String argsJson = userLog + (otherArgsJson.isEmpty() ? "" : ", " + otherArgsJson);
 
         log.info("REQUEST {} {} args={}", method, uri, argsJson);
 
@@ -113,21 +111,31 @@ public class ControllerLogAspect {
     }
 
     private String getCauseMessage(Throwable e) {
-        if (e instanceof BaseException) {
-            BaseException baseException = (BaseException) e;
+        if (e instanceof BaseException baseException) {
             return baseException.getStatus().getMessage();
         }
-        String message = e.getMessage();
-        return message != null ? message : e.getClass().getSimpleName();
+        return e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
     }
 
     private String getUserIdFromSecurityContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (authentication != null && authentication.isAuthenticated() &&
+                authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
             return String.valueOf(userDetails.getId());
         }
         return "anonymous";
+    }
+
+    private String getDeviceTypeFromSecurityContext() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() &&
+                authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+
+            return userDetails.getDeviceType() != null
+                    ? userDetails.getDeviceType().name()
+                    : "null";
+        }
+        return "unknown";
     }
 
     private Map<String, Object> toSafeMap(Object arg) {
