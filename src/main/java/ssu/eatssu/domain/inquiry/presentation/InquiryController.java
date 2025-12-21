@@ -21,6 +21,10 @@ import ssu.eatssu.domain.slack.entity.SlackMessageFormat;
 import ssu.eatssu.domain.slack.service.SlackService;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
+/**
+ * 문의하기는 카카오톡으로 이동되어 사용되지 않고 있습니다.
+ */
+@Deprecated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/inquiries")
