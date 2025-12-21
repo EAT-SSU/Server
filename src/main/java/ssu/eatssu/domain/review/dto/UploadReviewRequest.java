@@ -1,7 +1,6 @@
 package ssu.eatssu.domain.review.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -41,7 +40,7 @@ public class UploadReviewRequest {
     }
 
     public Review toReviewEntity(User user, Menu menu) {
-        Ratings ratings = Ratings.of(this.mainRating,this.amountRating,this.tasteRating);
+        Ratings ratings = Ratings.of(this.mainRating, this.amountRating, this.tasteRating);
         return Review.builder()
                      .user(user)
                      .content(this.content)

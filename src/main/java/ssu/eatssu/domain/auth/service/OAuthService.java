@@ -6,15 +6,13 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ssu.eatssu.domain.auth.dto.AppleLoginRequest;
-import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
-import ssu.eatssu.domain.auth.dto.OAuthInfo;
-import ssu.eatssu.domain.auth.dto.ValidRequest;
+import ssu.eatssu.domain.auth.dto.*;
 import ssu.eatssu.domain.auth.entity.AppleAuthenticator;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.JwtTokenProvider;
 import ssu.eatssu.domain.auth.util.RandomNicknameUtil;
 import ssu.eatssu.domain.user.dto.Tokens;
+import ssu.eatssu.domain.user.entity.DeviceType;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.user.service.UserService;
@@ -41,6 +39,21 @@ public class OAuthService {
         return generateOauthJwtTokens(user.getEmail(), KAKAO, request.providerId());
     }
 
+    /**
+     * V1 -> V2로 넘어가면서 DeviceType(IOS,ANDROID) 정보를 추가로 받게 되었고, 기존에 가입한 유저들은 추가로 기입해 주게 됩니다.
+     */
+    public Tokens kakaoLoginV2(KakaoLoginRequestV2 request) {
+        User user = userRepository.findByProviderId(request.providerId())
+                .orElseGet(() -> userService.joinV2(request.email(), KAKAO, request.providerId(),request.deviceType()));
+
+        if (user.getDeviceType() == null) {
+           user.updateDeviceType(request.deviceType());
+        }
+
+        return generateOauthJwtTokens(user.getEmail(), KAKAO, request.providerId());
+    }
+
+
     public Tokens appleLogin(AppleLoginRequest request) {
         OAuthInfo oAuthInfo = appleAuthenticator.getOAuthInfoByIdentityToken(request.identityToken());
 
@@ -48,6 +61,24 @@ public class OAuthService {
                                   .orElseGet(() -> userService.join(oAuthInfo.email(), APPLE, oAuthInfo.providerId()));
 
         updateAppleUserEmail(user, oAuthInfo.email());
+
+        return generateOauthJwtTokens(user.getEmail(), APPLE, oAuthInfo.providerId());
+    }
+
+    /**
+     * V1 -> V2로 넘어가면서 DeviceType(IOS,ANDROID) 정보를 추가로 받게 되었고, 기존에 가입한 유저들은 추가로 기입해 주게 됩니다.
+     */
+    public Tokens appleLoginV2(AppleLoginRequestV2 request) {
+        OAuthInfo oAuthInfo = appleAuthenticator.getOAuthInfoByIdentityToken(request.identityToken());
+
+        User user = userRepository.findByProviderId(oAuthInfo.providerId())
+                .orElseGet(() -> userService.joinV2(oAuthInfo.email(), APPLE, oAuthInfo.providerId(),request.deviceType()));
+
+        updateAppleUserEmail(user, oAuthInfo.email());
+
+        if (user.getDeviceType() == null) {
+            user.updateDeviceType(request.deviceType());
+        }
 
         return generateOauthJwtTokens(user.getEmail(), APPLE, oAuthInfo.providerId());
     }
@@ -97,5 +128,4 @@ public class OAuthService {
     private String makeOauthCredentials(OAuthProvider provider, String providerId) {
         return provider + providerId;
     }
-
 }
