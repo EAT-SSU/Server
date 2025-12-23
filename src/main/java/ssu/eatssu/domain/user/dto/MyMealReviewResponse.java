@@ -85,7 +85,7 @@ public class MyMealReviewResponse {
         return MyMealReviewResponse
                 .builder()
                 .reviewId(review.getId())
-                .rating(review.getRating())
+                .rating(review.getRating() != null ? review.getRating() : (review.getRatings() != null ? review.getRatings().getMainRating() : null))
                 .writtenAt(review.getCreatedDate().toLocalDate())
                 .content(review.getContent())
                 .imageUrls(imgUrlList)
