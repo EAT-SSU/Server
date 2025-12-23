@@ -49,11 +49,6 @@ public class Review extends BaseTimeEntity {
 
     private String content;
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "mainRating", column = @Column(name = "main_rating")),
-            @AttributeOverride(name = "amountRating", column = @Column(name = "amount_rating")),
-            @AttributeOverride(name = "tasteRating", column = @Column(name = "taste_rating"))
-    })
     private Ratings ratings;
 
     // v2용 rating
