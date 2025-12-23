@@ -1,10 +1,5 @@
 package ssu.eatssu.domain.review.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
@@ -30,6 +25,11 @@ import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.user.entity.BaseTimeEntity;
 import ssu.eatssu.domain.user.entity.User;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 /*
 *  251001 이정민
 * 해당 엔티티의 rating은 reviewV1, reviewV2 api의 유지를 위해 지우지 마셔야 합니다.
@@ -49,6 +49,11 @@ public class Review extends BaseTimeEntity {
 
     private String content;
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "mainRating", column = @Column(name = "main_rating")),
+            @AttributeOverride(name = "amountRating", column = @Column(name = "amount_rating")),
+            @AttributeOverride(name = "tasteRating", column = @Column(name = "taste_rating"))
+    })
     private Ratings ratings;
 
     // v2용 rating
