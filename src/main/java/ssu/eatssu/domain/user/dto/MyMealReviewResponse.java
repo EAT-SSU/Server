@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.review.dto.MenuIdNameLikeDto;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewMenuLike;
@@ -82,10 +83,17 @@ public class MyMealReviewResponse {
                                                  );
         }
 
+        Ratings ratings = review.getRatings();
+        int rating = 0;
+
+        if (ratings != null) {
+            rating = ratings.getMainRating() != null ? ratings.getMainRating() : 0;
+        }
+
         return MyMealReviewResponse
                 .builder()
                 .reviewId(review.getId())
-                .rating(review.getRating() != null ? review.getRating() : (review.getRatings() != null ? review.getRatings().getMainRating() : null))
+                .rating(rating)
                 .writtenAt(review.getCreatedDate().toLocalDate())
                 .content(review.getContent())
                 .imageUrls(imgUrlList)
