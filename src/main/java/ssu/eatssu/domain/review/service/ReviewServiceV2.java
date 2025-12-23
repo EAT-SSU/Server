@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
@@ -17,6 +15,7 @@ import ssu.eatssu.domain.menu.persistence.MealMenuRepository;
 import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.menu.service.MealRatingService;
+import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.CreateMenuReviewRequestV2;
@@ -429,7 +428,6 @@ public class ReviewServiceV2 {
     /**
      * 내 리뷰 리스트 조회
      */
-    @Transactional(readOnly = true)
     public SliceResponse<MyMealReviewResponse> findMyReviews(CustomUserDetails userDetails, Long lastReviewId,
                                                              Pageable pageable) {
         User user = userRepository.findById(userDetails.getId())
@@ -437,6 +435,17 @@ public class ReviewServiceV2 {
 
         Slice<Review> sliceReviews = reviewRepository.findByUserOrderByIdDesc(user, lastReviewId,
                                                                               pageable);
+
+        sliceReviews.forEach(item -> {
+            Ratings r = item.getRatings();
+            log.info(
+                    "reviewId=" + item.getId()
+                            + ", ratingCol=" + item.getRating()
+                            + ", ratingsObj=" + (r == null ? "null" : "not-null")
+                            + ", main=" + (r == null ? null : r.getMainRating())
+                            + ", amount=" + (r == null ? null : r.getAmountRating())
+                              );
+        });
 
         List<MyMealReviewResponse> myMealReviewResponses = sliceReviews.getContent().stream()
                                                                        .map(MyMealReviewResponse::from).toList();
@@ -447,44 +456,6 @@ public class ReviewServiceV2 {
                             .dataList(myMealReviewResponses)
                             .build();
     }
-
-    @Transactional(readOnly = true)
-    public SliceResponse<MyMealReviewResponse> findMyReviewsV2(
-            CustomUserDetails userDetails,
-            Long lastReviewId,
-            Pageable pageable
-                                                              ) {
-        User user = userRepository.findById(userDetails.getId())
-                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-
-        // pageSize + 1 로 조회
-        Pageable slicePageable =
-                PageRequest.of(
-                        pageable.getPageNumber(),
-                        pageable.getPageSize() + 1,
-                        Sort.by(Sort.Direction.DESC, "id")
-                              );
-
-        List<Review> reviews =
-                reviewRepository.findMyReviews(user, lastReviewId, slicePageable);
-
-        boolean hasNext = reviews.size() > pageable.getPageSize();
-        if (hasNext) {
-            reviews.remove(pageable.getPageSize());
-        }
-
-        List<MyMealReviewResponse> responses =
-                reviews.stream()
-                       .map(MyMealReviewResponse::from)
-                       .toList();
-
-        return SliceResponse.<MyMealReviewResponse>builder()
-                            .numberOfElements(responses.size())
-                            .hasNext(hasNext)
-                            .dataList(responses)
-                            .build();
-    }
-
 
     public ValidMenuForViewResponse validMenuForReview(Long mealId) {
         Meal meal = mealRepository.findById(mealId)

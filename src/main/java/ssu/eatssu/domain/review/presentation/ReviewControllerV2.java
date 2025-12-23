@@ -222,9 +222,9 @@ public class ReviewControllerV2 {
             @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY) @RequestParam(required = false) Long lastReviewId,
             @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        SliceResponse<MyMealReviewResponse> myReviews = reviewServiceV2.findMyReviewsV2(customUserDetails,
-                                                                                        lastReviewId,
-                                                                                        pageable);
+        SliceResponse<MyMealReviewResponse> myReviews = reviewServiceV2.findMyReviews(customUserDetails,
+                                                                                      lastReviewId,
+                                                                                      pageable);
         return BaseResponse.success(myReviews);
     }
 
