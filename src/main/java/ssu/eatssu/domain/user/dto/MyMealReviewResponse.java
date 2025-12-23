@@ -84,7 +84,7 @@ public class MyMealReviewResponse {
         }
 
         Ratings ratings = review.getRatings();
-        Integer rating = 0;
+        Integer rating;
 
         if (ratings != null) {
             rating = ratings.getMainRating();

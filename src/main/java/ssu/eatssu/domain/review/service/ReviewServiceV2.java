@@ -427,6 +427,7 @@ public class ReviewServiceV2 {
     /**
      * 내 리뷰 리스트 조회
      */
+    @Transactional(readOnly = true)
     public SliceResponse<MyMealReviewResponse> findMyReviews(CustomUserDetails userDetails, Long lastReviewId,
                                                              Pageable pageable) {
         User user = userRepository.findById(userDetails.getId())
