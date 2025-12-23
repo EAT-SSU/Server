@@ -84,10 +84,10 @@ public class MyMealReviewResponse {
         }
 
         Ratings ratings = review.getRatings();
-        int rating = 0;
+        Integer rating = review.getRating();
 
         if (ratings != null) {
-            rating = ratings.getMainRating() != null ? ratings.getMainRating() : 0;
+            rating = ratings.getMainRating() != null ? ratings.getMainRating() : rating;
         }
 
         return MyMealReviewResponse
