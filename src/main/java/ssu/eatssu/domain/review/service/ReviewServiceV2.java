@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
@@ -443,6 +445,43 @@ public class ReviewServiceV2 {
                             .numberOfElements(sliceReviews.getNumberOfElements())
                             .hasNext(sliceReviews.hasNext())
                             .dataList(myMealReviewResponses)
+                            .build();
+    }
+
+    @Transactional(readOnly = true)
+    public SliceResponse<MyMealReviewResponse> findMyReviewsV2(
+            CustomUserDetails userDetails,
+            Long lastReviewId,
+            Pageable pageable
+                                                              ) {
+        User user = userRepository.findById(userDetails.getId())
+                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+
+        // pageSize + 1 로 조회
+        Pageable slicePageable =
+                PageRequest.of(
+                        pageable.getPageNumber(),
+                        pageable.getPageSize() + 1,
+                        Sort.by(Sort.Direction.DESC, "id")
+                              );
+
+        List<Review> reviews =
+                reviewRepository.findMyReviews(user, lastReviewId, slicePageable);
+
+        boolean hasNext = reviews.size() > pageable.getPageSize();
+        if (hasNext) {
+            reviews.remove(pageable.getPageSize());
+        }
+
+        List<MyMealReviewResponse> responses =
+                reviews.stream()
+                       .map(MyMealReviewResponse::from)
+                       .toList();
+
+        return SliceResponse.<MyMealReviewResponse>builder()
+                            .numberOfElements(responses.size())
+                            .hasNext(hasNext)
+                            .dataList(responses)
                             .build();
     }
 

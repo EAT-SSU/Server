@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
-import ssu.eatssu.domain.review.dto.CreateMenuReviewRequest;
 import ssu.eatssu.domain.review.dto.CreateMenuReviewRequestV2;
 import ssu.eatssu.domain.review.dto.MealReviewResponse;
 import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
@@ -223,9 +222,9 @@ public class ReviewControllerV2 {
             @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY) @RequestParam(required = false) Long lastReviewId,
             @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        SliceResponse<MyMealReviewResponse> myReviews = reviewServiceV2.findMyReviews(customUserDetails,
-                                                                                      lastReviewId,
-                                                                                      pageable);
+        SliceResponse<MyMealReviewResponse> myReviews = reviewServiceV2.findMyReviewsV2(customUserDetails,
+                                                                                        lastReviewId,
+                                                                                        pageable);
         return BaseResponse.success(myReviews);
     }
 
