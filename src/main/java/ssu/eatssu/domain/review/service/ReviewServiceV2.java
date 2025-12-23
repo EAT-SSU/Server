@@ -1,17 +1,5 @@
 package ssu.eatssu.domain.review.service;
 
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MEAL;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.REVIEW_PERMISSION_DENIED;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -27,6 +15,7 @@ import ssu.eatssu.domain.menu.persistence.MealMenuRepository;
 import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.menu.service.MealRatingService;
+import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.dto.CreateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.CreateMenuReviewRequestV2;
@@ -50,6 +39,19 @@ import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.log.event.LogEvent;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MEAL;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.REVIEW_PERMISSION_DENIED;
 
 @Slf4j
 @Service
@@ -111,7 +113,6 @@ public class ReviewServiceV2 {
         review.addReviewMenuLike(menu, request.getMenuLike().getIsLike());
         request.getImageUrls().forEach(review::addReviewImage);
         reviewRepository.save(review);
-
 
         menu.addReview(review);
 
@@ -427,6 +428,7 @@ public class ReviewServiceV2 {
     /**
      * 내 리뷰 리스트 조회
      */
+    @Transactional(readOnly = true)
     public SliceResponse<MyMealReviewResponse> findMyReviews(CustomUserDetails userDetails, Long lastReviewId,
                                                              Pageable pageable) {
         User user = userRepository.findById(userDetails.getId())
@@ -434,6 +436,18 @@ public class ReviewServiceV2 {
 
         Slice<Review> sliceReviews = reviewRepository.findByUserOrderByIdDesc(user, lastReviewId,
                                                                               pageable);
+
+
+        sliceReviews.forEach(item -> {
+            Ratings r = item.getRatings();
+            log.info(
+                    "reviewId=" + item.getId()
+                            + ", ratingCol=" + item.getRating()
+                            + ", ratingsObj=" + (r == null ? "null" : "not-null")
+                            + ", main=" + (r == null ? null : r.getMainRating())
+                            + ", amount=" + (r == null ? null : r.getAmountRating())
+                              );
+        });
 
         List<MyMealReviewResponse> myMealReviewResponses = sliceReviews.getContent().stream()
                                                                        .map(MyMealReviewResponse::from).toList();
@@ -444,7 +458,6 @@ public class ReviewServiceV2 {
                             .dataList(myMealReviewResponses)
                             .build();
     }
-
 
     public ValidMenuForViewResponse validMenuForReview(Long mealId) {
         Meal meal = mealRepository.findById(mealId)

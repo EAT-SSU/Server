@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.review.dto.MenuIdNameLikeDto;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewMenuLike;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @Builder
 @Schema(title = "리뷰 상세 - 내 리뷰 리스트 조회 용")
 @Getter
+@Slf4j
 public class MyMealReviewResponse {
     @Schema(description = "리뷰 식별자", example = "123")
     Long reviewId;
@@ -82,10 +85,25 @@ public class MyMealReviewResponse {
                                                  );
         }
 
+        log.info("ratings = {}", review.getRatings());
+        if (review.getRatings() != null) {
+            log.info("mainRating = {}", review.getRatings().getMainRating());
+        }
+        log.info("legacy rating = {}", review.getRating());
+
+        Ratings ratings = review.getRatings();
+        Integer rating = null;
+
+        if (ratings != null && ratings.getMainRating() != null) {
+            rating = ratings.getMainRating();
+        } else if (review.getRating() != null) {
+            rating = review.getRating();
+        }
+
         return MyMealReviewResponse
                 .builder()
                 .reviewId(review.getId())
-                .rating(review.getRating())
+                .rating(rating)
                 .writtenAt(review.getCreatedDate().toLocalDate())
                 .content(review.getContent())
                 .imageUrls(imgUrlList)

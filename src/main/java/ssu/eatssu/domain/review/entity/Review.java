@@ -1,10 +1,5 @@
 package ssu.eatssu.domain.review.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
@@ -29,6 +24,11 @@ import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.user.entity.BaseTimeEntity;
 import ssu.eatssu.domain.user.entity.User;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /*
 *  251001 이정민
