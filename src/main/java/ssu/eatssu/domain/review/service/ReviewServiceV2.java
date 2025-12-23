@@ -1,17 +1,5 @@
 package ssu.eatssu.domain.review.service;
 
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MEAL;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.REVIEW_PERMISSION_DENIED;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -50,6 +38,19 @@ import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.log.event.LogEvent;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MEAL;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.REVIEW_PERMISSION_DENIED;
 
 @Slf4j
 @Service
@@ -111,7 +112,6 @@ public class ReviewServiceV2 {
         review.addReviewMenuLike(menu, request.getMenuLike().getIsLike());
         request.getImageUrls().forEach(review::addReviewImage);
         reviewRepository.save(review);
-
 
         menu.addReview(review);
 
