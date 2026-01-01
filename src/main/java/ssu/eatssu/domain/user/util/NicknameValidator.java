@@ -102,13 +102,13 @@ public class NicknameValidator {
             throw new BaseException(BaseResponseStatus.CONSECUTIVE_HYPHEN_NICKNAME);
         }
 
-        // 한글 영어가 아닌 것으로 시작
-        if (nickname.matches("^[^A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ].*")) {
+        // 한글, 영어, 숫자가 아닌 것으로 시작
+        if (nickname.matches("^[^A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ0-9].*")) {
             throw new BaseException(BaseResponseStatus.INVALID_START_OF_NICKNAME);
         }
 
-        // 한글 영어가 아닌 것으로 마무리
-        if (nickname.matches(".*[^A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ]$")) {
+        // 한글, 영어, 숫자가 아닌 것으로 끝남
+        if (nickname.matches(".*[^A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ0-9]$")) {
             throw new BaseException(BaseResponseStatus.INVALID_END_OF_NICKNAME);
         }
 
