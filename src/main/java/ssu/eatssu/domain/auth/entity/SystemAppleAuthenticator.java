@@ -25,7 +25,7 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.Map;
 
-import static ssu.eatssu.global.handler.response.BaseResponseStatus.INVALID_IDENTITY_TOKEN;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 @Component
 @RequiredArgsConstructor
@@ -49,10 +49,19 @@ public class SystemAppleAuthenticator implements AppleAuthenticator {
                             .parseClaimsJws(identityToken)
                             .getBody();
 
-        //Claims 에서 email, providerId(사용자 식별값) 를 추출한다.
+        Object emailObj = claims.get("email");
+        Object providerIdObj = claims.get("sub");
+
+        if (providerIdObj == null) {
+            throw new BaseException(NOT_FOUND_PROVIDER_ID);
+        }
+        if (emailObj == null) {
+            throw new BaseException(NOT_FOUND_EMAIL);
+        }
+
         try {
-            String email = claims.get("email").toString();
-            String providerId = claims.get("sub").toString();
+            String email = emailObj.toString();
+            String providerId = providerIdObj.toString();
             return new OAuthInfo(email, providerId);
         } catch (ExpiredJwtException exception) {
             throw new BaseException(INVALID_IDENTITY_TOKEN);

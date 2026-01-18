@@ -49,7 +49,6 @@ public class User extends BaseTimeEntity {
     private Long id;
     @Enumerated(EnumType.STRING)
     private Role role;
-    @Column(unique = true)
     private String email;
     private String nickname;
     @Enumerated(EnumType.STRING)
