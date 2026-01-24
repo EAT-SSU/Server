@@ -46,9 +46,8 @@ public class OAuthService {
         User user = userRepository.findByProviderId(request.providerId())
                 .orElseGet(() -> userService.joinV2(request.email(), KAKAO, request.providerId(),request.deviceType()));
 
-        if (user.getDeviceType() == null) {
-           user.updateDeviceType(request.deviceType());
-        }
+        user.updateDeviceType(request.deviceType());
+
 
         return generateOauthJwtTokens(user.getEmail(), KAKAO, request.providerId());
     }
@@ -76,9 +75,7 @@ public class OAuthService {
 
         updateAppleUserEmail(user, oAuthInfo.email());
 
-        if (user.getDeviceType() == null) {
-            user.updateDeviceType(request.deviceType());
-        }
+        user.updateDeviceType(request.deviceType());
 
         return generateOauthJwtTokens(user.getEmail(), APPLE, oAuthInfo.providerId());
     }
