@@ -41,8 +41,8 @@ spring:
 jwt:
   secret:
     key: ${EATSSU_JWT_SECRET_DEV}
-  token-validity-in-seconds: 86400
-  refresh-token-validity-in-seconds: 604800
+  token-validity-in-seconds: 60
+  refresh-token-validity-in-seconds: 180
 
 #S3
 cloud:
