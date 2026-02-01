@@ -34,7 +34,8 @@ public class OAuthService {
 
     public Tokens kakaoLogin(KakaoLoginRequest request) {
         User user = userRepository.findByProviderId(request.providerId())
-                                  .orElseGet(() -> userService.join(request.email(), KAKAO, request.providerId()));
+                                  .orElseGet(() -> userRepository.findFirstByEmailOrderByIdAsc(request.email())
+                                          .orElseGet(() -> userService.join(request.email(), KAKAO, request.providerId())));
 
         return generateOauthJwtTokens(user.getEmail(), KAKAO, request.providerId());
     }
@@ -44,11 +45,11 @@ public class OAuthService {
      */
     public Tokens kakaoLoginV2(KakaoLoginRequestV2 request) {
         User user = userRepository.findByProviderId(request.providerId())
-                .orElseGet(() -> userService.joinV2(request.email(), KAKAO, request.providerId(),request.deviceType()));
+                .orElseGet(() -> userRepository.findFirstByEmailOrderByIdAsc(request.email())
+                        .orElseGet(() -> userService.joinV2(request.email(), KAKAO, request.providerId(),request.deviceType())));
 
-        if (user.getDeviceType() == null) {
-           user.updateDeviceType(request.deviceType());
-        }
+        user.updateDeviceType(request.deviceType());
+
 
         return generateOauthJwtTokens(user.getEmail(), KAKAO, request.providerId());
     }
@@ -58,7 +59,8 @@ public class OAuthService {
         OAuthInfo oAuthInfo = appleAuthenticator.getOAuthInfoByIdentityToken(request.identityToken());
 
         User user = userRepository.findByProviderId(oAuthInfo.providerId())
-                                  .orElseGet(() -> userService.join(oAuthInfo.email(), APPLE, oAuthInfo.providerId()));
+                                  .orElseGet(() -> userRepository.findFirstByEmailOrderByIdAsc(oAuthInfo.email())
+                                          .orElseGet(() -> userService.join(oAuthInfo.email(), APPLE, oAuthInfo.providerId())));
 
         updateAppleUserEmail(user, oAuthInfo.email());
 
@@ -72,13 +74,12 @@ public class OAuthService {
         OAuthInfo oAuthInfo = appleAuthenticator.getOAuthInfoByIdentityToken(request.identityToken());
 
         User user = userRepository.findByProviderId(oAuthInfo.providerId())
-                .orElseGet(() -> userService.joinV2(oAuthInfo.email(), APPLE, oAuthInfo.providerId(),request.deviceType()));
+                .orElseGet(() -> userRepository.findFirstByEmailOrderByIdAsc(oAuthInfo.email())
+                        .orElseGet(() -> userService.joinV2(oAuthInfo.email(), APPLE, oAuthInfo.providerId(),request.deviceType())));
 
         updateAppleUserEmail(user, oAuthInfo.email());
 
-        if (user.getDeviceType() == null) {
-            user.updateDeviceType(request.deviceType());
-        }
+        user.updateDeviceType(request.deviceType());
 
         return generateOauthJwtTokens(user.getEmail(), APPLE, oAuthInfo.providerId());
     }
