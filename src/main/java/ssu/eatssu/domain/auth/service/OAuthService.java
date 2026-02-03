@@ -37,7 +37,7 @@ public class OAuthService {
                                   .orElseGet(() -> userRepository.findFirstByEmailOrderByIdAsc(request.email())
                                           .orElseGet(() -> userService.join(request.email(), KAKAO, request.providerId())));
 
-        return generateOauthJwtTokens(user.getEmail(), KAKAO, request.providerId());
+        return generateOauthJwtTokens(user.getEmail(), user.getProvider(), user.getProviderId());
     }
 
     /**
@@ -51,7 +51,7 @@ public class OAuthService {
         user.updateDeviceType(request.deviceType());
 
 
-        return generateOauthJwtTokens(user.getEmail(), KAKAO, request.providerId());
+        return generateOauthJwtTokens(user.getEmail(), user.getProvider(), user.getProviderId());
     }
 
 
@@ -64,7 +64,7 @@ public class OAuthService {
 
         updateAppleUserEmail(user, oAuthInfo.email());
 
-        return generateOauthJwtTokens(user.getEmail(), APPLE, oAuthInfo.providerId());
+        return generateOauthJwtTokens(user.getEmail(), user.getProvider(), user.getProviderId());
     }
 
     /**
@@ -81,7 +81,7 @@ public class OAuthService {
 
         user.updateDeviceType(request.deviceType());
 
-        return generateOauthJwtTokens(user.getEmail(), APPLE, oAuthInfo.providerId());
+        return generateOauthJwtTokens(user.getEmail(), user.getProvider(), user.getProviderId());
     }
 
     public Tokens refreshTokens(Authentication authentication) {
