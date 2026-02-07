@@ -28,10 +28,3 @@ ALTER TABLE menu
 
 ALTER TABLE review
     MODIFY rating INT;
-
--- =========================
--- 4. unique 제약조건 추가
--- =========================
-
-ALTER TABLE college
-    ADD CONSTRAINT UK_college_name UNIQUE (name);
