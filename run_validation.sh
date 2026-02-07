@@ -29,10 +29,11 @@ echo "[$ENV 환경] 데이터 검증을 시작합니다..."
 echo ""
 
 # 검증 쿼리 실행
-mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < validate_enum_data.sql > validation_result_${ENV}_$(date +%Y%m%d_%H%M%S).txt 2>&1
+RESULT_FILE="validation_result_${ENV}_$(date +%Y%m%d_%H%M%S).txt"
+mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < validate_enum_data.sql > "$RESULT_FILE" 2>&1
 
 if [ $? -eq 0 ]; then
-    echo "✅ 검증 완료! 결과 파일을 확인하세요: validation_result_${ENV}_$(date +%Y%m%d_%H%M%S).txt"
+    echo "✅ 검증 완료! 결과 파일을 확인하세요: $RESULT_FILE"
     echo ""
     echo "⚠️  중요: 결과 파일에서 아래 내용을 확인하세요"
     echo "   - 불일치 데이터가 있는 경우: 데이터 정리 후 다시 검증"
