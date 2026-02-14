@@ -5,6 +5,13 @@ server:
 
 
 spring:
+  ## Flyway
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    locations: classpath:db/migration
+
   ## Database
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -41,8 +48,8 @@ spring:
 jwt:
   secret:
     key: ${EATSSU_JWT_SECRET_DEV}
-  token-validity-in-seconds: 60
-  refresh-token-validity-in-seconds: 180
+  token-validity-in-seconds: 86400
+  refresh-token-validity-in-seconds: 604800
 
 #S3
 cloud:
