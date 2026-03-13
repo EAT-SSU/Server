@@ -7,12 +7,14 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ssu.eatssu.domain.auth.dto.AppleKeys;
 import ssu.eatssu.domain.auth.dto.OAuthInfo;
+import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 
 import java.math.BigInteger;
@@ -29,9 +31,11 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SystemAppleAuthenticator implements AppleAuthenticator {
 
     private final RestTemplate restTemplate;
+    private final UserRepository userRepository;
 
     public OAuthInfo getOAuthInfoByIdentityToken(String identityToken) {
         PublicKey publicKey = generatePublicKey(identityToken);
@@ -42,12 +46,16 @@ public class SystemAppleAuthenticator implements AppleAuthenticator {
      * 애플 로그인 - PublicKey 를 통해 유저 정보(providerId, email) 조회
      */
     private OAuthInfo getOAuthInfoByPublicKey(String identityToken, PublicKey publicKey) {
-        // identityToken 에서 publicKey 서명을 통해 Claims 를 추출한다.
-        Claims claims = Jwts.parserBuilder()
-                            .setSigningKey(publicKey)
-                            .build()
-                            .parseClaimsJws(identityToken)
-                            .getBody();
+        Claims claims;
+        try {
+            claims = Jwts.parserBuilder()
+                         .setSigningKey(publicKey)
+                         .build()
+                         .parseClaimsJws(identityToken)
+                         .getBody();
+        } catch (ExpiredJwtException exception) {
+            throw new BaseException(INVALID_IDENTITY_TOKEN);
+        }
 
         Object emailObj = claims.get("email");
         Object providerIdObj = claims.get("sub");
@@ -55,17 +63,26 @@ public class SystemAppleAuthenticator implements AppleAuthenticator {
         if (providerIdObj == null) {
             throw new BaseException(NOT_FOUND_PROVIDER_ID);
         }
+
+        String providerId = providerIdObj.toString();
+
+        // email 없는 경우 → Apple 재로그인 케이스 검증 (Apple 스펙상 최초 로그인 시에만 email 포함)
         if (emailObj == null) {
-            throw new BaseException(NOT_FOUND_EMAIL);
+            boolean existsUser = userRepository.findByProviderId(providerId).isPresent();
+
+            if (existsUser) {
+                // 가설 맞음: 기존 유저 재로그인 케이스
+                log.info("[Apple Login] email claim 없음 & DB 유저 있음. 재로그인 케이스로 확인. providerId={}", providerId);
+                throw new BaseException(NOT_FOUND_EMAIL);
+            } else {
+                // 다른 원인: 신규 유저인데 email 없음 → 슬랙 알럿용 별도 에러코드
+                log.warn("[Apple Login] email claim 없음 & DB 유저 없음. 원인 불명. providerId={}", providerId);
+                throw new BaseException(NOT_FOUND_APPLE_EMAIL_NEW_USER);
+            }
         }
 
-        try {
-            String email = emailObj.toString();
-            String providerId = providerIdObj.toString();
-            return new OAuthInfo(email, providerId);
-        } catch (ExpiredJwtException exception) {
-            throw new BaseException(INVALID_IDENTITY_TOKEN);
-        }
+        String email = emailObj.toString();
+        return new OAuthInfo(email, providerId);
     }
 
     private PublicKey generatePublicKey(String identityToken) {
