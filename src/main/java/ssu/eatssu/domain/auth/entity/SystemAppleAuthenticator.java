@@ -7,7 +7,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -31,7 +30,6 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.*;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class SystemAppleAuthenticator implements AppleAuthenticator {
 
     private final RestTemplate restTemplate;
@@ -66,23 +64,14 @@ public class SystemAppleAuthenticator implements AppleAuthenticator {
 
         String providerId = providerIdObj.toString();
 
-        // email 없는 경우 → Apple 재로그인 케이스 검증 (Apple 스펙상 최초 로그인 시에만 email 포함)
+        // email 없는 경우 → Apple 재로그인 케이스 (Apple 스펙상 최초 로그인 시에만 email 포함)
         if (emailObj == null) {
-            boolean existsUser = userRepository.findByProviderId(providerId).isPresent();
-
-            if (existsUser) {
-                // 가설 맞음: 기존 유저 재로그인 케이스 → 슬랙 알럿으로 확인
-                log.warn("[Apple Login] email claim 없음 & DB 유저 있음. 재로그인 케이스로 확인. providerId={}", providerId);
-                throw new BaseException(NOT_FOUND_EMAIL);
-            } else {
-                // 다른 원인: 신규 유저인데 email 없음 → 슬랙 알럿으로 별도 구분
-                log.warn("[Apple Login] email claim 없음 & DB 유저 없음. 원인 불명. providerId={}", providerId);
-                throw new BaseException(NOT_FOUND_APPLE_EMAIL_NEW_USER);
-            }
+            return userRepository.findByProviderId(providerId)
+                .map(user -> new OAuthInfo(user.getEmail(), providerId))
+                .orElseThrow(() -> new BaseException(NOT_FOUND_APPLE_EMAIL_NEW_USER));
         }
 
-        String email = emailObj.toString();
-        return new OAuthInfo(email, providerId);
+        return new OAuthInfo(emailObj.toString(), providerId);
     }
 
     private PublicKey generatePublicKey(String identityToken) {
