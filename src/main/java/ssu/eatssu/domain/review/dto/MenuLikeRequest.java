@@ -1,6 +1,7 @@
 package ssu.eatssu.domain.review.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,6 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MenuLikeRequest {
     @Schema(description = "메뉴 식별자", example = "123")
+    @NotNull
     private Long menuId;
     @Schema(description = "좋아요 선택", example = "좋아요 : true (기본값은 false)")
     private Boolean isLike;

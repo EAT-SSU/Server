@@ -1,8 +1,10 @@
 package ssu.eatssu.domain.review.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ssu.eatssu.domain.menu.entity.Menu;
@@ -16,10 +18,13 @@ import java.util.List;
 @AllArgsConstructor
 public class CreateMenuReviewRequestV2 {
     @Schema(description = "평점", example = "5")
+    @NotNull
     @Min(1)
     @Max(5)
     private Integer rating;
 
+    @NotNull
+    @Valid
     private MenuLikeRequest menuLike;
 
     @Schema(description = "한줄평", example = "이 메뉴 진짜 맛있어요!")
