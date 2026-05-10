@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
+import ssu.eatssu.domain.partnership.entity.PeriodType;
 
 import java.time.LocalDate;
 
@@ -18,6 +19,7 @@ public class PartnershipInfo {
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
+    private PeriodType periodType;
 
     public static PartnershipInfo fromEntity(Partnership partnership,
                                              PartnershipRestaurant restaurant,
@@ -27,6 +29,7 @@ public class PartnershipInfo {
                               .description(partnership.getDescription())
                               .startDate(partnership.getStartDate())
                               .endDate(partnership.getEndDate())
+                              .periodType(partnership.getPeriodType())
                               .collegeName(partnership.getPartnershipCollege() == null && partnership.getPartnershipDepartment() == null
                                                    ? "총학생회"
                                                    : (partnership.getPartnershipCollege() != null ? partnership.getPartnershipCollege()
