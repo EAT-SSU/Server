@@ -45,7 +45,7 @@ public class Partnership {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "period_type", nullable = false)
-    private PeriodType periodType = PeriodType.REGULAR;
+    private PeriodType periodType = PeriodType.NORMAL;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partnership_college_id")
