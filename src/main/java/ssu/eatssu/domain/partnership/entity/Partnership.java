@@ -2,6 +2,8 @@ package ssu.eatssu.domain.partnership.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -39,6 +41,12 @@ public class Partnership {
 
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "period_type", nullable = false)
+    private PeriodType periodType = PeriodType.NORMAL;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partnership_college_id")
     private College partnershipCollege;
