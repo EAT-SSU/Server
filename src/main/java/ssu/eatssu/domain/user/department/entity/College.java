@@ -27,10 +27,20 @@ public class College {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "college_id")
     private Long id;
-    @Column(nullable = false, unique = true)
-    private String name;
+    @Column(name = "name_ko", nullable = false, unique = true)
+    private String nameKo;
+    @Column(name = "name_en")
+    private String nameEn;
+    @Column(name = "name_ja")
+    private String nameJa;
+    @Column(name = "name_vi")
+    private String nameVi;
 
     public College(String name) {
-        this.name = name;
+        this.nameKo = name;
+    }
+
+    public String getName() {
+        return nameKo;
     }
 }

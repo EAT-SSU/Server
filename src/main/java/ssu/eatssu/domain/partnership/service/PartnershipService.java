@@ -52,7 +52,7 @@ public class PartnershipService {
                                                                                              NOT_FOUND_PARTNERSHIP_RESTAURANT));
         Partnership partnership = request.toPartnershipEntity(partnershipRestaurant);
 
-        College college = collegeRepository.findByName(request.getCollege())
+        College college = collegeRepository.findByNameKo(request.getCollege())
                                            .orElseThrow(() -> new BaseException(NOT_FOUND_COLLEGE));
         partnership.setPartnershipCollege(college);
         Department department = departmentRepository.findByName(request.getDepartment())
