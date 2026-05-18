@@ -50,9 +50,9 @@ public class MyPageResponse {
                              .provider(user.getProvider())
                              .language(user.getLanguage())
                              .departmentId(department != null ? department.getId() : null)
-                             .departmentName(department != null ? department.getName() : null)
+                             .departmentName(department != null ? department.getNameByLanguage(user.getLanguage()) : null)
                              .collegeId(college != null ? college.getId() : null)
-                             .collegeName(college != null ? college.getName() : null)
+                             .collegeName(college != null ? college.getNameByLanguage(user.getLanguage()) : null)
                              .build();
     }
 }

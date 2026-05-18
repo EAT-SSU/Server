@@ -79,7 +79,6 @@ public class User extends BaseTimeEntity {
         this.status = status;
         this.credentials = credentials;
         this.deviceType = deviceType;
-        this.language = Language.KO;
     }
 
     // TODO : 회원 가입 V2 마이그레이션 이후 삭제.
