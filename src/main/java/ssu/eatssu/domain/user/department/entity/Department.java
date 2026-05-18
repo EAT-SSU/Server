@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.partnership.entity.Partnership;
+import ssu.eatssu.domain.user.entity.Language;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,5 +47,18 @@ public class Department {
 
     public String getName() {
         return nameKo;
+    }
+
+    public String getNameByLanguage(Language language) {
+        if (language == null) {
+            return nameKo;
+        }
+
+        return switch (language) {
+            case EN -> nameEn != null ? nameEn : nameKo;
+            case JA -> nameJa != null ? nameJa : nameKo;
+            case VI -> nameVi != null ? nameVi : nameKo;
+            case KO -> nameKo;
+        };
     }
 }

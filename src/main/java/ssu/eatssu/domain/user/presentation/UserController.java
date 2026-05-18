@@ -244,8 +244,9 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 단과대", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/lookup/colleges")
-    public BaseResponse<List<GetCollegeResponse>> getColleges() {
-        List<GetCollegeResponse> getCollegeResponses = userService.getCollegeList();
+    public BaseResponse<List<GetCollegeResponse>> getColleges(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<GetCollegeResponse> getCollegeResponses = userService.getCollegeList(userDetails);
         return BaseResponse.success(getCollegeResponses);
     }
 
@@ -254,8 +255,9 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "단과대 리스트 조회 성공"),
     })
     @GetMapping("/lookup/departments")
-    public BaseResponse<List<GetDepartmentResponse>> getDepartments(@RequestParam Long collegeId) {
-        List<GetDepartmentResponse> getCollegeResponses = userService.getDepartmentList(collegeId);
+    public BaseResponse<List<GetDepartmentResponse>> getDepartments(@RequestParam Long collegeId,
+                                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<GetDepartmentResponse> getCollegeResponses = userService.getDepartmentList(collegeId, userDetails);
         return BaseResponse.success(getCollegeResponses);
     }
 

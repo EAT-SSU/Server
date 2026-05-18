@@ -23,6 +23,7 @@ import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
 import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
 import ssu.eatssu.domain.user.entity.DeviceType;
+import ssu.eatssu.domain.user.entity.Language;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.user.util.NicknameValidator;
@@ -140,7 +141,7 @@ public class UserService {
 
     public DepartmentResponse getDepartment(CustomUserDetails userDetails) {
         User user = findUserByUserDetails(userDetails);
-        return DepartmentResponse.from(user.getDepartment());
+        return DepartmentResponse.from(user.getDepartment(), user.getLanguage());
     }
 
     private User findUserByUserDetails(CustomUserDetails userDetails) {
@@ -148,23 +149,32 @@ public class UserService {
                              .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
     }
 
-    public List<GetCollegeResponse> getCollegeList() {
+    public List<GetCollegeResponse> getCollegeList(CustomUserDetails userDetails) {
+        Language language = findLanguageOrDefault(userDetails);
         List<College> colleges = collegeRepository.findAll();
         return colleges.stream().map(college -> GetCollegeResponse.builder()
                                                                   .id(college.getId())
-                                                                  .name(college.getName())
+                                                                  .name(college.getNameByLanguage(language))
                                                                   .build())
                        .toList();
     }
 
-    public List<GetDepartmentResponse> getDepartmentList(Long collegeId) {
+    public List<GetDepartmentResponse> getDepartmentList(Long collegeId, CustomUserDetails userDetails) {
+        Language language = findLanguageOrDefault(userDetails);
         College college = collegeRepository.findById(collegeId)
                                            .orElseThrow(() -> new BaseException(VALIDATION_ERROR));
         List<Department> departments = departmentRepository.findByCollege(college);
         return departments.stream().map(department -> GetDepartmentResponse.builder()
                                                                            .id(department.getId())
-                                                                           .name(department.getName())
+                                                                           .name(department.getNameByLanguage(language))
                                                                            .build())
                           .toList();
+    }
+
+    private Language findLanguageOrDefault(CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return Language.KO;
+        }
+        return findUserByUserDetails(userDetails).getLanguage();
     }
 }
