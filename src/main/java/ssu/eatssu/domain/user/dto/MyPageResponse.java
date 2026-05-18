@@ -7,6 +7,7 @@ import lombok.Getter;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.user.department.entity.College;
 import ssu.eatssu.domain.user.department.entity.Department;
+import ssu.eatssu.domain.user.entity.Language;
 import ssu.eatssu.domain.user.entity.User;
 
 @AllArgsConstructor
@@ -20,6 +21,9 @@ public class MyPageResponse {
 
     @Schema(description = "연결 계정 정보", example = "GOOGLE")
     private OAuthProvider provider;
+
+    @Schema(description = "언어 설정", example = "KO")
+    private Language language;
 
     @Schema(description = "학과 id", example = "1")
     private Long departmentId;
@@ -44,6 +48,7 @@ public class MyPageResponse {
         return MyPageResponse.builder()
                              .nickname(user.getNickname())
                              .provider(user.getProvider())
+                             .language(user.getLanguage())
                              .departmentId(department != null ? department.getId() : null)
                              .departmentName(department != null ? department.getName() : null)
                              .collegeId(college != null ? college.getId() : null)

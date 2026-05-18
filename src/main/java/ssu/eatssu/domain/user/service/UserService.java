@@ -18,6 +18,7 @@ import ssu.eatssu.domain.user.department.persistence.DepartmentRepository;
 import ssu.eatssu.domain.user.dto.DepartmentResponse;
 import ssu.eatssu.domain.user.dto.GetCollegeResponse;
 import ssu.eatssu.domain.user.dto.GetDepartmentResponse;
+import ssu.eatssu.domain.user.dto.LanguageResponse;
 import ssu.eatssu.domain.user.dto.LanguageUpdateRequest;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
@@ -98,6 +99,11 @@ public class UserService {
                 String.format("User language updated: userId=%d, language=%s",
                         user.getId(), request.language()))
         );
+    }
+
+    public LanguageResponse findLanguage(CustomUserDetails userDetails) {
+        User user = findUserByUserDetails(userDetails);
+        return LanguageResponse.from(user);
     }
 
     public boolean withdraw(CustomUserDetails userDetails) {

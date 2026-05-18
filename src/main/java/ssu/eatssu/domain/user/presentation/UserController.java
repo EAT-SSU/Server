@@ -33,6 +33,7 @@ import ssu.eatssu.domain.slice.service.SliceService;
 import ssu.eatssu.domain.user.dto.DepartmentResponse;
 import ssu.eatssu.domain.user.dto.GetCollegeResponse;
 import ssu.eatssu.domain.user.dto.GetDepartmentResponse;
+import ssu.eatssu.domain.user.dto.LanguageResponse;
 import ssu.eatssu.domain.user.dto.LanguageUpdateRequest;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
@@ -127,6 +128,17 @@ public class UserController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         userService.updateLanguage(userDetails, request);
         return BaseResponse.success();
+    }
+
+    @Operation(summary = "언어 설정 조회", description = "유저의 언어 설정을 조회하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "언어 설정 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @GetMapping("/language")
+    public BaseResponse<LanguageResponse> getLanguage(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return BaseResponse.success(userService.findLanguage(userDetails));
     }
 
     @Operation(summary = "유저 탈퇴", description = "유저 탈퇴 API 입니다.")
