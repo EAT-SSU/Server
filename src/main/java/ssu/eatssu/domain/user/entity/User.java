@@ -59,6 +59,9 @@ public class User extends BaseTimeEntity {
     private UserStatus status;
     @Enumerated(EnumType.STRING)
     private DeviceType deviceType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Language language = Language.KO;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
     private Department department;
@@ -76,6 +79,7 @@ public class User extends BaseTimeEntity {
         this.status = status;
         this.credentials = credentials;
         this.deviceType = deviceType;
+        this.language = Language.KO;
     }
 
     // TODO : 회원 가입 V2 마이그레이션 이후 삭제.
