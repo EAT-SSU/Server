@@ -55,7 +55,7 @@ public class PartnershipService {
         College college = collegeRepository.findByNameKo(request.getCollege())
                                            .orElseThrow(() -> new BaseException(NOT_FOUND_COLLEGE));
         partnership.setPartnershipCollege(college);
-        Department department = departmentRepository.findByName(request.getDepartment())
+        Department department = departmentRepository.findByNameKo(request.getDepartment())
                                                     .orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
         partnership.setPartnershipDepartment(department);
         partnershipRepository.save(partnership);

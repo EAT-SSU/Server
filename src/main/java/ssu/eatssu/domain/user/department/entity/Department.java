@@ -28,13 +28,23 @@ public class Department {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "department_id")
     private Long id;
-    @Column(nullable = false)
-    private String name;
+    @Column(name = "name_ko", nullable = false)
+    private String nameKo;
+    @Column(name = "name_en")
+    private String nameEn;
+    @Column(name = "name_ja")
+    private String nameJa;
+    @Column(name = "name_vi")
+    private String nameVi;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "college_id")
     private College college;
 
     public Department(String name) {
-        this.name = name;
+        this.nameKo = name;
+    }
+
+    public String getName() {
+        return nameKo;
     }
 }
