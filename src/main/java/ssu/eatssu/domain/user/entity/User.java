@@ -127,6 +127,10 @@ public class User extends BaseTimeEntity {
         this.department = department;
     }
 
+    public void updateLanguage(@NotNull Language language) {
+        this.language = language;
+    }
+
     // 추후에 기종이 바뀌더라도 업데이트합니다. + V1-> V2 마이그레이션을 수행하는 역할을 하기도 합니다.
     public void updateDeviceType(DeviceType deviceType) { this.deviceType = deviceType; }
 }
