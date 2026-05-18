@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import ssu.eatssu.domain.user.entity.Language;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,5 +52,18 @@ public class PartnershipRestaurant {
 
     public String getStoreName() {
         return storeNameKo;
+    }
+
+    public String getStoreNameByLanguage(Language language) {
+        if (language == null) {
+            return storeNameKo;
+        }
+
+        return switch (language) {
+            case EN -> storeNameEn != null ? storeNameEn : storeNameKo;
+            case JA -> storeNameJa != null ? storeNameJa : storeNameKo;
+            case VI -> storeNameVi != null ? storeNameVi : storeNameKo;
+            case KO -> storeNameKo;
+        };
     }
 }

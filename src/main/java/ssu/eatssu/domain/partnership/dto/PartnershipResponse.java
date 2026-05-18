@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
 import ssu.eatssu.domain.partnership.entity.RestaurantType;
+import ssu.eatssu.domain.user.entity.Language;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ public class PartnershipResponse {
     private RestaurantType restaurantType;
     private List<PartnershipInfo> partnershipInfos;
 
-    public static PartnershipResponse fromEntity(PartnershipRestaurant restaurant, Long userId) {
+    public static PartnershipResponse fromEntity(PartnershipRestaurant restaurant, Long userId, Language language) {
         boolean isLiked = restaurant.getLikes().stream()
                                     .anyMatch(like -> like.getUser().getId().equals(userId));
 
@@ -30,7 +31,7 @@ public class PartnershipResponse {
                                                 .collect(Collectors.toList());
 
         return PartnershipResponse.builder()
-                                  .storeName(restaurant.getStoreName())
+                                  .storeName(restaurant.getStoreNameByLanguage(language))
                                   .longitude(restaurant.getLongitude())
                                   .latitude(restaurant.getLatitude())
                                   .restaurantType(restaurant.getRestaurantType())

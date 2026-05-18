@@ -18,6 +18,7 @@ import ssu.eatssu.domain.user.department.entity.College;
 import ssu.eatssu.domain.user.department.entity.Department;
 import ssu.eatssu.domain.user.department.persistence.CollegeRepository;
 import ssu.eatssu.domain.user.department.persistence.DepartmentRepository;
+import ssu.eatssu.domain.user.entity.Language;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
@@ -62,9 +63,12 @@ public class PartnershipService {
     }
 
     public List<PartnershipResponse> getAllPartnerships(CustomUserDetails customUserDetails) {
+        Language language = findUserByUserDetails(customUserDetails).getLanguage();
+
         return partnerShipRestaurantRepository.findAllWithDetails().stream()
                                               .map(restaurant -> PartnershipResponse.fromEntity(restaurant,
-                                                                                                customUserDetails.getId()))
+                                                                                                customUserDetails.getId(),
+                                                                                                language))
                                               .collect(Collectors.toList());
     }
 
@@ -100,8 +104,7 @@ public class PartnershipService {
     }
 
     public List<PartnershipResponse> getUserLikedPartnerships(CustomUserDetails customUserDetails) {
-        User user = userRepository.findById(customUserDetails.getId())
-                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        User user = findUserByUserDetails(customUserDetails);
 
         List<PartnershipLike> likes = partnershipLikeRepository.findAllByUserWithDetails(user);
 
@@ -111,14 +114,14 @@ public class PartnershipService {
                         return restaurant.getPartnerships()
                                          .stream()
                                          .map(partnership -> PartnershipResponse.fromEntity(restaurant,
-                                                                                            customUserDetails.getId()));
+                                                                                            customUserDetails.getId(),
+                                                                                            user.getLanguage()));
                     }).collect(Collectors.toList());
     }
 
 
     public List<PartnershipResponse> getUserDepartmentPartnerships(CustomUserDetails customUserDetails) {
-        User user = userRepository.findById(customUserDetails.getId())
-                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        User user = findUserByUserDetails(customUserDetails);
 
         Department department = user.getDepartment();
         if (department == null) {
@@ -130,7 +133,13 @@ public class PartnershipService {
                 .findRestaurantsWithMyPartnerships(college, department)
                 .stream()
                 .map(partnershipRestaurant -> PartnershipResponse.fromEntity(partnershipRestaurant,
-                                                                             customUserDetails.getId()))
+                                                                             customUserDetails.getId(),
+                                                                             user.getLanguage()))
                 .collect(Collectors.toList());
+    }
+
+    private User findUserByUserDetails(CustomUserDetails userDetails) {
+        return userRepository.findById(userDetails.getId())
+                             .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
     }
 }
