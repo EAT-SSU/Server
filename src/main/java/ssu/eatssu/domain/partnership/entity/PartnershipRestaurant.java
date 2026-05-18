@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 import ssu.eatssu.domain.user.entity.Language;
+import ssu.eatssu.global.i18n.Localizable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PartnershipRestaurant {
+public class PartnershipRestaurant implements Localizable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "partnershipRestaurant_id")
@@ -55,15 +56,6 @@ public class PartnershipRestaurant {
     }
 
     public String getStoreNameByLanguage(Language language) {
-        if (language == null) {
-            return storeNameKo;
-        }
-
-        return switch (language) {
-            case EN -> storeNameEn != null ? storeNameEn : storeNameKo;
-            case JA -> storeNameJa != null ? storeNameJa : storeNameKo;
-            case VI -> storeNameVi != null ? storeNameVi : storeNameKo;
-            case KO -> storeNameKo;
-        };
+        return getLocalizedValue(language, storeNameKo, storeNameEn, storeNameJa, storeNameVi);
     }
 }

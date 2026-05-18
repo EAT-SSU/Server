@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MyPageResponseTest {
 
     @Test
-    void 사용자_언어에_맞는_학과와_단과대_이름을_반환한다() {
+    void shouldReturnLocalizedNamesBasedOnUserLanguage() {
         // given
         College college = new College("IT 대학");
         ReflectionTestUtils.setField(college, "nameEn", "College of IT");

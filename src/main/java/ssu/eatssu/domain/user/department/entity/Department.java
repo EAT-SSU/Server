@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.user.entity.Language;
+import ssu.eatssu.global.i18n.Localizable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Department {
+public class Department implements Localizable {
     @OneToMany(mappedBy = "partnershipDepartment", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Partnership> partnerships = new ArrayList<>();
     @Id
@@ -50,15 +51,6 @@ public class Department {
     }
 
     public String getNameByLanguage(Language language) {
-        if (language == null) {
-            return nameKo;
-        }
-
-        return switch (language) {
-            case EN -> nameEn != null ? nameEn : nameKo;
-            case JA -> nameJa != null ? nameJa : nameKo;
-            case VI -> nameVi != null ? nameVi : nameKo;
-            case KO -> nameKo;
-        };
+        return getLocalizedValue(language, nameKo, nameEn, nameJa, nameVi);
     }
 }
