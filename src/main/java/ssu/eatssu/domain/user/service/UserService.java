@@ -1,11 +1,10 @@
 package ssu.eatssu.domain.user.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
@@ -42,7 +41,6 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.VALIDATION_E
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Component
 public class UserService {
 
     private final UserRepository userRepository;
