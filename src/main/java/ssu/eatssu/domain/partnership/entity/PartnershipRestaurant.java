@@ -34,12 +34,22 @@ public class PartnershipRestaurant {
 
     @Column(name = "latitude", nullable = false)
     private Double latitude; // 위도 == y축
-    @Column(name = "store_name", nullable = false)
-    private String storeName;
+    @Column(name = "store_name_ko", nullable = false)
+    private String storeNameKo;
+    @Column(name = "store_name_en")
+    private String storeNameEn;
+    @Column(name = "store_name_ja")
+    private String storeNameJa;
+    @Column(name = "store_name_vi")
+    private String storeNameVi;
 
     @OneToMany(mappedBy = "partnershipRestaurant")
     @BatchSize(size = 20)
     private List<PartnershipLike> likes = new ArrayList<>();
     @OneToMany(mappedBy = "partnershipRestaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Partnership> partnerships = new ArrayList<>();
+
+    public String getStoreName() {
+        return storeNameKo;
+    }
 }
