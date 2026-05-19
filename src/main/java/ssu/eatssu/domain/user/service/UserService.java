@@ -1,11 +1,10 @@
 package ssu.eatssu.domain.user.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
@@ -18,10 +17,13 @@ import ssu.eatssu.domain.user.department.persistence.DepartmentRepository;
 import ssu.eatssu.domain.user.dto.DepartmentResponse;
 import ssu.eatssu.domain.user.dto.GetCollegeResponse;
 import ssu.eatssu.domain.user.dto.GetDepartmentResponse;
+import ssu.eatssu.domain.user.dto.LanguageResponse;
+import ssu.eatssu.domain.user.dto.LanguageUpdateRequest;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
 import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
 import ssu.eatssu.domain.user.entity.DeviceType;
+import ssu.eatssu.domain.user.entity.Language;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.domain.user.util.NicknameValidator;
@@ -39,7 +41,6 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.VALIDATION_E
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Component
 public class UserService {
 
     private final UserRepository userRepository;
@@ -65,8 +66,7 @@ public class UserService {
     }
 
     public void updateNickname(CustomUserDetails userDetails, NicknameUpdateRequest request) {
-        User user = userRepository.findById(userDetails.getId())
-                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        User user = findUserByUserDetails(userDetails);
 
         nicknameValidator.validateNickname(request.nickname());
 
@@ -84,14 +84,28 @@ public class UserService {
     }
 
     public MyPageResponse findMyPage(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        User user = findUserByUserDetails(userDetails);
         return MyPageResponse.from(user);
     }
 
+    public void updateLanguage(CustomUserDetails userDetails, LanguageUpdateRequest request) {
+        User user = findUserByUserDetails(userDetails);
+
+        user.updateLanguage(request.language());
+
+        eventPublisher.publishEvent(LogEvent.of(
+                String.format("User language updated: userId=%d, language=%s",
+                        user.getId(), request.language()))
+        );
+    }
+
+    public LanguageResponse findLanguage(CustomUserDetails userDetails) {
+        User user = findUserByUserDetails(userDetails);
+        return LanguageResponse.from(user);
+    }
+
     public boolean withdraw(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        User user = findUserByUserDetails(userDetails);
 
         user.getReviews().forEach(Review::clearUser);
         user.getUserInquiries().forEach(inquiry -> inquiry.clearUser());
@@ -122,8 +136,7 @@ public class UserService {
 
     @Transactional
     public void registerDepartment(UpdateDepartmentRequest request, CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        User user = findUserByUserDetails(userDetails);
         Department department = departmentRepository.findById(request.getDepartmentId())
                                                     .orElseThrow(() -> new BaseException(NOT_FOUND_DEPARTMENT));
 
@@ -131,28 +144,41 @@ public class UserService {
     }
 
     public DepartmentResponse getDepartment(CustomUserDetails userDetails) {
-        User user = userRepository.findById(userDetails.getId())
-                                  .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        return DepartmentResponse.from(user.getDepartment());
+        User user = findUserByUserDetails(userDetails);
+        return DepartmentResponse.from(user.getDepartment(), user.getLanguage());
     }
 
-    public List<GetCollegeResponse> getCollegeList() {
+    private User findUserByUserDetails(CustomUserDetails userDetails) {
+        return userRepository.findById(userDetails.getId())
+                             .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+    }
+
+    public List<GetCollegeResponse> getCollegeList(CustomUserDetails userDetails) {
+        Language language = findLanguageOrDefault(userDetails);
         List<College> colleges = collegeRepository.findAll();
         return colleges.stream().map(college -> GetCollegeResponse.builder()
                                                                   .id(college.getId())
-                                                                  .name(college.getName())
+                                                                  .name(college.getNameByLanguage(language))
                                                                   .build())
                        .toList();
     }
 
-    public List<GetDepartmentResponse> getDepartmentList(Long collegeId) {
+    public List<GetDepartmentResponse> getDepartmentList(Long collegeId, CustomUserDetails userDetails) {
+        Language language = findLanguageOrDefault(userDetails);
         College college = collegeRepository.findById(collegeId)
                                            .orElseThrow(() -> new BaseException(VALIDATION_ERROR));
         List<Department> departments = departmentRepository.findByCollege(college);
         return departments.stream().map(department -> GetDepartmentResponse.builder()
                                                                            .id(department.getId())
-                                                                           .name(department.getName())
+                                                                           .name(department.getNameByLanguage(language))
                                                                            .build())
                           .toList();
+    }
+
+    private Language findLanguageOrDefault(CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return Language.KO;
+        }
+        return findUserByUserDetails(userDetails).getLanguage();
     }
 }
