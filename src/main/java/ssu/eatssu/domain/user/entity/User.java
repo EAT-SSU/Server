@@ -59,6 +59,9 @@ public class User extends BaseTimeEntity {
     private UserStatus status;
     @Enumerated(EnumType.STRING)
     private DeviceType deviceType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Language language = Language.KO;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
     private Department department;
@@ -121,6 +124,10 @@ public class User extends BaseTimeEntity {
 
     public void updateDepartment(Department department) {
         this.department = department;
+    }
+
+    public void updateLanguage(@NotNull Language language) {
+        this.language = language;
     }
 
     // 추후에 기종이 바뀌더라도 업데이트합니다. + V1-> V2 마이그레이션을 수행하는 역할을 하기도 합니다.

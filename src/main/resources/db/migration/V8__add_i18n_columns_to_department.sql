@@ -1,0 +1,5 @@
+ALTER TABLE department
+    RENAME COLUMN name TO name_ko,
+    ADD COLUMN name_en VARCHAR(255) NULL,
+    ADD COLUMN name_ja VARCHAR(255) NULL,
+    ADD COLUMN name_vi VARCHAR(255) NULL;

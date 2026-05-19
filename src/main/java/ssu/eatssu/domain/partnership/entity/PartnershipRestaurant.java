@@ -13,6 +13,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import ssu.eatssu.domain.user.entity.Language;
+import ssu.eatssu.global.i18n.Localizable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PartnershipRestaurant {
+public class PartnershipRestaurant implements Localizable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "partnershipRestaurant_id")
@@ -34,12 +36,26 @@ public class PartnershipRestaurant {
 
     @Column(name = "latitude", nullable = false)
     private Double latitude; // 위도 == y축
-    @Column(name = "store_name", nullable = false)
-    private String storeName;
+    @Column(name = "store_name_ko", nullable = false)
+    private String storeNameKo;
+    @Column(name = "store_name_en")
+    private String storeNameEn;
+    @Column(name = "store_name_ja")
+    private String storeNameJa;
+    @Column(name = "store_name_vi")
+    private String storeNameVi;
 
     @OneToMany(mappedBy = "partnershipRestaurant")
     @BatchSize(size = 20)
     private List<PartnershipLike> likes = new ArrayList<>();
     @OneToMany(mappedBy = "partnershipRestaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Partnership> partnerships = new ArrayList<>();
+
+    public String getStoreName() {
+        return storeNameKo;
+    }
+
+    public String getStoreNameByLanguage(Language language) {
+        return getLocalizedValue(language, storeNameKo, storeNameEn, storeNameJa, storeNameVi);
+    }
 }
