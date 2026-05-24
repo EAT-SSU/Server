@@ -33,6 +33,8 @@ import ssu.eatssu.domain.slice.service.SliceService;
 import ssu.eatssu.domain.user.dto.DepartmentResponse;
 import ssu.eatssu.domain.user.dto.GetCollegeResponse;
 import ssu.eatssu.domain.user.dto.GetDepartmentResponse;
+import ssu.eatssu.domain.user.dto.LanguageResponse;
+import ssu.eatssu.domain.user.dto.LanguageUpdateRequest;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
 import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.MyReviewDetail;
@@ -112,6 +114,31 @@ public class UserController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         userService.updateNickname(userDetails, updateNicknameRequest);
         return BaseResponse.success();
+    }
+
+    @Operation(summary = "언어 설정 수정", description = "유저의 언어 설정을 수정하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "언어 설정 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "지원하지 않는 언어 또는 누락된 언어 설정", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @PatchMapping("/language")
+    public BaseResponse<?> updateLanguage(
+            @Valid @RequestBody LanguageUpdateRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        userService.updateLanguage(userDetails, request);
+        return BaseResponse.success();
+    }
+
+    @Operation(summary = "언어 설정 조회", description = "유저의 언어 설정을 조회하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "언어 설정 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @GetMapping("/language")
+    public BaseResponse<LanguageResponse> getLanguage(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return BaseResponse.success(userService.findLanguage(userDetails));
     }
 
     @Operation(summary = "유저 탈퇴", description = "유저 탈퇴 API 입니다.")
@@ -229,8 +256,9 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 단과대", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
     })
     @GetMapping("/lookup/colleges")
-    public BaseResponse<List<GetCollegeResponse>> getColleges() {
-        List<GetCollegeResponse> getCollegeResponses = userService.getCollegeList();
+    public BaseResponse<List<GetCollegeResponse>> getColleges(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<GetCollegeResponse> getCollegeResponses = userService.getCollegeList(userDetails);
         return BaseResponse.success(getCollegeResponses);
     }
 
@@ -239,8 +267,9 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "단과대 리스트 조회 성공"),
     })
     @GetMapping("/lookup/departments")
-    public BaseResponse<List<GetDepartmentResponse>> getDepartments(@RequestParam Long collegeId) {
-        List<GetDepartmentResponse> getCollegeResponses = userService.getDepartmentList(collegeId);
+    public BaseResponse<List<GetDepartmentResponse>> getDepartments(@RequestParam Long collegeId,
+                                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<GetDepartmentResponse> getCollegeResponses = userService.getDepartmentList(collegeId, userDetails);
         return BaseResponse.success(getCollegeResponses);
     }
 
