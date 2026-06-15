@@ -51,6 +51,7 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_ME
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MENU;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_REVIEW;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_USER;
+import static ssu.eatssu.global.handler.response.BaseResponseStatus.FAILED_VALIDATION;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.REVIEW_PERMISSION_DENIED;
 
 @Slf4j
@@ -78,12 +79,18 @@ public class ReviewServiceV2 {
 
         Review review = request.toReviewEntity(user, meal);
 
-        request.getImageUrls().forEach(review::addReviewImage);
+        List<String> imageUrls = Optional.ofNullable(request.getImageUrls()).orElse(Collections.emptyList());
+        imageUrls.forEach(review::addReviewImage);
 
-        for (MenuLikeRequest menuLike : request.getMenuLikes()) {
+        List<MenuLikeRequest> menuLikes = Optional.ofNullable(request.getMenuLikes()).orElse(Collections.emptyList());
+        for (MenuLikeRequest menuLike : menuLikes) {
+            if (menuLike == null || menuLike.getMenuId() == null) {
+                throw new BaseException(FAILED_VALIDATION);
+            }
             Menu menu = menuRepository.findById(menuLike.getMenuId())
                     .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
-            review.addReviewMenuLike(menu, menuLike.getIsLike());
+            boolean isLike = Boolean.TRUE.equals(menuLike.getIsLike());
+            review.addReviewMenuLike(menu, isLike);
         }
 
         reviewRepository.save(review);
@@ -93,8 +100,8 @@ public class ReviewServiceV2 {
                         review.getId(),
                         meal.getId(),
                         user.getId(),
-                        request.getImageUrls().size(),
-                        request.getMenuLikes().size())
+                        imageUrls.size(),
+                        menuLikes.size())
         ));
     }
 
@@ -106,23 +113,31 @@ public class ReviewServiceV2 {
         User user = userRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 
-        Menu menu = menuRepository.findById(request.getMenuLike().getMenuId())
+        MenuLikeRequest menuLike = request.getMenuLike();
+        if (menuLike == null || menuLike.getMenuId() == null) {
+            throw new BaseException(FAILED_VALIDATION);
+        }
+
+        Menu menu = menuRepository.findById(menuLike.getMenuId())
                 .orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
 
         Review review = request.toReviewEntity(user, menu);
-        review.addReviewMenuLike(menu, request.getMenuLike().getIsLike());
-        request.getImageUrls().forEach(review::addReviewImage);
+        boolean isLike = Boolean.TRUE.equals(menuLike.getIsLike());
+        review.addReviewMenuLike(menu, isLike);
+
+        List<String> imageUrls = Optional.ofNullable(request.getImageUrls()).orElse(Collections.emptyList());
+        imageUrls.forEach(review::addReviewImage);
         reviewRepository.save(review);
 
         menu.addReview(review);
 
         eventPublisher.publishEvent(LogEvent.of(
-                String.format("MenuReview created: reviewId=%d, menuId=%d, userId=%d, isLike=%s, imageUrl=%s",
+                String.format("MenuReview created: reviewId=%d, menuId=%d, userId=%d, isLike=%s, images=%d",
                               review.getId(),
                               menu.getId(),
                               user.getId(),
-                              request.getMenuLike().getIsLike(),
-                              request.getImageUrls().size())
+                              isLike,
+                              imageUrls.size())
         ));
     }
 
@@ -385,12 +400,20 @@ public class ReviewServiceV2 {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
 
-        Map<Menu, Boolean> menuLikes = request.getMenuLikes().stream()
-                                              .collect(Collectors.toMap(
-                                                      menuLike -> menuRepository.findById(menuLike.getMenuId())
-                                                                                .orElseThrow(() -> new BaseException(
-                                                                                        NOT_FOUND_MENU)),
-                                                      MenuLikeRequest::getIsLike));
+        List<MenuLikeRequest> menuLikeRequests = Optional.ofNullable(request.getMenuLikes()).orElse(Collections.emptyList());
+
+        Map<Menu, Boolean> menuLikes = menuLikeRequests.stream()
+                                                       .filter(Objects::nonNull)
+                                                       .collect(Collectors.toMap(
+                                                               menuLike -> {
+                                                                   if (menuLike.getMenuId() == null) {
+                                                                       throw new BaseException(FAILED_VALIDATION);
+                                                                   }
+                                                                   return menuRepository.findById(menuLike.getMenuId())
+                                                                                        .orElseThrow(() -> new BaseException(
+                                                                                                NOT_FOUND_MENU));
+                                                               },
+                                                               menuLike -> Boolean.TRUE.equals(menuLike.getIsLike())));
 
         review.update(request.getContent(), request.getRating(), menuLikes);
         reviewRepository.save(review);
