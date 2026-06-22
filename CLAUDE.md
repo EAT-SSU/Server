@@ -35,7 +35,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ./gradlew test                  # 테스트만 실행
 ./gradlew test --tests "ssu.eatssu.domain.review.service.ReviewServiceTest"  # 단일 테스트 클래스 실행
 ./gradlew bootRun --args='--spring.profiles.active=local'  # 로컬 서버 실행 (port 9000)
-docker build -f Dockerfile -t eatssu-local .  # Docker 이미지 빌드
+docker build -f Dockerfile -t eatssu-local .  # Docker 이미지 빌드 (반드시 ./gradlew build -x test 선행 필요)
 ```
 
 로컬 실행 시 MySQL이 `localhost:3306/eatssu`에 필요하며, `application-local.yml`에서 DB 정보를 설정한다. `.env` 파일로 환경변수를 오버라이드할 수 있다 (`spring.config.import: optional:file:.env[.properties]`).
