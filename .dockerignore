@@ -1,5 +1,14 @@
 .git
 .gitignore
 *.md
-build/
 src/test/
+.gradle/
+.idea/
+.DS_Store
+*/.DS_Store
+.env
+src/main/resources/application-local.yml
+
+build/*
+!build/libs/
+!build/libs/*.jar
