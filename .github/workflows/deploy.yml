@@ -84,7 +84,8 @@ jobs:
           script: |
             sudo docker ps
             sudo docker rm -f eatssu-prod || true
-            sudo docker ps -q --filter publish=9000 | xargs -r sudo docker rm -f
+            PUBLISHED_CONTAINERS=$(sudo docker ps -q --filter publish=9000)
+            if [ -n "$PUBLISHED_CONTAINERS" ]; then sudo docker rm -f $PUBLISHED_CONTAINERS; fi
             sudo docker pull ${{ secrets.DOCKER_REPO }}/eatssu-prod
             sudo docker run -d --name eatssu-prod --restart unless-stopped -p 9000:9000 \
             --log-driver=awslogs \
@@ -114,7 +115,8 @@ jobs:
           script: |
             sudo docker ps
             sudo docker rm -f eatssu-dev || true
-            sudo docker ps -q --filter publish=9000 | xargs -r sudo docker rm -f
+            PUBLISHED_CONTAINERS=$(sudo docker ps -q --filter publish=9000)
+            if [ -n "$PUBLISHED_CONTAINERS" ]; then sudo docker rm -f $PUBLISHED_CONTAINERS; fi
             sudo docker pull ${{ secrets.DOCKER_REPO }}/eatssu-dev
             sudo docker run -d --name eatssu-dev --restart unless-stopped -p 9000:9000 \
             --log-driver=awslogs \
