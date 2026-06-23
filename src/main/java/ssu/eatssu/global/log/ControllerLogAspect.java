@@ -104,7 +104,7 @@ public class ControllerLogAspect {
         }
     }
 
-    private String getResponseLog(String uri, Object result) {
+    String getResponseLog(String uri, Object result) {
         if (isAuthApi(uri)) {
             return RESPONSE_BODY_SKIPPED;
         }
@@ -152,7 +152,7 @@ public class ControllerLogAspect {
         return "unknown";
     }
 
-    private Map<String, Object> toSafeMap(Object arg) {
+    Map<String, Object> toSafeMap(Object arg) {
         Map<String, Object> result = new HashMap<>();
         for (Field field : arg.getClass().getDeclaredFields()) {
             field.setAccessible(true);
