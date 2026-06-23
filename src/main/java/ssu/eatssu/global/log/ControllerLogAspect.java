@@ -31,6 +31,8 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class ControllerLogAspect {
 
+    private static final String RESPONSE_BODY_SKIPPED = "[response-body-skipped]";
+
     private final ObjectMapper objectMapper;
     private final SlackErrorNotifier slackErrorNotifier;
 
@@ -87,15 +89,7 @@ public class ControllerLogAspect {
             Object result = joinPoint.proceed();
             long time = System.currentTimeMillis() - start;
 
-            String resultJson;
-            try {
-                resultJson = objectMapper.writeValueAsString(result);
-                if (resultJson.length() > 600) {
-                    resultJson = resultJson.substring(0, 600) + "...(truncated)";
-                }
-            } catch (Exception e) {
-                resultJson = String.valueOf(result);
-            }
+            String resultJson = getResponseLog(uri, result);
 
             log.info("RESPONSE {} {} ({} ms) result={}", method, uri, time, resultJson);
             return result;
@@ -108,6 +102,26 @@ public class ControllerLogAspect {
             slackErrorNotifier.notify(e, method, uri, userId, argsJson);
             throw e;
         }
+    }
+
+    String getResponseLog(String uri, Object result) {
+        if (isAuthApi(uri)) {
+            return RESPONSE_BODY_SKIPPED;
+        }
+
+        try {
+            String resultJson = objectMapper.writeValueAsString(result);
+            if (resultJson.length() > 600) {
+                return resultJson.substring(0, 600) + "...(truncated)";
+            }
+            return resultJson;
+        } catch (Exception e) {
+            return String.valueOf(result);
+        }
+    }
+
+    private boolean isAuthApi(String uri) {
+        return uri != null && uri.startsWith("/oauths/");
     }
 
     private String getCauseMessage(Throwable e) {
@@ -138,7 +152,7 @@ public class ControllerLogAspect {
         return "unknown";
     }
 
-    private Map<String, Object> toSafeMap(Object arg) {
+    Map<String, Object> toSafeMap(Object arg) {
         Map<String, Object> result = new HashMap<>();
         for (Field field : arg.getClass().getDeclaredFields()) {
             field.setAccessible(true);
