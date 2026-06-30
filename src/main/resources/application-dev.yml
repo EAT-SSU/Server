@@ -94,6 +94,10 @@ logging:
     com.zaxxer.hikari: INFO
 
 management:
+  server:
+    port: 9001
+    address: 127.0.0.1
+
   endpoint:
     metrics:
       enabled: true
