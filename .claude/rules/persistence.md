@@ -2,6 +2,7 @@
 paths:
   - "**/persistence/**/*.java"
   - "**/repository/**/*.java"
+  - "**/entity/**/*.java"
   - "src/main/resources/db/migration/**"
 ---
 
