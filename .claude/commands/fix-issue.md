@@ -38,3 +38,12 @@ Rules:
 - If the issue is operational, include the relevant environment such as prod, dev, EC2, Docker, or CloudWatch.
 - Do not claim a root cause unless it is directly supported by the given context.
 - If there is no attachment/reference, write `- 없음`.
+
+When the user explicitly asks to create the issue (not just draft it), run:
+
+```bash
+gh issue create --title "fix: <summary>" --body "<final markdown body>" --assignee @me --label fix
+```
+
+- Always include `--assignee @me` so the issue is assigned to the current user.
+- Always include `--label fix` to match this template's convention.
