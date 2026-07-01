@@ -1,6 +1,7 @@
 ---
 paths:
   - "src/main/java/**/*.java"
+  - "src/test/java/**/*.java"
 ---
 
 # Commenting Convention
