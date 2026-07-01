@@ -94,6 +94,10 @@ logging:
     com.zaxxer.hikari: INFO
 
 management:
+  server:
+    port: 9001
+    address: 0.0.0.0
+
   endpoint:
     metrics:
       enabled: true
@@ -104,3 +108,7 @@ management:
     web:
       exposure:
         include: health, info, metrics, prometheus
+
+  metrics:
+    tags:
+      application: eatssu-dev
