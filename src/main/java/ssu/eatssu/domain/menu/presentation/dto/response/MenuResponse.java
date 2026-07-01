@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.user.entity.Language;
 
 @Getter
 @NoArgsConstructor
@@ -24,7 +25,7 @@ public class MenuResponse {
     @Schema(description = "메뉴 평점 (평점이 없으면 null) ", example = "4.4")
     private Double rating;
 
-    public static MenuResponse from(Menu menu, Double rating) {
-        return new MenuResponse(menu.getId(), menu.getName(), menu.getPrice(), rating);
+    public static MenuResponse from(Menu menu, Double rating, Language language) {
+        return new MenuResponse(menu.getId(), menu.getNameByLanguage(language), menu.getPrice(), rating);
     }
 }

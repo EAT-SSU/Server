@@ -5,6 +5,7 @@ import lombok.Getter;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
 import ssu.eatssu.domain.partnership.entity.PeriodType;
+import ssu.eatssu.domain.user.entity.Language;
 
 import java.time.LocalDate;
 
@@ -23,10 +24,11 @@ public class PartnershipInfo {
 
     public static PartnershipInfo fromEntity(Partnership partnership,
                                              PartnershipRestaurant restaurant,
-                                             boolean isLiked) {
+                                             boolean isLiked,
+                                             Language language) {
         return PartnershipInfo.builder()
                               .id(partnership.getId())
-                              .description(partnership.getDescription())
+                              .description(partnership.getDescriptionByLanguage(language))
                               .startDate(partnership.getStartDate())
                               .endDate(partnership.getEndDate())
                               .periodType(partnership.getPeriodType())
