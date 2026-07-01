@@ -87,7 +87,7 @@ jobs:
             PUBLISHED_CONTAINERS=$(sudo docker ps -q --filter publish=9000)
             if [ -n "$PUBLISHED_CONTAINERS" ]; then sudo docker rm -f $PUBLISHED_CONTAINERS; fi
             sudo docker pull ${{ secrets.DOCKER_REPO }}/eatssu-prod
-            sudo docker run -d --name eatssu-prod --restart unless-stopped -p 9000:9000 \
+            sudo docker run -d --name eatssu-prod --restart unless-stopped -p 9000:9000 -p 127.0.0.1:9001:9001 \
             --log-driver=awslogs \
             --log-opt awslogs-region=ap-northeast-2 \
             --log-opt awslogs-group=prod-ec2-group \
