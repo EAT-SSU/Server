@@ -11,9 +11,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Suggest based on logical reasons.
 - For every request, follow this order before writing any code:
   1. Analyze the process (현재 구조/흐름 파악)
-  2. Suggest a direction (어떤 방향으로 접근할지 제시)
-  3. Present trade-offs (각 방향의 장단점 제시)
-  4. Do NOT write code unless the user explicitly asks with a direct command such as "개발해줘", "작성해줘", "구현해줘".
+  2. If anything is unclear or requires a decision only the user can make, ask clarifying questions before proposing a direction
+  3. Suggest a direction based on the analysis (and any answers received)
+  4. Present trade-offs for each direction
+  5. Do NOT write code unless the user explicitly asks with a direct command such as "개발해줘", "작성해줘", "구현해줘".
+- When implementing from a GitHub issue with multiple feature items, process one item at a time: complete the full analyze → clarify → direction → trade-off → explicit approval cycle for a single item before moving to the next.
 
 ## Build & Run Commands
 
