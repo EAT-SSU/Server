@@ -28,7 +28,6 @@ jobs:
       EATSSU_DB_URL_TEST: jdbc:mysql://localhost:3306/eatssu_test
       EATSSU_DB_USERNAME: root
       EATSSU_DB_PASSWORD: test
-      EATSSU_JWT_SECRET_TEST: 0GJB060nxHJUyrRG0+Igjn+NCHua05qf1Xfy3+Y1ZU2G+d8W9BCdEzHR6/W2pFfvYi4iRElOvTHSwzLnd4WqkA==
       EATSSU_AWS_ACCESS_KEY_DEV: dummy-access-key
       EATSSU_AWS_SECRET_KEY_DEV: dummy-secret-key
       EATSSU_SLACK_TOKEN: dummy-slack-token
@@ -53,6 +52,9 @@ jobs:
 
       - name: gradlew 실행 권한 부여
         run: chmod +x gradlew
+
+      - name: 테스트용 JWT 시크릿 생성
+        run: echo "EATSSU_JWT_SECRET_TEST=$(openssl rand -base64 64 | tr -d '\n')" >> "$GITHUB_ENV"
 
       - name: 테스트 실행
         run: ./gradlew test --no-daemon
