@@ -21,7 +21,9 @@ public class Ratings {
     private Integer tasteRating;
 
     private Ratings(Integer mainRating, Integer amountRating, Integer tasteRating) {
+        Assert.notNull(mainRating, "mainRating must not be null");
         validateRange(mainRating, "mainRating");
+        // FIXME(pooreumjung, 2026-07-04): amountRating/tasteRating을 선택값으로 둘지는 비즈니스 요구사항 확정 필요
         validateRange(amountRating, "amountRating");
         validateRange(tasteRating, "tasteRating");
         this.mainRating = mainRating;
@@ -33,7 +35,7 @@ public class Ratings {
         if (rating == null) {
             return;
         }
-        Assert.isTrue(rating >= 0 && rating <= 5, fieldName + " must be between 0 and 5");
+        Assert.isTrue(rating >= 1 && rating <= 5, fieldName + " must be between 1 and 5");
     }
 
     public static Ratings of(Integer mainRating, Integer amountRating, Integer tasteRating) {
