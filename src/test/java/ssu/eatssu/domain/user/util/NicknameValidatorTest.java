@@ -45,7 +45,9 @@ class NicknameValidatorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"유효한 닉네임","available nic","가능한-닉네임","유-효-한-닉-네-임","유 효 한 닉 1 2 a","ㅇㅅㅎㅇㅌ","0이름","0test","이름0","test0"})
-    void 유효한_이름을_입력하면_예외가_발생하지_않는다(String input) {
+    void doesNotThrowWhenNicknameIsValid(String input) {
+        // given: parameterized valid nickname input
+
         // when & then
         assertDoesNotThrow(()-> nicknameValidator.validateNickname(input));
     }
@@ -92,7 +94,9 @@ class NicknameValidatorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"-test"," test"})
-    void 한글_또는_영어로_시작하지_않는_닉네임인_경우_예외가_발생한다(String input) {
+    void throwsExceptionWhenNicknameStartsWithInvalidCharacter(String input) {
+        // given: parameterized nickname starting with a symbol (숫자는 시작 문자로 허용됨)
+
         // when & then
         assertThatThrownBy(()->nicknameValidator.validateNickname(input))
                 .isInstanceOf(BaseException.class)
@@ -102,7 +106,9 @@ class NicknameValidatorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"test-","test "})
-    void 한글_또는_영어로_끝나지_않는_닉네임인_경우_예외가_발생한다(String input) {
+    void throwsExceptionWhenNicknameEndsWithInvalidCharacter(String input) {
+        // given: parameterized nickname ending with a symbol (숫자는 끝 문자로 허용됨)
+
         // when & then
         assertThatThrownBy(()->nicknameValidator.validateNickname(input))
                 .isInstanceOf(BaseException.class)
