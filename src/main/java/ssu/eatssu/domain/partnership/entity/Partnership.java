@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 import ssu.eatssu.domain.user.department.entity.College;
 import ssu.eatssu.domain.user.department.entity.Department;
+import ssu.eatssu.domain.user.entity.Language;
+import ssu.eatssu.global.i18n.Localizable;
 
 import java.time.LocalDate;
 
@@ -27,7 +29,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @Where(clause = "end_date >= CURRENT_DATE")
-public class Partnership {
+public class Partnership implements Localizable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "partnership_id")
@@ -35,6 +37,15 @@ public class Partnership {
 
     @Column(name = "description", nullable = false)
     private String description;
+
+    @Column(name = "description_en", columnDefinition = "TEXT")
+    private String descriptionEn;
+
+    @Column(name = "description_ja", columnDefinition = "TEXT")
+    private String descriptionJa;
+
+    @Column(name = "description_vi", columnDefinition = "TEXT")
+    private String descriptionVi;
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
@@ -58,6 +69,10 @@ public class Partnership {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partnership_restaurant_id")
     private PartnershipRestaurant partnershipRestaurant;
+
+    public String getDescriptionByLanguage(Language language) {
+        return getLocalizedValue(language, description, descriptionEn, descriptionJa, descriptionVi);
+    }
 
     public void setPartnershipCollege(College partnershipCollege) {
         this.partnershipCollege = partnershipCollege;

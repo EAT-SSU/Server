@@ -27,7 +27,8 @@ public class PartnershipResponse {
         List<PartnershipInfo> infos = restaurant.getPartnerships().stream()
                                                 .map(partnership -> PartnershipInfo.fromEntity(partnership,
                                                                                                restaurant,
-                                                                                               isLiked))
+                                                                                               isLiked,
+                                                                                               language))
                                                 .collect(Collectors.toList());
 
         return PartnershipResponse.builder()

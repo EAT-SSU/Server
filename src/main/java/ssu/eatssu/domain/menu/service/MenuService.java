@@ -14,6 +14,7 @@ import ssu.eatssu.domain.menu.presentation.dto.response.MenuResponse;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenuRestaurantResponse;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
+import ssu.eatssu.domain.user.entity.Language;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
@@ -38,6 +39,10 @@ public class MenuService {
     }
 
     public MenuRestaurantResponse getMenusByRestaurant(Restaurant restaurant) {
+        return getMenusByRestaurant(restaurant, null);
+    }
+
+    public MenuRestaurantResponse getMenusByRestaurant(Restaurant restaurant, Language language) {
         validateMenuRestaurant(restaurant);
 
         List<MenuCategory> categories = findCategoriesByRestaurant(restaurant);
@@ -46,7 +51,8 @@ public class MenuService {
 
         for (MenuCategory category : categories) {
             List<MenuResponse> menus = getMenuResponsesByRestaurantAndCategory(restaurant,
-                                                                               category);
+                                                                               category,
+                                                                               language);
             response.add(CategoryWithMenusResponse.of(category.getName(), menus));
         }
 
@@ -59,12 +65,14 @@ public class MenuService {
 
     @NotNull
     private List<MenuResponse> getMenuResponsesByRestaurantAndCategory(Restaurant restaurant,
-                                                                       MenuCategory category) {
+                                                                       MenuCategory category,
+                                                                       Language language) {
         return menuRepository.findAllByRestaurantAndCategory(restaurant, category)
                              .stream()
                              .filter(Menu::isContinued)
                              .map(menu -> MenuResponse.from(menu,
-                                                            menuRatingService.getMainRatingAverage(menu.getId())))
+                                                            menuRatingService.getMainRatingAverage(menu.getId()),
+                                                            language))
                              .toList();
     }
 
