@@ -19,6 +19,8 @@ import lombok.NoArgsConstructor;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.Reviews;
+import ssu.eatssu.domain.user.entity.Language;
+import ssu.eatssu.global.i18n.Localizable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Menu {
+public class Menu implements Localizable {
 
     // TODO : 삭제되어야 함
     @Embedded
@@ -40,6 +42,12 @@ public class Menu {
     @Column(name = "menu_id")
     private Long id;
     private String name;
+    @Column(name = "name_en")
+    private String nameEn;
+    @Column(name = "name_ja")
+    private String nameJa;
+    @Column(name = "name_vi")
+    private String nameVi;
     private Integer price;
     @Enumerated(EnumType.STRING)
     private Restaurant restaurant;
@@ -65,6 +73,10 @@ public class Menu {
     public static Menu createFixed(String name, Restaurant restaurant, Integer price,
                                    MenuCategory category) {
         return new Menu(name, restaurant, price, category);
+    }
+
+    public String getNameByLanguage(Language language) {
+        return getLocalizedValue(language, name, nameEn, nameJa, nameVi);
     }
 
     public void addReview(Review review) {
