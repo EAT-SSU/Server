@@ -1,0 +1,67 @@
+name: EAT-SSU Server PR 테스트 게이트
+
+on:
+  pull_request:
+    branches: [ "develop", "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: eatssu_test
+          MYSQL_ROOT_PASSWORD: test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      EATSSU_DB_URL_TEST: jdbc:mysql://localhost:3306/eatssu_test
+      EATSSU_DB_USERNAME: root
+      EATSSU_DB_PASSWORD: test
+      EATSSU_AWS_ACCESS_KEY_DEV: dummy-access-key
+      EATSSU_AWS_SECRET_KEY_DEV: dummy-secret-key
+      EATSSU_SLACK_TOKEN: dummy-slack-token
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: JDK 17 설치
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Gradle 캐싱
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: gradlew 실행 권한 부여
+        run: chmod +x gradlew
+
+      - name: 테스트용 JWT 시크릿 생성
+        run: echo "EATSSU_JWT_SECRET_TEST=$(openssl rand -base64 64 | tr -d '\n')" >> "$GITHUB_ENV"
+
+      - name: 테스트 실행
+        run: ./gradlew test --no-daemon
+
+      - name: 테스트 리포트 업로드
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/reports/tests/test
