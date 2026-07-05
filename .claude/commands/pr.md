@@ -56,3 +56,25 @@ Rules:
 - For the checklist, mark an item checked only if the evidence is clear from the context or command results.
 - If tests were not run, leave the test checkbox unchecked and mention that in reviewer notes.
 - Do not include unrelated refactoring in the summary.
+
+When the user explicitly asks to create the PR (not just draft it), run:
+
+```bash
+gh pr create --title "<type>: <summary>" --body "<final markdown body>" --assignee @me --reviewer eunseo9311,sjinssun --label <label>
+```
+
+- Always include `--assignee @me` so the PR is assigned to the current user.
+- Always include `--reviewer eunseo9311,sjinssun`.
+- Determine `<label>` from the current branch's type prefix (`feat/`, `fix/`, `refactor/`, `docs/`, `test/`, `chore/`, `style/`) using this mapping:
+
+  | Branch type | Label |
+  | --- | --- |
+  | feat | feat |
+  | fix | fix |
+  | refactor | refactoring |
+  | docs | docs |
+  | test | test |
+  | chore | chore |
+  | style | (no label — omit `--label`) |
+
+  If the branch type has no matching label in the table, omit `--label` entirely rather than guessing.

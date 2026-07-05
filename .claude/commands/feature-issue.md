@@ -38,3 +38,12 @@ Rules:
 - Do not invent implementation details that are not implied by the request.
 - Prefer concrete acceptance criteria over vague descriptions.
 - If there is no attachment/reference, write `- 없음`.
+
+When the user explicitly asks to create the issue (not just draft it), run:
+
+```bash
+gh issue create --title "feature: <summary>" --body "<final markdown body>" --assignee @me --label feat
+```
+
+- Always include `--assignee @me` so the issue is assigned to the current user.
+- Always include `--label feat` to match this template's convention.

@@ -11,22 +11,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Suggest based on logical reasons.
 - For every request, follow this order before writing any code:
   1. Analyze the process (현재 구조/흐름 파악)
-  2. Suggest a direction (어떤 방향으로 접근할지 제시)
-  3. Present trade-offs (각 방향의 장단점 제시)
-  4. Do NOT write code unless the user explicitly asks with a direct command such as "개발해줘", "작성해줘", "구현해줘".
-
-## Commenting Convention
-
-- Comments should be written in a single line whenever possible.
-- Each comment must include the author's name and the date.
-- Use IntelliJ's default `FIX ME` comment format.
-  - Use this for parts of the code where there may be a potential issue but immediate exception handling is unnecessary.
-  - Also use this for parts that are not yet finalized due to unclear business requirements.
-
-## Test Code Convention
-
-- Test method names must be written in **English**.
-- But if the codes is related to test, write the comment for "given, when, then".
+  2. If anything is unclear or requires a decision only the user can make, ask clarifying questions before proposing a direction
+  3. Suggest a direction based on the analysis (and any answers received)
+  4. Present trade-offs for each direction
+  5. Do NOT write code unless the user explicitly asks with a direct command such as "개발해줘", "작성해줘", "구현해줘".
+- When implementing from a GitHub issue with multiple feature items, process one item at a time: complete the full analyze → clarify → direction → trade-off → explicit approval cycle for a single item before moving to the next.
 
 ## Build & Run Commands
 
@@ -84,17 +73,9 @@ src/main/java/ssu/eatssu/
 
 **다국어(i18n)**: `Localizable` 인터페이스의 `getLocalizedValue(language, ko, en, ja, vi)`를 구현하여 언어별 필드를 반환한다.
 
-**복잡한 쿼리**: `*RepositoryCustom` 인터페이스 + `*RepositoryImpl`(QueryDSL) 패턴을 사용한다.
-
-**DB 마이그레이션**: Flyway를 사용하며, `src/main/resources/db/migration/V{n}__{설명}.sql` 형식으로 관리한다. `ddl-auto: none`이므로 스키마 변경 시 반드시 마이그레이션 파일을 추가해야 한다.
-
 ### API 버전 관리
 
 일부 Controller/Service는 V1/V2로 버전이 분리되어 있다(예: `ReviewController`/`ReviewControllerV2`, `ReviewService`/`ReviewServiceV2`). 새 기능은 V2 이상에 추가하거나, 필요 시 새 버전을 생성한다.
-
-### 테스트
-
-테스트는 `@SpringBootTest`로 실제 DB에 연결하여 실행한다. 목(Mock) DB를 사용하지 않는다.
 
 ### 배포
 
