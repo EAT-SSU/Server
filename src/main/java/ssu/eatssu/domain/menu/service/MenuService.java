@@ -38,6 +38,10 @@ public class MenuService {
         }
     }
 
+    public MenuRestaurantResponse getMenusByRestaurant(Restaurant restaurant) {
+        return getMenusByRestaurant(restaurant, null);
+    }
+
     public MenuRestaurantResponse getMenusByRestaurant(Restaurant restaurant, Language language) {
         validateMenuRestaurant(restaurant);
 
