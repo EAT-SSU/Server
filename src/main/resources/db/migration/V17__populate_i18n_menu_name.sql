@@ -1,4 +1,3 @@
-- 고정 메뉴 다국어 번역 데이터 추가
 UPDATE menu SET name_en = 'Old-school Korean Lunch Box', name_ja = '思い出の弁当', name_vi = 'Cơm hộp kiểu Hàn xưa' WHERE name = '추억의도시락' AND restaurant = 'SNACK_CORNER';
 UPDATE menu SET name_en = 'Chicken Mayo Rice Bowl', name_ja = 'チキンマヨ丼', name_vi = 'Cơm tô gà mayo' WHERE name = '치킨마요덮밥' AND restaurant = 'SNACK_CORNER';
 UPDATE menu SET name_en = 'Rice Noodles', name_ja = 'フォー', name_vi = 'Phở' WHERE name = '쌀국수' AND restaurant = 'SNACK_CORNER';
