@@ -1,0 +1,24 @@
+- 고정 메뉴 다국어 번역 데이터 추가
+UPDATE menu SET name_en = 'Old-school Korean Lunch Box', name_ja = '思い出の弁当', name_vi = 'Cơm hộp kiểu Hàn xưa' WHERE name = '추억의도시락' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Chicken Mayo Rice Bowl', name_ja = 'チキンマヨ丼', name_vi = 'Cơm tô gà mayo' WHERE name = '치킨마요덮밥' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Rice Noodles', name_ja = 'フォー', name_vi = 'Phở' WHERE name = '쌀국수' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Soongsil Gimbap', name_ja = '崇実キンパ', name_vi = 'Soongsil Gimbap ' WHERE name = '숭실김밥' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Soongsil Mini Gimbap', name_ja = '崇実ミニキンパ', name_vi = 'Soongsil Mini Gimbap ' WHERE name = '숭실꼬마김밥' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Tuna Mini Gimbap', name_ja = 'ツナミニキンパ', name_vi = 'Gimbap mini cá ngừ' WHERE name = '참치꼬마김밥' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Soongsil Ramyeon', name_ja = '崇実ラーメン', name_vi = 'Soongsil Ramyeon ' WHERE name = '숭실라면' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Rice Cake & Dumpling Ramyeon', name_ja = '餅・餃子ラーメン', name_vi = 'Ramyeon bánh gạo và mandu' WHERE name = '떡만두라면' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Cheese Ramyeon', name_ja = 'チーズラーメン', name_vi = 'Ramyeon phô mai' WHERE name = '치즈라면' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Ramyeon + Bowl of Rice', name_ja = 'ラーメン＋ライス', name_vi = 'Ramyeon + cơm trắng' WHERE name = '라면+공기밥' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Ramyeon + Half Roll of Gimbap', name_ja = 'ラーメン＋キンパ半本', name_vi = 'Ramyeon + nửa cuộn gimbap' WHERE name = '라면+김밥반줄' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Tteokbokki', name_ja = 'トッポッキ', name_vi = 'Tteokbokki' WHERE name = '떡볶이' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Rabokki', name_ja = 'ラッポッキ', name_vi = 'Rabokki' WHERE name = '라볶이' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Sotteok Sotteok', name_ja = 'ソトックソトック', name_vi = 'Sotteok Sotteok' WHERE name = '소떡소떡' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Cobb Salad', name_ja = 'コブサラダ', name_vi = 'Salad Cobb' WHERE name = '콥샐러드' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Vegan Tofu Salad', name_ja = 'ヴィーガン豆腐サラダ', name_vi = 'Salad đậu phụ chay' WHERE name = '비건두부샐러드' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Salad Pasta', name_ja = 'サラダパスタ', name_vi = 'Salad Pasta' WHERE name = '샐러드파스타' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Balanced Macro Salad', name_ja = '栄養バランスサラダ', name_vi = 'Salad cân bằng dinh dưỡng' WHERE name = '탄단지샐러드' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Smoked Salmon Salad', name_ja = 'スモークサーモンサラダ', name_vi = 'Salad cá hồi hun khói' WHERE name = '훈제연어샐러드' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Boiled Egg (Salad Add-on)', name_ja = 'ゆで卵（サラダ追加）', name_vi = 'Trứng luộc (thêm vào salad)' WHERE name = '삶은계란(샐)' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = '5 Tofu Sticks', name_ja = '豆腐スティック5本', name_vi = '5 thanh đậu phụ' WHERE name = '두부스틱5개' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = '2 Slices of Sweet Pumpkin', name_ja = 'かぼちゃスライス2枚', name_vi = '2 lát bí đỏ ngọt' WHERE name = '단호박슬라이스2개' AND restaurant = 'SNACK_CORNER';
+UPDATE menu SET name_en = 'Extra Noodles (Salad Add-on)', name_ja = '麺追加（サラダ）', name_vi = 'Thêm mì (salad)' WHERE name = '면추가(샐러드)' AND restaurant = 'SNACK_CORNER';
