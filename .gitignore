@@ -50,3 +50,5 @@ out/
 ### DS File ###
 .DS_Store
 */.DS_Store
+
+.claude/settings.local.json
