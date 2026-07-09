@@ -61,7 +61,7 @@ src/main/java/ssu/eatssu/
 - **rating**: `Ratings` 임베디드 객체로 별점 집계 관리
 - **user**: User 엔티티, 학과/단과대학 정보(`department` 하위 패키지), 다국어 설정(`Language` enum: KO/EN/JA/VI)
 - **partnership**: 제휴 식당 정보 및 좋아요
-- **admin**: Mustache 템플릿 기반 어드민 UI. 식단/메뉴/카테고리/문의/리포트/리뷰 관리
+- **admin**: 일반 API와 동일한 JWT(`ROLE_ADMIN`) 인증을 쓰는 `@ResponseBody` JSON API. 식단/메뉴/카테고리/문의/리포트/리뷰 관리. `login.mustache`가 남아있으나 어떤 컨트롤러도 뷰를 렌더링하지 않는 죽은 코드
 - **slice**: 커서 기반 페이지네이션 (`SliceResponse<T>`)
 - **slack**: 서버 에러 발생 시 Slack 알림 (`SlackErrorNotifier`)
 
