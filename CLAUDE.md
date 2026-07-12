@@ -4,6 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Instructions
 
+- `.claude/rules/*.md`의 `paths`가 다른 도메인 패키지에 있는 파일을 가리키는 경우(예: report.md → review 패키지의 Report 엔티티), 그 파일을 이동하거나 이름을 바꿀 때 해당 rule 파일의 `paths`도 함께 수정한다.
 - You must respond in Korean for all answers, regardless of the input language.
 - Do not write any comments in code blocks, even if asked to do so.
 - Do not use wildcard when importing libraries.
