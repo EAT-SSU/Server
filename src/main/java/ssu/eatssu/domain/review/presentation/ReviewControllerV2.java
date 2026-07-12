@@ -158,8 +158,7 @@ public class ReviewControllerV2 {
     @PostMapping("/{reviewId}/translate")
     public BaseResponse<ReviewTranslationResponse> translateReview(
             @Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId,
-            @Parameter(description = "번역 대상 언어(현재 EN만 지원)") @RequestParam Language language,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+            @Parameter(description = "번역 대상 언어(현재 EN만 지원)") @RequestParam Language language) {
         return BaseResponse.success(reviewTranslationService.translateReview(reviewId, language));
     }
 
