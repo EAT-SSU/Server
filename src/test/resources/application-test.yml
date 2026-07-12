@@ -47,6 +47,11 @@ cloud:
 slack:
   token: ${EATSSU_SLACK_TOKEN}
 
+#DeepL
+deepl:
+  api-key: ${EATSSU_DEEPL_API_KEY}
+  base-url: https://api-free.deepl.com
+
 swagger:
   url: http://localhost:9000
   description: Test Server Swagger API
