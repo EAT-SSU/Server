@@ -31,7 +31,7 @@ public class DeepLTranslationClient {
     @Value("${deepl.api-key}")
     private String apiKey;
 
-    @Value("${deepl.base-url}")
+    @Value("${deepl.base-url:https://api-free.deepl.com}")
     private String baseUrl;
 
     public String translate(String text, Language targetLanguage) {

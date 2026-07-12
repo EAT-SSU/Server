@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import ssu.eatssu.domain.review.dto.ReviewTranslationResponse;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewTranslation;
@@ -21,12 +21,12 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_RE
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@Transactional
 public class ReviewTranslationService {
 
     private final ReviewRepository reviewRepository;
     private final ReviewTranslationRepository reviewTranslationRepository;
     private final DeepLTranslationClient deeplTranslationClient;
+    private final TransactionTemplate transactionTemplate;
 
     public ReviewTranslationResponse translateReview(Long reviewId, Language language) {
         if (language != Language.EN) {
@@ -61,12 +61,13 @@ public class ReviewTranslationService {
 
     private void saveTranslation(Review review, Language language, String translatedContent, int charCount) {
         try {
-            reviewTranslationRepository.save(ReviewTranslation.builder()
-                                                               .review(review)
-                                                               .language(language)
-                                                               .translatedContent(translatedContent)
-                                                               .charCount(charCount)
-                                                               .build());
+            transactionTemplate.executeWithoutResult(status ->
+                    reviewTranslationRepository.save(ReviewTranslation.builder()
+                                                                       .review(review)
+                                                                       .language(language)
+                                                                       .translatedContent(translatedContent)
+                                                                       .charCount(charCount)
+                                                                       .build()));
         } catch (DataIntegrityViolationException e) {
             log.warn("[리뷰 번역] 캐시 중복 저장 감지 reviewId={} language={}", review.getId(), language);
         }
