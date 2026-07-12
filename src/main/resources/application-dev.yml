@@ -68,6 +68,11 @@ cloud:
 slack:
   token: ${EATSSU_SLACK_TOKEN}
 
+#DeepL
+deepl:
+  api-key: ${EATSSU_DEEPL_API_KEY}
+  base-url: https://api-free.deepl.com
+
 #Swagger
 swagger:
   url: ${EATSSU_DEV_DOMAIN}
