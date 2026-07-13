@@ -31,6 +31,7 @@ jobs:
       EATSSU_AWS_ACCESS_KEY_DEV: dummy-access-key
       EATSSU_AWS_SECRET_KEY_DEV: dummy-secret-key
       EATSSU_SLACK_TOKEN: dummy-slack-token
+      EATSSU_DEEPL_API_KEY: dummy-deepl-key
     steps:
       - uses: actions/checkout@v3
 

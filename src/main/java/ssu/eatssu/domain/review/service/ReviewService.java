@@ -23,6 +23,7 @@ import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewImage;
 import ssu.eatssu.domain.review.repository.ReviewImageRepository;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
+import ssu.eatssu.domain.review.repository.ReviewTranslationRepository;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
@@ -30,6 +31,7 @@ import ssu.eatssu.global.util.S3Uploader;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.FAIL_IMAGE_UPLOAD;
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_MEAL;
@@ -47,6 +49,7 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final ReviewTranslationRepository reviewTranslationRepository;
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
     private final RatingCalculator ratingCalculator;
@@ -132,7 +135,12 @@ public class ReviewService {
             throw new BaseException(REVIEW_PERMISSION_DENIED);
         }
 
+        String oldContent = review.getContent();
         review.update(request.content(), request.mainRating(),request.amountRating(),request.tasteRating());
+
+        if (!Objects.equals(oldContent, request.content())) {
+            reviewTranslationRepository.deleteAllByReview_Id(reviewId);
+        }
     }
 
     public void deleteReview(CustomUserDetails userDetails, Long reviewId) {
