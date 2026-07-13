@@ -80,7 +80,7 @@ src/main/java/ssu/eatssu/
 
 ### 배포
 
-GitHub Actions(`deploy.yml`)로 Docker 이미지를 빌드하여 EC2에 SSH 배포한다. `prod`/`dev` 브랜치에 따라 배포 환경이 분기된다.
+GitHub Actions(`cd.yml`)로 Docker 이미지를 빌드하여 EC2에 SSH 배포한다. `prod`/`dev` 브랜치에 따라 배포 환경이 분기된다.
 
 ## Commit Convention
 
