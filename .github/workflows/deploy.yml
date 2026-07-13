@@ -8,11 +8,32 @@ permissions:
   contents: read
 
 jobs:
-  CI-CD:
-    name: CI/CD
+  build:
+    name: Build
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: eatssu_test
+          MYSQL_ROOT_PASSWORD: test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      EATSSU_DB_URL_TEST: jdbc:mysql://localhost:3306/eatssu_test
+      EATSSU_DB_USERNAME: root
+      EATSSU_DB_PASSWORD: test
+      EATSSU_AWS_ACCESS_KEY_DEV: dummy-access-key
+      EATSSU_AWS_SECRET_KEY_DEV: dummy-secret-key
+      EATSSU_SLACK_TOKEN: dummy-slack-token
     steps:
       - uses: actions/checkout@v3
+
       - name: JDK 17 설치
         uses: actions/setup-java@v3
         with:
@@ -48,11 +69,33 @@ jobs:
       - name: gradlew 실행 권한 부여
         run: chmod +x gradlew
 
+      - name: 테스트용 JWT 시크릿 생성
+        run: echo "EATSSU_JWT_SECRET_TEST=$(openssl rand -base64 64 | tr -d '\n')" >> "$GITHUB_ENV"
+
       - name: Gradle로 빌드
-        run: ./gradlew build -x test --no-daemon
+        run: ./gradlew build --no-daemon
 
       - name: 빌드 산출물 확인
         run: ls -lh build/libs/*.jar
+
+      - name: 빌드 산출물 업로드
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/eat-ssu.jar
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 빌드 산출물 다운로드
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs
 
       - name: Docker Hub 로그인
         uses: docker/login-action@v2
