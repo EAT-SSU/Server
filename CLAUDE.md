@@ -4,6 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Instructions
 
+- `.claude/rules/*.md`의 `paths`가 다른 도메인 패키지에 있는 파일을 가리키는 경우(예: report.md → review 패키지의 Report 엔티티), 그 파일을 이동하거나 이름을 바꿀 때 해당 rule 파일의 `paths`도 함께 수정한다.
 - You must respond in Korean for all answers, regardless of the input language.
 - Do not write any comments in code blocks, even if asked to do so.
 - Do not use wildcard when importing libraries.
@@ -79,7 +80,7 @@ src/main/java/ssu/eatssu/
 
 ### 배포
 
-GitHub Actions(`deploy.yml`)로 Docker 이미지를 빌드하여 EC2에 SSH 배포한다. `prod`/`dev` 브랜치에 따라 배포 환경이 분기된다.
+GitHub Actions(`cd.yml`)로 Docker 이미지를 빌드하여 EC2에 SSH 배포한다. `prod`/`dev` 브랜치에 따라 배포 환경이 분기된다.
 
 ## Commit Convention
 
