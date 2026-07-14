@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.review.entity.Review;
 
 @AllArgsConstructor
@@ -53,11 +54,16 @@ public class ReviewDetailV1 {
         List<String> imageUrls = new ArrayList<>();
         review.getReviewImages().forEach(i -> imageUrls.add(i.getImageUrl()));
 
+        Ratings ratings = review.getRatings();
+        Integer mainRating = (ratings != null) ? ratings.getMainRating() : review.getRating();
+        Integer amountRating = (ratings != null) ? ratings.getAmountRating() : null;
+        Integer tasteRating = (ratings != null) ? ratings.getTasteRating() : null;
+
         ReviewDetailV1Builder builder = ReviewDetailV1.builder()
                                                   .reviewId(review.getId())
-                                                  .mainRating(review.getRatings().getMainRating())
-                                                  .amountRating(review.getRatings().getAmountRating())
-                                                  .tasteRating(review.getRatings().getTasteRating())
+                                                  .mainRating(mainRating)
+                                                  .amountRating(amountRating)
+                                                  .tasteRating(tasteRating)
                                                   .writedAt(review.getCreatedDate().toLocalDate())
                                                   .content(review.getContent())
                                                   .imageUrls(imageUrls)
