@@ -44,6 +44,10 @@ public class PartnershipRestaurant implements Localizable {
     private String storeNameJa;
     @Column(name = "store_name_vi")
     private String storeNameVi;
+    @Column(name = "naver_map_url", length = 1024)
+    private String naverMapUrl;
+    @Column(name = "kakao_map_url", length = 1024)
+    private String kakaoMapUrl;
 
     @OneToMany(mappedBy = "partnershipRestaurant")
     @BatchSize(size = 20)
