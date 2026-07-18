@@ -97,6 +97,11 @@ public enum BaseResponseStatus {
     DUPLICATE_NICKNAME(false, HttpStatus.CONFLICT, 40902, "중복된 닉네임입니다."),
 
     /**
+     * 429 TOO_MANY_REQUESTS 요청 한도 초과
+     */
+    TRANSLATION_QUOTA_EXCEEDED(false, HttpStatus.TOO_MANY_REQUESTS, 42901, "번역 API 사용량 한도를 초과했습니다."),
+
+    /**
      * 415 UNSUPPORTED_MEDIA_TYPE 지원하지 않는 content type
      */
     UNSUPPORTED_MEDIA_TYPE(false, HttpStatus.UNSUPPORTED_MEDIA_TYPE, 415, "지원하지 않는 미디어 타입입니다."),
@@ -111,7 +116,9 @@ public enum BaseResponseStatus {
      * 503 SERVICE_UNAVAILABLE 서버 내부 에러
      */
     SERVICE_UNAVAILABLE(false, HttpStatus.SERVICE_UNAVAILABLE, 503, "현재 서비스가 불가능한 상태입니다."),
-    INTERNAL_SERVER_TIME_OUT(false, HttpStatus.SERVICE_UNAVAILABLE, 503, "서버에서 시간초과가 발생했습니다.");
+    INTERNAL_SERVER_TIME_OUT(false, HttpStatus.SERVICE_UNAVAILABLE, 503, "서버에서 시간초과가 발생했습니다."),
+    TRANSLATION_TIMEOUT(false, HttpStatus.SERVICE_UNAVAILABLE, 50301, "번역 요청 시간이 초과되었습니다."),
+    TRANSLATION_FAILED(false, HttpStatus.SERVICE_UNAVAILABLE, 50302, "번역에 실패했습니다.");
 
     private final boolean isSuccess;
     private final HttpStatus httpStatus;

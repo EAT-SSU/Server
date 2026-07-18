@@ -34,11 +34,14 @@ import ssu.eatssu.domain.review.dto.MealReviewsV2Response;
 import ssu.eatssu.domain.review.dto.MenuReviewsV2Response;
 import ssu.eatssu.domain.review.dto.RestaurantReviewResponse;
 import ssu.eatssu.domain.review.dto.ReviewDetail;
+import ssu.eatssu.domain.review.dto.ReviewTranslationResponse;
 import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.ValidMenuForViewResponse;
 import ssu.eatssu.domain.review.service.ReviewServiceV2;
+import ssu.eatssu.domain.review.service.ReviewTranslationService;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
+import ssu.eatssu.domain.user.entity.Language;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 @RestController
@@ -47,6 +50,7 @@ import ssu.eatssu.global.handler.response.BaseResponse;
 @Tag(name = "Review V2", description = "리뷰 V2 API")
 public class ReviewControllerV2 {
     private final ReviewServiceV2 reviewServiceV2;
+    private final ReviewTranslationService reviewTranslationService;
 
     @Operation(summary = "meal(식단)에 대한 리뷰 작성", description = "리뷰를 작성하는 API 입니다.")
     @ApiResponses(value = {
@@ -137,6 +141,25 @@ public class ReviewControllerV2 {
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         reviewServiceV2.deleteReview(customUserDetails, reviewId);
         return BaseResponse.success();
+    }
+
+    @Operation(summary = "리뷰 번역", description = """
+            리뷰 내용을 DeepL로 번역하는 API 입니다.<br><br>
+            같은 리뷰/언어 조합은 캐시된 결과를 반환합니다.<br><br>
+            현재는 language=EN만 지원합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 번역 성공"),
+            @ApiResponse(responseCode = "400", description = "지원하지 않는 언어이거나 번역할 내용이 없음", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 리뷰", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "429", description = "번역 API 사용량 한도 초과", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "503", description = "번역 시간 초과 또는 실패", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
+    })
+    @PostMapping("/{reviewId}/translate")
+    public BaseResponse<ReviewTranslationResponse> translateReview(
+            @Parameter(description = "reviewId") @PathVariable("reviewId") Long reviewId,
+            @Parameter(description = "번역 대상 언어(현재 EN만 지원)") @RequestParam Language language) {
+        return BaseResponse.success(reviewTranslationService.translateReview(reviewId, language));
     }
 
     @Operation(summary = "식단(변동 메뉴) 리뷰 정보 조회 V2(메뉴명, 평점 등등) [인증 토큰 필요 X]", description = """
