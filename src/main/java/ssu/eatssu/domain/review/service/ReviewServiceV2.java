@@ -32,6 +32,7 @@ import ssu.eatssu.domain.review.dto.UpdateMealReviewRequest;
 import ssu.eatssu.domain.review.dto.ValidMenuForViewResponse;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
+import ssu.eatssu.domain.review.repository.ReviewTranslationRepository;
 import ssu.eatssu.domain.review.utils.MenuFilterUtil;
 import ssu.eatssu.domain.slice.dto.SliceResponse;
 import ssu.eatssu.domain.user.dto.MyMealReviewResponse;
@@ -60,6 +61,7 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.REVIEW_PERMI
 public class ReviewServiceV2 {
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
+    private final ReviewTranslationRepository reviewTranslationRepository;
     private final MenuRepository menuRepository;
     private final MealRepository mealRepository;
     private final MealMenuRepository mealMenuRepository;
@@ -415,8 +417,13 @@ public class ReviewServiceV2 {
                                                                },
                                                                menuLike -> Boolean.TRUE.equals(menuLike.getIsLike())));
 
+        String oldContent = review.getContent();
         review.update(request.getContent(), request.getRating(), menuLikes);
         reviewRepository.save(review);
+
+        if (!Objects.equals(oldContent, request.getContent())) {
+            reviewTranslationRepository.deleteAllByReview_Id(reviewId);
+        }
 
         eventPublisher.publishEvent(LogEvent.of(
                 String.format("Review updated: reviewId=%d, userId=%d, newRating=%d",

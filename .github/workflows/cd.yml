@@ -2,17 +2,39 @@ name: EAT-SSU Server 개발 & 운영 서버 배포 파이프라인
 
 on:
   push:
-    branches: [ "main", "develop", "hotfix/deploy-prod-fail", "hotfix/deploy-dev-fail" ]
+    branches: [ "main", "develop" ]
 
 permissions:
   contents: read
 
 jobs:
-  CI-CD:
-    name: CI/CD
+  build:
+    name: Build
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: eatssu_test
+          MYSQL_ROOT_PASSWORD: test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      EATSSU_DB_URL_TEST: jdbc:mysql://localhost:3306/eatssu_test
+      EATSSU_DB_USERNAME: root
+      EATSSU_DB_PASSWORD: test
+      EATSSU_AWS_ACCESS_KEY_DEV: dummy-access-key
+      EATSSU_AWS_SECRET_KEY_DEV: dummy-secret-key
+      EATSSU_SLACK_TOKEN: dummy-slack-token
+      EATSSU_DEEPL_API_KEY: dummy-deepl-key
     steps:
       - uses: actions/checkout@v3
+
       - name: JDK 17 설치
         uses: actions/setup-java@v3
         with:
@@ -30,7 +52,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: dev 프로필 설정
-        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
+        if: github.ref_name == 'develop'
         run: |
           echo "spring:
             profiles:
@@ -38,7 +60,7 @@ jobs:
         shell: bash
 
       - name: prod 프로필 설정
-        if: github.ref_name == 'main' || github.ref_name == 'hotfix/deploy-prod-fail'
+        if: github.ref_name == 'main'
         run: |
           echo "spring:
             profiles:
@@ -48,11 +70,33 @@ jobs:
       - name: gradlew 실행 권한 부여
         run: chmod +x gradlew
 
+      - name: 테스트용 JWT 시크릿 생성
+        run: echo "EATSSU_JWT_SECRET_TEST=$(openssl rand -base64 64 | tr -d '\n')" >> "$GITHUB_ENV"
+
       - name: Gradle로 빌드
-        run: ./gradlew build -x test --no-daemon
+        run: ./gradlew build --no-daemon
 
       - name: 빌드 산출물 확인
         run: ls -lh build/libs/*.jar
+
+      - name: 빌드 산출물 업로드
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/eat-ssu.jar
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 빌드 산출물 다운로드
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs
 
       - name: Docker Hub 로그인
         uses: docker/login-action@v2
@@ -61,13 +105,13 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: prod 용 Docker 빌드 및 푸시
-        if: github.ref_name == 'main' || github.ref_name == 'hotfix/deploy-prod-fail'
+        if: github.ref_name == 'main'
         run: |
           docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/eatssu-prod .
           docker push ${{ secrets.DOCKER_REPO }}/eatssu-prod
 
       - name: dev 서버 용 Docker 빌드 및 푸시
-        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
+        if: github.ref_name == 'develop'
         run: |
           docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/eatssu-dev .
           docker push ${{ secrets.DOCKER_REPO }}/eatssu-dev
@@ -75,7 +119,7 @@ jobs:
       - name: prod에 배포
         uses: appleboy/ssh-action@master
         id: deploy-prod
-        if: github.ref_name == 'main' || github.ref_name == 'hotfix/deploy-prod-fail'
+        if: github.ref_name == 'main'
         with:
           host: ${{ secrets.HOST_PROD }}
           username: ${{ secrets.USERNAME }}
@@ -100,13 +144,14 @@ jobs:
             -e EATSSU_AWS_SECRET_KEY_PROD="${{ secrets.EATSSU_AWS_SECRET_KEY_PROD }}" \
             -e EATSSU_SLACK_TOKEN="${{ secrets.EATSSU_SLACK_TOKEN }}" \
             -e EATSSU_PROD_DOMAIN="${{ secrets.EATSSU_PROD_DOMAIN }}" \
+            -e EATSSU_DEEPL_API_KEY="${{ secrets.EATSSU_DEEPL_API_KEY }}" \
             ${{ secrets.DOCKER_REPO }}/eatssu-prod
             sudo docker image prune -f
 
       - name: dev 서버에 배포
         uses: appleboy/ssh-action@master
         id: deploy-dev
-        if: github.ref_name == 'develop' || github.ref_name == 'hotfix/deploy-dev-fail'
+        if: github.ref_name == 'develop'
         with:
           host: ${{ secrets.HOST_DEV }}
           username: ${{ secrets.USERNAME }}
@@ -131,5 +176,6 @@ jobs:
             -e EATSSU_AWS_SECRET_KEY_DEV="${{ secrets.EATSSU_AWS_SECRET_KEY_DEV }}" \
             -e EATSSU_SLACK_TOKEN="${{ secrets.EATSSU_SLACK_TOKEN }}" \
             -e EATSSU_DEV_DOMAIN="${{ secrets.EATSSU_DEV_DOMAIN }}" \
+            -e EATSSU_DEEPL_API_KEY="${{ secrets.EATSSU_DEEPL_API_KEY }}" \
             ${{ secrets.DOCKER_REPO }}/eatssu-dev
             sudo docker image prune -f
