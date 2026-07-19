@@ -18,6 +18,8 @@ public class PartnershipResponse {
     private Double longitude;
     private Double latitude;
     private RestaurantType restaurantType;
+    private String naverMapUrl;
+    private String kakaoMapUrl;
     private List<PartnershipInfo> partnershipInfos;
 
     public static PartnershipResponse fromEntity(PartnershipRestaurant restaurant, Long userId, Language language) {
@@ -36,6 +38,8 @@ public class PartnershipResponse {
                                   .longitude(restaurant.getLongitude())
                                   .latitude(restaurant.getLatitude())
                                   .restaurantType(restaurant.getRestaurantType())
+                                  .naverMapUrl(restaurant.getNaverMapUrl())
+                                  .kakaoMapUrl(restaurant.getKakaoMapUrl())
                                   .partnershipInfos(infos)
                                   .build();
     }
