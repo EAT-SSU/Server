@@ -1,4 +1,6 @@
-package ssu.eatssu.domain.admin.dto;
+package ssu.eatssu.domain.admin.dto.response;
+
+import ssu.eatssu.domain.admin.dto.SectionInBoard;
 
 import ssu.eatssu.domain.menu.entity.MenuCategory;
 

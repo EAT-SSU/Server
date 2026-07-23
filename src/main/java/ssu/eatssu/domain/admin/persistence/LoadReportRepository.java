@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
-import ssu.eatssu.domain.admin.dto.ReportLine;
+import ssu.eatssu.domain.admin.dto.response.ReportLine;
 import ssu.eatssu.domain.review.entity.QReport;
 import ssu.eatssu.domain.review.entity.QReview;
 

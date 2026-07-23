@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.admin.dto;
+package ssu.eatssu.domain.admin.dto.response;
 
 import org.springframework.data.domain.Page;
 

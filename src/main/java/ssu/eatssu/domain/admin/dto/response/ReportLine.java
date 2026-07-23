@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.admin.dto;
+package ssu.eatssu.domain.admin.dto.response;
 
 import ssu.eatssu.domain.review.entity.Report;
 import ssu.eatssu.domain.review.entity.Review;

@@ -2,8 +2,8 @@ package ssu.eatssu.global.log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import ssu.eatssu.domain.admin.dto.LoginRequest;
-import ssu.eatssu.domain.user.dto.Tokens;
+import ssu.eatssu.domain.admin.dto.request.LoginRequest;
+import ssu.eatssu.domain.user.dto.response.Tokens;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 import java.util.Map;

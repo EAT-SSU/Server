@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import ssu.eatssu.domain.admin.dto.LoginRequest;
+import ssu.eatssu.domain.admin.dto.request.LoginRequest;
 import ssu.eatssu.domain.admin.service.AuthenticationService;
-import ssu.eatssu.domain.user.dto.Tokens;
+import ssu.eatssu.domain.user.dto.response.Tokens;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 @Slf4j
