@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
-import ssu.eatssu.domain.partnership.dto.CreatePartnershipRequest;
-import ssu.eatssu.domain.partnership.dto.PartnershipResponse;
+import ssu.eatssu.domain.partnership.dto.request.CreatePartnershipRequest;
+import ssu.eatssu.domain.partnership.dto.response.PartnershipResponse;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 import java.util.List;

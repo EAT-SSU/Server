@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.partnership.dto;
+package ssu.eatssu.domain.partnership.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
