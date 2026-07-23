@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.review.dto;
+package ssu.eatssu.domain.review.dto.response;
 
 public interface ReviewInformationResponse {
 

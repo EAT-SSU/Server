@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.review.dto;
+package ssu.eatssu.domain.review.dto.response;
 
 import ssu.eatssu.domain.user.entity.Language;
 

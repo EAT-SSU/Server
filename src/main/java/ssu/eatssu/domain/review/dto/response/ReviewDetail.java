@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.review.dto;
+package ssu.eatssu.domain.review.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
