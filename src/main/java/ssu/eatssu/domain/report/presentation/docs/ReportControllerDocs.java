@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
-import ssu.eatssu.domain.report.dto.ReportCreateRequest;
-import ssu.eatssu.domain.report.dto.ReportTypeList;
+import ssu.eatssu.domain.report.dto.request.ReportCreateRequest;
+import ssu.eatssu.domain.report.dto.response.ReportTypeList;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 @Tag(name = "Report", description = "신고 API")

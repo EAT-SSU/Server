@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ssu.eatssu.domain.admin.dto.PageWrapper;
-import ssu.eatssu.domain.admin.dto.ReportLine;
+import ssu.eatssu.domain.admin.dto.response.PageWrapper;
+import ssu.eatssu.domain.admin.dto.response.ReportLine;
 import ssu.eatssu.domain.admin.persistence.LoadReportRepository;
 import ssu.eatssu.domain.admin.persistence.ManageReportRepository;
 

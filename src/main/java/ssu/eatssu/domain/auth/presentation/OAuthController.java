@@ -7,10 +7,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ssu.eatssu.domain.auth.dto.*;
+import ssu.eatssu.domain.auth.dto.request.AppleLoginRequest;
+import ssu.eatssu.domain.auth.dto.request.AppleLoginRequestV2;
+import ssu.eatssu.domain.auth.dto.request.KakaoLoginRequest;
+import ssu.eatssu.domain.auth.dto.request.KakaoLoginRequestV2;
+import ssu.eatssu.domain.auth.dto.request.ValidRequest;
 import ssu.eatssu.domain.auth.presentation.docs.OAuthControllerDocs;
 import ssu.eatssu.domain.auth.service.OAuthService;
-import ssu.eatssu.domain.user.dto.Tokens;
+import ssu.eatssu.domain.user.dto.response.Tokens;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 import static ssu.eatssu.domain.auth.infrastructure.SecurityUtil.getLoginUser;

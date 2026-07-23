@@ -5,7 +5,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
-import ssu.eatssu.domain.inquiry.dto.CreateInquiryRequest;
+import ssu.eatssu.domain.inquiry.dto.request.CreateInquiryRequest;
 import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.inquiry.repository.InquiryRepository;
 import ssu.eatssu.domain.user.entity.User;

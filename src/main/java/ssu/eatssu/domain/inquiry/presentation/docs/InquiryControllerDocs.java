@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
-import ssu.eatssu.domain.inquiry.dto.CreateInquiryRequest;
+import ssu.eatssu.domain.inquiry.dto.request.CreateInquiryRequest;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 @Tag(name = "Inquiry", description = "문의 API")

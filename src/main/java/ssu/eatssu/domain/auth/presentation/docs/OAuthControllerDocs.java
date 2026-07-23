@@ -4,12 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import ssu.eatssu.domain.auth.dto.AppleLoginRequest;
-import ssu.eatssu.domain.auth.dto.AppleLoginRequestV2;
-import ssu.eatssu.domain.auth.dto.KakaoLoginRequest;
-import ssu.eatssu.domain.auth.dto.KakaoLoginRequestV2;
-import ssu.eatssu.domain.auth.dto.ValidRequest;
-import ssu.eatssu.domain.user.dto.Tokens;
+import ssu.eatssu.domain.auth.dto.request.AppleLoginRequest;
+import ssu.eatssu.domain.auth.dto.request.AppleLoginRequestV2;
+import ssu.eatssu.domain.auth.dto.request.KakaoLoginRequest;
+import ssu.eatssu.domain.auth.dto.request.KakaoLoginRequestV2;
+import ssu.eatssu.domain.auth.dto.request.ValidRequest;
+import ssu.eatssu.domain.user.dto.response.Tokens;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 @Tag(name = "Oauth", description = "Oauth API")

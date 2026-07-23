@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
-import ssu.eatssu.domain.inquiry.dto.CreateInquiryRequest;
+import ssu.eatssu.domain.inquiry.dto.request.CreateInquiryRequest;
 import ssu.eatssu.domain.inquiry.entity.Inquiry;
 import ssu.eatssu.domain.inquiry.presentation.docs.InquiryControllerDocs;
 import ssu.eatssu.domain.inquiry.service.InquiryService;
