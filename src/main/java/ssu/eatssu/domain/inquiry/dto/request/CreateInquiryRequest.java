@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.inquiry.dto;
+package ssu.eatssu.domain.inquiry.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
