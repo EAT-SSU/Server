@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
-import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
+import ssu.eatssu.domain.user.dto.request.NicknameUpdateRequest;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 

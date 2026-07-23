@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.user.dto;
+package ssu.eatssu.domain.user.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import ssu.eatssu.domain.user.entity.Language;

@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.user.dto;
+package ssu.eatssu.domain.user.dto.response;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;

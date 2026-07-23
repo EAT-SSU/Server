@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.user.dto;
+package ssu.eatssu.domain.user.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import ssu.eatssu.domain.rating.entity.Ratings;
-import ssu.eatssu.domain.review.dto.MenuIdNameLikeDto;
+import ssu.eatssu.domain.review.dto.response.MenuIdNameLikeDto;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewMenuLike;
 import ssu.eatssu.domain.review.utils.MenuFilterUtil;
