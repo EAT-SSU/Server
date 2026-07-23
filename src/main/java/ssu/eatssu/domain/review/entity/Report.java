@@ -15,7 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ssu.eatssu.domain.report.dto.ReportCreateRequest;
+import ssu.eatssu.domain.report.dto.request.ReportCreateRequest;
 import ssu.eatssu.domain.report.entity.ReportStatus;
 import ssu.eatssu.domain.report.entity.ReportType;
 import ssu.eatssu.domain.user.entity.BaseTimeEntity;

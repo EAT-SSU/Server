@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.report.dto;
+package ssu.eatssu.domain.report.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import ssu.eatssu.domain.report.entity.ReportType;
