@@ -1,16 +1,7 @@
 package ssu.eatssu.domain.user.presentation;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -40,6 +31,7 @@ import ssu.eatssu.domain.user.dto.MyPageResponse;
 import ssu.eatssu.domain.user.dto.MyReviewDetail;
 import ssu.eatssu.domain.user.dto.NicknameUpdateRequest;
 import ssu.eatssu.domain.user.dto.UpdateDepartmentRequest;
+import ssu.eatssu.domain.user.presentation.docs.UserControllerDocs;
 import ssu.eatssu.domain.user.service.UserService;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
@@ -48,66 +40,27 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
-@Tag(name = "User", description = "유저 API")
-public class UserController {
+public class UserController implements UserControllerDocs {
 
     private final UserService userService;
     private final SliceService sliceService;
     private final PartnershipService partnershipService;
     private final ReviewServiceV2 reviewServiceV2;
 
-    @Operation(summary = "이메일 중복 체크", description = """
-            이메일 중복 체크 API 입니다.<br><br>
-            중복되지 않은 이메일이면 true 를 반환합니다
-            """)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "중복되지 않은 이메일")
-    })
+    @Override
     @PostMapping("/validate/email/{email}") //todo: 중복인 경우 error throw, 중복 아니면 ApiReposne return
     public BaseResponse<Boolean> validateDuplicatedEmail(
-            @Parameter(description = "이메일") @PathVariable String email) {
+            @PathVariable String email) {
         return BaseResponse.success(userService.validateDuplicatedEmail(email));
     }
 
-    @Operation(summary = "닉네임 중복 및 유효성 체크", description = """
-            닉네임 중복 및 유효성 체크 API 입니다.<br><br>
-            유효하고 중복되지 않은 닉네임이면 true 를 반환합니다
-            """)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "유효하고 중복되지 않은 닉네임"),
-            @ApiResponse(responseCode = "400", description = "숫자로만 이루어진 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "연속된 공백을 포함하는 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "연속된 하이폰을 사용하는 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "첫 글자가 한글,영문,숫자가 아닌 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "마지막 글자가 한글,영문,숫자가 아닌 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "한글,영문,숫자,공백,하이폰(-)이외의 문자를 쓴 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "닉네임이 1자 이상 16이하가 아닌 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "서비스명/브랜드명 단독 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "관리자로 혼동될 수 있는 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "욕설/비속어가 이름에 포함되는 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
+    @Override
     @GetMapping("/validate/nickname")
-    public BaseResponse<Boolean> validateNickname(@Parameter(description = "닉네임")
-                                                            @RequestParam(value = "nickname") String nickname) {
+    public BaseResponse<Boolean> validateNickname(@RequestParam(value = "nickname") String nickname) {
         return BaseResponse.success(userService.validateNickname(nickname));
     }
 
-    @Operation(summary = "닉네임 수정", description = "닉네임 수정 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "닉네임 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "숫자로만 이루어진 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "연속된 공백을 포함하는 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "연속된 하이폰을 사용하는 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "첫 글자가 한글,영문,숫자가 아닌 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "마지막 글자가 한글,영문,숫자가 아닌 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "한글,영문,숫자,공백,하이폰(-)이외의 문자를 쓴 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "닉네임이 1자 이상 16이하가 아닌 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "서비스명/브랜드명 단독 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "관리자로 혼동될 수 있는 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "욕설/비속어가 이름에 포함되는 경우", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "409", description = "중복된 닉네임", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
+    @Override
     @PatchMapping("/nickname")
     public BaseResponse<?> updateNickname(
             @Valid @RequestBody NicknameUpdateRequest updateNicknameRequest,
@@ -116,12 +69,7 @@ public class UserController {
         return BaseResponse.success();
     }
 
-    @Operation(summary = "언어 설정 수정", description = "유저의 언어 설정을 수정하는 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "언어 설정 수정 성공"),
-            @ApiResponse(responseCode = "400", description = "지원하지 않는 언어 또는 누락된 언어 설정", content = @Content(schema = @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
+    @Override
     @PatchMapping("/language")
     public BaseResponse<?> updateLanguage(
             @Valid @RequestBody LanguageUpdateRequest request,
@@ -130,36 +78,24 @@ public class UserController {
         return BaseResponse.success();
     }
 
-    @Operation(summary = "언어 설정 조회", description = "유저의 언어 설정을 조회하는 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "언어 설정 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
+    @Override
     @GetMapping("/language")
     public BaseResponse<LanguageResponse> getLanguage(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(userService.findLanguage(userDetails));
     }
 
-    @Operation(summary = "유저 탈퇴", description = "유저 탈퇴 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "유저 탈퇴 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
+    @Override
     @DeleteMapping("")
     public BaseResponse<Boolean> withdraw(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(userService.withdraw(userDetails));
     }
 
-    @Operation(summary = "내가 쓴 리뷰 리스트 조회", description = "내가 쓴 리뷰 리스트를 조회하는 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "내가 쓴 리뷰 리스트 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
+    @Override
     @GetMapping("/reviews")
     public BaseResponse<SliceResponse<MyReviewDetail>> getMyReviewList(
-            @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY) @RequestParam(required = false) Long lastReviewId,
-            @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) Long lastReviewId,
+            @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         SliceResponse<MyReviewDetail> myReviews = sliceService.findMyReviews(customUserDetails,
                                                                              pageable,
@@ -168,37 +104,21 @@ public class UserController {
     }
 
 
-    @Operation(summary = "마이페이지 정보 조회", description = "마이페이지 정보를 조회하는 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "마이페이지 정보 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
+    @Override
     @GetMapping("/mypage")
     public BaseResponse<MyPageResponse> getMyPage(
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return BaseResponse.success(userService.findMyPage(customUserDetails));
     }
 
-    @Operation(summary = "유저가 찜한 제휴 조회", description = "유저가 찜한 제휴를 조회하는 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "유저가 찜한 제휴 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-    })
+    @Override
     @GetMapping("/partnerships")
     public BaseResponse<List<PartnershipResponse>> getUserLikedPartnerships(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(partnershipService.getUserLikedPartnerships(userDetails));
     }
 
-    @Operation(summary = "유저의 학과 등록", description = "유저의 학과를 등록하는 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "유저의 학과 등록 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 학과", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-    })
+    @Override
     @PostMapping("/department")
     public BaseResponse<?> registerDepartment(@RequestBody UpdateDepartmentRequest request,
                                               @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -206,14 +126,7 @@ public class UserController {
         return BaseResponse.success();
     }
 
-    @Operation(summary = "유저의 단과대/학과 제휴 조회", description = "유저의 단과대/학과 제휴를 조회하는 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "유저의 단과대/학과 제휴 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "유저의 학과 정보가 등록되지 않음", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-    })
+    @Override
     @GetMapping("/department/partnerships")
     public BaseResponse<List<PartnershipResponse>> getUserDepartmentPartnerships(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -221,28 +134,17 @@ public class UserController {
     }
 
 
-    @Operation(summary = "유저의 학과 조회", description = "유저의 학과를 조회하는 API 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "유저의 학과 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "유저의 학과 정보가 등록되지 않음", content = @Content(schema =
-            @Schema(implementation = BaseResponse.class))),
-    })
+    @Override
     @GetMapping("/department")
     public BaseResponse<DepartmentResponse> getDepartment(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return BaseResponse.success(userService.getDepartment(userDetails));
     }
 
-    @Operation(summary = "내가 쓴 리뷰 리스트 조회", description = "내가 쓴 리뷰 리스트를 조회하는 API V2 입니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "내가 쓴 리뷰 리스트 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
+    @Override
     @GetMapping("/v2/reviews")
     public BaseResponse<SliceResponse<MyMealReviewResponse>> getMyReviews(
-            @Parameter(description = "마지막으로 조회된 reviewId값(첫 조회시 값 필요 없음)", in = ParameterIn.QUERY) @RequestParam(required = false) Long lastReviewId,
-            @ParameterObject @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) Long lastReviewId,
+            @PageableDefault(size = 20, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         SliceResponse<MyMealReviewResponse> myReviews = reviewServiceV2.findMyReviews(customUserDetails,
                                                                                       lastReviewId,
@@ -250,11 +152,7 @@ public class UserController {
         return BaseResponse.success(myReviews);
     }
 
-    @Operation(summary = "단과대 조회", description = "숭실대학교 단과대학 들을 조회하는 API입니다.(토큰 불필요)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "단과대 리스트 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 단과대", content = @Content(schema = @Schema(implementation = BaseResponse.class)))
-    })
+    @Override
     @GetMapping("/lookup/colleges")
     public BaseResponse<List<GetCollegeResponse>> getColleges(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -262,10 +160,7 @@ public class UserController {
         return BaseResponse.success(getCollegeResponses);
     }
 
-    @Operation(summary = "단과대에 따른 학과 조회", description = "단과대학을 입력하면 단과대에 속한 숭실대학교 학과를 조회하는 API입니다.(토큰 불필요)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "단과대 리스트 조회 성공"),
-    })
+    @Override
     @GetMapping("/lookup/departments")
     public BaseResponse<List<GetDepartmentResponse>> getDepartments(@RequestParam Long collegeId,
                                                                     @AuthenticationPrincipal CustomUserDetails userDetails) {
