@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import ssu.eatssu.domain.admin.dto.PageWrapper;
-import ssu.eatssu.domain.admin.dto.ReportLine;
+import ssu.eatssu.domain.admin.dto.response.PageWrapper;
+import ssu.eatssu.domain.admin.dto.response.ReportLine;
 import ssu.eatssu.domain.admin.service.ManageReportService;
 import ssu.eatssu.global.handler.response.BaseResponse;
 

@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
-import ssu.eatssu.domain.review.dto.ReviewTranslationResponse;
+import ssu.eatssu.domain.review.dto.response.ReviewTranslationResponse;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.ReviewTranslation;
 import ssu.eatssu.domain.review.infrastructure.DeepLTranslationClient;

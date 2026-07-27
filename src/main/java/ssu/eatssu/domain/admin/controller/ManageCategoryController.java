@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import ssu.eatssu.domain.admin.dto.RegisterCategoryRequest;
+import ssu.eatssu.domain.admin.dto.request.RegisterCategoryRequest;
 import ssu.eatssu.domain.admin.service.ManageCategoryService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.global.handler.response.BaseResponse;

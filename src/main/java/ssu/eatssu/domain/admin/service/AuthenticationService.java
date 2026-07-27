@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.admin.controller.AdminAuth;
-import ssu.eatssu.domain.admin.dto.LoginRequest;
+import ssu.eatssu.domain.admin.dto.request.LoginRequest;
 import ssu.eatssu.domain.auth.security.JwtTokenProvider;
-import ssu.eatssu.domain.user.dto.Tokens;
+import ssu.eatssu.domain.user.dto.response.Tokens;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 

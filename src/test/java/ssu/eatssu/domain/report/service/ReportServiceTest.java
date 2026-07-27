@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
-import ssu.eatssu.domain.report.dto.ReportCreateRequest;
+import ssu.eatssu.domain.report.dto.request.ReportCreateRequest;
 import ssu.eatssu.domain.report.entity.ReportType;
 import ssu.eatssu.domain.report.repository.ReportRepository;
 import ssu.eatssu.domain.review.entity.Report;

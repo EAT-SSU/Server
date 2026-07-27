@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import ssu.eatssu.domain.admin.dto.InquiryLine;
-import ssu.eatssu.domain.admin.dto.PageWrapper;
-import ssu.eatssu.domain.admin.dto.UpdateStatusRequest;
+import ssu.eatssu.domain.admin.dto.response.InquiryLine;
+import ssu.eatssu.domain.admin.dto.response.PageWrapper;
+import ssu.eatssu.domain.admin.dto.request.UpdateStatusRequest;
 import ssu.eatssu.domain.admin.service.ManageInquiryService;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
