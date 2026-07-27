@@ -19,6 +19,7 @@ import ssu.eatssu.domain.auth.dto.request.AppleLoginRequestV2;
 import ssu.eatssu.domain.auth.dto.request.KakaoLoginRequestV2;
 
 import ssu.eatssu.domain.user.entity.User;
+import ssu.eatssu.domain.user.entity.DeviceType;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.entity.AppleAuthenticator;
 import ssu.eatssu.domain.auth.security.JwtTokenProvider;
@@ -56,10 +57,7 @@ public class OAuthService {
      */
     public Tokens kakaoLoginV2(KakaoLoginRequestV2 request) {
         try {
-            User user = userRepository.findByProviderId(request.providerId())
-                    .orElseGet(() -> userRepository.findFirstByEmailOrderByIdAsc(request.email())
-                            .orElseGet(() -> userService.joinV2(request.email(), KAKAO, request.providerId(), request.deviceType())));
-
+            User user = findOrCreateUser(request.email(), KAKAO, request.providerId(), request.deviceType());
             user.updateDeviceType(request.deviceType());
 
             Tokens tokens = generateOauthJwtTokens(user.getEmail(), user.getProvider(), user.getProviderId());
@@ -91,9 +89,7 @@ public class OAuthService {
         try {
             OAuthInfo oAuthInfo = appleAuthenticator.getOAuthInfoByIdentityToken(request.identityToken());
 
-            User user = userRepository.findByProviderId(oAuthInfo.providerId())
-                    .orElseGet(() -> userRepository.findFirstByEmailOrderByIdAsc(oAuthInfo.email())
-                            .orElseGet(() -> userService.joinV2(oAuthInfo.email(), APPLE, oAuthInfo.providerId(), request.deviceType())));
+            User user = findOrCreateUser(oAuthInfo.email(), APPLE, oAuthInfo.providerId(), request.deviceType());
 
             updateAppleUserEmail(user, oAuthInfo.email());
 
@@ -156,5 +152,11 @@ public class OAuthService {
 
     private void countLoginAttempt(String provider, String result) {
         meterRegistry.counter("login.attempts", "provider", provider, "result", result).increment();
+    }
+
+    private User findOrCreateUser(String email, OAuthProvider provider, String providerId, DeviceType deviceType) {
+        return userRepository.findByProviderId(providerId)
+                .orElseGet(() -> userRepository.findFirstByEmailOrderByIdAsc(email)
+                        .orElseGet(() -> userService.joinV2(email, provider, providerId, deviceType)));
     }
 }
