@@ -1,6 +1,8 @@
 package ssu.eatssu.domain.review.service;
 
+import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,13 +25,16 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_FOUND_RE
 @Service
 public class ReviewTranslationService {
 
+    private static final Set<Language> SUPPORTED_TARGET_LANGUAGES = EnumSet.of(Language.EN, Language.JA,
+            Language.VI);
+
     private final ReviewRepository reviewRepository;
     private final ReviewTranslationRepository reviewTranslationRepository;
     private final DeepLTranslationClient deeplTranslationClient;
     private final TransactionTemplate transactionTemplate;
 
     public ReviewTranslationResponse translateReview(Long reviewId, Language language) {
-        if (language != Language.EN) {
+        if (!SUPPORTED_TARGET_LANGUAGES.contains(language)) {
             throw new BaseException(FAILED_VALIDATION);
         }
 
