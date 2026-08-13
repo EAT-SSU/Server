@@ -96,7 +96,7 @@ public interface ReviewControllerV2Docs {
     @Operation(summary = "리뷰 번역", description = """
             리뷰 내용을 DeepL로 번역하는 API 입니다.<br><br>
             같은 리뷰/언어 조합은 캐시된 결과를 반환합니다.<br><br>
-            현재는 language=EN만 지원합니다.
+            현재는 language=EN/JA/VI만 지원합니다.
             """)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰 번역 성공"),
@@ -107,7 +107,7 @@ public interface ReviewControllerV2Docs {
     })
     BaseResponse<ReviewTranslationResponse> translateReview(
             @Parameter(description = "reviewId") Long reviewId,
-            @Parameter(description = "번역 대상 언어(현재 EN만 지원)") Language language);
+            @Parameter(description = "번역 대상 언어(현재 EN/JA/VI만 지원)") Language language);
 
     @Operation(summary = "식단(변동 메뉴) 리뷰 정보 조회 V2(메뉴명, 평점 등등) [인증 토큰 필요 X]", description = """
             식단 리뷰 정보를 조회하는 API 입니다.<br><br>
