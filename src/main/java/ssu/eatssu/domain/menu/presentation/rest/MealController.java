@@ -13,12 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 import ssu.eatssu.domain.menu.entity.constants.TimePart;
 import ssu.eatssu.domain.menu.presentation.dto.request.CreateMealRequest;
 import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateWithPriceRequest;
+import ssu.eatssu.domain.menu.presentation.dto.response.MealCreateResult;
 import ssu.eatssu.domain.menu.presentation.dto.response.MealDetailResponse;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenusInMealResponse;
 import ssu.eatssu.domain.menu.presentation.rest.docs.MealControllerDocs;
 import ssu.eatssu.domain.menu.service.MealService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
+import ssu.eatssu.domain.user.entity.Language;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
@@ -36,7 +38,7 @@ public class MealController implements MealControllerDocs {
 
     @Override
     @PostMapping("")
-    public BaseResponse<Void> createMeal(
+    public BaseResponse<MealCreateResult> createMeal(
             @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
             @RequestParam("restaurant") Restaurant restaurant,
             @RequestParam("time") TimePart timePart,
@@ -45,13 +47,12 @@ public class MealController implements MealControllerDocs {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
 
-        mealService.createMeal(date, restaurant, timePart, mealCreateRequest);
-        return BaseResponse.success();
+        return BaseResponse.success(mealService.createMeal(date, restaurant, timePart, mealCreateRequest));
     }
 
     @Override
     @PostMapping("/with-price")
-    public BaseResponse<Void> createMealWithPrice(
+    public BaseResponse<MealCreateResult> createMealWithPrice(
             @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
             @RequestParam("restaurant") Restaurant restaurant,
             @RequestParam("time") TimePart timePart,
@@ -60,8 +61,7 @@ public class MealController implements MealControllerDocs {
             throw new BaseException(NOT_SUPPORT_RESTAURANT);
         }
 
-        mealService.createMealWithPrice(date, restaurant, timePart, request);
-        return BaseResponse.success();
+        return BaseResponse.success(mealService.createMealWithPrice(date, restaurant, timePart, request));
     }
 
     @Override
@@ -69,10 +69,11 @@ public class MealController implements MealControllerDocs {
     public BaseResponse<List<MealDetailResponse>> getMealDetail(
             @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
             @RequestParam("restaurant") Restaurant restaurant,
-            @RequestParam("time") TimePart timePart) {
+            @RequestParam("time") TimePart timePart,
+            @RequestParam(value = "language", required = false) Language language) {
 
         return BaseResponse.success(
-                mealService.getMealDetailsByDateAndRestaurantAndTimePart(date, restaurant, timePart));
+                mealService.getMealDetailsByDateAndRestaurantAndTimePart(date, restaurant, timePart, language));
     }
 
     @Override
@@ -86,7 +87,9 @@ public class MealController implements MealControllerDocs {
 
     @Override
     @GetMapping("/{mealId}/menus-info")
-    public BaseResponse<MenusInMealResponse> getMenusInMeal(@PathVariable("mealId") Long mealId) {
-        return BaseResponse.success(mealService.getMenusInMealByMealId(mealId));
+    public BaseResponse<MenusInMealResponse> getMenusInMeal(
+            @PathVariable("mealId") Long mealId,
+            @RequestParam(value = "language", required = false) Language language) {
+        return BaseResponse.success(mealService.getMenusInMealByMealId(mealId, language));
     }
 }

@@ -12,6 +12,7 @@ import ssu.eatssu.domain.menu.persistence.MealRepository;
 import ssu.eatssu.domain.menu.presentation.dto.request.CreateMealRequest;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenusInMealResponse;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
+import ssu.eatssu.domain.user.entity.Language;
 
 import java.sql.Date;
 import java.util.List;
@@ -58,10 +59,10 @@ class MealServiceTest {
         Date date = Date.valueOf("2024-01-03");
         TimePart timePart = LUNCH;
         Restaurant restaurant = Restaurant.from("HAKSIK");
-        CreateMealRequest request = new CreateMealRequest(List.of("돈까스", "샐러드", "김치"));
+        CreateMealRequest request = new CreateMealRequest(List.of("돈까스", "샐러드", "김치"), null);
 
         // then
-        return mealService.createMeal(date, restaurant, timePart, request);
+        return mealService.createMeal(date, restaurant, timePart, request).mealId();
     }
 
     @Test
@@ -70,7 +71,7 @@ class MealServiceTest {
         Long meadId = 식단_생성_요청();
 
         // when
-        MenusInMealResponse response = mealService.getMenusInMealByMealId(meadId);
+        MenusInMealResponse response = mealService.getMenusInMealByMealId(meadId, Language.KO);
 
         // then
         assertThat(response.getBriefMenus()).hasSize(3);
