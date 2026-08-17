@@ -9,7 +9,9 @@ public record MealCreateWithPriceRequest(
         @Schema(description = "메뉴명 리스트", example = "[\"돈까스\", \"샐러드\", \"김치\"]")
         List<String> menuNames,
         @Schema(description = "식단 가격", example = "3000")
-        Integer price
+        Integer price,
+        @Schema(description = "대표메뉴 목록(영어 UI 노출용, optional)")
+        List<MainMenuRequest> mainMenus
 ) {
 
 }

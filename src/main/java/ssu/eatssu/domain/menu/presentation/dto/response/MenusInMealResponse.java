@@ -9,6 +9,7 @@ import ssu.eatssu.domain.menu.entity.MealMenu;
 import ssu.eatssu.domain.menu.entity.Menu;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @NoArgsConstructor
@@ -19,9 +20,9 @@ public class MenusInMealResponse {
     @Schema(description = "식단 속 메뉴 목록", example = "[]")
     private List<BriefMenuResponse> briefMenus;
 
-    public static MenusInMealResponse from(List<Menu> menus) {
-        List<BriefMenuResponse> menusInformation =  menus.stream()
-                                                       .map(BriefMenuResponse::new)
+    public static MenusInMealResponse from(List<Menu> menus, Map<String, String> mainMenuTranslations) {
+        List<BriefMenuResponse> menusInformation = menus.stream()
+                                                       .map(menu -> new BriefMenuResponse(menu, mainMenuTranslations))
                                                        .toList();
 
         return new MenusInMealResponse(menusInformation);
