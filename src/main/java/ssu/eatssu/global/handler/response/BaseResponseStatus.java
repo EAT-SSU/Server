@@ -78,6 +78,7 @@ public enum BaseResponseStatus {
     NOT_FOUND_PROVIDER_ID(false, HttpStatus.NOT_FOUND, 40413, "Claims에서 ProviderId(sub)를 찾을 수 없습니다."),
     NOT_FOUND_EMAIL(false, HttpStatus.NOT_FOUND, 40414, "Claims에서 이메일을 찾을 수 없습니다."),
     NOT_FOUND_APPLE_EMAIL_NEW_USER(false, HttpStatus.NOT_FOUND, 40415, "신규 Apple 유저인데 email claim이 없습니다."),
+    NOT_FOUND_GOOD_PRICE_STORE(false, HttpStatus.NOT_FOUND, 40416, "해당 착한가격업소를 찾을 수 없습니다."),
 
     /**
      * 405 METHOD_NOT_ALLOWED 지원하지 않은 method 호출
