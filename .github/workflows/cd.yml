@@ -197,6 +197,7 @@ jobs:
               DB_PORT="${DB_HOST_PORT##*:}"
               if [ "$DB_PORT" = "$DB_HOST_PORT" ]; then DB_PORT="3306"; fi
 
+              REHEARSAL_DB_PASSWORD="rehearsal"
               REHEARSAL_CONTAINER="eatssu-prod-migration-rehearsal-${{ github.run_id }}-${{ github.run_attempt }}"
               DUMP_FILE="/tmp/${REHEARSAL_CONTAINER}.sql"
               DUMP_TIMEOUT="20m"
@@ -225,12 +226,12 @@ jobs:
               echo "리허설 MySQL 컨테이너를 시작합니다: $REHEARSAL_CONTAINER"
               sudo docker run -d \
                 --name "$REHEARSAL_CONTAINER" \
-                -e MYSQL_ROOT_PASSWORD='rehearsal' \
+                -e MYSQL_ROOT_PASSWORD="$REHEARSAL_DB_PASSWORD" \
                 -e MYSQL_DATABASE="$DB_NAME" \
                 mysql:8.0
 
               for i in $(seq 1 30); do
-                if sudo docker exec "$REHEARSAL_CONTAINER" mysqladmin ping -uroot -prehearsal --silent; then
+                if sudo docker exec -e MYSQL_PWD="$REHEARSAL_DB_PASSWORD" "$REHEARSAL_CONTAINER" mysql -uroot -e "SELECT 1" >/dev/null 2>&1; then
                   break
                 fi
                 if [ "$i" -eq 30 ]; then
@@ -241,7 +242,7 @@ jobs:
               done
 
               echo "덤프를 리허설 DB에 복원합니다."
-              timeout "$RESTORE_TIMEOUT" sudo docker exec -i "$REHEARSAL_CONTAINER" mysql -uroot -prehearsal "$DB_NAME" < "$DUMP_FILE"
+              timeout "$RESTORE_TIMEOUT" sudo docker exec -i -e MYSQL_PWD="$REHEARSAL_DB_PASSWORD" "$REHEARSAL_CONTAINER" mysql -uroot "$DB_NAME" < "$DUMP_FILE"
 
               echo "복제 DB에서 Flyway 마이그레이션 리허설을 실행합니다."
               timeout "$MIGRATION_TIMEOUT" sudo docker run --rm \
@@ -249,7 +250,7 @@ jobs:
                 -v "$MIGRATION_DIR:/flyway/sql:ro" \
                 -e FLYWAY_URL="jdbc:mysql://127.0.0.1:3306/$DB_NAME?allowPublicKeyRetrieval=true&useSSL=false" \
                 -e FLYWAY_USER='root' \
-                -e FLYWAY_PASSWORD='rehearsal' \
+                -e FLYWAY_PASSWORD="$REHEARSAL_DB_PASSWORD" \
                 -e FLYWAY_LOCATIONS='filesystem:/flyway/sql' \
                 -e FLYWAY_BASELINE_ON_MIGRATE='true' \
                 -e FLYWAY_BASELINE_VERSION='1' \
@@ -316,6 +317,7 @@ jobs:
               DB_PORT="${DB_HOST_PORT##*:}"
               if [ "$DB_PORT" = "$DB_HOST_PORT" ]; then DB_PORT="3306"; fi
 
+              REHEARSAL_DB_PASSWORD="rehearsal"
               REHEARSAL_CONTAINER="eatssu-dev-migration-rehearsal-${{ github.run_id }}-${{ github.run_attempt }}"
               DUMP_FILE="/tmp/${REHEARSAL_CONTAINER}.sql"
               DUMP_TIMEOUT="20m"
@@ -344,12 +346,12 @@ jobs:
               echo "리허설 MySQL 컨테이너를 시작합니다: $REHEARSAL_CONTAINER"
               sudo docker run -d \
                 --name "$REHEARSAL_CONTAINER" \
-                -e MYSQL_ROOT_PASSWORD='rehearsal' \
+                -e MYSQL_ROOT_PASSWORD="$REHEARSAL_DB_PASSWORD" \
                 -e MYSQL_DATABASE="$DB_NAME" \
                 mysql:8.0
 
               for i in $(seq 1 30); do
-                if sudo docker exec "$REHEARSAL_CONTAINER" mysqladmin ping -uroot -prehearsal --silent; then
+                if sudo docker exec -e MYSQL_PWD="$REHEARSAL_DB_PASSWORD" "$REHEARSAL_CONTAINER" mysql -uroot -e "SELECT 1" >/dev/null 2>&1; then
                   break
                 fi
                 if [ "$i" -eq 30 ]; then
@@ -360,7 +362,7 @@ jobs:
               done
 
               echo "덤프를 리허설 DB에 복원합니다."
-              timeout "$RESTORE_TIMEOUT" sudo docker exec -i "$REHEARSAL_CONTAINER" mysql -uroot -prehearsal "$DB_NAME" < "$DUMP_FILE"
+              timeout "$RESTORE_TIMEOUT" sudo docker exec -i -e MYSQL_PWD="$REHEARSAL_DB_PASSWORD" "$REHEARSAL_CONTAINER" mysql -uroot "$DB_NAME" < "$DUMP_FILE"
 
               echo "복제 DB에서 Flyway 마이그레이션 리허설을 실행합니다."
               timeout "$MIGRATION_TIMEOUT" sudo docker run --rm \
@@ -368,7 +370,7 @@ jobs:
                 -v "$MIGRATION_DIR:/flyway/sql:ro" \
                 -e FLYWAY_URL="jdbc:mysql://127.0.0.1:3306/$DB_NAME?allowPublicKeyRetrieval=true&useSSL=false" \
                 -e FLYWAY_USER='root' \
-                -e FLYWAY_PASSWORD='rehearsal' \
+                -e FLYWAY_PASSWORD="$REHEARSAL_DB_PASSWORD" \
                 -e FLYWAY_LOCATIONS='filesystem:/flyway/sql' \
                 -e FLYWAY_BASELINE_ON_MIGRATE='true' \
                 -e FLYWAY_BASELINE_VERSION='1' \
