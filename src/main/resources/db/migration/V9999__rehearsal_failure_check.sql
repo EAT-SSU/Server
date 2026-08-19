@@ -1,3 +1,7 @@
-ALTER TABLE review
-ADD CONSTRAINT chk_rehearsal_review_id_over_1000000000
-CHECK (review_id > 1000000000);
+INSERT INTO review (review_id, created_date, modified_date)
+SELECT existing_review.review_id, NOW(6), NOW(6)
+FROM (
+    SELECT review_id
+    FROM review
+    LIMIT 1
+) existing_review;
