@@ -92,6 +92,35 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: 신규 마이그레이션 파일 감지
+        id: detect-new-migrations
+        shell: bash
+        run: |
+          set -euo pipefail
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            BEFORE="${AFTER}^"
+          fi
+
+          NEW_MIGRATIONS=$(git diff --name-only --diff-filter=A "$BEFORE" "$AFTER" -- src/main/resources/db/migration/)
+
+          if [ -n "$NEW_MIGRATIONS" ]; then
+            echo "HAS_NEW_MIGRATIONS=true" >> "$GITHUB_ENV"
+            echo "has-new-migrations=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "new-migrations<<EOF"
+              echo "$NEW_MIGRATIONS"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "$NEW_MIGRATIONS"
+          else
+            echo "HAS_NEW_MIGRATIONS=false" >> "$GITHUB_ENV"
+            echo "has-new-migrations=false" >> "$GITHUB_OUTPUT"
+            echo "신규 마이그레이션 파일 없음"
+          fi
+
       - name: 빌드 산출물 다운로드
         uses: actions/download-artifact@v4
         with:
