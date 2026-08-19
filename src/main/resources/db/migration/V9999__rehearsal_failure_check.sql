@@ -1,3 +1,3 @@
-ALTER TABLE college
-ADD CONSTRAINT chk_rehearsal_college_id_over_100
-CHECK (college_id > 100);
+ALTER TABLE review
+ADD CONSTRAINT chk_rehearsal_review_id_over_1000000000
+CHECK (review_id > 1000000000);
