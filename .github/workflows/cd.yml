@@ -91,6 +91,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 신규 마이그레이션 파일 감지
+        id: detect-new-migrations
+        shell: bash
+        run: |
+          set -euo pipefail
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            BEFORE="${AFTER}^"
+          fi
+
+          NEW_MIGRATIONS=$(git diff --name-only --diff-filter=A "$BEFORE" "$AFTER" -- src/main/resources/db/migration/)
+
+          if [ -n "$NEW_MIGRATIONS" ]; then
+            echo "HAS_NEW_MIGRATIONS=true" >> "$GITHUB_ENV"
+            echo "has-new-migrations=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "new-migrations<<EOF"
+              echo "$NEW_MIGRATIONS"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "$NEW_MIGRATIONS"
+          else
+            echo "HAS_NEW_MIGRATIONS=false" >> "$GITHUB_ENV"
+            echo "has-new-migrations=false" >> "$GITHUB_OUTPUT"
+            echo "신규 마이그레이션 파일 없음"
+          fi
 
       - name: 빌드 산출물 다운로드
         uses: actions/download-artifact@v4
@@ -149,10 +180,84 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PROD_PRIVATE_KEY }}
           port: 22
+          command_timeout: 60m
           script: |
             set -e
             MIGRATION_DIR="$HOME/eatssu-deploy/prod/src/main/resources/db/migration"
             test -d "$MIGRATION_DIR"
+            if [ "${{ steps.detect-new-migrations.outputs.has-new-migrations }}" = "true" ]; then
+              DB_URL='${{ secrets.EATSSU_DB_URL_PROD }}'
+              DB_URL_WITHOUT_PREFIX="${DB_URL#jdbc:mysql://}"
+              DB_HOST_PORT="${DB_URL_WITHOUT_PREFIX%%/*}"
+              DB_NAME_WITH_PARAMS="${DB_URL_WITHOUT_PREFIX#*/}"
+              DB_NAME="${DB_NAME_WITH_PARAMS%%\?*}"
+              DB_HOST="${DB_HOST_PORT%%:*}"
+              DB_PORT="${DB_HOST_PORT##*:}"
+              if [ "$DB_PORT" = "$DB_HOST_PORT" ]; then DB_PORT="3306"; fi
+
+              REHEARSAL_DB_PASSWORD="rehearsal"
+              REHEARSAL_CONTAINER="eatssu-prod-migration-rehearsal-${{ github.run_id }}-${{ github.run_attempt }}"
+              DUMP_FILE="/tmp/${REHEARSAL_CONTAINER}.sql"
+              DUMP_TIMEOUT="20m"
+              RESTORE_TIMEOUT="20m"
+              MIGRATION_TIMEOUT="10m"
+              cleanup_rehearsal() {
+                sudo docker rm -f "$REHEARSAL_CONTAINER" >/dev/null 2>&1 || true
+                rm -f "$DUMP_FILE"
+              }
+              trap cleanup_rehearsal EXIT
+
+              echo "prod DB 덤프를 시작합니다: $DB_HOST:$DB_PORT/$DB_NAME"
+              timeout "$DUMP_TIMEOUT" sudo docker run --rm \
+                -e MYSQL_PWD='${{ secrets.EATSSU_DB_PASSWORD }}' \
+                mysql:8.0 mysqldump \
+                --single-transaction \
+                --quick \
+                --routines \
+                --triggers \
+                --set-gtid-purged=OFF \
+                -h "$DB_HOST" \
+                -P "$DB_PORT" \
+                -u '${{ secrets.EATSSU_DB_USERNAME }}' \
+                "$DB_NAME" > "$DUMP_FILE"
+
+              echo "리허설 MySQL 컨테이너를 시작합니다: $REHEARSAL_CONTAINER"
+              sudo docker run -d \
+                --name "$REHEARSAL_CONTAINER" \
+                -e MYSQL_ROOT_PASSWORD="$REHEARSAL_DB_PASSWORD" \
+                -e MYSQL_DATABASE="$DB_NAME" \
+                mysql:8.0
+
+              for i in $(seq 1 30); do
+                if sudo docker exec -e MYSQL_PWD="$REHEARSAL_DB_PASSWORD" "$REHEARSAL_CONTAINER" mysql -uroot -e "SELECT 1" >/dev/null 2>&1; then
+                  break
+                fi
+                if [ "$i" -eq 30 ]; then
+                  echo "리허설 MySQL 컨테이너가 준비되지 않았습니다."
+                  exit 1
+                fi
+                sleep 2
+              done
+
+              echo "덤프를 리허설 DB에 복원합니다."
+              timeout "$RESTORE_TIMEOUT" sudo docker exec -i -e MYSQL_PWD="$REHEARSAL_DB_PASSWORD" "$REHEARSAL_CONTAINER" mysql -uroot "$DB_NAME" < "$DUMP_FILE"
+
+              echo "복제 DB에서 Flyway 마이그레이션 리허설을 실행합니다."
+              timeout "$MIGRATION_TIMEOUT" sudo docker run --rm \
+                --network "container:$REHEARSAL_CONTAINER" \
+                -v "$MIGRATION_DIR:/flyway/sql:ro" \
+                -e FLYWAY_URL="jdbc:mysql://127.0.0.1:3306/$DB_NAME?allowPublicKeyRetrieval=true&useSSL=false" \
+                -e FLYWAY_USER='root' \
+                -e FLYWAY_PASSWORD="$REHEARSAL_DB_PASSWORD" \
+                -e FLYWAY_LOCATIONS='filesystem:/flyway/sql' \
+                -e FLYWAY_BASELINE_ON_MIGRATE='true' \
+                -e FLYWAY_BASELINE_VERSION='1' \
+                -e FLYWAY_OUT_OF_ORDER='true' \
+                -e FLYWAY_CONNECT_RETRIES='10' \
+                flyway/flyway:9.5.1 migrate
+            else
+              echo "신규 마이그레이션 파일이 없어 prod 리허설을 건너뜁니다."
+            fi
             sudo docker run --rm \
               -v "$MIGRATION_DIR:/flyway/sql:ro" \
               -e FLYWAY_URL='${{ secrets.EATSSU_DB_URL_PROD }}' \
@@ -195,10 +300,83 @@ jobs:
           username: ${{ secrets.USERNAME }}
           port: 22
           key: ${{ secrets.DEV_PRIVATE_KEY }}
+          command_timeout: 60m
           script: |
             set -e
             MIGRATION_DIR="$HOME/eatssu-deploy/dev/src/main/resources/db/migration"
             test -d "$MIGRATION_DIR"
+            if [ "${{ steps.detect-new-migrations.outputs.has-new-migrations }}" = "true" ]; then
+              DB_URL='${{ secrets.EATSSU_DB_URL_DEV }}'
+              DB_URL_WITHOUT_PREFIX="${DB_URL#jdbc:mysql://}"
+              DB_HOST_PORT="${DB_URL_WITHOUT_PREFIX%%/*}"
+              DB_NAME_WITH_PARAMS="${DB_URL_WITHOUT_PREFIX#*/}"
+              DB_NAME="${DB_NAME_WITH_PARAMS%%\?*}"
+              DB_HOST="${DB_HOST_PORT%%:*}"
+              DB_PORT="${DB_HOST_PORT##*:}"
+              if [ "$DB_PORT" = "$DB_HOST_PORT" ]; then DB_PORT="3306"; fi
+
+              REHEARSAL_DB_PASSWORD="rehearsal"
+              REHEARSAL_CONTAINER="eatssu-dev-migration-rehearsal-${{ github.run_id }}-${{ github.run_attempt }}"
+              DUMP_FILE="/tmp/${REHEARSAL_CONTAINER}.sql"
+              DUMP_TIMEOUT="20m"
+              RESTORE_TIMEOUT="20m"
+              MIGRATION_TIMEOUT="10m"
+              cleanup_rehearsal() {
+                sudo docker rm -f "$REHEARSAL_CONTAINER" >/dev/null 2>&1 || true
+                rm -f "$DUMP_FILE"
+              }
+              trap cleanup_rehearsal EXIT
+
+              echo "dev DB 덤프를 시작합니다: $DB_HOST:$DB_PORT/$DB_NAME"
+              timeout "$DUMP_TIMEOUT" sudo docker run --rm \
+                -e MYSQL_PWD='${{ secrets.EATSSU_DB_PASSWORD }}' \
+                mysql:8.0 mysqldump \
+                --single-transaction \
+                --quick \
+                --routines \
+                --triggers \
+                --set-gtid-purged=OFF \
+                -h "$DB_HOST" \
+                -P "$DB_PORT" \
+                -u '${{ secrets.EATSSU_DB_USERNAME }}' \
+                "$DB_NAME" > "$DUMP_FILE"
+
+              echo "리허설 MySQL 컨테이너를 시작합니다: $REHEARSAL_CONTAINER"
+              sudo docker run -d \
+                --name "$REHEARSAL_CONTAINER" \
+                -e MYSQL_ROOT_PASSWORD="$REHEARSAL_DB_PASSWORD" \
+                -e MYSQL_DATABASE="$DB_NAME" \
+                mysql:8.0
+
+              for i in $(seq 1 30); do
+                if sudo docker exec -e MYSQL_PWD="$REHEARSAL_DB_PASSWORD" "$REHEARSAL_CONTAINER" mysql -uroot -e "SELECT 1" >/dev/null 2>&1; then
+                  break
+                fi
+                if [ "$i" -eq 30 ]; then
+                  echo "리허설 MySQL 컨테이너가 준비되지 않았습니다."
+                  exit 1
+                fi
+                sleep 2
+              done
+
+              echo "덤프를 리허설 DB에 복원합니다."
+              timeout "$RESTORE_TIMEOUT" sudo docker exec -i -e MYSQL_PWD="$REHEARSAL_DB_PASSWORD" "$REHEARSAL_CONTAINER" mysql -uroot "$DB_NAME" < "$DUMP_FILE"
+
+              echo "복제 DB에서 Flyway 마이그레이션 리허설을 실행합니다."
+              timeout "$MIGRATION_TIMEOUT" sudo docker run --rm \
+                --network "container:$REHEARSAL_CONTAINER" \
+                -v "$MIGRATION_DIR:/flyway/sql:ro" \
+                -e FLYWAY_URL="jdbc:mysql://127.0.0.1:3306/$DB_NAME?allowPublicKeyRetrieval=true&useSSL=false" \
+                -e FLYWAY_USER='root' \
+                -e FLYWAY_PASSWORD="$REHEARSAL_DB_PASSWORD" \
+                -e FLYWAY_LOCATIONS='filesystem:/flyway/sql' \
+                -e FLYWAY_BASELINE_ON_MIGRATE='true' \
+                -e FLYWAY_BASELINE_VERSION='1' \
+                -e FLYWAY_CONNECT_RETRIES='10' \
+                flyway/flyway:9.5.1 migrate
+            else
+              echo "신규 마이그레이션 파일이 없어 dev 리허설을 건너뜁니다."
+            fi
             sudo docker run --rm \
               -v "$MIGRATION_DIR:/flyway/sql:ro" \
               -e FLYWAY_URL='${{ secrets.EATSSU_DB_URL_DEV }}' \
