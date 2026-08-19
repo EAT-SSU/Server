@@ -2,7 +2,7 @@ name: EAT-SSU Server 개발 & 운영 서버 배포 파이프라인
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "develop", "feat/#442-rehearse-migration-with-db-clone" ]
 
 permissions:
   contents: read
@@ -52,7 +52,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: dev 프로필 설정
-        if: github.ref_name == 'develop'
+        if: github.ref_name == 'develop' || github.ref_name == 'feat/#442-rehearse-migration-with-db-clone'
         run: |
           echo "spring:
             profiles:
@@ -142,7 +142,7 @@ jobs:
           docker push ${{ secrets.DOCKER_REPO }}/eatssu-prod
 
       - name: dev 서버 용 Docker 빌드 및 푸시
-        if: github.ref_name == 'develop'
+        if: github.ref_name == 'develop' || github.ref_name == 'feat/#442-rehearse-migration-with-db-clone'
         run: |
           docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }}/eatssu-dev .
           docker push ${{ secrets.DOCKER_REPO }}/eatssu-dev
@@ -161,7 +161,7 @@ jobs:
 
       - name: dev 마이그레이션 SQL 전송
         uses: appleboy/scp-action@master
-        if: github.ref_name == 'develop'
+        if: github.ref_name == 'develop' || github.ref_name == 'feat/#442-rehearse-migration-with-db-clone'
         with:
           host: ${{ secrets.HOST_DEV }}
           username: ${{ secrets.USERNAME }}
@@ -293,7 +293,7 @@ jobs:
       - name: dev 서버에 배포
         uses: appleboy/ssh-action@master
         id: deploy-dev
-        if: github.ref_name == 'develop'
+        if: github.ref_name == 'develop' || github.ref_name == 'feat/#442-rehearse-migration-with-db-clone'
         with:
           host: ${{ secrets.HOST_DEV }}
           username: ${{ secrets.USERNAME }}
