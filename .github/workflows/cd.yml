@@ -102,7 +102,9 @@ jobs:
           BEFORE="${{ github.event.before }}"
           AFTER="${{ github.sha }}"
 
-          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+          if [ "${{ github.ref_name }}" = "feat/#442-rehearse-migration-with-db-clone" ]; then
+            BEFORE="$(git merge-base HEAD origin/develop)"
+          elif [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
             BEFORE="${AFTER}^"
           fi
 
