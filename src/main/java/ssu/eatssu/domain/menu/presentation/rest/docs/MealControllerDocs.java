@@ -10,9 +10,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ssu.eatssu.domain.menu.entity.constants.TimePart;
 import ssu.eatssu.domain.menu.presentation.dto.request.CreateMealRequest;
 import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateWithPriceRequest;
+import ssu.eatssu.domain.menu.presentation.dto.response.MealCreateResult;
 import ssu.eatssu.domain.menu.presentation.dto.response.MealDetailResponse;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenusInMealResponse;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
+import ssu.eatssu.domain.user.entity.Language;
 import ssu.eatssu.global.handler.response.BaseResponse;
 
 import java.util.Date;
@@ -35,7 +37,7 @@ public interface MealControllerDocs {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema =
             @Schema(implementation = BaseResponse.class)))
     })
-    BaseResponse<Void> createMeal(
+    BaseResponse<MealCreateResult> createMeal(
             @Parameter(schema = @Schema(type = "string", format = "date", example = "20240101")) Date date,
             @Parameter(description = "식당이름") Restaurant restaurant,
             @Parameter(description = "시간대") TimePart timePart,
@@ -56,7 +58,7 @@ public interface MealControllerDocs {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema =
             @Schema(implementation = BaseResponse.class)))
     })
-    BaseResponse<Void> createMealWithPrice(
+    BaseResponse<MealCreateResult> createMealWithPrice(
             @Parameter(schema = @Schema(type = "string", format = "date", example = "20240101")) Date date,
             @Parameter(description = "식당이름") Restaurant restaurant,
             @Parameter(description = "시간대") TimePart timePart,
@@ -77,7 +79,8 @@ public interface MealControllerDocs {
     BaseResponse<List<MealDetailResponse>> getMealDetail(
             @Parameter(schema = @Schema(type = "string", format = "date", example = "20240101")) Date date,
             @Parameter(description = "식당 이름") Restaurant restaurant,
-            @Parameter(description = "시간대") TimePart timePart);
+            @Parameter(description = "시간대") TimePart timePart,
+            @Parameter(description = "언어(EN이면 대표메뉴를 영문으로 치환, 미지정 시 한글)") Language language);
 
     @Operation(summary = "식단 삭제 [인증 토큰 필요 X]", description = "식단을 삭제하는 API 입니다.")
     @ApiResponses(value = {
@@ -96,5 +99,7 @@ public interface MealControllerDocs {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 식단", content = @Content(schema =
             @Schema(implementation = BaseResponse.class)))
     })
-    BaseResponse<MenusInMealResponse> getMenusInMeal(@Parameter(description = "mealId") Long mealId);
+    BaseResponse<MenusInMealResponse> getMenusInMeal(
+            @Parameter(description = "mealId") Long mealId,
+            @Parameter(description = "언어(EN이면 대표메뉴를 영문으로 치환, 미지정 시 한글)") Language language);
 }

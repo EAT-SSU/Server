@@ -76,6 +76,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+    implementation 'org.apache.commons:commons-csv:1.10.0'
 }
 
 tasks.named('test') {
