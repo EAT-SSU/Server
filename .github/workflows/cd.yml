@@ -242,13 +242,17 @@ jobs:
 
               REHEARSAL_CONTAINER="eatssu-dev-migration-rehearsal-${{ github.run_id }}-${{ github.run_attempt }}"
               DUMP_FILE="/tmp/${REHEARSAL_CONTAINER}.sql"
+              DUMP_TIMEOUT="20m"
+              RESTORE_TIMEOUT="20m"
+              MIGRATION_TIMEOUT="10m"
               cleanup_rehearsal() {
                 sudo docker rm -f "$REHEARSAL_CONTAINER" >/dev/null 2>&1 || true
                 rm -f "$DUMP_FILE"
               }
               trap cleanup_rehearsal EXIT
 
-              sudo docker run --rm \
+              echo "dev DB 덤프를 시작합니다: $DB_HOST:$DB_PORT/$DB_NAME"
+              timeout "$DUMP_TIMEOUT" sudo docker run --rm \
                 -e MYSQL_PWD='${{ secrets.EATSSU_DB_PASSWORD }}' \
                 mysql:8.0 mysqldump \
                 --single-transaction \
@@ -261,6 +265,7 @@ jobs:
                 -u '${{ secrets.EATSSU_DB_USERNAME }}' \
                 "$DB_NAME" > "$DUMP_FILE"
 
+              echo "리허설 MySQL 컨테이너를 시작합니다: $REHEARSAL_CONTAINER"
               sudo docker run -d \
                 --name "$REHEARSAL_CONTAINER" \
                 -e MYSQL_ROOT_PASSWORD='rehearsal' \
@@ -278,9 +283,11 @@ jobs:
                 sleep 2
               done
 
-              sudo docker exec -i "$REHEARSAL_CONTAINER" mysql -uroot -prehearsal "$DB_NAME" < "$DUMP_FILE"
+              echo "덤프를 리허설 DB에 복원합니다."
+              timeout "$RESTORE_TIMEOUT" sudo docker exec -i "$REHEARSAL_CONTAINER" mysql -uroot -prehearsal "$DB_NAME" < "$DUMP_FILE"
 
-              sudo docker run --rm \
+              echo "복제 DB에서 Flyway 마이그레이션 리허설을 실행합니다."
+              timeout "$MIGRATION_TIMEOUT" sudo docker run --rm \
                 --network "container:$REHEARSAL_CONTAINER" \
                 -v "$MIGRATION_DIR:/flyway/sql:ro" \
                 -e FLYWAY_URL="jdbc:mysql://127.0.0.1:3306/$DB_NAME?allowPublicKeyRetrieval=true&useSSL=false" \
