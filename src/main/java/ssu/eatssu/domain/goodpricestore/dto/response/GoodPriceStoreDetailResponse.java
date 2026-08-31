@@ -17,6 +17,8 @@ public class GoodPriceStoreDetailResponse {
     private Integer price;
     private String roadAddress;
     private String imageUrl;
+    private String naverMapUrl;
+    private String kakaoMapUrl;
 
     public static GoodPriceStoreDetailResponse fromEntity(GoodPriceStore store) {
         return GoodPriceStoreDetailResponse.builder()
@@ -27,6 +29,8 @@ public class GoodPriceStoreDetailResponse {
                                            .price(store.getPrice())
                                            .roadAddress(store.getRoadAddress())
                                            .imageUrl(store.getRepresentativeImageUrl())
+                                           .naverMapUrl(store.getNaverMapUrl())
+                                           .kakaoMapUrl(store.getKakaoMapUrl())
                                            .build();
     }
 }

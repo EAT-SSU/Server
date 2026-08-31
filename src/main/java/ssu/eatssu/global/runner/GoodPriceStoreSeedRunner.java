@@ -74,6 +74,8 @@ public class GoodPriceStoreSeedRunner implements ApplicationRunner {
                              .imageUrl1(blankToNull(record.get("image_url_1")))
                              .imageUrl2(blankToNull(record.get("image_url_2")))
                              .imageUrl3(blankToNull(record.get("image_url_3")))
+                             .naverMapUrl(blankToNull(record.get("naver_map_url")))
+                             .kakaoMapUrl(blankToNull(record.get("kakao_map_url")))
                              .build();
     }
 
