@@ -57,11 +57,18 @@ public class GoodPriceStore {
     @Column(name = "image_url_3", length = 2048)
     private String imageUrl3;
 
+    @Column(name = "naver_map_url", length = 2048)
+    private String naverMapUrl;
+
+    @Column(name = "kakao_map_url", length = 2048)
+    private String kakaoMapUrl;
+
     @Builder
     private GoodPriceStore(Integer sourceId, CategoryType category, String storeName, String mainMenu,
                             Integer price, String roadAddress, String district,
                             Double latitude, Double longitude,
-                            String imageUrl1, String imageUrl2, String imageUrl3) {
+                            String imageUrl1, String imageUrl2, String imageUrl3,
+                            String naverMapUrl, String kakaoMapUrl) {
         this.sourceId = sourceId;
         this.category = category;
         this.storeName = storeName;
@@ -74,6 +81,8 @@ public class GoodPriceStore {
         this.imageUrl1 = imageUrl1;
         this.imageUrl2 = imageUrl2;
         this.imageUrl3 = imageUrl3;
+        this.naverMapUrl = naverMapUrl;
+        this.kakaoMapUrl = kakaoMapUrl;
     }
 
     public String getRepresentativeImageUrl() {
