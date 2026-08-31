@@ -14,6 +14,7 @@ class LocalizableTest {
         assertThat(localizable.getLocalizedValue(Language.EN, "한글", "English", "日本語", "Tiếng Việt")).isEqualTo("English");
         assertThat(localizable.getLocalizedValue(Language.JA, "한글", "English", null, "Tiếng Việt")).isEqualTo("한글");
         assertThat(localizable.getLocalizedValue(Language.VI, "한글", "English", "日本語", null)).isEqualTo("한글");
+        assertThat(localizable.getLocalizedValue(Language.KO, "한글", "English", "日本語", "Tiếng Việt")).isEqualTo("한글");
         assertThat(localizable.getLocalizedValue(null, "한글", "English", "日本語", "Tiếng Việt")).isEqualTo("한글");
     }
 }

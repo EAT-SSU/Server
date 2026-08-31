@@ -20,4 +20,14 @@ class WarmUpRunnerTest {
 
         verify(oauthService).kakaoLogin(any());
     }
+
+    @Test
+    void 카카오와_애플_웜업을_모두_호출한다() throws Exception {
+        OAuthService oauthService = mock(OAuthService.class);
+
+        new WarmUpRunner(oauthService).run(new DefaultApplicationArguments());
+
+        verify(oauthService).kakaoLogin(any());
+        verify(oauthService).appleLogin(any());
+    }
 }

@@ -5,6 +5,7 @@ import org.springframework.boot.ApplicationArguments;
 import ssu.eatssu.domain.goodpricestore.persistence.GoodPriceStoreRepository;
 
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -33,5 +34,17 @@ class GoodPriceStoreSeedRunnerTest {
         new GoodPriceStoreSeedRunner(repository).run(arguments);
 
         verify(repository, never()).saveAll(anyList());
+    }
+
+    @Test
+    void 비어있는_저장소에는_CSV_데이터를_시딩한다() throws Exception {
+        GoodPriceStoreRepository repository = mock(GoodPriceStoreRepository.class);
+        ApplicationArguments arguments = mock(ApplicationArguments.class);
+        when(arguments.containsOption("seed-good-price-store")).thenReturn(true);
+        when(repository.count()).thenReturn(0L);
+
+        new GoodPriceStoreSeedRunner(repository).run(arguments);
+
+        verify(repository).saveAll(any());
     }
 }
