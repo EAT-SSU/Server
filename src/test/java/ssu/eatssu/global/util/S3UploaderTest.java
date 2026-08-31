@@ -1,0 +1,32 @@
+package ssu.eatssu.global.util;
+
+import com.amazonaws.services.s3.AmazonS3Client;
+import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.net.URL;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class S3UploaderTest {
+
+    @Test
+    void 파일을_S3에_올리고_URL을_반환한다() throws Exception {
+        AmazonS3Client s3Client = mock(AmazonS3Client.class);
+        when(s3Client.getUrl(eq("bucket"), org.mockito.ArgumentMatchers.anyString()))
+                .thenReturn(new URL("https://example.com/image.png"));
+        S3Uploader uploader = new S3Uploader(s3Client);
+        ReflectionTestUtils.setField(uploader, "bucket", "bucket");
+
+        String url = uploader.upload(new MockMultipartFile("image", "image.png", "image/png", "image".getBytes()), "reviews");
+
+        assertThat(url).isEqualTo("https://example.com/image.png");
+        verify(s3Client).putObject(any());
+    }
+}
