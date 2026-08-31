@@ -10,11 +10,6 @@ import static org.mockito.Mockito.mock;
 class InfrastructureConfigTest {
 
     @Test
-    void 비동기_설정을_생성한다() {
-        assertThat(new AsyncConfig()).isNotNull();
-    }
-
-    @Test
     void QueryDsl_팩토리를_생성한다() {
         QueryDslConfig config = new QueryDslConfig();
         ReflectionTestUtils.setField(config, "entityManager", mock(EntityManager.class));
