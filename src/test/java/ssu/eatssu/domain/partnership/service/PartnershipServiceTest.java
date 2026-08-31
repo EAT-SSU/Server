@@ -14,8 +14,11 @@ import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
 import ssu.eatssu.domain.partnership.persistence.PartnershipLikeRepository;
 import ssu.eatssu.domain.partnership.persistence.PartnershipRepository;
 import ssu.eatssu.domain.partnership.persistence.PartnershipRestaurantRepository;
+import ssu.eatssu.domain.user.department.entity.College;
+import ssu.eatssu.domain.user.department.entity.Department;
 import ssu.eatssu.domain.user.department.persistence.CollegeRepository;
 import ssu.eatssu.domain.user.department.persistence.DepartmentRepository;
+import ssu.eatssu.domain.user.entity.Language;
 import ssu.eatssu.domain.user.entity.Role;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
@@ -23,8 +26,10 @@ import ssu.eatssu.global.handler.response.BaseException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -53,8 +58,57 @@ class PartnershipServiceTest {
     }
 
     @Test
+    void createPartnershipThrowsWhenCollegeDoesNotExist() {
+        CreatePartnershipRequest request = request();
+        PartnershipRestaurant restaurant = org.mockito.Mockito.mock(PartnershipRestaurant.class);
+        given(partnershipRestaurantRepository.findById(request.getStoreId())).willReturn(Optional.of(restaurant));
+        given(collegeRepository.findByNameKo(request.getCollege())).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> partnershipService.createPartnership(request))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void createPartnershipThrowsWhenDepartmentDoesNotExist() {
+        CreatePartnershipRequest request = request();
+        PartnershipRestaurant restaurant = org.mockito.Mockito.mock(PartnershipRestaurant.class);
+        College college = org.mockito.Mockito.mock(College.class);
+        given(partnershipRestaurantRepository.findById(request.getStoreId())).willReturn(Optional.of(restaurant));
+        given(collegeRepository.findByNameKo(request.getCollege())).willReturn(Optional.of(college));
+        given(departmentRepository.findByNameKo(request.getDepartment())).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> partnershipService.createPartnership(request))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void createPartnershipSavesPartnershipWhenValid() {
+        CreatePartnershipRequest request = request();
+        PartnershipRestaurant restaurant = org.mockito.Mockito.mock(PartnershipRestaurant.class);
+        College college = org.mockito.Mockito.mock(College.class);
+        Department department = org.mockito.Mockito.mock(Department.class);
+        given(partnershipRestaurantRepository.findById(request.getStoreId())).willReturn(Optional.of(restaurant));
+        given(collegeRepository.findByNameKo(request.getCollege())).willReturn(Optional.of(college));
+        given(departmentRepository.findByNameKo(request.getDepartment())).willReturn(Optional.of(department));
+
+        partnershipService.createPartnership(request);
+
+        verify(partnershipRepository).save(any(Partnership.class));
+    }
+
+    @Test
     void togglePartnershipLikeThrowsWhenPartnershipDoesNotExist() {
         given(partnershipRepository.findById(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> partnershipService.togglePartnershipLike(1L, userDetails()))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void togglePartnershipLikeThrowsWhenUserDoesNotExist() {
+        Partnership partnership = org.mockito.Mockito.mock(Partnership.class);
+        given(partnershipRepository.findById(1L)).willReturn(Optional.of(partnership));
+        given(userRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> partnershipService.togglePartnershipLike(1L, userDetails()))
                 .isInstanceOf(BaseException.class);
@@ -104,6 +158,26 @@ class PartnershipServiceTest {
 
         assertThatThrownBy(() -> partnershipService.getUserDepartmentPartnerships(userDetails()))
                 .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void getUserDepartmentPartnershipsReturnsPartnershipsWhenDepartmentExists() {
+        User user = org.mockito.Mockito.mock(User.class);
+        Department department = org.mockito.Mockito.mock(Department.class);
+        College college = org.mockito.Mockito.mock(College.class);
+        PartnershipRestaurant restaurant = org.mockito.Mockito.mock(PartnershipRestaurant.class);
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(user.getDepartment()).willReturn(department);
+        given(user.getLanguage()).willReturn(Language.KO);
+        given(department.getCollege()).willReturn(college);
+        given(restaurant.getLikes()).willReturn(new ArrayList<>());
+        given(restaurant.getPartnerships()).willReturn(new ArrayList<>());
+        given(partnershipRepository.findRestaurantsWithMyPartnerships(college, department))
+                .willReturn(List.of(restaurant));
+
+        List<?> result = partnershipService.getUserDepartmentPartnerships(userDetails());
+
+        assertThat(result).hasSize(1);
     }
 
     private CreatePartnershipRequest request() {
