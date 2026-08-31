@@ -9,8 +9,24 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RestaurantTest {
 
     @Test
-    void 식당_이름을_enum으로_변환한다() {
-        assertThat(Restaurant.from("FOOD_COURT")).isEqualTo(Restaurant.FOOD_COURT);
-        assertThatThrownBy(() -> Restaurant.from("UNKNOWN")).isInstanceOf(BaseException.class);
+    void fromReturnsMatchingRestaurant() {
+        Restaurant restaurant = Restaurant.from("DODAM");
+
+        assertThat(restaurant).isEqualTo(Restaurant.DODAM);
+        assertThat(restaurant.getRestaurantPrice()).isEqualTo(6000);
+    }
+
+    @Test
+    void fromThrowsForUnknownRestaurant() {
+        assertThatThrownBy(() -> Restaurant.from("UNKNOWN"))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void restaurantTypeClassifiesFixedAndVariableRestaurants() {
+        assertThat(RestaurantType.isFixedType(Restaurant.FOOD_COURT)).isTrue();
+        assertThat(RestaurantType.isVariableType(Restaurant.DODAM)).isTrue();
+        assertThat(RestaurantType.isFixedType(Restaurant.FACULTY)).isFalse();
+        assertThat(RestaurantType.isVariableType(Restaurant.FACULTY)).isFalse();
     }
 }
