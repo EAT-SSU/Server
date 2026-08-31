@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -150,10 +151,56 @@ class ControllerLogAspectTest {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
         when(joinPoint.getSignature()).thenReturn(signature);
         when(signature.getParameterNames()).thenReturn(new String[]{"body"});
-        when(joinPoint.getArgs()).thenReturn(new Object[]{new RecursiveRequest()});
+        when(joinPoint.getArgs()).thenReturn(new Object[]{new RecursiveRequest(), null});
         when(joinPoint.proceed()).thenReturn("ok");
 
         assertThat(controllerLogAspect.logApi(joinPoint)).isEqualTo("ok");
+    }
+
+    @Test
+    void 인증되지_않은_사용자와_메시지_없는_예외을_처리한다() throws Throwable {
+        SlackErrorNotifier notifier = mock(SlackErrorNotifier.class);
+        ControllerLogAspect aspect = new ControllerLogAspect(new ObjectMapper(), notifier);
+        ProceedingJoinPoint joinPoint = mock(ProceedingJoinPoint.class);
+        MethodSignature signature = mock(MethodSignature.class);
+        Authentication authentication = mock(Authentication.class);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/menus");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        when(authentication.isAuthenticated()).thenReturn(false);
+        when(joinPoint.getSignature()).thenReturn(signature);
+        when(signature.getParameterNames()).thenReturn(new String[0]);
+        when(joinPoint.getArgs()).thenReturn(new Object[0]);
+        when(joinPoint.proceed()).thenThrow(new RuntimeException());
+
+        assertThatThrownBy(() -> aspect.logApi(joinPoint)).isInstanceOf(RuntimeException.class);
+        verify(notifier).notify(any(), anyString(), anyString(), org.mockito.ArgumentMatchers.eq("anonymous"), anyString());
+    }
+
+    @Test
+    void CustomUserDetails가_아닌_principal은_익명으로_처리한다() throws Throwable {
+        SlackErrorNotifier notifier = mock(SlackErrorNotifier.class);
+        ControllerLogAspect aspect = new ControllerLogAspect(new ObjectMapper(), notifier);
+        ProceedingJoinPoint joinPoint = mock(ProceedingJoinPoint.class);
+        MethodSignature signature = mock(MethodSignature.class);
+        Authentication authentication = mock(Authentication.class);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/menus");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        when(authentication.isAuthenticated()).thenReturn(true);
+        when(authentication.getPrincipal()).thenReturn("user");
+        when(joinPoint.getSignature()).thenReturn(signature);
+        when(signature.getParameterNames()).thenReturn(new String[0]);
+        when(joinPoint.getArgs()).thenReturn(new Object[0]);
+        when(joinPoint.proceed()).thenThrow(new IllegalStateException("failed"));
+
+        assertThatThrownBy(() -> aspect.logApi(joinPoint)).isInstanceOf(IllegalStateException.class);
+        verify(notifier).notify(any(), anyString(), anyString(), org.mockito.ArgumentMatchers.eq("anonymous"), anyString());
+    }
+
+    @Test
+    void null_URI도_일반_응답으로_로그한다() {
+        assertThat(controllerLogAspect.getResponseLog(null, "ok")).contains("ok");
     }
 
     private record LongRequest(String value) { }

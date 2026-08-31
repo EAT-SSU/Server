@@ -8,7 +8,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.net.URL;
 import java.io.File;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -40,5 +42,20 @@ class S3UploaderTest {
         ReflectionTestUtils.invokeMethod(uploader, "removeNewFile", file);
 
         verify(file).delete();
+    }
+
+    @Test
+    void 같은_이름의_임시_파일이_있으면_업로드하지_않는다() throws Exception {
+        File file = mock(File.class);
+        when(file.createNewFile()).thenReturn(false);
+        S3Uploader uploader = new S3Uploader(mock(AmazonS3Client.class)) {
+            @Override
+            File createFile(String fileName) {
+                return file;
+            }
+        };
+
+        assertThatThrownBy(() -> uploader.upload(new MockMultipartFile("image", "image.png", "image/png", new byte[0]), "reviews"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
