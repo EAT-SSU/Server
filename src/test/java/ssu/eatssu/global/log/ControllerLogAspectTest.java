@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import ssu.eatssu.domain.admin.dto.request.LoginRequest;
@@ -123,6 +124,42 @@ class ControllerLogAspectTest {
 
         assertThatThrownBy(() -> aspect.logApi(joinPoint)).isInstanceOf(BaseException.class);
         verify(notifier).notify(any(), anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void 제외_인자와_null_인자와_긴_인자를_안전하게_로그한다() throws Throwable {
+        ProceedingJoinPoint joinPoint = mock(ProceedingJoinPoint.class);
+        MethodSignature signature = mock(MethodSignature.class);
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/menus");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        CustomUserDetails user = new CustomUserDetails(1L, "user@test.com", "pw", Role.USER, null);
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
+        when(joinPoint.getSignature()).thenReturn(signature);
+        when(signature.getParameterNames()).thenReturn(null);
+        when(joinPoint.getArgs()).thenReturn(new Object[]{request, user, mock(BindingResult.class), null, new LongRequest("x".repeat(300))});
+        when(joinPoint.proceed()).thenReturn("ok");
+
+        assertThat(controllerLogAspect.logApi(joinPoint)).isEqualTo("ok");
+    }
+
+    @Test
+    void 요청_인자_직렬화에_실패하면_toString으로_대체한다() throws Throwable {
+        ProceedingJoinPoint joinPoint = mock(ProceedingJoinPoint.class);
+        MethodSignature signature = mock(MethodSignature.class);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/menus");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        when(joinPoint.getSignature()).thenReturn(signature);
+        when(signature.getParameterNames()).thenReturn(new String[]{"body"});
+        when(joinPoint.getArgs()).thenReturn(new Object[]{new RecursiveRequest()});
+        when(joinPoint.proceed()).thenReturn("ok");
+
+        assertThat(controllerLogAspect.logApi(joinPoint)).isEqualTo("ok");
+    }
+
+    private record LongRequest(String value) { }
+
+    private static class RecursiveRequest {
+        private final Object self = this;
     }
 
 }

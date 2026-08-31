@@ -6,6 +6,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.net.URL;
+import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,5 +29,16 @@ class S3UploaderTest {
 
         assertThat(url).isEqualTo("https://example.com/image.png");
         verify(s3Client).putObject(any());
+    }
+
+    @Test
+    void 임시_파일_삭제에_실패해도_업로드_결과는_유지한다() {
+        S3Uploader uploader = new S3Uploader(mock(AmazonS3Client.class));
+        File file = mock(File.class);
+        when(file.delete()).thenReturn(false);
+
+        ReflectionTestUtils.invokeMethod(uploader, "removeNewFile", file);
+
+        verify(file).delete();
     }
 }
