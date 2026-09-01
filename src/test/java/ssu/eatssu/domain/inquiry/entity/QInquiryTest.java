@@ -32,4 +32,13 @@ class QInquiryTest {
         assertThat(new QInquiry(metadata, PathInits.DIRECT2).getType()).isEqualTo(Inquiry.class);
         assertThat(new QInquiry(Inquiry.class, metadata, PathInits.DIRECT2).getType()).isEqualTo(Inquiry.class);
     }
+
+    @Test
+    void userAssociationIsNullWhenNotInitialized() {
+        PathMetadata metadata = QInquiry.inquiry.getMetadata();
+
+        QInquiry uninitialized = new QInquiry(metadata, PathInits.DEFAULT);
+
+        assertThat(uninitialized.user).isNull();
+    }
 }
