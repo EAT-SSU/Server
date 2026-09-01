@@ -33,13 +33,15 @@ SET name = '치즈떡라면',
 WHERE menu_id = 2216;
 
 INSERT INTO menu (name, name_en, name_ja, name_vi, restaurant, price, is_discontinued, like_count, unlike_count, menu_category_id)
-VALUES ('냉모밀+갈비만두6개', 'Cold Soba + 6 Galbi Mandu', '冷やしそば＋カルビ餃子6個', 'Mì soba lạnh + 6 bánh mandu nhân thịt galbi', 'SNACK_CORNER', 6000, false, 0, 0, 6),
-       ('잔치국수+갈비만두2개', 'Janchi Guksu (Korean Noodle Soup) + 2 Galbi Mandu', 'チャンチグクス（韓国式温麺）＋カルビ餃子2個', 'Mì nước Janchi Guksu kiểu Hàn + 2 bánh mandu nhân thịt galbi', 'SNACK_CORNER', 5000, false, 0, 0, 6),
-       ('잔치국수+갈비만두6개', 'Janchi Guksu (Korean Noodle Soup) + 6 Galbi Mandu', 'チャンチグクス（韓国式温麺）＋カルビ餃子6個', 'Mì nước Janchi Guksu kiểu Hàn + 6 bánh mandu nhân thịt galbi', 'SNACK_CORNER', 6000, false, 0, 0, 6),
-       ('비빔국수+갈비만두2개', 'Bibim Guksu (Spicy Mixed Noodles) + 2 Galbi Mandu', 'ビビングクス（韓国風ピリ辛混ぜ麺）＋カルビ餃子2個', 'Mì trộn cay Bibim Guksu + 2 bánh mandu nhân thịt galbi', 'SNACK_CORNER', 5000, false, 0, 0, 6),
-       ('비빔국수+갈비만두6개', 'Bibim Guksu (Spicy Mixed Noodles) + 6 Galbi Mandu', 'ビビングクス（韓国風ピリ辛混ぜ麺）＋カルビ餃子6個', 'Mì trộn cay Bibim Guksu + 6 bánh mandu nhân thịt galbi', 'SNACK_CORNER', 6000, false, 0, 0, 6),
-       ('[포장] 샐러드파스타', '[Takeout] Pasta Salad', '[テイクアウト] サラダパスタ', '[Mang đi] Salad mì Ý', 'SNACK_CORNER', 8000, false, 0, 0, 9),
-       ('[포장] 탄단지샐러드', '[Takeout] Balanced Macro Salad', '[テイクアウト] 栄養バランスサラダ', '[Mang đi] Salad cân bằng dinh dưỡng', 'SNACK_CORNER', 8000, false, 0, 0, 9);
+SELECT v.name, v.name_en, v.name_ja, v.name_vi, 'SNACK_CORNER', v.price, false, 0, 0, v.menu_category_id
+FROM (SELECT '냉모밀+갈비만두6개' AS name, 'Cold Soba + 6 Galbi Mandu' AS name_en, '冷やしそば＋カルビ餃子6個' AS name_ja, 'Mì soba lạnh + 6 bánh mandu nhân thịt galbi' AS name_vi, 6000 AS price, 6 AS menu_category_id
+      UNION ALL SELECT '잔치국수+갈비만두2개', 'Janchi Guksu (Korean Noodle Soup) + 2 Galbi Mandu', 'チャンチグクス（韓国式温麺）＋カルビ餃子2個', 'Mì nước Janchi Guksu kiểu Hàn + 2 bánh mandu nhân thịt galbi', 5000, 6
+      UNION ALL SELECT '잔치국수+갈비만두6개', 'Janchi Guksu (Korean Noodle Soup) + 6 Galbi Mandu', 'チャンチグクス（韓国式温麺）＋カルビ餃子6個', 'Mì nước Janchi Guksu kiểu Hàn + 6 bánh mandu nhân thịt galbi', 6000, 6
+      UNION ALL SELECT '비빔국수+갈비만두2개', 'Bibim Guksu (Spicy Mixed Noodles) + 2 Galbi Mandu', 'ビビングクス（韓国風ピリ辛混ぜ麺）＋カルビ餃子2個', 'Mì trộn cay Bibim Guksu + 2 bánh mandu nhân thịt galbi', 5000, 6
+      UNION ALL SELECT '비빔국수+갈비만두6개', 'Bibim Guksu (Spicy Mixed Noodles) + 6 Galbi Mandu', 'ビビングクス（韓国風ピリ辛混ぜ麺）＋カルビ餃子6個', 'Mì trộn cay Bibim Guksu + 6 bánh mandu nhân thịt galbi', 6000, 6
+      UNION ALL SELECT '[포장] 샐러드파스타', '[Takeout] Pasta Salad', '[テイクアウト] サラダパスタ', '[Mang đi] Salad mì Ý', 8000, 9
+      UNION ALL SELECT '[포장] 탄단지샐러드', '[Takeout] Balanced Macro Salad', '[テイクアウト] 栄養バランスサラダ', '[Mang đi] Salad cân bằng dinh dưỡng', 8000, 9) v
+JOIN menu_category mc ON mc.menu_category_id = v.menu_category_id AND mc.restaurant = 'SNACK_CORNER';
 
 UPDATE menu
 SET is_discontinued = true
