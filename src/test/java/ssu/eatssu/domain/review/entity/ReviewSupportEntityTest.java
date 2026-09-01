@@ -22,12 +22,28 @@ class ReviewSupportEntityTest {
 
         assertThat(image.getReview()).isSameAs(review);
         assertThat(image.getImageUrl()).isEqualTo("image.jpg");
+        assertThat(image.getId()).isNull();
         assertThat(like.getUser()).isSameAs(user);
         assertThat(like.getReview()).isSameAs(review);
+        assertThat(like.getId()).isNull();
         assertThat(menuLike.getMenu()).isSameAs(menu);
+        assertThat(menuLike.getReview()).isSameAs(review);
+        assertThat(menuLike.getId()).isNull();
         assertThat(menuLike.getIsLike()).isTrue();
         menuLike.updateLike(false);
         assertThat(menuLike.getIsLike()).isFalse();
+    }
+
+    @Test
+    void resetMenuLikeStatusCancelsMenuLikeCount() {
+        Review review = Review.builder().build();
+        Menu menu = Menu.createVariable("돈가스", Restaurant.DODAM);
+        menu.changeLikeStatus(true);
+        ReviewMenuLike menuLike = ReviewMenuLike.create(review, menu, true);
+
+        menuLike.resetMenuLikeStatus();
+
+        assertThat(menu.getLikeCount()).isZero();
     }
 
     @Test
@@ -41,5 +57,6 @@ class ReviewSupportEntityTest {
         assertThat(translation.getLanguage()).isEqualTo(ssu.eatssu.domain.user.entity.Language.EN);
         assertThat(translation.getTranslatedContent()).isEqualTo("Great");
         assertThat(translation.getCharCount()).isEqualTo(5);
+        assertThat(translation.getId()).isNull();
     }
 }
