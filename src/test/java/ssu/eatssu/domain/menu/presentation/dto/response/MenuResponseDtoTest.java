@@ -31,6 +31,8 @@ class MenuResponseDtoTest {
         BriefMenuResponse withoutTranslations = new BriefMenuResponse(menu);
         assertThat(withoutTranslations.getName()).isEqualTo("돈가스");
         assertThat(withoutTranslations.isMain()).isFalse();
+
+        assertThat(new BriefMenuResponse().getMenuId()).isNull();
     }
 
     @Test
@@ -52,6 +54,8 @@ class MenuResponseDtoTest {
         assertThat(category.getCategory()).isEqualTo("한식");
         assertThat(category.getMenus()).containsExactly(response);
         assertThat(restaurant.getCategoryMenuListCollection()).containsExactly(category, category);
+
+        assertThat(new MenuResponse().getMenuId()).isNull();
     }
 
     @Test

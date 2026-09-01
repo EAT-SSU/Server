@@ -67,14 +67,18 @@ class MenuEntityTest {
 
     @Test
     void mealReturnsMenusAndNamesInInsertionOrder() {
+        Date date = new Date();
         Menu first = Menu.createVariable("라면", Restaurant.DODAM);
         Menu second = Menu.createVariable("김치", Restaurant.DODAM);
-        Meal meal = new Meal(new Date(), TimePart.LUNCH, Restaurant.DODAM);
+        Meal meal = new Meal(date, TimePart.LUNCH, Restaurant.DODAM);
         meal.addMealMenu(MealMenu.builder().meal(meal).menu(first).build());
         meal.addMealMenu(MealMenu.builder().meal(meal).menu(second).build());
 
         assertThat(meal.getMenus()).containsExactly(first, second);
         assertThat(meal.getMenuNames()).containsExactly("라면", "김치");
+        assertThat(meal.getDate()).isEqualTo(date);
+        assertThat(meal.getId()).isNull();
+        assertThat(meal.getMealMenus()).hasSize(2);
     }
 
     @Test

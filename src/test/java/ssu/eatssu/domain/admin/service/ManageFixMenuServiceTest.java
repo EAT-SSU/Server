@@ -148,6 +148,15 @@ class ManageFixMenuServiceTest {
     }
 
     @Test
+    void deleteRemovesMenuById() {
+        ManageMenuRepository manageRepository = mock(ManageMenuRepository.class);
+
+        service(mock(LoadFixMenuRepository.class), manageRepository).delete(1L);
+
+        verify(manageRepository).deleteById(1L);
+    }
+
+    @Test
     void getMenuBoardsBuildsBoardsWithMenuLinesForEachFixedRestaurant() {
         LoadFixMenuRepository loadRepository = mock(LoadFixMenuRepository.class);
         MenuRatingRepository ratingRepository = mock(MenuRatingRepository.class);

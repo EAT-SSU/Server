@@ -1,18 +1,25 @@
 package ssu.eatssu.domain.auth.security;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.test.util.ReflectionTestUtils;
 import ssu.eatssu.domain.user.dto.response.Tokens;
 import ssu.eatssu.domain.user.entity.DeviceType;
+import ssu.eatssu.global.handler.response.BaseException;
 
 import java.util.Base64;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -98,5 +105,18 @@ class JwtTokenProviderTest {
 
         // then
         assertThat(isValid).isFalse();
+    }
+
+    @Test
+    void generateTokensThrowsWhenSubjectSerializationFails() throws JsonProcessingException {
+        // given
+        JwtTokenProvider provider = createProvider(3600, 604800);
+        ObjectMapper failingMapper = mock(ObjectMapper.class);
+        given(failingMapper.writeValueAsString(any())).willThrow(mock(JsonProcessingException.class));
+        ReflectionTestUtils.setField(provider, "objectMapper", failingMapper);
+
+        // when & then
+        assertThatThrownBy(() -> provider.generateTokens(createAuthentication()))
+                .isInstanceOf(BaseException.class);
     }
 }

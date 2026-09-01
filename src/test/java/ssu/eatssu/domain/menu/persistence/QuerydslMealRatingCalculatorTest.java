@@ -1,5 +1,6 @@
 package ssu.eatssu.domain.menu.persistence;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,9 @@ class QuerydslMealRatingCalculatorTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JPAQueryFactory queryFactory;
 
     @BeforeEach
     void setup() {
@@ -84,6 +88,21 @@ class QuerydslMealRatingCalculatorTest {
 
         // when
         Double average = calculator.getMainRatingAverage(meal.getId());
+
+        // then
+        assertThat(average).isNull();
+    }
+
+    @Test
+    void getMainRatingAverageReturnsNullWhenMenuIdsIsNull() {
+        // given
+        MealMenuQueryRepository nullReturningRepository = org.mockito.Mockito.mock(MealMenuQueryRepository.class);
+        org.mockito.BDDMockito.given(nullReturningRepository.getMenuIds(1L)).willReturn(null);
+        QuerydslMealRatingCalculator calculatorWithNullMenuIds =
+                new QuerydslMealRatingCalculator(nullReturningRepository, queryFactory);
+
+        // when
+        Double average = calculatorWithNullMenuIds.getMainRatingAverage(1L);
 
         // then
         assertThat(average).isNull();
