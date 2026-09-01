@@ -75,6 +75,20 @@ class ReviewTranslationServiceTest {
     }
 
     @Test
+    void 리뷰_내용이_널이면_번역하지_않는다() {
+        ReviewRepository reviewRepository = mock(ReviewRepository.class);
+        ReviewTranslationRepository translationRepository = mock(ReviewTranslationRepository.class);
+        Review review = mock(Review.class);
+        when(review.getContent()).thenReturn(null);
+        when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
+        when(translationRepository.findByReview_IdAndLanguage(1L, Language.EN)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service(reviewRepository, translationRepository, mock(DeepLTranslationClient.class))
+                .translateReview(1L, Language.EN))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
     void 번역을_수행하고_저장한다() {
         ReviewRepository reviewRepository = mock(ReviewRepository.class);
         ReviewTranslationRepository translationRepository = mock(ReviewTranslationRepository.class);

@@ -37,12 +37,23 @@ class ReviewDtoCoverageTest {
         assertThat(like.getIsLike()).isTrue();
         assertThat(update.getRating()).isEqualTo(4);
         assertThat(update.getMenuLikes()).containsExactly(like);
+        assertThat(record.mainRating()).isEqualTo(5);
+        assertThat(record.amountRating()).isEqualTo(4);
+        assertThat(record.tasteRating()).isEqualTo(3);
         assertThat(record.content()).isEqualTo("기록");
+        assertThat(translation.reviewId()).isEqualTo(1L);
+        assertThat(translation.language()).isEqualTo(Language.EN);
+        assertThat(translation.translatedContent()).isEqualTo("translated");
         assertThat(translation.cached()).isTrue();
         assertThat(image.getUrl()).isEqualTo("image.jpg");
+        assertThat(menu.id()).isEqualTo(2L);
         assertThat(menu.name()).isEqualTo("돈가스");
+        assertThat(liked.id()).isEqualTo(2L);
+        assertThat(liked.name()).isEqualTo("돈가스");
         assertThat(liked.isLike()).isTrue();
         assertThat(valid.getMenuList()).hasSize(1);
+        assertThat(valid.getMenuList().get(0).getMenuId()).isEqualTo(2L);
+        assertThat(valid.getMenuList().get(0).getName()).isEqualTo("돈가스");
     }
 
     @Test

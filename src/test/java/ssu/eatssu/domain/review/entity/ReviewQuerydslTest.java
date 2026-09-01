@@ -125,4 +125,32 @@ class ReviewQuerydslTest {
         assertThat(new QReviews(QReviews.reviews1).getType()).isEqualTo(Reviews.class);
         assertThat(new QReviews(reviewsMetadata).getType()).isEqualTo(Reviews.class);
     }
+
+    @Test
+    void pathInitsDefaultLeavesNestedAssociationsUninitialized() {
+        QReview review = new QReview(QReview.review.getMetadata(), PathInits.DEFAULT);
+        assertThat(review.meal).isNull();
+        assertThat(review.menu).isNull();
+        assertThat(review.ratings).isNull();
+        assertThat(review.user).isNull();
+
+        QReviewImage image = new QReviewImage(QReviewImage.reviewImage.getMetadata(), PathInits.DEFAULT);
+        assertThat(image.review).isNull();
+
+        QReviewLike like = new QReviewLike(QReviewLike.reviewLike.getMetadata(), PathInits.DEFAULT);
+        assertThat(like.review).isNull();
+        assertThat(like.user).isNull();
+
+        QReviewMenuLike menuLike = new QReviewMenuLike(QReviewMenuLike.reviewMenuLike.getMetadata(), PathInits.DEFAULT);
+        assertThat(menuLike.menu).isNull();
+        assertThat(menuLike.review).isNull();
+
+        QReviewTranslation translation = new QReviewTranslation(QReviewTranslation.reviewTranslation.getMetadata(),
+                PathInits.DEFAULT);
+        assertThat(translation.review).isNull();
+
+        QReport report = new QReport(QReport.report.getMetadata(), PathInits.DEFAULT);
+        assertThat(report.review).isNull();
+        assertThat(report.user).isNull();
+    }
 }

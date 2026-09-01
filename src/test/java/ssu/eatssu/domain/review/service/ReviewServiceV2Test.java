@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.test.util.ReflectionTestUtils;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
@@ -80,6 +81,35 @@ class ReviewServiceV2Test {
     }
 
     @Test
+    void 메뉴가_모두_리뷰제외대상이면_빈_목록을_반환한다() {
+        Meal meal = mock(Meal.class);
+        given(mealRepository.findById(1L)).willReturn(Optional.of(meal));
+        Menu excludedMenu = Menu.createVariable("쌀밥", Restaurant.DODAM);
+        given(mealMenuRepository.findMenusByMeal(meal)).willReturn(List.of(excludedMenu));
+
+        SliceResponse<?> response = reviewServiceV2.findMealReviewList(1L, null, PageRequest.of(0, 20), null);
+
+        assertThat(response.getDataList()).isEmpty();
+    }
+
+    @Test
+    void findMealReviewListReturnsReviewsForKnownUser() {
+        Meal meal = mock(Meal.class);
+        given(mealRepository.findById(1L)).willReturn(Optional.of(meal));
+        Menu menu = Menu.createVariable("돈까스", Restaurant.DODAM);
+        given(mealMenuRepository.findMenusByMeal(meal)).willReturn(List.of(menu));
+        Review review = Review.builder().id(10L).meal(meal).rating(4)
+                .reviewImages(List.of()).menuLikes(List.of()).build();
+        ReflectionTestUtils.setField(review, "createdDate", java.time.LocalDateTime.now());
+        Page<Review> page = new PageImpl<>(List.of(review), PageRequest.of(0, 20), 1);
+        given(reviewRepository.findMealAndMenuReviews(1L, null, PageRequest.of(0, 20))).willReturn(page);
+
+        SliceResponse<?> response = reviewServiceV2.findMealReviewList(1L, null, PageRequest.of(0, 20), userDetails());
+
+        assertThat(response.getDataList()).hasSize(1);
+    }
+
+    @Test
     void createMealReviewThrowsWhenUserDoesNotExist() {
         given(userRepository.findById(1L)).willReturn(Optional.empty());
 
@@ -126,6 +156,30 @@ class ReviewServiceV2Test {
     }
 
     @Test
+    void createMealReviewSucceedsWithoutImagesOrMenuLikes() {
+        given(userRepository.findById(1L)).willReturn(Optional.of(mock(User.class)));
+        Meal meal = new Meal(new java.util.Date(), ssu.eatssu.domain.menu.entity.constants.TimePart.LUNCH, Restaurant.DODAM);
+        given(mealRepository.findById(1L)).willReturn(Optional.of(meal));
+        given(reviewRepository.save(any())).willAnswer(invocation -> invocation.getArgument(0));
+
+        reviewServiceV2.createMealReview(userDetails(), new CreateMealReviewRequest(1L, 4, null, "굿", null));
+
+        verify(reviewRepository).save(any());
+    }
+
+    @Test
+    void createMealReviewThrowsWhenMenuLikeMenuDoesNotExist() {
+        given(userRepository.findById(1L)).willReturn(Optional.of(mock(User.class)));
+        Meal meal = new Meal(new java.util.Date(), ssu.eatssu.domain.menu.entity.constants.TimePart.LUNCH, Restaurant.DODAM);
+        given(mealRepository.findById(1L)).willReturn(Optional.of(meal));
+        given(menuRepository.findById(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> reviewServiceV2.createMealReview(userDetails(),
+                new CreateMealReviewRequest(1L, 4, List.of(new MenuLikeRequest(1L, true)), "굿", null)))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
     void createMenuReviewThrowsWhenMenuLikeIsMissing() {
         given(userRepository.findById(1L)).willReturn(Optional.of(mock(User.class)));
 
@@ -141,6 +195,15 @@ class ReviewServiceV2Test {
 
         assertThatThrownBy(() -> reviewServiceV2.createMenuReview(userDetails(),
                 new CreateMenuReviewRequestV2(4, new MenuLikeRequest(1L, true), "굿", null)))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void createMenuReviewThrowsWhenMenuLikeMenuIdIsMissing() {
+        given(userRepository.findById(1L)).willReturn(Optional.of(mock(User.class)));
+
+        assertThatThrownBy(() -> reviewServiceV2.createMenuReview(userDetails(),
+                new CreateMenuReviewRequestV2(4, new MenuLikeRequest(null, true), "굿", null)))
                 .isInstanceOf(BaseException.class);
     }
 
@@ -176,6 +239,24 @@ class ReviewServiceV2Test {
     }
 
     @Test
+    void findRestaurantReviewsFallsBackToLegacyRatingAndSkipsNullLikeCounts() {
+        Meal meal = new Meal(new java.util.Date(), ssu.eatssu.domain.menu.entity.constants.TimePart.LUNCH, Restaurant.DODAM);
+        given(mealRepository.findByRestaurant(Restaurant.DODAM)).willReturn(List.of(meal));
+        Menu menuWithNullCounts = mock(Menu.class);
+        Review legacyRating = Review.builder().rating(3).build();
+        Review noRating = Review.builder().build();
+        given(reviewRepository.findByMealIn(List.of(meal))).willReturn(List.of(legacyRating, noRating));
+        given(mealMenuRepository.findMenusByMeals(List.of(meal))).willReturn(List.of(menuWithNullCounts));
+
+        RestaurantReviewResponse response = reviewServiceV2.findRestaurantReviews(Restaurant.DODAM);
+
+        assertThat(response.getTotalReviewCount()).isEqualTo(2);
+        assertThat(response.getRating()).isEqualTo(3.0);
+        assertThat(response.getLikeCount()).isZero();
+        assertThat(response.getUnlikeCount()).isZero();
+    }
+
+    @Test
     void findMenuReviewListThrowsWhenMenuDoesNotExist() {
         given(menuRepository.findById(1L)).willReturn(Optional.empty());
 
@@ -193,6 +274,21 @@ class ReviewServiceV2Test {
         SliceResponse<?> response = reviewServiceV2.findMenuReviewList(1L, PageRequest.of(0, 20), null, null);
 
         assertThat(response.getDataList()).isEmpty();
+    }
+
+    @Test
+    void findMenuReviewListReturnsReviewsForKnownUser() {
+        Menu menu = Menu.createVariable("돈까스", Restaurant.DODAM);
+        given(menuRepository.findById(1L)).willReturn(Optional.of(menu));
+        Review review = Review.builder().id(10L).menu(menu).rating(4)
+                .reviewImages(List.of()).menuLikes(List.of()).build();
+        ReflectionTestUtils.setField(review, "createdDate", java.time.LocalDateTime.now());
+        Slice<Review> slice = new SliceImpl<>(List.of(review), PageRequest.of(0, 20), false);
+        given(reviewRepository.findAllByMenuOrderByIdDesc(menu, null, PageRequest.of(0, 20))).willReturn(slice);
+
+        SliceResponse<?> response = reviewServiceV2.findMenuReviewList(1L, PageRequest.of(0, 20), null, userDetails());
+
+        assertThat(response.getDataList()).hasSize(1);
     }
 
     @Test
@@ -217,6 +313,20 @@ class ReviewServiceV2Test {
     }
 
     @Test
+    void findMenuReviewsV2WarnsWhenAllRatingsMissingAndLikeCountIsNull() {
+        Menu menu = mock(Menu.class);
+        given(menu.getName()).willReturn("돈까스");
+        given(menuRepository.findById(1L)).willReturn(Optional.of(menu));
+        Review review = Review.builder().build();
+        given(reviewRepository.findAllByMenu(menu)).willReturn(List.of(review));
+
+        MenuReviewsV2Response response = reviewServiceV2.findMenuReviews(1L);
+
+        assertThat(response.getRating()).isEqualTo(0.0);
+        assertThat(response.getLikeCount()).isZero();
+    }
+
+    @Test
     void findMealReviewsV2ThrowsWhenMealDoesNotExist() {
         given(mealRepository.findById(1L)).willReturn(Optional.empty());
 
@@ -237,6 +347,21 @@ class ReviewServiceV2Test {
         assertThat(response.getTotalReviewCount()).isEqualTo(1L);
         assertThat(response.getRating()).isEqualTo(4.0);
         assertThat(response.getMenuList()).extracting("name").containsExactly("돈까스");
+    }
+
+    @Test
+    void findMealReviewsV2WarnsWhenAllRatingsMissingAndNoValidMenus() {
+        Meal meal = mock(Meal.class);
+        given(meal.getId()).willReturn(1L);
+        given(mealRepository.findById(1L)).willReturn(Optional.of(meal));
+        Review review = Review.builder().build();
+        given(reviewRepository.findAllMealAndMenuReviews(1L)).willReturn(List.of(review));
+        given(mealMenuRepository.findMenusByMeal(meal)).willReturn(List.of());
+
+        MealReviewsV2Response response = reviewServiceV2.findMealReviews(1L);
+
+        assertThat(response.getRating()).isNull();
+        assertThat(response.getMenuList()).isEmpty();
     }
 
     @Test
@@ -282,6 +407,37 @@ class ReviewServiceV2Test {
         assertThatThrownBy(() -> reviewServiceV2.updateReview(userDetails(), 2L,
                 new UpdateMealReviewRequest(5, List.of(new MenuLikeRequest(null, true)), "변경")))
                 .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void updateReviewThrowsWhenMenuLikeMenuDoesNotExist() {
+        User author = mock(User.class);
+        given(author.getId()).willReturn(1L);
+        Review review = Review.builder().id(2L).user(author).content("원본").build();
+        given(userRepository.findById(1L)).willReturn(Optional.of(author));
+        given(reviewRepository.findById(2L)).willReturn(Optional.of(review));
+        given(menuRepository.findById(3L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> reviewServiceV2.updateReview(userDetails(), 2L,
+                new UpdateMealReviewRequest(5, List.of(new MenuLikeRequest(3L, true)), "변경")))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void updateReviewAppliesMenuLikesAndIgnoresNullEntries() {
+        User author = mock(User.class);
+        given(author.getId()).willReturn(1L);
+        Review review = Review.builder().id(2L).user(author).content("원본").build();
+        given(userRepository.findById(1L)).willReturn(Optional.of(author));
+        given(reviewRepository.findById(2L)).willReturn(Optional.of(review));
+        Menu menu = Menu.createVariable("돈까스", Restaurant.DODAM);
+        given(menuRepository.findById(3L)).willReturn(Optional.of(menu));
+
+        reviewServiceV2.updateReview(userDetails(), 2L,
+                new UpdateMealReviewRequest(5, java.util.Arrays.asList(new MenuLikeRequest(3L, true), null), "변경"));
+
+        assertThat(review.getMenuLikes()).hasSize(1);
+        assertThat(menu.getLikeCount()).isEqualTo(1);
     }
 
     @Test
@@ -359,6 +515,25 @@ class ReviewServiceV2Test {
         SliceResponse<?> response = reviewServiceV2.findMyReviews(userDetails(), null, PageRequest.of(0, 20));
 
         assertThat(response.getDataList()).isEmpty();
+    }
+
+    @Test
+    void findMyReviewsLogsRatingsForEachReview() {
+        User user = mock(User.class);
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        Menu menu = Menu.createVariable("돈까스", Restaurant.DODAM);
+        Review withRatings = Review.builder().id(1L).menu(menu).ratings(Ratings.of(5, 4, 3))
+                .reviewImages(List.of()).menuLikes(List.of()).build();
+        Review withoutRatings = Review.builder().id(2L).menu(menu)
+                .reviewImages(List.of()).menuLikes(List.of()).build();
+        ReflectionTestUtils.setField(withRatings, "createdDate", java.time.LocalDateTime.now());
+        ReflectionTestUtils.setField(withoutRatings, "createdDate", java.time.LocalDateTime.now());
+        Slice<Review> slice = new SliceImpl<>(List.of(withRatings, withoutRatings), PageRequest.of(0, 20), false);
+        given(reviewRepository.findByUserOrderByIdDesc(user, null, PageRequest.of(0, 20))).willReturn(slice);
+
+        SliceResponse<?> response = reviewServiceV2.findMyReviews(userDetails(), null, PageRequest.of(0, 20));
+
+        assertThat(response.getDataList()).hasSize(2);
     }
 
     @Test
