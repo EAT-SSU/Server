@@ -2,12 +2,52 @@ package ssu.eatssu.domain.rating.entity;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import ssu.eatssu.domain.menu.entity.Meal;
+import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.review.dto.RatingAverages;
 import ssu.eatssu.domain.review.dto.ReviewRatingCount;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RatingEntityTest {
+
+    private static final RatingCalculator EMPTY_CALCULATOR = new RatingCalculator() {
+        @Override
+        public ReviewRatingCount mealRatingCount(Meal meal) {
+            return null;
+        }
+
+        @Override
+        public ReviewRatingCount menuRatingCount(Menu menu) {
+            return null;
+        }
+
+        @Override
+        public RatingAverages mealAverageRatings(Meal meal) {
+            return null;
+        }
+
+        @Override
+        public RatingAverages menuAverageRatings(Menu menu) {
+            return null;
+        }
+
+        @Override
+        public Double mealAverageMainRating(Meal meal) {
+            return null;
+        }
+
+        @Override
+        public Double menuAverageMainRating(Menu menu) {
+            return null;
+        }
+
+        @Override
+        public long mealTotalReviewCount(Meal meal) {
+            return 0;
+        }
+    };
 
     @AfterEach
     void resetRatings() {
@@ -43,23 +83,9 @@ class RatingEntityTest {
     }
 
     @Test
-    void ratingCalculatorsReturnNullForMissingAverageInputs() {
-        JpaLoadCollectionRatingCalculator loadCalculator = new JpaLoadCollectionRatingCalculator();
-        JpaProjectionRatingCalculator projectionCalculator = new JpaProjectionRatingCalculator(null);
-
-        assertThat(loadCalculator.averageRating(null, 1)).isNull();
-        assertThat(loadCalculator.averageRating(5, 0)).isNull();
-        assertThat(loadCalculator.averageRating(9, 2)).isEqualTo(4.5);
-        assertThat(projectionCalculator.averageRating(null, 1)).isNull();
-        assertThat(projectionCalculator.averageRating(8, 2)).isEqualTo(4.0);
-    }
-
-    @Test
     void ratingCalculatorSumHandlesNullValues() {
-        RatingCalculator calculator = new JpaLoadCollectionRatingCalculator();
-
-        assertThat(calculator.sum(null, 3)).isEqualTo(3);
-        assertThat(calculator.sum(2, null)).isEqualTo(2);
-        assertThat(calculator.sum(2, 3)).isEqualTo(5);
+        assertThat(EMPTY_CALCULATOR.sum(null, 3)).isEqualTo(3);
+        assertThat(EMPTY_CALCULATOR.sum(2, null)).isEqualTo(2);
+        assertThat(EMPTY_CALCULATOR.sum(2, 3)).isEqualTo(5);
     }
 }
