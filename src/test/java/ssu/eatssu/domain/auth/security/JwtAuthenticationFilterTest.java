@@ -49,6 +49,17 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
+    void whitelistRequestWithInvalidTokenStillContinuesFilterChainWithoutAuthentication() throws Exception {
+        given(jwtTokenProvider.validateToken("expired")).willReturn(false);
+        MockFilterChain chain = new MockFilterChain();
+
+        filter.doFilter(request("/oauths/valid/token", "Bearer expired"), new MockHttpServletResponse(), chain);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        assertThat(chain.getRequest()).isNotNull();
+    }
+
+    @Test
     void protectedRequestWithoutTokenReturnsUnauthorized() throws Exception {
         MockHttpServletResponse response = new MockHttpServletResponse();
         MockFilterChain chain = new MockFilterChain();
@@ -83,6 +94,28 @@ class JwtAuthenticationFilterTest {
 
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isSameAs(authentication);
         assertThat(chain.getRequest()).isNotNull();
+    }
+
+    @Test
+    void resolveTokenReturnsNullForNonBearerAuthorizationHeader() throws Exception {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockFilterChain chain = new MockFilterChain();
+
+        filter.doFilter(request("/users/me", "Basic dXNlcjpwYXNz"), response, chain);
+
+        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(chain.getRequest()).isNull();
+    }
+
+    @Test
+    void resolveTokenReturnsNullWhenBearerHeaderHasNoTokenAfterIt() throws Exception {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockFilterChain chain = new MockFilterChain();
+
+        filter.doFilter(request("/users/me", "Bearer"), response, chain);
+
+        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(chain.getRequest()).isNull();
     }
 
     private MockHttpServletRequest request(String uri, String authorization) {

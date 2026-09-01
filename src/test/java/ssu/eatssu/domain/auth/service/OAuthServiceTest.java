@@ -15,13 +15,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import ssu.eatssu.domain.auth.dto.request.AppleLoginRequest;
+import ssu.eatssu.domain.auth.dto.request.AppleLoginRequestV2;
 import ssu.eatssu.domain.auth.dto.request.KakaoLoginRequest;
+import ssu.eatssu.domain.auth.dto.request.KakaoLoginRequestV2;
 import ssu.eatssu.domain.auth.dto.OAuthInfo;
 import ssu.eatssu.domain.auth.dto.request.ValidRequest;
 import ssu.eatssu.domain.auth.entity.AppleAuthenticator;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.user.dto.response.Tokens;
+import ssu.eatssu.domain.user.entity.DeviceType;
 import ssu.eatssu.domain.user.entity.Role;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.entity.UserStatus;
@@ -37,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
@@ -248,6 +252,77 @@ class OAuthServiceTest {
         User updatedUser = userRepository.findByProviderId(providerId).orElse(null);
         assertThat(updatedUser).isNotNull();
         assertThat(updatedUser.getEmail()).isEqualTo(realEmail);
+    }
+
+    @Test
+    @DisplayName("카카오 로그인 V2 - 신규 사용자 가입 및 디바이스 타입 반영")
+    void kakaoLoginV2_신규사용자_토큰생성() {
+        // given
+        String email = "test-v2@kakao.com";
+        String providerId = "kakao-v2-123";
+        KakaoLoginRequestV2 request = new KakaoLoginRequestV2(email, providerId, DeviceType.IOS);
+
+        // when
+        Tokens tokens = oAuthService.kakaoLoginV2(request);
+
+        // then
+        assertThat(tokens.accessToken()).isNotBlank();
+        User savedUser = userRepository.findByProviderId(providerId).orElseThrow();
+        assertThat(savedUser.getDeviceType()).isEqualTo(DeviceType.IOS);
+    }
+
+    @Test
+    @DisplayName("카카오 로그인 V2 - 기존 사용자 디바이스 타입 갱신")
+    void kakaoLoginV2_기존사용자_디바이스타입갱신() {
+        // given
+        String email = "existing-v2@kakao.com";
+        String providerId = "existing-v2-123";
+        User existingUser = userService.join(email, OAuthProvider.KAKAO, providerId);
+        userRepository.save(existingUser);
+        KakaoLoginRequestV2 request = new KakaoLoginRequestV2(email, providerId, DeviceType.ANDROID);
+
+        // when
+        Tokens tokens = oAuthService.kakaoLoginV2(request);
+
+        // then
+        assertThat(tokens.accessToken()).isNotBlank();
+        User savedUser = userRepository.findByProviderId(providerId).orElseThrow();
+        assertThat(savedUser.getDeviceType()).isEqualTo(DeviceType.ANDROID);
+        assertThat(userRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("애플 로그인 V2 - 신규 사용자 가입 및 디바이스 타입 반영")
+    void appleLoginV2_신규사용자_토큰생성() {
+        // given
+        String email = "test-v2@apple.com";
+        String providerId = "apple-v2-123";
+        String identityToken = "mock.identity.v2.token";
+        AppleLoginRequestV2 request = new AppleLoginRequestV2(identityToken, DeviceType.IOS);
+        given(appleAuthenticator.getOAuthInfoByIdentityToken(identityToken))
+                .willReturn(new OAuthInfo(email, providerId));
+
+        // when
+        Tokens tokens = oAuthService.appleLoginV2(request);
+
+        // then
+        assertThat(tokens.accessToken()).isNotBlank();
+        User savedUser = userRepository.findByProviderId(providerId).orElseThrow();
+        assertThat(savedUser.getDeviceType()).isEqualTo(DeviceType.IOS);
+    }
+
+    @Test
+    @DisplayName("애플 로그인 V2 - identityToken 검증 실패 시 예외를 전파하고 실패를 기록한다")
+    void appleLoginV2_토큰검증실패시_예외전파() {
+        // given
+        AppleLoginRequestV2 request = new AppleLoginRequestV2("invalid-token", DeviceType.IOS);
+        given(appleAuthenticator.getOAuthInfoByIdentityToken("invalid-token"))
+                .willThrow(new RuntimeException("애플 토큰 검증 실패"));
+
+        // when & then
+        assertThatThrownBy(() -> oAuthService.appleLoginV2(request))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("애플 토큰 검증 실패");
     }
 
     @Test
