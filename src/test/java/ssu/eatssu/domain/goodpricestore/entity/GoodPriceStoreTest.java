@@ -17,6 +17,12 @@ class GoodPriceStoreTest {
         assertThat(second.getRepresentativeImageUrl()).isEqualTo("two");
         assertThat(third.getRepresentativeImageUrl()).isEqualTo("three");
         assertThat(none.getRepresentativeImageUrl()).isNull();
+
+        assertThat(first.getSourceId()).isEqualTo(1);
+        assertThat(first.getDistrict()).isEqualTo("동작구");
+        assertThat(first.getImageUrl1()).isEqualTo("one");
+        assertThat(first.getImageUrl2()).isEqualTo("two");
+        assertThat(first.getImageUrl3()).isEqualTo("three");
     }
 
     private GoodPriceStore store(String image1, String image2, String image3) {

@@ -20,10 +20,20 @@ class GoodPriceStoreResponseTest {
         GoodPriceStoreResponse list = GoodPriceStoreResponse.fromEntity(store);
         GoodPriceStoreDetailResponse detail = GoodPriceStoreDetailResponse.fromEntity(store);
 
+        assertThat(list.getId()).isEqualTo(1L);
         assertThat(list.getStoreName()).isEqualTo("식당");
+        assertThat(list.getCategory()).isEqualTo(CategoryType.KOREAN);
         assertThat(list.getLatitude()).isEqualTo(37.5);
+        assertThat(list.getLongitude()).isEqualTo(126.9);
+
+        assertThat(detail.getId()).isEqualTo(1L);
+        assertThat(detail.getStoreName()).isEqualTo("식당");
+        assertThat(detail.getCategory()).isEqualTo(CategoryType.KOREAN);
         assertThat(detail.getMainMenu()).isEqualTo("비빔밥");
+        assertThat(detail.getPrice()).isEqualTo(6000);
+        assertThat(detail.getRoadAddress()).isEqualTo("서울");
         assertThat(detail.getImageUrl()).isEqualTo("image2");
         assertThat(detail.getNaverMapUrl()).isEqualTo("naver");
+        assertThat(detail.getKakaoMapUrl()).isEqualTo("kakao");
     }
 }
