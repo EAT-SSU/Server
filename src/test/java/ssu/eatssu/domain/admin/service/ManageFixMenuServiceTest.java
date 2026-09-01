@@ -3,6 +3,7 @@ package ssu.eatssu.domain.admin.service;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import ssu.eatssu.domain.admin.dto.request.RegisterFixMenuRequest;
+import ssu.eatssu.domain.admin.dto.request.UpdateFixMenuRequest;
 import ssu.eatssu.domain.admin.persistence.LoadFixMenuRepository;
 import ssu.eatssu.domain.admin.persistence.ManageMenuRepository;
 import ssu.eatssu.domain.admin.persistence.MenuRatingRepository;
@@ -12,6 +13,7 @@ import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.global.handler.response.BaseException;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,6 +55,93 @@ class ManageFixMenuServiceTest {
         assertThatThrownBy(() -> service(categoryRepository, mock(ManageMenuRepository.class))
                 .register(Restaurant.FOOD_COURT, new RegisterFixMenuRequest(1L, "돈가스", 6000)))
                 .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void updateMenuThrowsWhenRestaurantIsVariableType() {
+        LoadFixMenuRepository loadRepository = mock(LoadFixMenuRepository.class);
+        given(loadRepository.getRestaurant(1L)).willReturn(Restaurant.DODAM);
+
+        assertThatThrownBy(() -> service(loadRepository, mock(ManageMenuRepository.class))
+                .updateMenu(1L, new UpdateFixMenuRequest("돈가스", 6000)))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void updateMenuThrowsWhenMenuDoesNotExist() {
+        LoadFixMenuRepository loadRepository = mock(LoadFixMenuRepository.class);
+        ManageMenuRepository manageRepository = mock(ManageMenuRepository.class);
+        given(loadRepository.getRestaurant(1L)).willReturn(Restaurant.FOOD_COURT);
+        given(manageRepository.findById(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service(loadRepository, manageRepository)
+                .updateMenu(1L, new UpdateFixMenuRequest("돈가스", 6000)))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void updateMenuThrowsWhenNewNameAlreadyExists() {
+        LoadFixMenuRepository loadRepository = mock(LoadFixMenuRepository.class);
+        ManageMenuRepository manageRepository = mock(ManageMenuRepository.class);
+        Menu menu = Menu.createFixed("돈가스", Restaurant.FOOD_COURT, 5000, null);
+        given(loadRepository.getRestaurant(1L)).willReturn(Restaurant.FOOD_COURT);
+        given(manageRepository.findById(1L)).willReturn(Optional.of(menu));
+        given(loadRepository.existsMenu("김치볶음밥", Restaurant.FOOD_COURT)).willReturn(true);
+
+        assertThatThrownBy(() -> service(loadRepository, manageRepository)
+                .updateMenu(1L, new UpdateFixMenuRequest("김치볶음밥", 6000)))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void updateMenuUpdatesNameAndPriceWhenValid() {
+        LoadFixMenuRepository loadRepository = mock(LoadFixMenuRepository.class);
+        ManageMenuRepository manageRepository = mock(ManageMenuRepository.class);
+        Menu menu = Menu.createFixed("돈가스", Restaurant.FOOD_COURT, 5000, null);
+        given(loadRepository.getRestaurant(1L)).willReturn(Restaurant.FOOD_COURT);
+        given(manageRepository.findById(1L)).willReturn(Optional.of(menu));
+        given(loadRepository.existsMenu("김치볶음밥", Restaurant.FOOD_COURT)).willReturn(false);
+
+        service(loadRepository, manageRepository).updateMenu(1L, new UpdateFixMenuRequest("김치볶음밥", 6000));
+
+        assertThat(menu.getName()).isEqualTo("김치볶음밥");
+        assertThat(menu.getPrice()).isEqualTo(6000);
+        verify(manageRepository).save(menu);
+    }
+
+    @Test
+    void changeDiscontinuedStatusThrowsWhenRestaurantIsVariableType() {
+        LoadFixMenuRepository loadRepository = mock(LoadFixMenuRepository.class);
+        given(loadRepository.getRestaurant(1L)).willReturn(Restaurant.DODAM);
+
+        assertThatThrownBy(() -> service(loadRepository, mock(ManageMenuRepository.class))
+                .changeDiscontinuedStatus(1L))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void changeDiscontinuedStatusThrowsWhenMenuDoesNotExist() {
+        LoadFixMenuRepository loadRepository = mock(LoadFixMenuRepository.class);
+        ManageMenuRepository manageRepository = mock(ManageMenuRepository.class);
+        given(loadRepository.getRestaurant(1L)).willReturn(Restaurant.FOOD_COURT);
+        given(manageRepository.findById(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service(loadRepository, manageRepository).changeDiscontinuedStatus(1L))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void changeDiscontinuedStatusTogglesAndReturnsNewStatus() {
+        LoadFixMenuRepository loadRepository = mock(LoadFixMenuRepository.class);
+        ManageMenuRepository manageRepository = mock(ManageMenuRepository.class);
+        Menu menu = Menu.createFixed("돈가스", Restaurant.FOOD_COURT, 5000, null);
+        given(loadRepository.getRestaurant(1L)).willReturn(Restaurant.FOOD_COURT);
+        given(manageRepository.findById(1L)).willReturn(Optional.of(menu));
+
+        Boolean result = service(loadRepository, manageRepository).changeDiscontinuedStatus(1L);
+
+        assertThat(result).isTrue();
+        assertThat(menu.isDiscontinued()).isTrue();
     }
 
     private ManageFixMenuService service(LoadFixMenuRepository loadRepository, ManageMenuRepository manageRepository) {
