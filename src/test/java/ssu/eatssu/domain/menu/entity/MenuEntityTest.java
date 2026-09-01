@@ -4,12 +4,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import ssu.eatssu.domain.menu.entity.constants.TimePart;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
+import ssu.eatssu.domain.user.entity.Language;
 
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MenuEntityTest {
+
+    @Test
+    void getNameByLanguageFallsBackToKoreanWhenTranslationMissing() {
+        Menu menu = Menu.createFixed("돈가스", Restaurant.FOOD_COURT, 6000, null);
+        ReflectionTestUtils.setField(menu, "nameEn", "Pork Cutlet");
+
+        assertThat(menu.getNameByLanguage(Language.EN)).isEqualTo("Pork Cutlet");
+        assertThat(menu.getNameByLanguage(Language.JA)).isEqualTo("돈가스");
+        assertThat(menu.getNameByLanguage(Language.KO)).isEqualTo("돈가스");
+        assertThat(menu.getNameByLanguage(null)).isEqualTo("돈가스");
+    }
 
     @Test
     void menuTracksDiscontinuedAndLikeStates() {
@@ -20,9 +32,35 @@ class MenuEntityTest {
         menu.changeLikeStatus(false);
 
         assertThat(menu.isContinued()).isFalse();
+        assertThat(menu.isDiscontinued()).isTrue();
         assertThat(menu.getLikeCount()).isZero();
         menu.cancelLike(true);
         assertThat(menu.getLikeCount()).isEqualTo(-1);
+    }
+
+    @Test
+    void updateChangesNameAndPrice() {
+        Menu menu = Menu.createFixed("돈가스", Restaurant.FOOD_COURT, 6000, null);
+
+        menu.update("김치찌개", 7000);
+
+        assertThat(menu.getName()).isEqualTo("김치찌개");
+        assertThat(menu.getPrice()).isEqualTo(7000);
+    }
+
+    @Test
+    void createFixedAndCreateVariableSetExpectedFields() {
+        MenuCategory category = MenuCategory.builder().name("한식").restaurant(Restaurant.FOOD_COURT).build();
+        Menu fixed = Menu.createFixed("돈가스", Restaurant.FOOD_COURT, 6000, category);
+        Menu variable = Menu.createVariable("라면", Restaurant.DODAM);
+
+        assertThat(fixed.getName()).isEqualTo("돈가스");
+        assertThat(fixed.getRestaurant()).isEqualTo(Restaurant.FOOD_COURT);
+        assertThat(fixed.getPrice()).isEqualTo(6000);
+        assertThat(fixed.getCategory()).isSameAs(category);
+        assertThat(fixed.getId()).isNull();
+        assertThat(variable.getPrice()).isZero();
+        assertThat(variable.getCategory()).isNull();
     }
 
     @Test
