@@ -6,6 +6,7 @@ import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.review.entity.Review;
+import ssu.eatssu.domain.review.entity.ReviewImage;
 import ssu.eatssu.domain.review.entity.ReviewMenuLike;
 import ssu.eatssu.domain.user.entity.User;
 
@@ -29,8 +30,10 @@ class ReviewDetailResponseTest {
         ReviewMenuLike like = mock(ReviewMenuLike.class);
         given(like.getIsLike()).willReturn(true);
         given(like.getMenu()).willReturn(menu);
+        ReviewImage image = mock(ReviewImage.class);
+        given(image.getImageUrl()).willReturn("https://cdn.example/review.jpg");
         Review review = Review.builder().id(3L).menu(menu).user(user).content("맛있어요")
-                .rating(5).reviewImages(List.of()).menuLikes(List.of(like)).build();
+                .rating(5).reviewImages(List.of(image)).menuLikes(List.of(like)).build();
         ReflectionTestUtils.setField(review, "createdDate", LocalDateTime.of(2026, 1, 2, 3, 4));
 
         ReviewDetail response = ReviewDetail.from(review, 7L);
@@ -41,6 +44,8 @@ class ReviewDetailResponseTest {
         assertThat(response.getWrittenAt()).isEqualTo(java.time.LocalDate.of(2026, 1, 2));
         assertThat(response.getWriterNickname()).isEqualTo("먹방러");
         assertThat(response.getIsWriter()).isTrue();
+        assertThat(response.getContent()).isEqualTo("맛있어요");
+        assertThat(response.getImageUrls()).containsExactly("https://cdn.example/review.jpg");
     }
 
     @Test

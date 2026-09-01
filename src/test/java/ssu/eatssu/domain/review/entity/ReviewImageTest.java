@@ -14,5 +14,6 @@ class ReviewImageTest {
 
         assertThat(image.getReview()).isSameAs(review);
         assertThat(image.getImageUrl()).isEqualTo("https://cdn.example/review.jpg");
+        assertThat(image.getId()).isNull();
     }
 }

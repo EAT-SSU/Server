@@ -24,5 +24,6 @@ class ReportEntityTest {
         assertThat(report.getReportType()).isEqualTo(ReportType.NO_ASSOCIATE_CONTENT);
         assertThat(report.getContent()).isEqualTo("내용 불일치");
         assertThat(report.getStatus()).isEqualTo(ReportStatus.PENDING);
+        assertThat(report.getId()).isNull();
     }
 }

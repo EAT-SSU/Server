@@ -5,6 +5,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.review.entity.Review;
+import ssu.eatssu.domain.review.entity.ReviewImage;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 
@@ -24,8 +25,10 @@ class ReviewDetailV1Test {
         User user = mock(User.class);
         given(user.getId()).willReturn(7L);
         given(user.getNickname()).willReturn("먹방러");
+        ReviewImage image = mock(ReviewImage.class);
+        given(image.getImageUrl()).willReturn("https://cdn.example/review.jpg");
         Review review = Review.builder().id(3L).menu(menu).user(user).ratings(Ratings.of(5, 4, 3))
-                .content("맛있어요").reviewImages(List.of()).build();
+                .content("맛있어요").reviewImages(List.of(image)).build();
         ReflectionTestUtils.setField(review, "createdDate", LocalDateTime.of(2026, 9, 1, 10, 0));
 
         ReviewDetailV1 response = ReviewDetailV1.from(review, 7L);
@@ -38,6 +41,8 @@ class ReviewDetailV1Test {
         assertThat(response.getWritedAt()).isEqualTo(LocalDate.of(2026, 9, 1));
         assertThat(response.getWriterNickname()).isEqualTo("먹방러");
         assertThat(response.getIsWriter()).isTrue();
+        assertThat(response.getContent()).isEqualTo("맛있어요");
+        assertThat(response.getImageUrls()).containsExactly("https://cdn.example/review.jpg");
     }
 
     @Test

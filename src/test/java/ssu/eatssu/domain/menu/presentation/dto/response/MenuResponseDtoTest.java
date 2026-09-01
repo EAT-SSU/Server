@@ -40,7 +40,9 @@ class MenuResponseDtoTest {
         restaurant.add(category);
         restaurant.addAll(List.of(category));
 
+        assertThat(response.getMenuId()).isEqualTo(1L);
         assertThat(response.getName()).isEqualTo("Pork cutlet");
+        assertThat(response.getPrice()).isEqualTo(6000);
         assertThat(response.getRating()).isEqualTo(4.5);
         assertThat(restaurant.getCategoryMenuListCollection()).containsExactly(category, category);
     }
