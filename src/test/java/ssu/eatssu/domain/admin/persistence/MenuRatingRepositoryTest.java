@@ -1,4 +1,4 @@
-package ssu.eatssu.domain.menu.persistence;
+package ssu.eatssu.domain.admin.persistence;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,22 +7,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ssu.eatssu.domain.auth.entity.OAuthProvider;
 import ssu.eatssu.domain.menu.entity.Menu;
+import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.rating.entity.Ratings;
+import ssu.eatssu.domain.report.repository.ReportRepository;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
 
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class QuerydslMenuRatingCounterTest {
+class MenuRatingRepositoryTest {
 
     @Autowired
-    private QuerydslMenuRatingCounter counter;
+    private MenuRatingRepository menuRatingRepository;
 
     @Autowired
     private ReviewRepository reviewRepository;
@@ -33,54 +33,44 @@ class QuerydslMenuRatingCounterTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ReportRepository reportRepository;
+
     @BeforeEach
     void setup() {
-        reviewRepository.deleteAll();
-        menuRepository.deleteAll();
-        userRepository.deleteAll();
+        cleanUp();
     }
 
     @AfterEach
     void tearDown() {
+        cleanUp();
+    }
+
+    private void cleanUp() {
+        reportRepository.deleteAll();
         reviewRepository.deleteAll();
         menuRepository.deleteAll();
         userRepository.deleteAll();
     }
 
     @Test
-    void getRatingCountMapReturnsCountPerRatingForMenu() {
-        // given
+    void getMainRatingAverageReturnsAverageOfReviewsForMenu() {
         User user = userRepository.save(User.create("test@test.com", "user-test", OAuthProvider.EATSSU, "1234", "1234"));
         Menu menu = menuRepository.save(Menu.createFixed("라면", Restaurant.FOOD_COURT, 3000, null));
-        saveReviewWithRating(user, menu, 4);
-        saveReviewWithRating(user, menu, 4);
-        saveReviewWithRating(user, menu, 2);
+        reviewRepository.save(Review.builder().content("리뷰").ratings(Ratings.of(4, 4, 4)).user(user).menu(menu).build());
+        reviewRepository.save(Review.builder().content("리뷰").ratings(Ratings.of(2, 2, 2)).user(user).menu(menu).build());
 
-        // when
-        Map<Integer, Long> ratingCountMap = counter.getRatingCountMap(menu.getId());
+        Double average = menuRatingRepository.getMainRatingAverage(menu.getId());
 
-        // then
-        assertThat(ratingCountMap).containsEntry(4, 2L).containsEntry(2, 1L);
+        assertThat(average).isEqualTo(3.0);
     }
 
     @Test
-    void getRatingCountMapReturnsEmptyMapWhenMenuHasNoReviews() {
-        // given
+    void getMainRatingAverageReturnsNullWhenMenuHasNoReviews() {
         Menu menu = menuRepository.save(Menu.createFixed("라면", Restaurant.FOOD_COURT, 3000, null));
 
-        // when
-        Map<Integer, Long> ratingCountMap = counter.getRatingCountMap(menu.getId());
+        Double average = menuRatingRepository.getMainRatingAverage(menu.getId());
 
-        // then
-        assertThat(ratingCountMap).isEmpty();
-    }
-
-    private void saveReviewWithRating(User user, Menu menu, int mainRating) {
-        reviewRepository.save(Review.builder()
-                                    .content("리뷰")
-                                    .ratings(Ratings.of(mainRating, mainRating, mainRating))
-                                    .user(user)
-                                    .menu(menu)
-                                    .build());
+        assertThat(average).isNull();
     }
 }

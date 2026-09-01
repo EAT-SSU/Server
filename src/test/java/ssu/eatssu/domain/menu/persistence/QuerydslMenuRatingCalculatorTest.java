@@ -1,5 +1,6 @@
 package ssu.eatssu.domain.menu.persistence;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,13 @@ class QuerydslMenuRatingCalculatorTest {
 
     @BeforeEach
     void setup() {
+        reviewRepository.deleteAll();
+        menuRepository.deleteAll();
+        userRepository.deleteAll();
+    }
+
+    @AfterEach
+    void tearDown() {
         reviewRepository.deleteAll();
         menuRepository.deleteAll();
         userRepository.deleteAll();

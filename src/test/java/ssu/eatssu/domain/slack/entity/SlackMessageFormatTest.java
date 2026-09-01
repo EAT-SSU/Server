@@ -1,5 +1,6 @@
 package ssu.eatssu.domain.slack.entity;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,15 @@ class SlackMessageFormatTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(SlackMessageFormat.class, "serverEnv", "test");
+        cleanUp();
+    }
+
+    @AfterEach
+    void tearDown() {
+        cleanUp();
+    }
+
+    private void cleanUp() {
         reportRepository.deleteAll();
         inquiryRepository.deleteAll();
         reviewRepository.deleteAll();
