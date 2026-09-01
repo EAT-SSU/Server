@@ -203,6 +203,11 @@ class ControllerLogAspectTest {
         assertThat(controllerLogAspect.getResponseLog(null, "ok")).contains("ok");
     }
 
+    @Test
+    void 포인트컷_선언은_예외없이_호출된다() {
+        controllerLogAspect.restController();
+    }
+
     private record LongRequest(String value) { }
 
     private static class RecursiveRequest {

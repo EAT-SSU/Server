@@ -23,4 +23,10 @@ class BaseResponseTest {
         assertThat(BaseResponseStatus.sendSlackNotification(BaseResponseStatus.INTERNAL_SERVER_ERROR)).isTrue();
         assertThat(BaseResponseStatus.sendSlackNotification(BaseResponseStatus.BAD_REQUEST)).isFalse();
     }
+
+    @Test
+    void 상태값_목록과_이름으로_조회할_수_있다() {
+        assertThat(BaseResponseStatus.values()).contains(BaseResponseStatus.SUCCESS);
+        assertThat(BaseResponseStatus.valueOf("SUCCESS")).isEqualTo(BaseResponseStatus.SUCCESS);
+    }
 }

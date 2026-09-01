@@ -2,8 +2,10 @@ package ssu.eatssu.global.runner;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.test.util.ReflectionTestUtils;
 import ssu.eatssu.domain.goodpricestore.persistence.GoodPriceStoreRepository;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -46,5 +48,16 @@ class GoodPriceStoreSeedRunnerTest {
         new GoodPriceStoreSeedRunner(repository).run(arguments);
 
         verify(repository).saveAll(any());
+    }
+
+    @Test
+    void 값이_널이면_빈값으로_취급한다() {
+        GoodPriceStoreSeedRunner runner = new GoodPriceStoreSeedRunner(mock(GoodPriceStoreRepository.class));
+
+        String blanked = ReflectionTestUtils.invokeMethod(runner, "blankToNull", (String) null);
+        Integer parsed = ReflectionTestUtils.invokeMethod(runner, "parseNullableInt", (String) null);
+
+        assertThat(blanked).isNull();
+        assertThat(parsed).isNull();
     }
 }
