@@ -53,4 +53,17 @@ class LoadInquiryRepositoryTest {
         assertThat(page.getContent()).extracting(Inquiry::getId).containsExactly(waiting.getId(), answered.getId());
         assertThat(page.getTotalElements()).isEqualTo(2);
     }
+
+    @Test
+    void findAllInquiriesRunsCountQueryWhenPageIsFull() {
+        User user = userRepository.save(User.create("test@test.com", "user-test", OAuthProvider.EATSSU, "1234", "1234"));
+        inquiryRepository.save(new Inquiry("문의1", user, "test@test.com"));
+        inquiryRepository.save(new Inquiry("문의2", user, "test@test.com"));
+
+        // 페이지 크기와 조회된 개수가 같으면 PageableExecutionUtils가 실제 count 쿼리를 실행한다
+        Page<Inquiry> page = loadInquiryRepository.findAllInquiries(PageRequest.of(0, 1));
+
+        assertThat(page.getContent()).hasSize(1);
+        assertThat(page.getTotalElements()).isEqualTo(2);
+    }
 }

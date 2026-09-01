@@ -75,6 +75,23 @@ class LoadReportRepositoryTest {
     }
 
     @Test
+    void findAllRunsCountQueryWhenPageIsFull() {
+        User reporter = userRepository.save(User.create("reporter@test.com", "신고자", OAuthProvider.EATSSU, "1", "1"));
+        Menu menu = menuRepository.save(Menu.createFixed("라면", Restaurant.FOOD_COURT, 3000, null));
+        Review review = reviewRepository.save(Review.builder().content("리뷰").rating(4).user(reporter).menu(menu).build());
+        reportRepository.save(Report.builder().user(reporter).review(review).reportType(ReportType.EXTRA)
+                                    .content("신고1").status(ReportStatus.PENDING).build());
+        reportRepository.save(Report.builder().user(reporter).review(review).reportType(ReportType.EXTRA)
+                                    .content("신고2").status(ReportStatus.PENDING).build());
+
+        // 페이지 크기와 조회된 개수가 같으면 PageableExecutionUtils가 실제 count 쿼리를 실행한다
+        Page<ReportLine> page = loadReportRepository.findAll(PageRequest.of(0, 1));
+
+        assertThat(page.getContent()).hasSize(1);
+        assertThat(page.getTotalElements()).isEqualTo(2);
+    }
+
+    @Test
     void findAllByReviewIdReturnsReportIdsForThatReview() {
         User reporter = userRepository.save(User.create("reporter@test.com", "신고자", OAuthProvider.EATSSU, "1", "1"));
         Menu menu = menuRepository.save(Menu.createFixed("라면", Restaurant.FOOD_COURT, 3000, null));
