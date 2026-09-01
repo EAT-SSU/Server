@@ -61,6 +61,27 @@ class UserDtoCoverageTest {
     }
 
     @Test
+    void myReviewDetailHandlesNullImageList() {
+        Review review = mock(Review.class);
+        given(review.getReviewImages()).willReturn(null);
+
+        MyReviewDetail response = MyReviewDetail.from(review);
+
+        assertThat(response.getImgUrlList()).isEmpty();
+    }
+
+    @Test
+    void myReviewDetailSkipsImagesWithoutUrl() {
+        ReviewImage blankImage = mock(ReviewImage.class);
+        given(blankImage.getImageUrl()).willReturn(null);
+        Review review = Review.builder().reviewImages(java.util.Arrays.asList(blankImage, null)).build();
+
+        MyReviewDetail response = MyReviewDetail.from(review);
+
+        assertThat(response.getImgUrlList()).isEmpty();
+    }
+
+    @Test
     void mapsMyMealReviewForMealAndLegacyMenuReview() {
         Menu included = mock(Menu.class);
         given(included.getId()).willReturn(1L);
@@ -85,5 +106,32 @@ class UserDtoCoverageTest {
 
         assertThat(MyMealReviewResponse.from(menuReview).getRating()).isEqualTo(5);
         assertThat(MyMealReviewResponse.from(menuReview).getMenuList().get(0).name()).isEqualTo("샐러드");
+    }
+
+    @Test
+    void myMealReviewFallsBackToLegacyRatingWhenMainRatingIsMissing() {
+        Menu menu = mock(Menu.class);
+        given(menu.getId()).willReturn(2L);
+        given(menu.getName()).willReturn("샐러드");
+        Ratings ratingsWithoutMain = mock(Ratings.class);
+        given(ratingsWithoutMain.getMainRating()).willReturn(null);
+        Review review = Review.builder().menu(menu).ratings(ratingsWithoutMain).rating(3)
+                .reviewImages(List.of()).menuLikes(List.of()).build();
+        ReflectionTestUtils.setField(review, "createdDate", LocalDateTime.of(2026, 9, 1, 11, 0));
+
+        assertThat(MyMealReviewResponse.from(review).getRating()).isEqualTo(3);
+    }
+
+    @Test
+    void myMealReviewExcludesFilteredMenuNamesFromMealMenuList() {
+        Menu excluded = mock(Menu.class);
+        given(excluded.getId()).willReturn(1L);
+        given(excluded.getName()).willReturn("쌀밥");
+        Meal meal = mock(Meal.class);
+        given(meal.getMenus()).willReturn(List.of(excluded));
+        Review review = Review.builder().meal(meal).rating(4).reviewImages(List.of()).menuLikes(List.of()).build();
+        ReflectionTestUtils.setField(review, "createdDate", LocalDateTime.of(2026, 9, 1, 11, 0));
+
+        assertThat(MyMealReviewResponse.from(review).getMenuList()).isEmpty();
     }
 }

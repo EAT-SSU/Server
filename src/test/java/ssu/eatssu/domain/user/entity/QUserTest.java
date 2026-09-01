@@ -43,4 +43,11 @@ class QUserTest {
         assertThat(new QUser(metadata, PathInits.DIRECT2).getType()).isEqualTo(User.class);
         assertThat(new QUser(User.class, metadata, PathInits.DIRECT2).getType()).isEqualTo(User.class);
     }
+
+    @Test
+    void pathInitsDefaultLeavesDepartmentUninitialized() {
+        QUser query = new QUser(QUser.user.getMetadata(), PathInits.DEFAULT);
+
+        assertThat(query.department).isNull();
+    }
 }

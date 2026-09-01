@@ -28,6 +28,17 @@ class UserProfileResponseTest {
     }
 
     @Test
+    void departmentResponseUsesKoreanByDefault() {
+        Department department = mock(Department.class);
+        given(department.getId()).willReturn(1L);
+        given(department.getNameByLanguage(Language.KO)).willReturn("컴퓨터학부");
+
+        DepartmentResponse response = DepartmentResponse.from(department);
+
+        assertThat(response.departmentName()).isEqualTo("컴퓨터학부");
+    }
+
+    @Test
     void myPageResponseMapsUserDepartmentAndCollege() {
         User user = mock(User.class);
         Department department = mock(Department.class);
@@ -48,6 +59,33 @@ class UserProfileResponseTest {
         assertThat(response.getDepartmentName()).isEqualTo("Computer Science");
         assertThat(response.getCollegeName()).isEqualTo("IT College");
         assertThat(MyPageResponse.from(null).getNickname()).isNull();
+    }
+
+    @Test
+    void myPageResponseHandlesMissingDepartmentAndCollege() {
+        User user = mock(User.class);
+        given(user.getNickname()).willReturn("닉네임");
+        given(user.getDepartment()).willReturn(null);
+
+        MyPageResponse response = MyPageResponse.from(user);
+
+        assertThat(response.getDepartmentId()).isNull();
+        assertThat(response.getCollegeId()).isNull();
+    }
+
+    @Test
+    void myPageResponseHandlesDepartmentWithoutCollege() {
+        User user = mock(User.class);
+        Department department = mock(Department.class);
+        given(user.getDepartment()).willReturn(department);
+        given(department.getId()).willReturn(1L);
+        given(department.getCollege()).willReturn(null);
+
+        MyPageResponse response = MyPageResponse.from(user);
+
+        assertThat(response.getDepartmentId()).isEqualTo(1L);
+        assertThat(response.getCollegeId()).isNull();
+        assertThat(response.getCollegeName()).isNull();
     }
 
     @Test

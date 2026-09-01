@@ -32,4 +32,11 @@ class QDepartmentTest {
         assertThat(new QDepartment(metadata, PathInits.DIRECT2).getType()).isEqualTo(Department.class);
         assertThat(new QDepartment(Department.class, metadata, PathInits.DIRECT2).getType()).isEqualTo(Department.class);
     }
+
+    @Test
+    void pathInitsDefaultLeavesCollegeUninitialized() {
+        QDepartment query = new QDepartment(QDepartment.department.getMetadata(), PathInits.DEFAULT);
+
+        assertThat(query.college).isNull();
+    }
 }
