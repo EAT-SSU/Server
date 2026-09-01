@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
+import ssu.eatssu.domain.menu.entity.Meal;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.entity.constants.MenuType;
 import ssu.eatssu.domain.menu.persistence.MealRepository;
@@ -56,10 +57,71 @@ class SliceServiceTest {
     }
 
     @Test
+    void findReviewsThrowsWhenFixedMenuDoesNotExist() {
+        given(menuRepository.findById(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sliceService.findReviews(MenuType.FIXED, 1L, null, PAGEABLE, null, null))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
     void findReviewsThrowsWhenVariableMealDoesNotExist() {
         given(mealRepository.findById(2L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> sliceService.findReviews(MenuType.VARIABLE, null, 2L, PAGEABLE, null, null))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void findReviewsReturnsSliceForVariableMealWithLoggedInUser() {
+        Meal meal = org.mockito.Mockito.mock(Meal.class);
+        given(mealRepository.findById(2L)).willReturn(Optional.of(meal));
+        given(reviewRepository.findAllByMealOrderByIdDesc(meal, null, PAGEABLE))
+                .willReturn(new SliceImpl<>(List.of(), PAGEABLE, false));
+
+        SliceResponse<?> response = sliceService.findReviews(MenuType.VARIABLE, null, 2L, PAGEABLE, null, userDetails());
+
+        assertThat(response.getDataList()).isEmpty();
+    }
+
+    @Test
+    void findReviewsV1ReturnsSliceForFixedMenu() {
+        Menu menu = org.mockito.Mockito.mock(Menu.class);
+        given(menuRepository.findById(1L)).willReturn(Optional.of(menu));
+        given(reviewRepository.findAllByMenuOrderByIdDesc(menu, null, PAGEABLE))
+                .willReturn(new SliceImpl<>(List.of(), PAGEABLE, false));
+
+        SliceResponse<?> response = sliceService.findReviewsV1(MenuType.FIXED, 1L, null, PAGEABLE, null, null);
+
+        assertThat(response.getDataList()).isEmpty();
+    }
+
+    @Test
+    void findReviewsV1ThrowsWhenFixedMenuDoesNotExist() {
+        given(menuRepository.findById(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sliceService.findReviewsV1(MenuType.FIXED, 1L, null, PAGEABLE, null, null))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void findReviewsV1ReturnsSliceForVariableMealWithLoggedInUser() {
+        Meal meal = org.mockito.Mockito.mock(Meal.class);
+        given(mealRepository.findById(2L)).willReturn(Optional.of(meal));
+        given(reviewRepository.findAllByMealOrderByIdDesc(meal, null, PAGEABLE))
+                .willReturn(new SliceImpl<>(List.of(), PAGEABLE, false));
+
+        SliceResponse<?> response = sliceService.findReviewsV1(MenuType.VARIABLE, null, 2L, PAGEABLE, null,
+                                                                userDetails());
+
+        assertThat(response.getDataList()).isEmpty();
+    }
+
+    @Test
+    void findReviewsV1ThrowsWhenVariableMealDoesNotExist() {
+        given(mealRepository.findById(2L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> sliceService.findReviewsV1(MenuType.VARIABLE, null, 2L, PAGEABLE, null, null))
                 .isInstanceOf(BaseException.class);
     }
 
