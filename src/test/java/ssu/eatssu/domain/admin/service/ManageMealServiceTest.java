@@ -1,8 +1,10 @@
 package ssu.eatssu.domain.admin.service;
 
 import org.junit.jupiter.api.Test;
+import ssu.eatssu.domain.admin.dto.BriefMenu;
 import ssu.eatssu.domain.admin.dto.MealInfo;
 import ssu.eatssu.domain.admin.dto.request.RegisterMealRequest;
+import ssu.eatssu.domain.admin.dto.response.MenuBoards;
 import ssu.eatssu.domain.admin.persistence.LoadMealRepository;
 import ssu.eatssu.domain.admin.persistence.ManageMealMenuRepository;
 import ssu.eatssu.domain.admin.persistence.ManageMealRepository;
@@ -18,8 +20,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -109,5 +113,29 @@ class ManageMealServiceTest {
         service.register(MEAL_INFO, new RegisterMealRequest(new ArrayList<>(List.of("돈까스"))));
 
         verify(mealMenuRepository).save(any(MealMenu.class));
+    }
+
+    @Test
+    void getMenuBoardsBuildsBoardsWithMenuLinesForEachVariableRestaurant() {
+        LoadMealRepository loader = mock(LoadMealRepository.class);
+        MenuRatingRepository ratingRepository = mock(MenuRatingRepository.class);
+        Date date = new Date();
+        MealInfo dodamInfo = new MealInfo(Restaurant.DODAM, date, TimePart.LUNCH);
+        given(loader.getAllMealIdsByInfo(any(MealInfo.class))).willReturn(List.of());
+        given(loader.getAllMealIdsByInfo(dodamInfo)).willReturn(List.of(1L));
+        given(loader.findBriefMenusByMealId(1L)).willReturn(List.of(new BriefMenu(10L, "제육볶음", 5000)));
+        given(ratingRepository.getMainRatingAverage(10L)).willReturn(4.5);
+        ManageMealService service = new ManageMealService(loader, ratingRepository, mock(ManageMealRepository.class),
+                                                           mock(ManageMealMenuRepository.class),
+                                                           mock(ManageMenuRepository.class));
+
+        MenuBoards boards = service.getMenuBoards(date, TimePart.LUNCH);
+
+        assertThat(boards.menuBoards()).hasSize(3);
+        assertThat(boards.menuBoards()).anySatisfy(board -> {
+            if (board.restaurantName().equals(Restaurant.DODAM.getRestaurantName())) {
+                assertThat(board.sections()).hasSize(1);
+            }
+        });
     }
 }

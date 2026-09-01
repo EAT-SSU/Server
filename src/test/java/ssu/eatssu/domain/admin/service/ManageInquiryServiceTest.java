@@ -1,7 +1,11 @@
 package ssu.eatssu.domain.admin.service;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import ssu.eatssu.domain.admin.dto.request.UpdateStatusRequest;
+import ssu.eatssu.domain.admin.dto.response.PageWrapper;
+import ssu.eatssu.domain.admin.dto.response.InquiryLine;
 import ssu.eatssu.domain.admin.persistence.LoadInquiryRepository;
 import ssu.eatssu.domain.admin.persistence.ManageInquiryRepository;
 import ssu.eatssu.domain.inquiry.entity.Inquiry;
@@ -39,5 +43,30 @@ class ManageInquiryServiceTest {
 
         assertThatThrownBy(() -> service.updateStatus(1L, new UpdateStatusRequest(InquiryStatus.ANSWERED)))
                 .isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void getInquiryBoardReturnsPagedInquiryLines() {
+        LoadInquiryRepository loadRepository = mock(LoadInquiryRepository.class);
+        Inquiry inquiry = Inquiry.builder().id(1L).email("test@test.com").content("문의").status(InquiryStatus.WAITING)
+                                 .build();
+        PageRequest pageable = PageRequest.of(0, 20);
+        given(loadRepository.findAllInquiries(pageable)).willReturn(new PageImpl<>(java.util.List.of(inquiry), pageable, 1));
+        ManageInquiryService service = new ManageInquiryService(loadRepository, mock(ManageInquiryRepository.class));
+
+        PageWrapper<InquiryLine> result = service.getInquiryBoard(pageable);
+
+        assertThat(result.content()).extracting(InquiryLine::inquiryId).containsExactly(1L);
+        assertThat(result.totalElements()).isEqualTo(1);
+    }
+
+    @Test
+    void deleteRemovesInquiryById() {
+        ManageInquiryRepository repository = mock(ManageInquiryRepository.class);
+        ManageInquiryService service = new ManageInquiryService(mock(LoadInquiryRepository.class), repository);
+
+        service.delete(1L);
+
+        verify(repository).deleteById(1L);
     }
 }
