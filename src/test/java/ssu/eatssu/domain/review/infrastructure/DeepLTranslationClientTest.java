@@ -3,8 +3,10 @@ package ssu.eatssu.domain.review.infrastructure;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -58,6 +60,30 @@ class DeepLTranslationClientTest {
 
         given(restTemplate.postForObject(any(String.class), any(), eq(DeepLTranslateResponse.class)))
                 .willThrow(new RestClientException("failed"));
+        assertThatThrownBy(() -> client.translate("안녕", Language.EN)).isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void rejectsWhenTranslationsListIsEmpty() {
+        given(restTemplate.postForObject(any(String.class), any(), eq(DeepLTranslateResponse.class)))
+                .willReturn(new DeepLTranslateResponse(List.of()));
+
+        assertThatThrownBy(() -> client.translate("안녕", Language.EN)).isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void mapsQuotaExceededStatus456ToQuotaException() {
+        given(restTemplate.postForObject(any(String.class), any(), eq(DeepLTranslateResponse.class)))
+                .willThrow(HttpClientErrorException.create(HttpStatusCode.valueOf(456), "quota", null, null, null));
+
+        assertThatThrownBy(() -> client.translate("안녕", Language.EN)).isInstanceOf(BaseException.class);
+    }
+
+    @Test
+    void mapsHttpServerErrorExceptionToTranslationFailed() {
+        given(restTemplate.postForObject(any(String.class), any(), eq(DeepLTranslateResponse.class)))
+                .willThrow(HttpServerErrorException.create(HttpStatus.INTERNAL_SERVER_ERROR, "error", null, null, null));
+
         assertThatThrownBy(() -> client.translate("안녕", Language.EN)).isInstanceOf(BaseException.class);
     }
 

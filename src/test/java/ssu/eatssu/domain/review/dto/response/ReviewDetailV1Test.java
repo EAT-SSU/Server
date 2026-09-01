@@ -46,6 +46,23 @@ class ReviewDetailV1Test {
     }
 
     @Test
+    void marksOtherUsersReviewAsNotWriter() {
+        Menu menu = Menu.createVariable("돈가스", Restaurant.DODAM);
+        User writer = mock(User.class);
+        given(writer.getId()).willReturn(7L);
+        given(writer.getNickname()).willReturn("먹방러");
+        Review review = Review.builder().id(3L).menu(menu).user(writer).ratings(Ratings.of(5, 4, 3))
+                .content("맛있어요").reviewImages(List.of()).build();
+        ReflectionTestUtils.setField(review, "createdDate", LocalDateTime.of(2026, 9, 1, 10, 0));
+
+        ReviewDetailV1 response = ReviewDetailV1.from(review, 99L);
+
+        assertThat(response.getWriterId()).isEqualTo(7L);
+        assertThat(response.getWriterNickname()).isEqualTo("먹방러");
+        assertThat(response.getIsWriter()).isFalse();
+    }
+
+    @Test
     void marksAnonymousWriter() {
         Menu menu = Menu.createVariable("샐러드", Restaurant.DODAM);
         Review review = Review.builder().menu(menu).ratings(Ratings.of(2, null, null)).reviewImages(List.of()).build();

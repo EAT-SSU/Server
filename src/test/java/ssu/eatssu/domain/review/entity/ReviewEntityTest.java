@@ -6,6 +6,9 @@ import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.rating.entity.Ratings;
 import ssu.eatssu.domain.rating.entity.ReviewRating;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
+import ssu.eatssu.domain.user.entity.User;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,6 +45,76 @@ class ReviewEntityTest {
 
         assertThat(menu.getLikeCount()).isZero();
         assertThat(review.getMenuLikes()).isEmpty();
+    }
+
+    @Test
+    void isNotWrittenByDistinguishesAuthor() {
+        User author = org.mockito.Mockito.mock(User.class);
+        User other = org.mockito.Mockito.mock(User.class);
+        Review review = Review.builder().user(author).build();
+
+        assertThat(review.isNotWrittenBy(author)).isFalse();
+        assertThat(review.isNotWrittenBy(other)).isTrue();
+    }
+
+    @Test
+    void clearUserRemovesAuthor() {
+        User author = org.mockito.Mockito.mock(User.class);
+        Review review = Review.builder().user(author).build();
+
+        review.clearUser();
+
+        assertThat(review.getUser()).isNull();
+    }
+
+    @Test
+    void addReviewImageAppendsImageLinkedToReview() {
+        Review review = Review.builder().build();
+
+        review.addReviewImage("https://cdn.example/review.jpg");
+
+        assertThat(review.getReviewImages()).hasSize(1);
+        assertThat(review.getReviewImages().get(0).getImageUrl()).isEqualTo("https://cdn.example/review.jpg");
+        assertThat(review.getReviewImages().get(0).getReview()).isSameAs(review);
+    }
+
+    @Test
+    void v2UpdateAddsNewMenuLikeWhenNoneExists() {
+        Menu menu = Menu.createVariable("메뉴", Restaurant.DODAM);
+        Review review = Review.builder().build();
+
+        review.update("맛있어요", 5, Map.of(menu, true));
+
+        assertThat(review.getContent()).isEqualTo("맛있어요");
+        assertThat(review.getRating()).isEqualTo(5);
+        assertThat(review.getMenuLikes()).hasSize(1);
+        assertThat(menu.getLikeCount()).isEqualTo(1);
+    }
+
+    @Test
+    void v2UpdateChangesExistingMenuLikeWhenStateDiffers() {
+        Menu menu = Menu.createVariable("메뉴", Restaurant.DODAM);
+        Review review = Review.builder().build();
+        review.addReviewMenuLike(menu, true);
+
+        review.update("변경", 4, Map.of(menu, false));
+
+        assertThat(review.getMenuLikes()).hasSize(1);
+        assertThat(review.getMenuLikes().get(0).getIsLike()).isFalse();
+        assertThat(menu.getLikeCount()).isZero();
+    }
+
+    @Test
+    void v2UpdateKeepsExistingMenuLikeWhenStateUnchanged() {
+        Menu menu = Menu.createVariable("메뉴", Restaurant.DODAM);
+        Review review = Review.builder().build();
+        review.addReviewMenuLike(menu, true);
+
+        review.update("동일", 4, Map.of(menu, true));
+
+        assertThat(review.getMenuLikes()).hasSize(1);
+        assertThat(review.getMenuLikes().get(0).getIsLike()).isTrue();
+        assertThat(menu.getLikeCount()).isEqualTo(1);
     }
 
     @Test
