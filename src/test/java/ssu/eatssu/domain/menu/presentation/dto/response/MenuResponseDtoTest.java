@@ -24,8 +24,13 @@ class MenuResponseDtoTest {
 
         assertThat(translated.getName()).isEqualTo("Pork cutlet");
         assertThat(translated.isMain()).isTrue();
+        assertThat(translated.getMenuId()).isEqualTo(1L);
         assertThat(original.getName()).isEqualTo("돈가스");
         assertThat(original.isMain()).isFalse();
+
+        BriefMenuResponse withoutTranslations = new BriefMenuResponse(menu);
+        assertThat(withoutTranslations.getName()).isEqualTo("돈가스");
+        assertThat(withoutTranslations.isMain()).isFalse();
     }
 
     @Test
@@ -44,6 +49,8 @@ class MenuResponseDtoTest {
         assertThat(response.getName()).isEqualTo("Pork cutlet");
         assertThat(response.getPrice()).isEqualTo(6000);
         assertThat(response.getRating()).isEqualTo(4.5);
+        assertThat(category.getCategory()).isEqualTo("한식");
+        assertThat(category.getMenus()).containsExactly(response);
         assertThat(restaurant.getCategoryMenuListCollection()).containsExactly(category, category);
     }
 
@@ -56,5 +63,7 @@ class MenuResponseDtoTest {
         MenusInMealResponse response = MenusInMealResponse.from(List.of(menu), Map.of());
 
         assertThat(response.getBriefMenus()).extracting(BriefMenuResponse::getName).containsExactly("라면");
+        assertThat(new MenusInMealResponse().getBriefMenus()).isNull();
+        assertThat(new MealDetailResponse().getMealId()).isNull();
     }
 }
