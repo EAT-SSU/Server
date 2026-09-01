@@ -28,6 +28,7 @@ class PartnershipSupportEntityTest {
         ReflectionTestUtils.setField(restaurant, "restaurantType", RestaurantType.RESTAURANT);
         ReflectionTestUtils.setField(restaurant, "longitude", 126.9576);
         ReflectionTestUtils.setField(restaurant, "latitude", 37.4963);
+        ReflectionTestUtils.setField(restaurant, "storeNameKo", "테스트 가게");
         ReflectionTestUtils.setField(restaurant, "storeNameEn", "Test Store");
         ReflectionTestUtils.setField(restaurant, "storeNameJa", "テストストア");
         ReflectionTestUtils.setField(restaurant, "storeNameVi", "Cửa hàng thử nghiệm");
@@ -38,6 +39,7 @@ class PartnershipSupportEntityTest {
         assertThat(restaurant.getRestaurantType()).isEqualTo(RestaurantType.RESTAURANT);
         assertThat(restaurant.getLongitude()).isEqualTo(126.9576);
         assertThat(restaurant.getLatitude()).isEqualTo(37.4963);
+        assertThat(restaurant.getStoreNameKo()).isEqualTo("테스트 가게");
         assertThat(restaurant.getStoreNameEn()).isEqualTo("Test Store");
         assertThat(restaurant.getStoreNameJa()).isEqualTo("テストストア");
         assertThat(restaurant.getStoreNameVi()).isEqualTo("Cửa hàng thử nghiệm");

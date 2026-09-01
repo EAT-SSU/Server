@@ -79,4 +79,18 @@ class PartnershipQuerydslTest {
                 .isEqualTo(PartnershipRestaurant.class);
         assertThat(new QPartnershipRestaurant(restaurantMetadata).getType()).isEqualTo(PartnershipRestaurant.class);
     }
+
+    @Test
+    void associationFieldsAreNullWhenNotInitialized() {
+        PathMetadata partnershipMetadata = QPartnership.partnership.getMetadata();
+        QPartnership uninitializedPartnership = new QPartnership(partnershipMetadata, PathInits.DEFAULT);
+        assertThat(uninitializedPartnership.partnershipCollege).isNull();
+        assertThat(uninitializedPartnership.partnershipDepartment).isNull();
+        assertThat(uninitializedPartnership.partnershipRestaurant).isNull();
+
+        PathMetadata likeMetadata = QPartnershipLike.partnershipLike.getMetadata();
+        QPartnershipLike uninitializedLike = new QPartnershipLike(likeMetadata, PathInits.DEFAULT);
+        assertThat(uninitializedLike.partnershipRestaurant).isNull();
+        assertThat(uninitializedLike.user).isNull();
+    }
 }

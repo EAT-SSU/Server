@@ -180,6 +180,40 @@ class PartnershipServiceTest {
         assertThat(result).hasSize(1);
     }
 
+    @Test
+    void getAllPartnershipsReturnsResponsesForEveryRestaurant() {
+        User user = org.mockito.Mockito.mock(User.class);
+        PartnershipRestaurant restaurant = org.mockito.Mockito.mock(PartnershipRestaurant.class);
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(user.getLanguage()).willReturn(Language.KO);
+        given(restaurant.getLikes()).willReturn(new ArrayList<>());
+        given(restaurant.getPartnerships()).willReturn(new ArrayList<>());
+        given(partnershipRestaurantRepository.findAllWithDetails()).willReturn(List.of(restaurant));
+
+        List<?> result = partnershipService.getAllPartnerships(userDetails());
+
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void getUserLikedPartnershipsReturnsResponsePerLikedPartnership() {
+        User user = org.mockito.Mockito.mock(User.class);
+        PartnershipRestaurant restaurant = org.mockito.Mockito.mock(PartnershipRestaurant.class);
+        Partnership partnership = org.mockito.Mockito.mock(Partnership.class);
+        ssu.eatssu.domain.partnership.entity.PartnershipLike like =
+                org.mockito.Mockito.mock(ssu.eatssu.domain.partnership.entity.PartnershipLike.class);
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(user.getLanguage()).willReturn(Language.KO);
+        given(like.getPartnershipRestaurant()).willReturn(restaurant);
+        given(restaurant.getLikes()).willReturn(new ArrayList<>());
+        given(restaurant.getPartnerships()).willReturn(List.of(partnership));
+        given(partnershipLikeRepository.findAllByUserWithDetails(user)).willReturn(List.of(like));
+
+        List<?> result = partnershipService.getUserLikedPartnerships(userDetails());
+
+        assertThat(result).hasSize(1);
+    }
+
     private CreatePartnershipRequest request() {
         return new CreatePartnershipRequest(1L, "IT대", "컴퓨터학부", "10% 할인", LocalDate.now(), LocalDate.now());
     }

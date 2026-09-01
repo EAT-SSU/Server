@@ -3,11 +3,14 @@ package ssu.eatssu.domain.partnership.dto.response;
 import org.junit.jupiter.api.Test;
 import ssu.eatssu.domain.partnership.entity.Partnership;
 import ssu.eatssu.domain.partnership.entity.PartnershipRestaurant;
+import ssu.eatssu.domain.partnership.entity.PartnershipLike;
 import ssu.eatssu.domain.partnership.entity.PeriodType;
+import ssu.eatssu.domain.user.department.entity.College;
 import ssu.eatssu.domain.user.department.entity.Department;
 import ssu.eatssu.domain.user.entity.Language;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -54,5 +57,21 @@ class PartnershipInfoTest {
         assertThat(response.getCollegeName()).isNull();
         assertThat(response.getDepartmentName()).isEqualTo("컴퓨터학부");
         assertThat(response.getIsLiked()).isTrue();
+    }
+
+    @Test
+    void fromEntityMapsCollegeOnlyAffiliationAndCountsLikes() {
+        Partnership partnership = mock(Partnership.class);
+        PartnershipRestaurant restaurant = mock(PartnershipRestaurant.class);
+        College college = mock(College.class);
+        given(partnership.getPartnershipCollege()).willReturn(college);
+        given(college.getName()).willReturn("IT대학");
+        given(restaurant.getLikes()).willReturn(List.of(mock(PartnershipLike.class), mock(PartnershipLike.class)));
+
+        PartnershipInfo response = PartnershipInfo.fromEntity(partnership, restaurant, false, Language.KO);
+
+        assertThat(response.getCollegeName()).isEqualTo("IT대학");
+        assertThat(response.getDepartmentName()).isNull();
+        assertThat(response.getLikeCount()).isEqualTo(2);
     }
 }
