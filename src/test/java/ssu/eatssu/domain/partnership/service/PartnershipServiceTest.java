@@ -28,11 +28,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -196,22 +198,124 @@ class PartnershipServiceTest {
     }
 
     @Test
-    void getUserLikedPartnershipsReturnsResponsePerLikedPartnership() {
+    void getUserLikedPartnershipsExcludesRestaurantsNotVisibleInCurrentDepartment() {
+        // given
         User user = org.mockito.Mockito.mock(User.class);
-        PartnershipRestaurant restaurant = org.mockito.Mockito.mock(PartnershipRestaurant.class);
-        Partnership partnership = org.mockito.Mockito.mock(Partnership.class);
-        ssu.eatssu.domain.partnership.entity.PartnershipLike like =
-                org.mockito.Mockito.mock(ssu.eatssu.domain.partnership.entity.PartnershipLike.class);
+        Department department = org.mockito.Mockito.mock(Department.class);
+        College college = org.mockito.Mockito.mock(College.class);
+        PartnershipRestaurant sharedRestaurant = restaurantOf(1L);
+        stubResponseFields(sharedRestaurant);
         given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(user.getDepartment()).willReturn(department);
         given(user.getLanguage()).willReturn(Language.KO);
-        given(like.getPartnershipRestaurant()).willReturn(restaurant);
-        given(restaurant.getLikes()).willReturn(new ArrayList<>());
-        given(restaurant.getPartnerships()).willReturn(List.of(partnership));
-        given(partnershipLikeRepository.findAllByUserWithDetails(user)).willReturn(List.of(like));
+        given(department.getCollege()).willReturn(college);
+        given(partnershipLikeRepository.findLikedRestaurantIdsByUser(user)).willReturn(Set.of(1L, 2L));
+        given(partnershipRepository.findRestaurantsWithMyPartnerships(college, department))
+                .willReturn(List.of(sharedRestaurant));
 
+        // when
         List<?> result = partnershipService.getUserLikedPartnerships(userDetails());
 
+        // then
         assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void getUserLikedPartnershipsRestoresHiddenRestaurantsWhenDepartmentIsChangedBack() {
+        // given
+        User user = org.mockito.Mockito.mock(User.class);
+        Department department = org.mockito.Mockito.mock(Department.class);
+        College college = org.mockito.Mockito.mock(College.class);
+        PartnershipRestaurant sharedRestaurant = restaurantOf(1L);
+        PartnershipRestaurant previousDepartmentRestaurant = restaurantOf(2L);
+        stubResponseFields(sharedRestaurant);
+        stubResponseFields(previousDepartmentRestaurant);
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(user.getDepartment()).willReturn(department);
+        given(user.getLanguage()).willReturn(Language.KO);
+        given(department.getCollege()).willReturn(college);
+        given(partnershipLikeRepository.findLikedRestaurantIdsByUser(user)).willReturn(Set.of(1L, 2L));
+        given(partnershipRepository.findRestaurantsWithMyPartnerships(college, department))
+                .willReturn(List.of(sharedRestaurant, previousDepartmentRestaurant));
+
+        // when
+        List<?> result = partnershipService.getUserLikedPartnerships(userDetails());
+
+        // then
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    void getUserLikedPartnershipsReturnsGeneralPartnershipsWhenDepartmentIsMissing() {
+        // given
+        User user = org.mockito.Mockito.mock(User.class);
+        PartnershipRestaurant generalRestaurant = restaurantOf(3L);
+        stubResponseFields(generalRestaurant);
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(user.getDepartment()).willReturn(null);
+        given(user.getLanguage()).willReturn(Language.KO);
+        given(partnershipLikeRepository.findLikedRestaurantIdsByUser(user)).willReturn(Set.of(3L));
+        given(partnershipRepository.findRestaurantsWithMyPartnerships(null, null))
+                .willReturn(List.of(generalRestaurant));
+
+        // when
+        List<?> result = partnershipService.getUserLikedPartnerships(userDetails());
+
+        // then
+        assertThat(result).hasSize(1);
+        verify(partnershipRepository).findRestaurantsWithMyPartnerships(null, null);
+    }
+
+    @Test
+    void getUserLikedPartnershipsReturnsEmptyWithoutQueryingVisibleRestaurantsWhenNoLikeExists() {
+        // given
+        User user = org.mockito.Mockito.mock(User.class);
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(partnershipLikeRepository.findLikedRestaurantIdsByUser(user)).willReturn(Set.of());
+
+        // when
+        List<?> result = partnershipService.getUserLikedPartnerships(userDetails());
+
+        // then
+        assertThat(result).isEmpty();
+        verify(partnershipRepository, never()).findRestaurantsWithMyPartnerships(any(), any());
+    }
+
+    @Test
+    void getUserLikedPartnershipsReturnsSingleResponsePerRestaurantRegardlessOfPartnershipCount() {
+        // given
+        User user = org.mockito.Mockito.mock(User.class);
+        Department department = org.mockito.Mockito.mock(Department.class);
+        College college = org.mockito.Mockito.mock(College.class);
+        PartnershipRestaurant restaurant = restaurantOf(1L);
+        given(restaurant.getLikes()).willReturn(new ArrayList<>());
+        given(restaurant.getPartnerships()).willReturn(List.of(
+                org.mockito.Mockito.mock(Partnership.class),
+                org.mockito.Mockito.mock(Partnership.class)));
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(user.getDepartment()).willReturn(department);
+        given(user.getLanguage()).willReturn(Language.KO);
+        given(department.getCollege()).willReturn(college);
+        given(partnershipLikeRepository.findLikedRestaurantIdsByUser(user)).willReturn(Set.of(1L));
+        given(partnershipRepository.findRestaurantsWithMyPartnerships(college, department))
+                .willReturn(List.of(restaurant));
+
+        // when
+        List<?> result = partnershipService.getUserLikedPartnerships(userDetails());
+
+        // then
+        assertThat(result).hasSize(1);
+    }
+
+    private PartnershipRestaurant restaurantOf(Long id) {
+        PartnershipRestaurant restaurant = org.mockito.Mockito.mock(PartnershipRestaurant.class);
+        given(restaurant.getId()).willReturn(id);
+        return restaurant;
+    }
+
+    private void stubResponseFields(PartnershipRestaurant restaurant) {
+        given(restaurant.getLikes()).willReturn(new ArrayList<>());
+        given(restaurant.getPartnerships()).willReturn(new ArrayList<>());
     }
 
     private CreatePartnershipRequest request() {

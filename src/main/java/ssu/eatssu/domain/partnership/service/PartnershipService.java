@@ -26,6 +26,7 @@ import ssu.eatssu.global.log.event.LogEvent;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.MISSING_USER_DEPARTMENT;
@@ -106,36 +107,39 @@ public class PartnershipService {
     public List<PartnershipResponse> getUserLikedPartnerships(CustomUserDetails customUserDetails) {
         User user = findUserByUserDetails(customUserDetails);
 
-        List<PartnershipLike> likes = partnershipLikeRepository.findAllByUserWithDetails(user);
+        Set<Long> likedRestaurantIds = partnershipLikeRepository.findLikedRestaurantIdsByUser(user);
+        if (likedRestaurantIds.isEmpty()) {
+            return List.of();
+        }
 
-        return likes.stream()
-                    .flatMap(like -> {
-                        PartnershipRestaurant restaurant = like.getPartnershipRestaurant();
-                        return restaurant.getPartnerships()
-                                         .stream()
-                                         .map(partnership -> PartnershipResponse.fromEntity(restaurant,
-                                                                                            customUserDetails.getId(),
-                                                                                            user.getLanguage()));
-                    }).collect(Collectors.toList());
+        return findVisibleRestaurants(user).stream()
+                                           .filter(restaurant -> likedRestaurantIds.contains(restaurant.getId()))
+                                           .map(restaurant -> PartnershipResponse.fromEntity(restaurant,
+                                                                                             customUserDetails.getId(),
+                                                                                             user.getLanguage()))
+                                           .collect(Collectors.toList());
     }
 
 
     public List<PartnershipResponse> getUserDepartmentPartnerships(CustomUserDetails customUserDetails) {
         User user = findUserByUserDetails(customUserDetails);
 
-        Department department = user.getDepartment();
-        if (department == null) {
+        if (user.getDepartment() == null) {
             throw new BaseException(MISSING_USER_DEPARTMENT);
         }
-        College college = department.getCollege();
 
-        return partnershipRepository
-                .findRestaurantsWithMyPartnerships(college, department)
-                .stream()
-                .map(partnershipRestaurant -> PartnershipResponse.fromEntity(partnershipRestaurant,
-                                                                             customUserDetails.getId(),
-                                                                             user.getLanguage()))
-                .collect(Collectors.toList());
+        return findVisibleRestaurants(user).stream()
+                                           .map(restaurant -> PartnershipResponse.fromEntity(restaurant,
+                                                                                             customUserDetails.getId(),
+                                                                                             user.getLanguage()))
+                                           .collect(Collectors.toList());
+    }
+
+    private List<PartnershipRestaurant> findVisibleRestaurants(User user) {
+        Department department = user.getDepartment();
+        College college = department == null ? null : department.getCollege();
+
+        return partnershipRepository.findRestaurantsWithMyPartnerships(college, department);
     }
 
     private User findUserByUserDetails(CustomUserDetails userDetails) {
