@@ -40,12 +40,27 @@ class UserServiceBranchTest {
         College college = mock(College.class);
         when(college.getId()).thenReturn(1L);
         when(college.getNameByLanguage(Language.KO)).thenReturn("숭실대학교");
-        when(collegeRepository.findAll()).thenReturn(List.of(college));
+        when(collegeRepository.findAllByNameKoNot("총학생회")).thenReturn(List.of(college));
 
         var response = service(mock(UserRepository.class), mock(DepartmentRepository.class), collegeRepository,
                                mock(ApplicationEventPublisher.class)).getCollegeList(null);
 
         assertThat(response).extracting("name").containsExactly("숭실대학교");
+    }
+
+    @Test
+    void 대학_목록에서_총학생회는_제외된다() {
+        CollegeRepository collegeRepository = mock(CollegeRepository.class);
+        College college = mock(College.class);
+        when(college.getId()).thenReturn(1L);
+        when(college.getNameByLanguage(Language.KO)).thenReturn("숭실대학교");
+        when(collegeRepository.findAllByNameKoNot("총학생회")).thenReturn(List.of(college));
+
+        var response = service(mock(UserRepository.class), mock(DepartmentRepository.class), collegeRepository,
+                               mock(ApplicationEventPublisher.class)).getCollegeList(null);
+
+        assertThat(response).extracting("name").doesNotContain("총학생회");
+        verify(collegeRepository).findAllByNameKoNot("총학생회");
     }
 
     @Test
