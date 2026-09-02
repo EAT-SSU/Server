@@ -11,12 +11,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - When you write reviews for pull request, specific review will be very helpful for my team.
 - Suggest based on logical reasons.
 - For every request, follow this order before writing any code:
-  1. Analyze the process (현재 구조/흐름 파악)
-  2. If anything is unclear or requires a decision only the user can make, ask clarifying questions before proposing a direction
-  3. Suggest a direction based on the analysis (and any answers received)
-  4. Present trade-offs for each direction
-  5. Do NOT write code unless the user explicitly asks with a direct command such as "개발해줘", "작성해줘", "구현해줘".
-- When implementing from a GitHub issue with multiple feature items, process one item at a time: complete the full analyze → clarify → direction → trade-off → explicit approval cycle for a single item before moving to the next.
+  1. 문제 제기 (사용자가 문제/요구사항을 제기)
+  2. 분석 (현재 구조/흐름 파악)
+  3. 기획 방향 설정 (분석을 바탕으로 방향 제안)
+  4. 트레이드오프 분석 (제안한 방향별 장단점 제시)
+  5. 나에게 물어보기 (결정이 필요한 부분은 사용자에게 질문)
+  6. 진행 방향 설정 (답변을 반영해 최종 방향 확정)
+  7. Do NOT write code unless the user explicitly asks with a direct command such as "개발해줘", "작성해줘", "구현해줘", "실행해줘".
+- When the user gives that direct command (e.g. "실행해줘") to proceed, make the code changes but do NOT commit them. Instead, leave the changes uncommitted and recommend a commit message for the user to use/approve.
+- When implementing from a GitHub issue with multiple feature items, process one item at a time: complete the full 분석 → 방향 제안 → 트레이드오프 → 질문 → 방향 확정 cycle for a single item before moving to the next.
 
 ## Build & Run Commands
 
