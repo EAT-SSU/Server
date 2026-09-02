@@ -83,4 +83,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 90
           min-coverage-changed-files: 90
-          title: 커버리지 리포트
+          title: 📊 테스트 커버리지 리포트
