@@ -66,3 +66,10 @@ jobs:
         with:
           name: test-results
           path: build/reports/tests/test
+
+      - name: 커버리지 리포트 업로드
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/test
