@@ -22,6 +22,11 @@ class PartnershipResponseTest {
         // then
         assertThat(response.getNaverMapUrl()).isEqualTo("https://map.naver.com/p/example");
         assertThat(response.getKakaoMapUrl()).isEqualTo("https://map.kakao.com/link/map/example");
+        assertThat(response.getStoreName()).isEqualTo("테스트 가게");
+        assertThat(response.getLongitude()).isEqualTo(126.9576);
+        assertThat(response.getLatitude()).isEqualTo(37.4963);
+        assertThat(response.getRestaurantType()).isEqualTo(RestaurantType.RESTAURANT);
+        assertThat(response.getPartnershipInfos()).isEmpty();
     }
 
     @Test

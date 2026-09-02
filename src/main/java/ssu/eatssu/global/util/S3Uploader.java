@@ -57,7 +57,7 @@ public class S3Uploader {
     private Optional<File> convert(MultipartFile file) throws IOException {
         String formatedNow = LocalDateTime.now()
                                           .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        File convertFile = new File(formatedNow + file.getOriginalFilename());
+        File convertFile = createFile(formatedNow + file.getOriginalFilename());
         if (convertFile.createNewFile()) {
             try (FileOutputStream fos = new FileOutputStream(convertFile)) {
                 fos.write(file.getBytes());
@@ -65,5 +65,9 @@ public class S3Uploader {
             return Optional.of(convertFile);
         }
         return Optional.empty();
+    }
+
+    File createFile(String fileName) {
+        return new File(fileName);
     }
 }

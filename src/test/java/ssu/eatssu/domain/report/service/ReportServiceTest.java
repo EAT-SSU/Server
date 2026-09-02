@@ -58,6 +58,11 @@ class ReportServiceTest {
                   .isEqualTo("음란성, 욕설 등 부적절한 내용");
     }
 
+    @Test
+    void 신고_유형_목록을_반환한다() {
+        Assertions.assertThat(reportService.getReportType().getResponse()).hasSize(ReportType.values().length);
+    }
+
     private User createUser() {
         return User.create("test1@test.com", "user-test", OAuthProvider.EATSSU, "1234", "1234");
     }
