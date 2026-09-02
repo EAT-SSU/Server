@@ -43,6 +43,8 @@ import static ssu.eatssu.global.handler.response.BaseResponseStatus.VALIDATION_E
 @Transactional
 public class UserService {
 
+    private static final String EXCLUDED_COLLEGE_NAME = "총학생회";
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final DepartmentRepository departmentRepository;
@@ -155,7 +157,7 @@ public class UserService {
 
     public List<GetCollegeResponse> getCollegeList(CustomUserDetails userDetails) {
         Language language = findLanguageOrDefault(userDetails);
-        List<College> colleges = collegeRepository.findAll();
+        List<College> colleges = collegeRepository.findAllByNameKoNot(EXCLUDED_COLLEGE_NAME);
         return colleges.stream().map(college -> GetCollegeResponse.builder()
                                                                   .id(college.getId())
                                                                   .name(college.getNameByLanguage(language))
