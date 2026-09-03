@@ -1,0 +1,40 @@
+logging {
+  level = "warn"
+}
+
+prometheus.scrape "spring_app" {
+  targets = [{
+    __address__      = "localhost:9001",
+    __metrics_path__ = "/actuator/prometheus",
+  }]
+  forward_to = [prometheus.remote_write.metrics_hosted_prometheus.receiver]
+}
+
+prometheus.remote_write "metrics_hosted_prometheus" {
+  endpoint {
+    name = "hosted-prometheus"
+    url  = "https://prometheus-prod-49-prod-ap-northeast-0.grafana.net/api/prom/push"
+    basic_auth {
+      username = "3340646"
+      password = "__GRAFANA_TOKEN__"
+    }
+  }
+}
+
+loki.write "grafanacloud" {
+  endpoint {
+    url = "https://logs-prod-030.grafana.net/loki/api/v1/push"
+    basic_auth {
+      username = "1665998"
+      password = "__GRAFANA_TOKEN__"
+    }
+  }
+}
+
+loki.source.file "app_log" {
+  targets = [{
+    __path__    = "/var/log/eatssu/app.log",
+    application = "__APP_LABEL__",
+  }]
+  forward_to = [loki.write.grafanacloud.receiver]
+}
