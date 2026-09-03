@@ -171,6 +171,30 @@ jobs:
           target: /home/${{ secrets.USERNAME }}/eatssu-deploy/dev
           rm: true
 
+      - name: prod Grafana Alloy 설정 전송
+        uses: appleboy/scp-action@master
+        if: github.ref_name == 'main'
+        with:
+          host: ${{ secrets.HOST_PROD }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PROD_PRIVATE_KEY }}
+          port: 22
+          source: "monitoring/alloy-config.alloy"
+          target: /home/${{ secrets.USERNAME }}/eatssu-deploy/prod
+          rm: true
+
+      - name: dev Grafana Alloy 설정 전송
+        uses: appleboy/scp-action@master
+        if: github.ref_name == 'develop'
+        with:
+          host: ${{ secrets.HOST_DEV }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.DEV_PRIVATE_KEY }}
+          port: 22
+          source: "monitoring/alloy-config.alloy"
+          target: /home/${{ secrets.USERNAME }}/eatssu-deploy/dev
+          rm: true
+
       - name: prod에 배포
         uses: appleboy/ssh-action@master
         id: deploy-prod
@@ -228,6 +252,11 @@ jobs:
             -e EATSSU_DEEPL_API_KEY="${{ secrets.EATSSU_DEEPL_API_KEY }}" \
             ${{ secrets.DOCKER_REPO }}/eatssu-prod
             sudo docker image prune -f
+            ALLOY_CONFIG_SRC="$HOME/eatssu-deploy/prod/monitoring/alloy-config.alloy"
+            sed -e 's|__GRAFANA_TOKEN__|${{ secrets.EATSSU_GRAFANA_TOKEN }}|g' \
+                -e 's|__APP_LABEL__|eatssu-prod|g' \
+                "$ALLOY_CONFIG_SRC" | sudo tee /etc/alloy/config.alloy > /dev/null
+            sudo systemctl restart alloy
 
       - name: dev 서버에 배포
         uses: appleboy/ssh-action@master
@@ -285,3 +314,8 @@ jobs:
             -e EATSSU_DEEPL_API_KEY="${{ secrets.EATSSU_DEEPL_API_KEY }}" \
             ${{ secrets.DOCKER_REPO }}/eatssu-dev
             sudo docker image prune -f
+            ALLOY_CONFIG_SRC="$HOME/eatssu-deploy/dev/monitoring/alloy-config.alloy"
+            sed -e 's|__GRAFANA_TOKEN__|${{ secrets.EATSSU_GRAFANA_TOKEN }}|g' \
+                -e 's|__APP_LABEL__|eatssu-dev|g' \
+                "$ALLOY_CONFIG_SRC" | sudo tee /etc/alloy/config.alloy > /dev/null
+            sudo systemctl restart alloy
