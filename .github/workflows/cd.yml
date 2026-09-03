@@ -181,7 +181,6 @@ jobs:
           port: 22
           source: "monitoring/alloy-config.alloy"
           target: /home/${{ secrets.USERNAME }}/eatssu-deploy/prod
-          rm: true
 
       - name: dev Grafana Alloy 설정 전송
         uses: appleboy/scp-action@master
@@ -193,7 +192,6 @@ jobs:
           port: 22
           source: "monitoring/alloy-config.alloy"
           target: /home/${{ secrets.USERNAME }}/eatssu-deploy/dev
-          rm: true
 
       - name: prod에 배포
         uses: appleboy/ssh-action@master
