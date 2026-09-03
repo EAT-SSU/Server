@@ -1,5 +1,7 @@
 package ssu.eatssu.domain.slack.entity;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ssu.eatssu.domain.inquiry.entity.Inquiry;
@@ -8,15 +10,31 @@ import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.global.handler.response.BaseException;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class SlackMessageFormat {
 
-    private static String serverEnv;
+    private static final long LOG_LINK_WINDOW_MILLIS = 5 * 60 * 1000;
 
-    private SlackMessageFormat(@Value("${server.env:unknown}") String serverEnvValue) {
+    private static String serverEnv;
+    private static String grafanaBaseUrl;
+    private static String lokiDatasourceUid;
+    private static ObjectMapper objectMapper;
+
+    private SlackMessageFormat(@Value("${server.env:unknown}") String serverEnvValue,
+                                @Value("${grafana.base-url:}") String grafanaBaseUrlValue,
+                                @Value("${grafana.loki-datasource-uid:}") String lokiDatasourceUidValue,
+                                ObjectMapper objectMapperValue) {
         SlackMessageFormat.serverEnv = serverEnvValue;
+        SlackMessageFormat.grafanaBaseUrl = grafanaBaseUrlValue;
+        SlackMessageFormat.lokiDatasourceUid = lokiDatasourceUidValue;
+        SlackMessageFormat.objectMapper = objectMapperValue;
     }
 
     public static String sendReport(Report report) {
@@ -113,6 +131,50 @@ public class SlackMessageFormat {
                 userId,
                 args != null && args.length() > 500 ? args.substring(0, 500) + "...(truncated)" : args
         };
-        return messageFormat.format(formatArgs);
+        String message = messageFormat.format(formatArgs);
+
+        String logLink = buildGrafanaLogLink();
+        if (logLink != null) {
+            message += "\n" + logLink;
+        }
+        return message;
+    }
+
+    private static String buildGrafanaLogLink() {
+        String requestId = MDC.get("requestId");
+        if (grafanaBaseUrl == null || grafanaBaseUrl.isBlank()
+                || lokiDatasourceUid == null || lokiDatasourceUid.isBlank()
+                || requestId == null || requestId.isBlank()) {
+            return null;
+        }
+
+        String application = "eatssu-" + serverEnv;
+        String logQl = "{application=\"" + application + "\"} |= \"reqId=" + requestId + "\"";
+        long now = System.currentTimeMillis();
+
+        Map<String, Object> query = new LinkedHashMap<>();
+        query.put("refId", "A");
+        query.put("expr", logQl);
+        query.put("datasource", Map.of("type", "loki", "uid", lokiDatasourceUid));
+        query.put("editorMode", "code");
+
+        Map<String, Object> range = new LinkedHashMap<>();
+        range.put("from", String.valueOf(now - LOG_LINK_WINDOW_MILLIS));
+        range.put("to", String.valueOf(now + LOG_LINK_WINDOW_MILLIS));
+
+        Map<String, Object> pane = new LinkedHashMap<>();
+        pane.put("datasource", lokiDatasourceUid);
+        pane.put("queries", List.of(query));
+        pane.put("range", range);
+        pane.put("compact", false);
+
+        try {
+            String panesJson = objectMapper.writeValueAsString(Map.of("wes", pane));
+            String encodedPanes = URLEncoder.encode(panesJson, StandardCharsets.UTF_8);
+            String url = grafanaBaseUrl + "/explore?schemaVersion=1&panes=" + encodedPanes;
+            return "<" + url + "|Grafana에서 로그 보기>";
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

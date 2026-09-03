@@ -3,6 +3,7 @@ package ssu.eatssu.domain.slack.entity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -54,11 +55,17 @@ class SlackMessageFormatTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(SlackMessageFormat.class, "serverEnv", "test");
+        ReflectionTestUtils.setField(SlackMessageFormat.class, "grafanaBaseUrl", "");
+        ReflectionTestUtils.setField(SlackMessageFormat.class, "lokiDatasourceUid", "");
+        MDC.remove("requestId");
         cleanUp();
     }
 
     @AfterEach
     void tearDown() {
+        ReflectionTestUtils.setField(SlackMessageFormat.class, "grafanaBaseUrl", "");
+        ReflectionTestUtils.setField(SlackMessageFormat.class, "lokiDatasourceUid", "");
+        MDC.remove("requestId");
         cleanUp();
     }
 
@@ -85,6 +92,32 @@ class SlackMessageFormatTest {
                 "x".repeat(501));
 
         assertThat(message).contains("예외 타입", "IllegalStateException", "메시지 없음", "...(truncated)");
+    }
+
+    @Test
+    void sendServerErrorOmitsGrafanaLinkWhenNotConfigured() {
+        // given: grafana.base-url is left unconfigured (default test setup)
+
+        // when
+        String message = SlackMessageFormat.sendServerError(new IllegalStateException(), "GET", "/menus", "1", null);
+
+        // then
+        assertThat(message).doesNotContain("Grafana에서 로그 보기");
+    }
+
+    @Test
+    void sendServerErrorIncludesGrafanaLogLinkWhenConfiguredAndRequestIdPresent() {
+        // given
+        ReflectionTestUtils.setField(SlackMessageFormat.class, "grafanaBaseUrl", "https://example.grafana.net");
+        ReflectionTestUtils.setField(SlackMessageFormat.class, "lokiDatasourceUid", "grafanacloud-logs");
+        MDC.put("requestId", "test-request-id");
+
+        // when
+        String message = SlackMessageFormat.sendServerError(new IllegalStateException(), "GET", "/menus", "1", null);
+
+        // then
+        assertThat(message).contains("https://example.grafana.net/explore?schemaVersion=1&panes=",
+                                      "Grafana에서 로그 보기");
     }
 
     @Test
