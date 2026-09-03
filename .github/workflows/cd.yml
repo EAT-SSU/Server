@@ -248,6 +248,8 @@ jobs:
             -e EATSSU_SLACK_TOKEN="${{ secrets.EATSSU_SLACK_TOKEN }}" \
             -e EATSSU_PROD_DOMAIN="${{ secrets.EATSSU_PROD_DOMAIN }}" \
             -e EATSSU_DEEPL_API_KEY="${{ secrets.EATSSU_DEEPL_API_KEY }}" \
+            -e GRAFANA_BASE_URL="${{ secrets.EATSSU_GRAFANA_BASE_URL }}" \
+            -e GRAFANA_LOKI_DATASOURCE_UID="${{ secrets.EATSSU_GRAFANA_LOKI_DATASOURCE_UID }}" \
             ${{ secrets.DOCKER_REPO }}/eatssu-prod
             sudo docker image prune -f
             ALLOY_CONFIG_SRC="$HOME/eatssu-deploy/prod/monitoring/alloy-config.alloy"
