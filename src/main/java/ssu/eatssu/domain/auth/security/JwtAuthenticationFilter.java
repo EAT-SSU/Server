@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     private static final List<String> AUTH_WHITELIST = List.of(
             "/", "/oauths/kakao", "/oauths/apple", "/menus/**", "/meals/**", "/admin/login",
             "/reviews", "/reviews/menus/**", "/reviews/meals/**", "/v2/reviews/statistics/**",
-            "/v2/reviews/menus/**", "/v2/reviews/meals/**", "/actuator/**", "/error-test/**",
+            "/v2/reviews/menus/**", "/v2/reviews/meals/**", "/actuator/**",
             "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**",
             "/oauths/valid/token", "/admin/img/**", "/css/**", "/js/**",
             "/favicon.ico", "/error/**", "/webjars/**", "/h2-console/**",
