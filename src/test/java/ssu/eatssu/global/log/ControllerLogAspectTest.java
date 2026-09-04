@@ -111,7 +111,24 @@ class ControllerLogAspectTest {
     }
 
     @Test
-    void 컨트롤러_예외를_슬랙에_알리고_다시_던진다() throws Throwable {
+    void 컨트롤러_5xx_예외를_슬랙에_알리고_다시_던진다() throws Throwable {
+        SlackErrorNotifier notifier = mock(SlackErrorNotifier.class);
+        ControllerLogAspect aspect = new ControllerLogAspect(new ObjectMapper(), notifier);
+        ProceedingJoinPoint joinPoint = mock(ProceedingJoinPoint.class);
+        MethodSignature signature = mock(MethodSignature.class);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/menus");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        when(joinPoint.getSignature()).thenReturn(signature);
+        when(signature.getParameterNames()).thenReturn(new String[0]);
+        when(joinPoint.getArgs()).thenReturn(new Object[0]);
+        when(joinPoint.proceed()).thenThrow(new BaseException(BaseResponseStatus.INTERNAL_SERVER_ERROR));
+
+        assertThatThrownBy(() -> aspect.logApi(joinPoint)).isInstanceOf(BaseException.class);
+        verify(notifier).notify(any(), anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void doesNotNotifySlackFor4xxBusinessException() throws Throwable {
         SlackErrorNotifier notifier = mock(SlackErrorNotifier.class);
         ControllerLogAspect aspect = new ControllerLogAspect(new ObjectMapper(), notifier);
         ProceedingJoinPoint joinPoint = mock(ProceedingJoinPoint.class);
@@ -124,7 +141,7 @@ class ControllerLogAspectTest {
         when(joinPoint.proceed()).thenThrow(new BaseException(BaseResponseStatus.NOT_FOUND_MENU));
 
         assertThatThrownBy(() -> aspect.logApi(joinPoint)).isInstanceOf(BaseException.class);
-        verify(notifier).notify(any(), anyString(), anyString(), anyString(), anyString());
+        verify(notifier, org.mockito.Mockito.never()).notify(any(), anyString(), anyString(), anyString(), anyString());
     }
 
     @Test

@@ -17,6 +17,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.response.BaseException;
+import ssu.eatssu.global.handler.response.BaseResponseStatus;
 import ssu.eatssu.global.log.annotation.LogMask;
 
 import java.lang.reflect.Field;
@@ -99,7 +100,9 @@ public class ControllerLogAspect {
             String exceptionType = e.getClass().getSimpleName();
             log.error("EXCEPTION {} {} ({} ms) type={} cause={}", method, uri, time, exceptionType, causeMessage, e);
 
-            slackErrorNotifier.notify(e, method, uri, userId, argsJson);
+            if (shouldNotifySlack(e)) {
+                slackErrorNotifier.notify(e, method, uri, userId, argsJson);
+            }
             throw e;
         }
     }
@@ -122,6 +125,13 @@ public class ControllerLogAspect {
 
     private boolean isAuthApi(String uri) {
         return uri != null && uri.startsWith("/oauths/");
+    }
+
+    private boolean shouldNotifySlack(Throwable e) {
+        if (e instanceof BaseException baseException) {
+            return BaseResponseStatus.sendSlackNotification(baseException.getStatus());
+        }
+        return true;
     }
 
     private String getCauseMessage(Throwable e) {
