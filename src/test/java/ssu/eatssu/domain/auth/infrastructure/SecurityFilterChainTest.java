@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
@@ -13,9 +14,16 @@ import ssu.eatssu.domain.user.entity.DeviceType;
 import ssu.eatssu.domain.user.entity.Role;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(properties = {
+        "logging.config=classpath:logback-security-test.xml",
+        "spring.flyway.enabled=false",
+        "swagger.username=test-swagger",
+        "swagger.password=test-password"
+})
+@ActiveProfiles({"dev", "test"})
 @AutoConfigureMockMvc
 class SecurityFilterChainTest {
 
@@ -63,6 +71,18 @@ class SecurityFilterChainTest {
         String token = accessTokenWithRole(Role.ADMIN);
 
         mockMvc.perform(get("/admin/anything").header("Authorization", "Bearer " + token))
+               .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void Swagger_경로는_Basic_Auth_없이는_401을_반환한다() throws Exception {
+        mockMvc.perform(get("/swagger-ui/not-found.css"))
+               .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void Swagger_경로는_유효한_Basic_Auth로_접근할_수_있다() throws Exception {
+        mockMvc.perform(get("/swagger-ui/not-found.css").with(httpBasic("test-swagger", "test-password")))
                .andExpect(status().isNotFound());
     }
 }
