@@ -8,6 +8,9 @@
     Thread : 동시성 문제 관련 사용, Request : 요청 단위 -->
     <property name="LOG_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} %clr([%level]) [%thread] [reqId=%X{requestId}] %cyan(%logger{36}) - %msg%n"/>
+    <!-- 파일 출력용: 색상 코드(%clr) 없이 동일 패턴 -->
+    <property name="FILE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%level] [%thread] [reqId=%X{requestId}] %logger{36} - %msg%n"/>
 
     <!-- 콘솔 출력 (stdout) -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -22,8 +25,33 @@
         <appender-ref ref="CONSOLE"/>
     </appender>
 
+    <!-- 파일 출력: Grafana Alloy가 이 파일을 tail해서 Loki로 전송 (호스트 볼륨 마운트 경로와 일치해야 함)
+         /var/log/eatssu는 EC2에만 있는 경로라 prod/dev 프로필에서만 활성화 (test/local에서 켜면 디렉토리가 없어 초기화 실패함) -->
+    <springProfile name="prod,dev">
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>/var/log/eatssu/app.log</file>
+            <encoder>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>/var/log/eatssu/app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <maxFileSize>100MB</maxFileSize>
+                <maxHistory>3</maxHistory>
+                <totalSizeCap>1GB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+
+        <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+            <neverBlock>true</neverBlock>
+            <appender-ref ref="FILE"/>
+        </appender>
+    </springProfile>
+
     <!-- Root Logger -->
     <root level="INFO">
         <appender-ref ref="ASYNC_CONSOLE"/>
+        <springProfile name="prod,dev">
+            <appender-ref ref="ASYNC_FILE"/>
+        </springProfile>
     </root>
 </configuration>

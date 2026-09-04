@@ -77,6 +77,8 @@ deepl:
 swagger:
   url: ${EATSSU_DEV_DOMAIN}
   description: Test Server Swagger API
+  username: ${SWAGGER_USER}
+  password: ${SWAGGER_PASSWORD}
 
 springdoc:
   swagger-ui:

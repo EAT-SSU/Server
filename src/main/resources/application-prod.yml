@@ -78,6 +78,8 @@ deepl:
 swagger:
   url: ${EATSSU_PROD_DOMAIN}
   description: Prod-Server url
+  username: ${SWAGGER_USER}
+  password: ${SWAGGER_PASSWORD}
 
 springdoc:
   swagger-ui:
