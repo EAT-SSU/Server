@@ -5,7 +5,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.AuthenticationManager;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +41,7 @@ public class OAuthService {
     private final MeterRegistry meterRegistry;
     private final UserRepository userRepository;
     private final AppleAuthenticator appleAuthenticator;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
 
     public Tokens kakaoLogin(KakaoLoginRequest request) {
@@ -141,7 +141,7 @@ public class OAuthService {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(email, makeOauthCredentials(provider, providerId));
 
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
         return jwtTokenProvider.generateTokens(authentication);
     }

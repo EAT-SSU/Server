@@ -1,6 +1,7 @@
 package ssu.eatssu.domain.auth.security;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
@@ -22,7 +23,7 @@ class UserAuthenticationProviderTest {
 
     @Test
     void getAuthenticationReturnsAuthenticatedTokenForValidCredentials() throws Exception {
-        UserAuthenticationProvider provider = new UserAuthenticationProvider(builder("provider-id", "password"));
+        UserAuthenticationProvider provider = new UserAuthenticationProvider(authenticationManager("provider-id", "password"));
 
         Authentication result = provider.getAuthentication("provider-id", "password");
 
@@ -32,13 +33,13 @@ class UserAuthenticationProviderTest {
 
     @Test
     void getAuthenticationThrowsForInvalidCredentials() throws Exception {
-        UserAuthenticationProvider provider = new UserAuthenticationProvider(builder("provider-id", "password"));
+        UserAuthenticationProvider provider = new UserAuthenticationProvider(authenticationManager("provider-id", "password"));
 
         assertThatThrownBy(() -> provider.getAuthentication("provider-id", "wrong-password"))
                 .isInstanceOf(BadCredentialsException.class);
     }
 
-    private AuthenticationManagerBuilder builder(String providerId, String rawPassword) throws Exception {
+    private AuthenticationManager authenticationManager(String providerId, String rawPassword) throws Exception {
         UserDetailsService userDetailsService = username ->
                 new User(providerId, PASSWORD_ENCODER.encode(rawPassword), List.of());
         DaoAuthenticationProvider daoProvider = new DaoAuthenticationProvider();
@@ -53,8 +54,6 @@ class UserAuthenticationProviderTest {
         };
         AuthenticationManagerBuilder builder = new AuthenticationManagerBuilder(noOpPostProcessor);
         builder.authenticationProvider(daoProvider);
-        // 실제 앱에서는 스프링 시큐리티 자동설정이 컨텍스트 시작 시 build()를 호출해둔 뒤 getObject()로 재사용한다.
-        builder.build();
-        return builder;
+        return builder.build();
     }
 }
