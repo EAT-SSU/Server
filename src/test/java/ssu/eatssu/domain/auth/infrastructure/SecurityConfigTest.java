@@ -18,7 +18,7 @@ class SecurityConfigTest {
 
     @Test
     void swaggerUserDetailsServiceEncodesPasswordAndExposesUsername() {
-        PasswordEncoder passwordEncoder = securityConfig.passwordEncoder();
+        PasswordEncoder passwordEncoder = new AuthenticationConfig().passwordEncoder();
 
         UserDetailsService userDetailsService =
                 securityConfig.swaggerUserDetailsService("eatssu-dev", "eatssu2026!", passwordEncoder);
