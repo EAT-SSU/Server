@@ -20,7 +20,6 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponse;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
@@ -32,7 +31,7 @@ import static org.mockito.Mockito.mock;
 
 class GlobalExceptionHandlerTest {
 
-    private final GlobalExceptionHandler handler = new GlobalExceptionHandler(mock(SlackErrorNotifier.class));
+    private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
     private final HttpHeaders headers = new HttpHeaders();
     private final org.springframework.web.context.request.WebRequest request = mock(org.springframework.web.context.request.WebRequest.class);
 

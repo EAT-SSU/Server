@@ -149,7 +149,7 @@ public class SlackMessageFormat {
         }
 
         String application = "eatssu-" + serverEnv;
-        String logQl = "{application=\"" + application + "\"} |= \"reqId=" + requestId + "\"";
+        String logQl = "{application=\"" + application + "\"} |= \"" + requestId + "\"";
         long now = System.currentTimeMillis();
 
         Map<String, Object> query = new LinkedHashMap<>();

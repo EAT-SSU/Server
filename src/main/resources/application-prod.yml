@@ -45,6 +45,9 @@ spring:
       max-file-size: 20MB
       max-request-size: 20MB
 
+  mvc:
+    log-resolved-exception: true
+
 ## Auth
 jwt:
   secret:

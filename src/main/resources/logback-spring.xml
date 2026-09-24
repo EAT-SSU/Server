@@ -7,7 +7,7 @@
     <!-- 로그 형식 설정 예시 :2025-09-25 12:34:56.789 [INFO] [http-nio-9000-ex] [reqId=123e4567] [com.eatssu.api.UserController] - 내용
     Thread : 동시성 문제 관련 사용, Request : 요청 단위 -->
     <property name="LOG_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %clr([%level]) [%thread] [reqId=%X{requestId}] %cyan(%logger{36}) - %msg%n"/>
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS, Asia/Seoul} %clr([%level]) [%thread] [reqId=%X{requestId}] %cyan(%logger{36}) - %msg%n"/>
     <!-- 콘솔 출력 (stdout) -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

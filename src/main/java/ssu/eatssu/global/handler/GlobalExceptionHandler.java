@@ -1,9 +1,6 @@
 package ssu.eatssu.global.handler;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -25,7 +22,6 @@ import org.springframework.web.context.request.async.AsyncRequestTimeoutExceptio
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponse;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
@@ -33,14 +29,8 @@ import ssu.eatssu.global.handler.response.BaseResponseStatus;
 /**
  * 전역 Controller 예외처리
  */
-@Slf4j
 @RestControllerAdvice
-@RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-    private final SlackErrorNotifier slackErrorNotifier;
-    @Value("${server.env:unknown}")
-    private String serverEnv;
-
     /**
      * BaseException 처리
      */
