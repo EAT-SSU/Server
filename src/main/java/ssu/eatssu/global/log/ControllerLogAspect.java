@@ -98,10 +98,11 @@ public class ControllerLogAspect {
             long time = System.currentTimeMillis() - start;
             String causeMessage = getCauseMessage(e);
             String exceptionType = e.getClass().getSimpleName();
-            log.error("EXCEPTION {} {} ({} ms) type={} cause={}", method, uri, time, exceptionType, causeMessage, e);
-
-            if (shouldNotifySlack(e)) {
+            if (isServerError(e)) {
+                log.error("EXCEPTION {} {} ({} ms) type={} cause={}", method, uri, time, exceptionType, causeMessage, e);
                 slackErrorNotifier.notify(e, method, uri, userId, argsJson);
+            } else {
+                log.warn("EXCEPTION {} {} ({} ms) type={} cause={}", method, uri, time, exceptionType, causeMessage);
             }
             throw e;
         }
@@ -127,7 +128,7 @@ public class ControllerLogAspect {
         return uri != null && uri.startsWith("/oauths/");
     }
 
-    private boolean shouldNotifySlack(Throwable e) {
+    private boolean isServerError(Throwable e) {
         if (e instanceof BaseException baseException) {
             return BaseResponseStatus.sendSlackNotification(baseException.getStatus());
         }
