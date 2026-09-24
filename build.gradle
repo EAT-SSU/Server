@@ -78,6 +78,8 @@ dependencies {
 
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
     implementation 'org.apache.commons:commons-csv:1.10.0'
 }
 
