@@ -8,10 +8,6 @@
     Thread : 동시성 문제 관련 사용, Request : 요청 단위 -->
     <property name="LOG_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} %clr([%level]) [%thread] [reqId=%X{requestId}] %cyan(%logger{36}) - %msg%n"/>
-    <!-- 파일 출력용: 색상 코드(%clr) 없이 동일 패턴 -->
-    <property name="FILE_LOG_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%level] [%thread] [reqId=%X{requestId}] %logger{36} - %msg%n"/>
-
     <!-- 콘솔 출력 (stdout) -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -30,8 +26,8 @@
     <springProfile name="prod,dev">
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>/var/log/eatssu/app.log</file>
-            <encoder>
-                <pattern>${FILE_LOG_PATTERN}</pattern>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <timeZone>Asia/Seoul</timeZone>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <fileNamePattern>/var/log/eatssu/app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
