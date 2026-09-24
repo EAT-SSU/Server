@@ -32,16 +32,19 @@ class AsyncConfigTest {
     }
 
     @Test
-    void 비동기_스레드로_MDC를_전파하고_작업_종료_후_제거한다() {
+    void propagatesMdcToAsyncThreadAndClearsAfterTask() {
         contextRunner.run(context -> {
+            // given
             ThreadPoolTaskExecutor executor = context.getBean(ThreadPoolTaskExecutor.class);
             executor.setCorePoolSize(1);
             MDC.put("requestId", "request-1");
 
+            // when
             Future<String> propagated = executor.submit(() -> MDC.get("requestId"));
             MDC.clear();
             Future<String> cleared = executor.submit(() -> MDC.get("requestId"));
 
+            // then
             assertThat(propagated.get()).isEqualTo("request-1");
             assertThat(cleared.get()).isNull();
         });
