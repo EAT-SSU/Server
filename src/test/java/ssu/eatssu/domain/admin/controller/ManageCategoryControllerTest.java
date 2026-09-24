@@ -11,7 +11,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ssu.eatssu.domain.admin.dto.request.RegisterCategoryRequest;
 import ssu.eatssu.domain.admin.service.ManageCategoryService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.GlobalExceptionHandler;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
@@ -29,15 +28,12 @@ class ManageCategoryControllerTest {
     @Mock
     private ManageCategoryService manageCategoryService;
 
-    @Mock
-    private SlackErrorNotifier slackErrorNotifier;
-
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new ManageCategoryController(manageCategoryService))
-                                 .setControllerAdvice(new GlobalExceptionHandler(slackErrorNotifier))
+                                 .setControllerAdvice(new GlobalExceptionHandler())
                                  .build();
     }
 
