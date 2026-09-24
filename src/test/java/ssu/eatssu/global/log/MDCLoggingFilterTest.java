@@ -27,6 +27,16 @@ class MDCLoggingFilterTest {
     }
 
     @Test
+    void 요청_메서드와_URI를_전달하고_필터_종료_후_제거한다() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/v2/reviews");
+
+        new MDCLoggingFilter().doFilter(request, new MockHttpServletResponse(), (req, res) ->
+                assertThat(MDC.get("uri")).isEqualTo("POST /v2/reviews"));
+
+        assertThat(MDC.get("uri")).isNull();
+    }
+
+    @Test
     void 요청_ID가_없으면_새_ID를_생성한다() throws Exception {
         new MDCLoggingFilter().doFilter(new MockHttpServletRequest(), new MockHttpServletResponse(), (req, res) ->
                 assertThat(MDC.get("requestId")).hasSize(32));

@@ -16,11 +16,13 @@ public class MDCLoggingFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        String requestId = ((HttpServletRequest) request).getHeader("X-RequestID");
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String requestId = httpRequest.getHeader("X-RequestID");
         if (requestId == null) {
             requestId = UUID.randomUUID().toString().replace("-", "");
         }
         MDC.put("requestId", requestId);
+        MDC.put("uri", httpRequest.getMethod() + " " + httpRequest.getRequestURI());
         try {
             chain.doFilter(request, response);
         } finally {
