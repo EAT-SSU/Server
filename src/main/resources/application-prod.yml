@@ -77,6 +77,10 @@ deepl:
   api-key: ${EATSSU_DEEPL_API_KEY}
   base-url: https://api-free.deepl.com
 
+#Firebase
+firebase:
+  credentials: ${EATSSU_FIREBASE_CREDENTIALS:}
+
 #Swagger
 swagger:
   url: ${EATSSU_PROD_DOMAIN}

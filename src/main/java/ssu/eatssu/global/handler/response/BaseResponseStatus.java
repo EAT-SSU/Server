@@ -48,6 +48,12 @@ public enum BaseResponseStatus {
     PROFANITY_NICKNAME(false,HttpStatus.BAD_REQUEST,40024,"욕설, 비속어 등의 표현이 포함된 닉네임은 사용할 수 없어요."),
 
     /**
+     * 메뉴 찜 관련
+     */
+    INVALID_SEARCH_KEYWORD(false, HttpStatus.BAD_REQUEST, 40025, "두 글자 이상 입력해주세요."),
+    DISCONTINUED_MENU(false, HttpStatus.BAD_REQUEST, 40026, "단종된 메뉴는 찜할 수 없습니다."),
+
+    /**
      * 401 UNAUTHORIZED 권한없음(인증 실패)
      */
     UNAUTHORIZED(false, HttpStatus.UNAUTHORIZED, 401, "인증에 실패했습니다."),
