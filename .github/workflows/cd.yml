@@ -248,6 +248,7 @@ jobs:
             -e EATSSU_SLACK_TOKEN="${{ secrets.EATSSU_SLACK_TOKEN }}" \
             -e EATSSU_PROD_DOMAIN="${{ secrets.EATSSU_PROD_DOMAIN }}" \
             -e EATSSU_DEEPL_API_KEY="${{ secrets.EATSSU_DEEPL_API_KEY }}" \
+            -e EATSSU_FIREBASE_CREDENTIALS="${{ secrets.EATSSU_FIREBASE_CREDENTIALS }}" \
             -e GRAFANA_BASE_URL="${{ secrets.EATSSU_GRAFANA_BASE_URL }}" \
             -e GRAFANA_LOKI_DATASOURCE_UID="${{ secrets.EATSSU_GRAFANA_LOKI_DATASOURCE_UID }}" \
             -e SWAGGER_USER="${{ secrets.SWAGGER_PROD_USER }}" \
@@ -314,6 +315,7 @@ jobs:
             -e EATSSU_SLACK_TOKEN="${{ secrets.EATSSU_SLACK_TOKEN }}" \
             -e EATSSU_DEV_DOMAIN="${{ secrets.EATSSU_DEV_DOMAIN }}" \
             -e EATSSU_DEEPL_API_KEY="${{ secrets.EATSSU_DEEPL_API_KEY }}" \
+            -e EATSSU_FIREBASE_CREDENTIALS="${{ secrets.EATSSU_FIREBASE_CREDENTIALS }}" \
             -e SWAGGER_USER="${{ secrets.SWAGGER_DEV_USER }}" \
             -e SWAGGER_PASSWORD="${{ secrets.SWAGGER_DEV_PASSWORD }}" \
             ${{ secrets.DOCKER_REPO }}/eatssu-dev
