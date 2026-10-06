@@ -15,10 +15,12 @@ class SecurityConfigTest {
 
     private final SecurityConfig securityConfig = new SecurityConfig(
             mock(JwtTokenProvider.class), mock(JwtAccessDeniedHandler.class), mock(JwtAuthenticationEntryPoint.class));
+    private final AuthenticationConfig authenticationConfig = new AuthenticationConfig();
 
     @Test
     void swaggerUserDetailsServiceEncodesPasswordAndExposesUsername() {
-        PasswordEncoder passwordEncoder = new AuthenticationConfig().passwordEncoder();
+
+        PasswordEncoder passwordEncoder = authenticationConfig.passwordEncoder();
 
         UserDetailsService userDetailsService =
                 securityConfig.swaggerUserDetailsService("eatssu-dev", "eatssu2026!", passwordEncoder);
