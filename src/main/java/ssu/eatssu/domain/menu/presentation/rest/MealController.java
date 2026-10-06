@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +16,7 @@ import ssu.eatssu.domain.menu.presentation.dto.request.CreateMealRequest;
 import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateWithPriceRequest;
 import ssu.eatssu.domain.menu.presentation.dto.response.MealCreateResult;
 import ssu.eatssu.domain.menu.presentation.dto.response.MealDetailResponse;
+import ssu.eatssu.domain.menu.presentation.dto.response.MealSlotReconcileResult;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenusInMealResponse;
 import ssu.eatssu.domain.menu.presentation.rest.docs.MealControllerDocs;
 import ssu.eatssu.domain.menu.service.MealService;
@@ -62,6 +64,20 @@ public class MealController implements MealControllerDocs {
         }
 
         return BaseResponse.success(mealService.createMealWithPrice(date, restaurant, timePart, request));
+    }
+
+    @Override
+    @PutMapping("/with-price/slot")
+    public BaseResponse<MealSlotReconcileResult> reconcileMealSlot(
+            @RequestParam("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
+            @RequestParam("restaurant") Restaurant restaurant,
+            @RequestParam("time") TimePart timePart,
+            @RequestBody List<MealCreateWithPriceRequest> requests) {
+        if (RestaurantType.isFixedType(restaurant)) {
+            throw new BaseException(NOT_SUPPORT_RESTAURANT);
+        }
+
+        return BaseResponse.success(mealService.reconcileMealSlot(date, restaurant, timePart, requests));
     }
 
     @Override

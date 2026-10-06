@@ -12,6 +12,7 @@ import ssu.eatssu.domain.menu.presentation.dto.request.CreateMealRequest;
 import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateWithPriceRequest;
 import ssu.eatssu.domain.menu.presentation.dto.response.MealCreateResult;
 import ssu.eatssu.domain.menu.presentation.dto.response.MealDetailResponse;
+import ssu.eatssu.domain.menu.presentation.dto.response.MealSlotReconcileResult;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenusInMealResponse;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.user.entity.Language;
@@ -63,6 +64,26 @@ public interface MealControllerDocs {
             @Parameter(description = "식당이름") Restaurant restaurant,
             @Parameter(description = "시간대") TimePart timePart,
             MealCreateWithPriceRequest request);
+
+    @Operation(summary = "식단 슬롯 조정 [인증 토큰 필요 X]", description = """
+            특정 날짜, 식당, 시간대의 식단 목록을 요청 본문과 일치하도록 조정합니다.<br><br>
+            같은 메뉴명 목록의 식단은 유지하고 가격과 대표메뉴를 갱신합니다.<br><br>
+            요청에서 빠진 식단은 리뷰가 없을 때만 삭제합니다.
+            """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "식단 슬롯 조정 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 지원하지 않는 식당", content =
+            @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 날짜형식", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 식당", content = @Content(schema =
+            @Schema(implementation = BaseResponse.class)))
+    })
+    BaseResponse<MealSlotReconcileResult> reconcileMealSlot(
+            @Parameter(schema = @Schema(type = "string", format = "date", example = "20240101")) Date date,
+            @Parameter(description = "식당이름") Restaurant restaurant,
+            @Parameter(description = "시간대") TimePart timePart,
+            List<MealCreateWithPriceRequest> requests);
 
     @Operation(summary = "변동 메뉴 식단 리스트 조회 [인증 토큰 필요 X]", description = """
             변동 메뉴 식단 리스트를 조회하는 API 입니다.

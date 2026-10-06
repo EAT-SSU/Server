@@ -9,11 +9,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ssu.eatssu.domain.menu.entity.constants.TimePart;
+import ssu.eatssu.domain.menu.presentation.dto.response.MealSlotReconcileResult;
 import ssu.eatssu.domain.menu.presentation.dto.response.MealCreateResult;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenusInMealResponse;
 import ssu.eatssu.domain.menu.service.MealService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.global.handler.GlobalExceptionHandler;
+import ssu.eatssu.global.handler.response.BaseException;
+import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
 import java.util.List;
 
@@ -26,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -98,6 +102,71 @@ class MealControllerTest {
                                 .param("time", TimePart.LUNCH.name())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"menuNames\":[\"돈까스\"],\"price\":3000}"))
+               .andExpect(status().isBadRequest())
+               .andExpect(jsonPath("$.isSuccess").value(false));
+
+        verifyNoInteractions(mealService);
+    }
+
+    @Test
+    void reconcilesMealSlot() throws Exception {
+        // given
+        when(mealService.reconcileMealSlot(any(), eq(Restaurant.DODAM), eq(TimePart.LUNCH), any()))
+                .thenReturn(new MealSlotReconcileResult(List.of(1L, 2L), List.of(List.of(), List.of("김치")),
+                                                        List.of(3L), List.of(4L)));
+
+        // when & then
+        mockMvc.perform(put("/meals/with-price/slot")
+                                .param("date", "20260101")
+                                .param("restaurant", Restaurant.DODAM.name())
+                                .param("time", TimePart.LUNCH.name())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        [
+                                          {"menuNames":["돈까스"],"price":3000,"mainMenus":[]},
+                                          {"menuNames":["제육볶음"],"price":3500,"mainMenus":[]}
+                                        ]
+                                        """))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.isSuccess").value(true))
+               .andExpect(jsonPath("$.result.mealIds[0]").value(1))
+               .andExpect(jsonPath("$.result.mealIds[1]").value(2))
+               .andExpect(jsonPath("$.result.unmatchedMainMenus[1][0]").value("김치"))
+               .andExpect(jsonPath("$.result.deletedMealIds[0]").value(3))
+               .andExpect(jsonPath("$.result.keptWithReviews[0]").value(4));
+    }
+
+    @Test
+    void returnsBadRequestWhenReconcilingDuplicateMeals() throws Exception {
+        // given
+        when(mealService.reconcileMealSlot(any(), eq(Restaurant.DODAM), eq(TimePart.LUNCH), any()))
+                .thenThrow(new BaseException(BaseResponseStatus.BAD_REQUEST));
+
+        // when & then
+        mockMvc.perform(put("/meals/with-price/slot")
+                                .param("date", "20260101")
+                                .param("restaurant", Restaurant.DODAM.name())
+                                .param("time", TimePart.LUNCH.name())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        [
+                                          {"menuNames":["돈까스","김치"],"price":3000},
+                                          {"menuNames":["김치","돈까스"],"price":3000}
+                                        ]
+                                        """))
+               .andExpect(status().isBadRequest())
+               .andExpect(jsonPath("$.isSuccess").value(false));
+    }
+
+    @Test
+    void returnsBadRequestWhenReconcilingFixedRestaurant() throws Exception {
+        // when & then
+        mockMvc.perform(put("/meals/with-price/slot")
+                                .param("date", "20260101")
+                                .param("restaurant", Restaurant.FOOD_COURT.name())
+                                .param("time", TimePart.LUNCH.name())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("[{\"menuNames\":[\"돈까스\"],\"price\":3000}]"))
                .andExpect(status().isBadRequest())
                .andExpect(jsonPath("$.isSuccess").value(false));
 
