@@ -5,6 +5,7 @@ import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ssu.eatssu.domain.slack.entity.SlackChannel;
 
@@ -17,6 +18,7 @@ public class SlackService {
 
     private final MethodsClient methodsClient;
 
+    @Async
     public void sendSlackMessage(String message, SlackChannel channel) {
 
         String channelAddress = channel.getKrName();

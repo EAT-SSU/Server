@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ssu.eatssu.domain.auth.security.CustomUserDetails;
 import ssu.eatssu.domain.partnership.service.PartnershipService;
-import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.domain.user.entity.Role;
 import ssu.eatssu.global.handler.GlobalExceptionHandler;
 import ssu.eatssu.global.handler.response.BaseException;
@@ -39,9 +38,6 @@ class PartnershipControllerTest {
     @Mock
     private PartnershipService partnershipService;
 
-    @Mock
-    private SlackErrorNotifier slackErrorNotifier;
-
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -49,7 +45,7 @@ class PartnershipControllerTest {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new ParameterNamesModule())
                                                        .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         mockMvc = MockMvcBuilders.standaloneSetup(new PartnershipController(partnershipService))
-                                 .setControllerAdvice(new GlobalExceptionHandler(slackErrorNotifier))
+                                 .setControllerAdvice(new GlobalExceptionHandler())
                                  .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
                                  .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
                                  .build();

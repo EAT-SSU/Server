@@ -78,7 +78,15 @@ dependencies {
 
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
     implementation 'org.apache.commons:commons-csv:1.10.0'
+
+    implementation('com.google.firebase:firebase-admin:9.11.0') {
+        exclude group: 'com.google.cloud', module: 'google-cloud-storage'
+        exclude group: 'com.google.cloud', module: 'google-cloud-firestore'
+    }
+    implementation 'com.google.http-client:google-http-client-jackson2:2.2.0'
 }
 
 tasks.named('test') {

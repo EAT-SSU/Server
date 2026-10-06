@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ssu.eatssu.domain.admin.service.ManageReviewService;
-import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.GlobalExceptionHandler;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
@@ -26,15 +25,12 @@ class ManageReviewControllerTest {
     @Mock
     private ManageReviewService manageReviewService;
 
-    @Mock
-    private SlackErrorNotifier slackErrorNotifier;
-
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new ManageReviewController(manageReviewService))
-                                 .setControllerAdvice(new GlobalExceptionHandler(slackErrorNotifier))
+                                 .setControllerAdvice(new GlobalExceptionHandler())
                                  .build();
     }
 

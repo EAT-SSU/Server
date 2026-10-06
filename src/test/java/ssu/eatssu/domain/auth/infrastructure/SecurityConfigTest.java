@@ -19,6 +19,7 @@ class SecurityConfigTest {
 
     @Test
     void swaggerUserDetailsServiceEncodesPasswordAndExposesUsername() {
+
         PasswordEncoder passwordEncoder = authenticationConfig.passwordEncoder();
 
         UserDetailsService userDetailsService =

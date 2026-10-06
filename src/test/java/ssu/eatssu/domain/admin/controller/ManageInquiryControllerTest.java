@@ -15,7 +15,6 @@ import ssu.eatssu.domain.admin.dto.response.InquiryLine;
 import ssu.eatssu.domain.admin.dto.response.PageWrapper;
 import ssu.eatssu.domain.admin.service.ManageInquiryService;
 import ssu.eatssu.domain.inquiry.entity.InquiryStatus;
-import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.GlobalExceptionHandler;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
@@ -39,15 +38,12 @@ class ManageInquiryControllerTest {
     @Mock
     private ManageInquiryService manageInquiryService;
 
-    @Mock
-    private SlackErrorNotifier slackErrorNotifier;
-
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new ManageInquiryController(manageInquiryService))
-                                 .setControllerAdvice(new GlobalExceptionHandler(slackErrorNotifier))
+                                 .setControllerAdvice(new GlobalExceptionHandler())
                                  .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                                  .build();
     }

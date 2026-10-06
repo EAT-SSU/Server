@@ -1,10 +1,15 @@
 package ssu.eatssu.global.log;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -142,6 +147,65 @@ class ControllerLogAspectTest {
 
         assertThatThrownBy(() -> aspect.logApi(joinPoint)).isInstanceOf(BaseException.class);
         verify(notifier, org.mockito.Mockito.never()).notify(any(), anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void logs4xxBusinessExceptionAsWarnWithoutStackTrace() throws Throwable {
+        // given
+        ListAppender<ILoggingEvent> appender = attachListAppender();
+        ControllerLogAspect aspect = new ControllerLogAspect(new ObjectMapper(), mock(SlackErrorNotifier.class));
+        ProceedingJoinPoint joinPoint = joinPointThrowing(new BaseException(BaseResponseStatus.NOT_FOUND_MENU));
+
+        // when
+        assertThatThrownBy(() -> aspect.logApi(joinPoint)).isInstanceOf(BaseException.class);
+
+        // then
+        ILoggingEvent event = findExceptionLog(appender);
+        assertThat(event.getLevel()).isEqualTo(Level.WARN);
+        assertThat(event.getThrowableProxy()).isNull();
+    }
+
+    @Test
+    void logs5xxExceptionAsErrorWithStackTrace() throws Throwable {
+        // given
+        ListAppender<ILoggingEvent> appender = attachListAppender();
+        ControllerLogAspect aspect = new ControllerLogAspect(new ObjectMapper(), mock(SlackErrorNotifier.class));
+        ProceedingJoinPoint joinPoint = joinPointThrowing(new BaseException(BaseResponseStatus.INTERNAL_SERVER_ERROR));
+
+        // when
+        assertThatThrownBy(() -> aspect.logApi(joinPoint)).isInstanceOf(BaseException.class);
+
+        // then
+        ILoggingEvent event = findExceptionLog(appender);
+        assertThat(event.getLevel()).isEqualTo(Level.ERROR);
+        assertThat(event.getThrowableProxy()).isNotNull();
+    }
+
+    private ListAppender<ILoggingEvent> attachListAppender() {
+        Logger logger = (Logger) LoggerFactory.getLogger(ControllerLogAspect.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        return appender;
+    }
+
+    private ILoggingEvent findExceptionLog(ListAppender<ILoggingEvent> appender) {
+        ((Logger) LoggerFactory.getLogger(ControllerLogAspect.class)).detachAppender(appender);
+        return appender.list.stream()
+                .filter(event -> event.getFormattedMessage().startsWith("EXCEPTION"))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private ProceedingJoinPoint joinPointThrowing(Throwable throwable) throws Throwable {
+        ProceedingJoinPoint joinPoint = mock(ProceedingJoinPoint.class);
+        MethodSignature signature = mock(MethodSignature.class);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest("GET", "/menus")));
+        when(joinPoint.getSignature()).thenReturn(signature);
+        when(signature.getParameterNames()).thenReturn(new String[0]);
+        when(joinPoint.getArgs()).thenReturn(new Object[0]);
+        when(joinPoint.proceed()).thenThrow(throwable);
+        return joinPoint;
     }
 
     @Test

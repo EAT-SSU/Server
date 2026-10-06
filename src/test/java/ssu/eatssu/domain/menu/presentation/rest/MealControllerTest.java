@@ -13,7 +13,6 @@ import ssu.eatssu.domain.menu.presentation.dto.response.MealCreateResult;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenusInMealResponse;
 import ssu.eatssu.domain.menu.service.MealService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.GlobalExceptionHandler;
 
 import java.util.List;
@@ -36,15 +35,12 @@ class MealControllerTest {
     @Mock
     private MealService mealService;
 
-    @Mock
-    private SlackErrorNotifier slackErrorNotifier;
-
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new MealController(mealService))
-                                 .setControllerAdvice(new GlobalExceptionHandler(slackErrorNotifier))
+                                 .setControllerAdvice(new GlobalExceptionHandler())
                                  .build();
     }
 

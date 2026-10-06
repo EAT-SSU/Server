@@ -27,6 +27,8 @@ import ssu.eatssu.domain.user.repository.UserRepository;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -118,6 +120,9 @@ class SlackMessageFormatTest {
         // then
         assertThat(message).contains("https://example.grafana.net/explore?schemaVersion=1&panes=",
                                       "Grafana에서 로그 보기");
+        assertThat(URLDecoder.decode(message, StandardCharsets.UTF_8))
+                .contains("|= \\\"test-request-id\\\"")
+                .doesNotContain("reqId=");
     }
 
     @Test

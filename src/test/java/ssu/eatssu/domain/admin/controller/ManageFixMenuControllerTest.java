@@ -13,7 +13,6 @@ import ssu.eatssu.domain.admin.dto.request.UpdateFixMenuRequest;
 import ssu.eatssu.domain.admin.dto.response.MenuBoards;
 import ssu.eatssu.domain.admin.service.ManageFixMenuService;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.GlobalExceptionHandler;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
@@ -35,15 +34,12 @@ class ManageFixMenuControllerTest {
     @Mock
     private ManageFixMenuService manageFixMenuService;
 
-    @Mock
-    private SlackErrorNotifier slackErrorNotifier;
-
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new ManageFixMenuController(manageFixMenuService))
-                                 .setControllerAdvice(new GlobalExceptionHandler(slackErrorNotifier))
+                                 .setControllerAdvice(new GlobalExceptionHandler())
                                  .build();
     }
 

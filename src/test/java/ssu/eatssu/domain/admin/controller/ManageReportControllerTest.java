@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ssu.eatssu.domain.admin.dto.response.PageWrapper;
 import ssu.eatssu.domain.admin.dto.response.ReportLine;
 import ssu.eatssu.domain.admin.service.ManageReportService;
-import ssu.eatssu.domain.slack.service.SlackErrorNotifier;
 import ssu.eatssu.global.handler.GlobalExceptionHandler;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
@@ -35,15 +34,12 @@ class ManageReportControllerTest {
     @Mock
     private ManageReportService manageReportService;
 
-    @Mock
-    private SlackErrorNotifier slackErrorNotifier;
-
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new ManageReportController(manageReportService))
-                                 .setControllerAdvice(new GlobalExceptionHandler(slackErrorNotifier))
+                                 .setControllerAdvice(new GlobalExceptionHandler())
                                  .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                                  .build();
     }
