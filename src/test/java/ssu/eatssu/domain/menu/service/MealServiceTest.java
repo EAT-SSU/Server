@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import ssu.eatssu.domain.favorite.persistence.MenuFavoriteQueryRepository;
 import ssu.eatssu.domain.menu.entity.Meal;
+import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.entity.constants.TimePart;
 import ssu.eatssu.domain.menu.persistence.MealMainMenuRepository;
 import ssu.eatssu.domain.menu.persistence.MealMenuRepository;
@@ -47,6 +49,9 @@ class MealServiceTest {
 
     @Autowired
     private MenuRepository menuRepository;
+
+    @Autowired
+    private MenuFavoriteQueryRepository menuFavoriteQueryRepository;
 
     @BeforeEach
     void setUp() {
@@ -175,6 +180,100 @@ class MealServiceTest {
 
         // then
         assertThat(result.unmatchedMainMenus()).isEmpty();
+    }
+
+    @Test
+    void createMealSyncsMainMenuTranslationToMenuNameEn() {
+        // given
+        CreateMealRequest request = new CreateMealRequest(List.of("김치찌개", "깍두기"),
+                List.of(new MainMenuRequest("김치찌개", "Kimchi Stew")));
+
+        // when
+        mealService.createMeal(Date.valueOf("2024-01-03"), Restaurant.HAKSIK, LUNCH, request);
+
+        // then
+        assertThat(menuNameEn("김치찌개")).isEqualTo("Kimchi Stew");
+        assertThat(menuNameEn("깍두기")).isNull();
+    }
+
+    @Test
+    void laterMealTranslationOverwritesMenuNameEn() {
+        // given
+        mealService.createMeal(Date.valueOf("2024-01-03"), Restaurant.HAKSIK, LUNCH,
+                new CreateMealRequest(List.of("김치찌개"), List.of(new MainMenuRequest("김치찌개", "Kimchi Stew"))));
+
+        // when
+        mealService.createMeal(Date.valueOf("2024-01-04"), Restaurant.HAKSIK, LUNCH,
+                new CreateMealRequest(List.of("김치찌개"), List.of(new MainMenuRequest("김치찌개", "Kimchi Jjigae"))));
+
+        // then
+        assertThat(menuNameEn("김치찌개")).isEqualTo("Kimchi Jjigae");
+    }
+
+    @Test
+    void menuNameEnIsKeptWhenOmittedFromMainMenusOrBlank() {
+        // given
+        mealService.createMeal(Date.valueOf("2024-01-03"), Restaurant.HAKSIK, LUNCH,
+                new CreateMealRequest(List.of("김치찌개", "돈까스"),
+                        List.of(new MainMenuRequest("김치찌개", "Kimchi Stew"),
+                                new MainMenuRequest("돈까스", "Pork Cutlet"))));
+
+        // when
+        mealService.createMeal(Date.valueOf("2024-01-04"), Restaurant.HAKSIK, LUNCH,
+                new CreateMealRequest(List.of("김치찌개", "돈까스"),
+                        List.of(new MainMenuRequest("돈까스", "  "))));
+
+        // then
+        assertThat(menuNameEn("김치찌개")).isEqualTo("Kimchi Stew");
+        assertThat(menuNameEn("돈까스")).isEqualTo("Pork Cutlet");
+    }
+
+    @Test
+    void unmatchedMainMenuDoesNotTouchMenuNameEn() {
+        // given
+        CreateMealRequest request = new CreateMealRequest(List.of("돈까스"),
+                List.of(new MainMenuRequest("김치", "Kimchi")));
+
+        // when
+        mealService.createMeal(Date.valueOf("2024-01-03"), Restaurant.HAKSIK, LUNCH, request);
+
+        // then
+        assertThat(menuRepository.findByNameAndRestaurant("김치", Restaurant.HAKSIK)).isEmpty();
+        assertThat(menuNameEn("돈까스")).isNull();
+    }
+
+    @Test
+    void reconcileMealSlotSyncsMainMenuTranslationToMenuNameEn() {
+        // given
+        List<MealCreateWithPriceRequest> requests = List.of(new MealCreateWithPriceRequest(
+                List.of("김치볶음밥"), 5000, List.of(new MainMenuRequest("김치볶음밥", "Kimchi Fried Rice"))));
+
+        // when
+        mealService.reconcileMealSlot(Date.valueOf("2024-01-03"), Restaurant.HAKSIK, LUNCH, requests);
+
+        // then
+        assertThat(menuNameEn("김치볶음밥")).isEqualTo("Kimchi Fried Rice");
+    }
+
+    @Test
+    void favoriteSearchMatchesSyncedEnglishName() {
+        // given
+        mealService.createMeal(Date.valueOf("2024-01-03"), Restaurant.HAKSIK, LUNCH,
+                new CreateMealRequest(List.of("김치찌개"), List.of(new MainMenuRequest("김치찌개", "Kimchi Stew"))));
+
+        // when
+        List<Menu> englishResults = menuFavoriteQueryRepository.searchMenus("kimchi", Language.EN);
+        List<Menu> koreanResults = menuFavoriteQueryRepository.searchMenus("kimchi", Language.KO);
+
+        // then
+        assertThat(englishResults).extracting(Menu::getName).containsExactly("김치찌개");
+        assertThat(koreanResults).isEmpty();
+    }
+
+    private String menuNameEn(String name) {
+        return menuRepository.findByNameAndRestaurant(name, Restaurant.HAKSIK)
+                             .orElseThrow()
+                             .getNameEn();
     }
 
     @Test
