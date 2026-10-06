@@ -65,6 +65,10 @@ public class Meal {
         mealMenus.add(mealMenu);
     }
 
+    public void updatePrice(Integer price) {
+        this.price = price;
+    }
+
     public List<Menu> getMenus() {
         return mealMenus.stream()
                         .map(MealMenu::getMenu)
