@@ -17,18 +17,22 @@ import ssu.eatssu.domain.menu.presentation.dto.request.MainMenuRequest;
 import ssu.eatssu.domain.menu.presentation.dto.request.MealCreateWithPriceRequest;
 import ssu.eatssu.domain.menu.presentation.dto.response.MealCreateResult;
 import ssu.eatssu.domain.menu.presentation.dto.response.MealDetailResponse;
+import ssu.eatssu.domain.menu.presentation.dto.response.MealSlotReconcileResult;
 import ssu.eatssu.domain.menu.presentation.dto.response.MenusInMealResponse;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.restaurant.entity.RestaurantType;
+import ssu.eatssu.domain.review.repository.ReviewRepository;
 import ssu.eatssu.domain.user.entity.Language;
 import ssu.eatssu.global.handler.response.BaseException;
 import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.NOT_SUPPORT_RESTAURANT;
@@ -42,6 +46,7 @@ public class MealService {
     private final MealRepository mealRepository;
     private final MealMenuRepository mealMenuRepository;
     private final MealMainMenuRepository mealMainMenuRepository;
+    private final ReviewRepository reviewRepository;
     private final MealRatingService mealRatingService;
     private final MenuService menuService;
 
@@ -102,9 +107,85 @@ public class MealService {
 
     @Transactional
     public MealCreateResult createMealWithPrice(Date date, Restaurant restaurant, TimePart timePart,
-                                                MealCreateWithPriceRequest request) {
+                                                 MealCreateWithPriceRequest request) {
         return createMealWithOptionalPrice(date, restaurant, timePart, request.menuNames(), request.price(),
                                            request.mainMenus());
+    }
+
+    @Transactional
+    public MealSlotReconcileResult reconcileMealSlot(Date date, Restaurant restaurant, TimePart timePart,
+                                                      List<MealCreateWithPriceRequest> requests) {
+        validateMealRestaurant(restaurant);
+        validateSlotRequests(requests);
+
+        List<Meal> existingMeals = mealRepository.findAllByDateAndTimePartAndRestaurant(date, timePart, restaurant);
+        Set<Long> matchedMealIds = new HashSet<>();
+        List<Long> mealIds = new ArrayList<>();
+        List<List<String>> unmatchedMainMenus = new ArrayList<>();
+
+        for (MealCreateWithPriceRequest request : requests) {
+            Meal existingMeal = findMatchingMeal(existingMeals, matchedMealIds, request.menuNames()).orElse(null);
+            Long mealId;
+            if (existingMeal != null) {
+                existingMeal.updatePrice(request.price());
+                mealId = existingMeal.getId();
+                matchedMealIds.add(mealId);
+            } else {
+                mealId = createNewMeal(date, restaurant, timePart, request.menuNames(), request.price());
+            }
+
+            mealIds.add(mealId);
+            unmatchedMainMenus.add(upsertMainMenus(mealId, request.menuNames(), request.mainMenus()));
+        }
+
+        List<Long> deletedMealIds = new ArrayList<>();
+        List<Long> keptWithReviews = new ArrayList<>();
+        for (Meal existingMeal : existingMeals) {
+            Long mealId = existingMeal.getId();
+            if (matchedMealIds.contains(mealId)) {
+                continue;
+            }
+            if (reviewRepository.existsByMeal_Id(mealId)) {
+                keptWithReviews.add(mealId);
+                continue;
+            }
+
+            mealMainMenuRepository.deleteAllByMeal_Id(mealId);
+            mealMainMenuRepository.flush();
+            mealRepository.delete(existingMeal);
+            deletedMealIds.add(mealId);
+        }
+
+        return new MealSlotReconcileResult(mealIds, unmatchedMainMenus, deletedMealIds, keptWithReviews);
+    }
+
+    private void validateSlotRequests(List<MealCreateWithPriceRequest> requests) {
+        if (requests == null || requests.isEmpty()) {
+            throw new BaseException(BaseResponseStatus.BAD_REQUEST);
+        }
+
+        Set<List<String>> menuNameSets = new HashSet<>();
+        for (MealCreateWithPriceRequest request : requests) {
+            if (request == null || request.menuNames() == null || request.menuNames().isEmpty()
+                    || request.menuNames().stream().anyMatch(name -> name == null || name.isBlank())) {
+                throw new BaseException(BaseResponseStatus.BAD_REQUEST);
+            }
+            if (!menuNameSets.add(sortedMenuNames(request.menuNames()))) {
+                throw new BaseException(BaseResponseStatus.BAD_REQUEST);
+            }
+        }
+    }
+
+    private Optional<Meal> findMatchingMeal(List<Meal> meals, Set<Long> matchedMealIds, List<String> menuNames) {
+        List<String> sortedRequestMenuNames = sortedMenuNames(menuNames);
+        return meals.stream()
+                    .filter(meal -> !matchedMealIds.contains(meal.getId()))
+                    .filter(meal -> sortedMenuNames(meal.getMenuNames()).equals(sortedRequestMenuNames))
+                    .findFirst();
+    }
+
+    private List<String> sortedMenuNames(List<String> menuNames) {
+        return menuNames.stream().sorted().toList();
     }
 
     private MealCreateResult createMealWithOptionalPrice(Date date, Restaurant restaurant, TimePart timePart,
@@ -159,16 +240,12 @@ public class MealService {
                                              List<String> menuNames) {
         List<Meal> meals = mealRepository.findAllByDateAndTimePartAndRestaurant(date, timePart, restaurant);
 
-        List<String> sortedRequestMenuNames = menuNames.stream()
-                                                       .sorted()
-                                                       .toList();
+        List<String> sortedRequestMenuNames = sortedMenuNames(menuNames);
 
         return meals.stream()
                     .filter(meal -> {
-                        List<String> sortedMenuNames = meal.getMenuNames().stream()
-                                                           .sorted()
-                                                           .toList();
-                        return sortedMenuNames.equals(sortedRequestMenuNames);
+                        List<String> existingMenuNames = sortedMenuNames(meal.getMenuNames());
+                        return existingMenuNames.equals(sortedRequestMenuNames);
                     })
                     .findFirst()
                     .map(Meal::getId);

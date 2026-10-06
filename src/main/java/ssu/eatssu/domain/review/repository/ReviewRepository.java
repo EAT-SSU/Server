@@ -19,6 +19,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
 
     List<Review> findAllByMeal(Meal meal);
 
+    boolean existsByMeal_Id(Long mealId);
+
     /**
      * dto projection
      */
