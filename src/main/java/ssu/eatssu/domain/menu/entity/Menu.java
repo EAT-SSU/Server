@@ -92,6 +92,13 @@ public class Menu implements Localizable {
         this.price = price;
     }
 
+    public void updateNameEn(String nameEn) {
+        if (nameEn == null || nameEn.isBlank()) {
+            return;
+        }
+        this.nameEn = nameEn;
+    }
+
     public void changeDiscontinuedStatus() {
         this.isDiscontinued = !this.isDiscontinued;
     }

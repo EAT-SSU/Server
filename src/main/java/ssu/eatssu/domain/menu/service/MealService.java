@@ -222,6 +222,7 @@ public class MealService {
         }
 
         Meal meal = mealRepository.getReferenceById(mealId);
+        Map<String, Menu> menusByName = getMenusByName(meal);
         List<String> unmatchedMainMenus = new ArrayList<>();
         int seq = 0;
         for (MainMenuRequest mainMenu : mainMenus) {
@@ -231,9 +232,23 @@ public class MealService {
                 continue;
             }
             mealMainMenuRepository.save(MealMainMenu.of(meal, seq++, mainMenu.nameKo(), mainMenu.nameEn()));
+            syncMenuNameEn(menusByName.get(mainMenu.nameKo()), mainMenu.nameEn());
         }
 
         return unmatchedMainMenus;
+    }
+
+    private Map<String, Menu> getMenusByName(Meal meal) {
+        return meal.getMealMenus().stream()
+                   .map(MealMenu::getMenu)
+                   .collect(Collectors.toMap(Menu::getName, menu -> menu, (existing, duplicate) -> existing));
+    }
+
+    private void syncMenuNameEn(Menu menu, String nameEn) {
+        if (menu == null) {
+            return;
+        }
+        menu.updateNameEn(nameEn);
     }
 
     private Optional<Long> getExistingMealId(Date date, TimePart timePart, Restaurant restaurant,
