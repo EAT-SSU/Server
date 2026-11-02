@@ -88,7 +88,9 @@ class MenuFavoritePushPersistenceTest {
         // given
         User fan = userRepository.save(user("fan@eatssu.com"));
         User other = userRepository.save(user("other@eatssu.com"));
-        Menu favorite = menuRepository.save(Menu.createVariable("돈까스", Restaurant.HAKSIK));
+        Menu favoriteMenu = Menu.createVariable("돈까스", Restaurant.HAKSIK);
+        favoriteMenu.updateNameEn("Pork Cutlet");
+        Menu favorite = menuRepository.save(favoriteMenu);
         Menu duplicatedRow = menuRepository.save(Menu.createVariable("돈까스", Restaurant.HAKSIK));
         Menu otherRestaurant = menuRepository.save(Menu.createVariable("돈까스", Restaurant.DODAM));
         Menu notServed = menuRepository.save(Menu.createVariable("김치찌개", Restaurant.HAKSIK));
@@ -107,8 +109,8 @@ class MenuFavoritePushPersistenceTest {
 
         // then
         assertThat(matches).containsExactlyInAnyOrder(
-                new MenuFavoriteMatch(fan.getId(), "돈까스", Restaurant.HAKSIK, TimePart.LUNCH),
-                new MenuFavoriteMatch(fan.getId(), "돈까스", Restaurant.HAKSIK, TimePart.DINNER));
+                new MenuFavoriteMatch(fan.getId(), "돈까스", "Pork Cutlet", Restaurant.HAKSIK, TimePart.LUNCH),
+                new MenuFavoriteMatch(fan.getId(), "돈까스", "Pork Cutlet", Restaurant.HAKSIK, TimePart.DINNER));
     }
 
     @Test
