@@ -28,7 +28,8 @@ public class MenuFavoriteMatchQueryRepository {
 
     public List<MenuFavoriteMatch> findMatches(LocalDate date, Collection<TimePart> timeParts) {
         return queryFactory.select(Projections.constructor(MenuFavoriteMatch.class,
-                                   favorite.user.id, favoriteMenu.name, meal.restaurant, meal.timePart))
+                                   favorite.user.id, favoriteMenu.name, favoriteMenu.nameEn, meal.restaurant,
+                                   meal.timePart))
                            .distinct()
                            .from(favorite)
                            .join(favorite.menu, favoriteMenu)
