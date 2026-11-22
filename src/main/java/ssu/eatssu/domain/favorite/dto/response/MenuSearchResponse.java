@@ -3,7 +3,6 @@ package ssu.eatssu.domain.favorite.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
-import ssu.eatssu.domain.user.entity.Language;
 
 @Schema(title = "찜 메뉴 검색 결과")
 public record MenuSearchResponse(
@@ -17,8 +16,7 @@ public record MenuSearchResponse(
         boolean isFavorite
 ) {
 
-    public static MenuSearchResponse of(Menu menu, Language language, boolean isFavorite) {
-        return new MenuSearchResponse(menu.getId(), menu.getNameByLanguage(language), menu.getRestaurant(),
-                                      isFavorite);
+    public static MenuSearchResponse of(Menu menu, String menuName, boolean isFavorite) {
+        return new MenuSearchResponse(menu.getId(), menuName, menu.getRestaurant(), isFavorite);
     }
 }

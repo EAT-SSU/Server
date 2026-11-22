@@ -111,6 +111,58 @@ class MenuFavoriteServiceTest {
     }
 
     @Test
+    void searchNormalizesNamesAndMergesMenusThatDifferOnlyByNoise() {
+        // given
+        Menu dotted = menu(1L, ".콩나물국", Restaurant.DORMITORY);
+        Menu trailingSpace = menu(2L, "콩나물국 ", Restaurant.DORMITORY);
+        Menu otherRestaurant = menu(3L, "콩나물국", Restaurant.HAKSIK);
+        Menu starred = menu(4L, "★콩나물국밥", Restaurant.HAKSIK);
+        when(menuFavoriteQueryRepository.searchMenus("콩나물국", Language.KO))
+                .thenReturn(List.of(starred, trailingSpace, otherRestaurant, dotted));
+        when(menuFavoriteRepository.findFavoriteMenuIds(eq(USER_ID), any())).thenReturn(Set.of());
+
+        // when
+        List<MenuSearchResponse> responses = service.searchMenus(userDetails, "콩나물국");
+
+        // then
+        assertThat(responses).extracting(MenuSearchResponse::menuId).containsExactly(1L, 3L, 4L);
+        assertThat(responses).extracting(MenuSearchResponse::menuName).containsExactly("콩나물국", "콩나물국", "콩나물국밥");
+    }
+
+    @Test
+    void searchExcludesNonMenuEntriesWithoutCheckingFavoritesWhenNothingRemains() {
+        // given
+        Menu greeting = menu(1L, "즐거운 명절 보내세요..^^", Restaurant.DORMITORY);
+        Menu fragment = menu(2L, "새해 ", Restaurant.DORMITORY);
+        when(menuFavoriteQueryRepository.searchMenus("명절", Language.KO)).thenReturn(List.of(greeting, fragment));
+
+        // when
+        List<MenuSearchResponse> responses = service.searchMenus(userDetails, "명절");
+
+        // then
+        assertThat(responses).isEmpty();
+        verify(menuFavoriteRepository, never()).findFavoriteMenuIds(anyLong(), any());
+    }
+
+    @Test
+    void searchKeepsNormalMenusAlongsideExcludedEntries() {
+        // given
+        Menu greeting = menu(1L, "밝은 보름달처럼 넉넉한 한가위 보내세요.", Restaurant.DORMITORY);
+        Menu special = menu(2L, "한가위 특식", Restaurant.HAKSIK);
+        Menu englishOnly = menu(3L, "Hangawi Special", Restaurant.HAKSIK);
+        when(menuFavoriteQueryRepository.searchMenus("한가위", Language.KO))
+                .thenReturn(List.of(greeting, special, englishOnly));
+        when(menuFavoriteRepository.findFavoriteMenuIds(eq(USER_ID), any())).thenReturn(Set.of(2L));
+
+        // when
+        List<MenuSearchResponse> responses = service.searchMenus(userDetails, "한가위");
+
+        // then
+        assertThat(responses).extracting(MenuSearchResponse::menuId).containsExactly(2L);
+        assertThat(responses.get(0).isFavorite()).isTrue();
+    }
+
+    @Test
     void searchReturnsEmptyListWithoutCheckingFavoritesWhenNothingMatches() {
         // given
         when(menuFavoriteQueryRepository.searchMenus("없는메뉴", Language.KO)).thenReturn(List.of());
