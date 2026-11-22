@@ -21,13 +21,11 @@ import ssu.eatssu.global.handler.response.BaseResponseStatus;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -82,7 +80,7 @@ class MenuFavoriteServiceTest {
         Menu kimchiAtOtherRestaurant = menu(5L, "김치", Restaurant.HAKSIK);
         when(menuFavoriteQueryRepository.searchMenus("김치", Language.KO))
                 .thenReturn(List.of(friedRice, duplicatedKimchi, stew, kimchiAtOtherRestaurant, kimchi));
-        when(menuFavoriteRepository.findFavoriteMenuIds(eq(USER_ID), any())).thenReturn(Set.of(1L));
+        when(menuFavoriteRepository.findAllWithMenuByUserId(USER_ID)).thenReturn(List.of(MenuFavorite.of(user, stew)));
 
         // when
         List<MenuSearchResponse> responses = service.searchMenus(userDetails, " 김치 ");
@@ -101,7 +99,6 @@ class MenuFavoriteServiceTest {
         ReflectionTestUtils.setField(cutlet, "nameEn", "Pork Cutlet");
         Menu untranslated = menu(2L, "치즈 PORK", Restaurant.DODAM);
         when(menuFavoriteQueryRepository.searchMenus("pork", Language.EN)).thenReturn(List.of(untranslated, cutlet));
-        when(menuFavoriteRepository.findFavoriteMenuIds(eq(USER_ID), any())).thenReturn(Set.of());
 
         // when
         List<MenuSearchResponse> responses = service.searchMenus(userDetails, "pork");
@@ -119,7 +116,6 @@ class MenuFavoriteServiceTest {
         Menu starred = menu(4L, "★콩나물국밥", Restaurant.HAKSIK);
         when(menuFavoriteQueryRepository.searchMenus("콩나물국", Language.KO))
                 .thenReturn(List.of(starred, trailingSpace, otherRestaurant, dotted));
-        when(menuFavoriteRepository.findFavoriteMenuIds(eq(USER_ID), any())).thenReturn(Set.of());
 
         // when
         List<MenuSearchResponse> responses = service.searchMenus(userDetails, "콩나물국");
@@ -141,7 +137,7 @@ class MenuFavoriteServiceTest {
 
         // then
         assertThat(responses).isEmpty();
-        verify(menuFavoriteRepository, never()).findFavoriteMenuIds(anyLong(), any());
+        verify(menuFavoriteRepository, never()).findAllWithMenuByUserId(anyLong());
     }
 
     @Test
@@ -152,7 +148,7 @@ class MenuFavoriteServiceTest {
         Menu englishOnly = menu(3L, "Hangawi Special", Restaurant.HAKSIK);
         when(menuFavoriteQueryRepository.searchMenus("한가위", Language.KO))
                 .thenReturn(List.of(greeting, special, englishOnly));
-        when(menuFavoriteRepository.findFavoriteMenuIds(eq(USER_ID), any())).thenReturn(Set.of(2L));
+        when(menuFavoriteRepository.findAllWithMenuByUserId(USER_ID)).thenReturn(List.of(MenuFavorite.of(user, special)));
 
         // when
         List<MenuSearchResponse> responses = service.searchMenus(userDetails, "한가위");
@@ -172,7 +168,7 @@ class MenuFavoriteServiceTest {
 
         // then
         assertThat(responses).isEmpty();
-        verify(menuFavoriteRepository, never()).findFavoriteMenuIds(anyLong(), any());
+        verify(menuFavoriteRepository, never()).findAllWithMenuByUserId(anyLong());
     }
 
     @Test
@@ -210,7 +206,6 @@ class MenuFavoriteServiceTest {
         // given
         Menu menu = menu(10L, "파스타", Restaurant.DODAM);
         when(menuRepository.findById(10L)).thenReturn(Optional.of(menu));
-        when(menuFavoriteRepository.existsByUserIdAndMenuId(USER_ID, 10L)).thenReturn(false);
 
         // when
         service.addFavorite(userDetails, 10L);
@@ -225,7 +220,7 @@ class MenuFavoriteServiceTest {
         Menu menu = menu(10L, "파스타", Restaurant.DODAM);
         menu.changeDiscontinuedStatus();
         when(menuRepository.findById(10L)).thenReturn(Optional.of(menu));
-        when(menuFavoriteRepository.existsByUserIdAndMenuId(USER_ID, 10L)).thenReturn(true);
+        when(menuFavoriteRepository.findAllWithMenuByUserId(USER_ID)).thenReturn(List.of(MenuFavorite.of(user, menu)));
 
         // when
         service.addFavorite(userDetails, 10L);
@@ -271,6 +266,110 @@ class MenuFavoriteServiceTest {
 
         // then
         verify(menuFavoriteRepository).deleteByUserIdAndMenuId(USER_ID, menuId);
+    }
+
+    @Test
+    void searchMergesNotationVariantsAndMarksGroupAsFavoritedWhenAnyVariantIsFavorited() {
+        // given
+        Menu star = menu(1L, "수육*새우젓", Restaurant.DODAM);
+        Menu ampersand = menu(2L, "수육&새우젓", Restaurant.DODAM);
+        Menu plus = menu(3L, "수육+새우젓", Restaurant.DODAM);
+        Menu otherRestaurant = menu(4L, "수육 & 새우젓", Restaurant.HAKSIK);
+        when(menuFavoriteQueryRepository.searchMenus("수육", Language.KO))
+                .thenReturn(List.of(plus, star, otherRestaurant, ampersand));
+        when(menuFavoriteRepository.findAllWithMenuByUserId(USER_ID)).thenReturn(List.of(MenuFavorite.of(user, plus)));
+
+        // when
+        List<MenuSearchResponse> responses = service.searchMenus(userDetails, "수육");
+
+        // then
+        assertThat(responses).extracting(MenuSearchResponse::restaurant)
+                             .containsExactlyInAnyOrder(Restaurant.DODAM, Restaurant.HAKSIK);
+        assertThat(responses).filteredOn(response -> response.restaurant() == Restaurant.DODAM)
+                             .singleElement()
+                             .extracting(MenuSearchResponse::isFavorite)
+                             .isEqualTo(true);
+        assertThat(responses).filteredOn(response -> response.restaurant() == Restaurant.HAKSIK)
+                             .singleElement()
+                             .extracting(MenuSearchResponse::isFavorite)
+                             .isEqualTo(false);
+    }
+
+    @Test
+    void searchMergesSizeNotationTildeAndSpacingVariants() {
+        // given
+        Menu hanja = menu(1L, "잔치국수(大)", Restaurant.HAKSIK);
+        Menu hangul = menu(2L, "잔치국수(대)", Restaurant.HAKSIK);
+        Menu tilde = menu(3L, "멸치~잔치국수", Restaurant.HAKSIK);
+        Menu plain = menu(4L, "멸치잔치국수", Restaurant.HAKSIK);
+        Menu spaced = menu(5L, "꼬막 비빔밥 & 계란후라이", Restaurant.DODAM);
+        Menu joined = menu(6L, "꼬막비빔밥 & 계란후라이", Restaurant.DODAM);
+        when(menuFavoriteQueryRepository.searchMenus("국수", Language.KO))
+                .thenReturn(List.of(hanja, hangul, tilde, plain));
+        when(menuFavoriteQueryRepository.searchMenus("꼬막", Language.KO)).thenReturn(List.of(spaced, joined));
+
+        // when
+        List<MenuSearchResponse> noodles = service.searchMenus(userDetails, "국수");
+        List<MenuSearchResponse> bibimbap = service.searchMenus(userDetails, "꼬막");
+
+        // then
+        assertThat(noodles).hasSize(2);
+        assertThat(noodles).extracting(MenuSearchResponse::menuName).contains("멸치잔치국수")
+                           .noneMatch(name -> name.contains("~"));
+        assertThat(bibimbap).hasSize(1);
+    }
+
+    @Test
+    void getFavoriteMenusShowsOneEntryPerNotationGroup() {
+        // given
+        Menu latest = menu(1L, "수육&새우젓", Restaurant.DODAM);
+        Menu older = menu(2L, "수육*새우젓", Restaurant.DODAM);
+        Menu other = menu(3L, "파스타", Restaurant.DODAM);
+        when(menuFavoriteRepository.findAllWithMenuByUserId(USER_ID))
+                .thenReturn(List.of(MenuFavorite.of(user, latest), MenuFavorite.of(user, older),
+                                    MenuFavorite.of(user, other)));
+
+        // when
+        List<FavoriteMenuResponse> responses = service.getFavoriteMenus(userDetails);
+
+        // then
+        assertThat(responses).extracting(FavoriteMenuResponse::menuId).containsExactly(1L, 3L);
+    }
+
+    @Test
+    void addFavoriteDoesNothingWhenAnotherNotationVariantIsAlreadyFavorited() {
+        // given
+        Menu favorited = menu(1L, "수육*새우젓", Restaurant.DODAM);
+        Menu variant = menu(2L, "수육+새우젓", Restaurant.DODAM);
+        when(menuRepository.findById(2L)).thenReturn(Optional.of(variant));
+        when(menuFavoriteRepository.findAllWithMenuByUserId(USER_ID))
+                .thenReturn(List.of(MenuFavorite.of(user, favorited)));
+
+        // when
+        service.addFavorite(userDetails, 2L);
+
+        // then
+        verify(menuFavoriteRepository, never()).save(any());
+    }
+
+    @Test
+    void removeFavoriteDeletesEveryNotationVariantInTheSameGroup() {
+        // given
+        Menu star = menu(1L, "수육*새우젓", Restaurant.DODAM);
+        Menu plus = menu(2L, "수육+새우젓", Restaurant.DODAM);
+        Menu otherRestaurant = menu(3L, "수육*새우젓", Restaurant.HAKSIK);
+        MenuFavorite starFavorite = MenuFavorite.of(user, star);
+        MenuFavorite plusFavorite = MenuFavorite.of(user, plus);
+        MenuFavorite otherFavorite = MenuFavorite.of(user, otherRestaurant);
+        when(menuRepository.findById(1L)).thenReturn(Optional.of(star));
+        when(menuFavoriteRepository.findAllWithMenuByUserId(USER_ID))
+                .thenReturn(List.of(starFavorite, plusFavorite, otherFavorite));
+
+        // when
+        service.removeFavorite(userDetails, 1L);
+
+        // then
+        verify(menuFavoriteRepository).deleteAll(List.of(starFavorite, plusFavorite));
     }
 
     private Menu menu(Long id, String name, Restaurant restaurant) {

@@ -114,6 +114,29 @@ class MenuFavoritePushPersistenceTest {
     }
 
     @Test
+    void findMatchesMatchesNotationVariantsOnceEvenWhenSeveralVariantsAreFavorited() {
+        // given
+        User fan = userRepository.save(user("variant@eatssu.com"));
+        Menu star = menuRepository.save(Menu.createVariable("수육*새우젓", Restaurant.DODAM));
+        Menu plus = menuRepository.save(Menu.createVariable("수육+새우젓", Restaurant.DODAM));
+        Menu ampersand = menuRepository.save(Menu.createVariable("수육 & 새우젓 ", Restaurant.DODAM));
+        Menu otherRestaurant = menuRepository.save(Menu.createVariable("수육&새우젓", Restaurant.HAKSIK));
+        menuFavoriteRepository.save(MenuFavorite.of(fan, star));
+        menuFavoriteRepository.save(MenuFavorite.of(fan, plus));
+
+        serve(TODAY, TimePart.LUNCH, Restaurant.DODAM, ampersand);
+        serve(TODAY, TimePart.LUNCH, Restaurant.HAKSIK, otherRestaurant);
+
+        // when
+        List<MenuFavoriteMatch> matches = menuFavoriteMatchQueryRepository.findMatches(
+                TODAY, List.of(TimePart.LUNCH, TimePart.DINNER));
+
+        // then
+        assertThat(matches).containsExactly(
+                new MenuFavoriteMatch(fan.getId(), "수육*새우젓", null, Restaurant.DODAM, TimePart.LUNCH));
+    }
+
+    @Test
     void pushTokenQueriesFindAndDeleteTokens() {
         // given
         User owner = userRepository.save(user("owner@eatssu.com"));

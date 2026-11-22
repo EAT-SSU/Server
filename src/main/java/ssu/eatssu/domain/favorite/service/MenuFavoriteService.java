@@ -14,6 +14,7 @@ import ssu.eatssu.domain.menu.entity.Menu;
 import ssu.eatssu.domain.menu.persistence.MenuRepository;
 import ssu.eatssu.domain.menu.util.MenuNameSanitizer;
 import ssu.eatssu.domain.menu.util.SanitizedMenuName;
+import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.user.entity.Language;
 import ssu.eatssu.domain.user.entity.User;
 import ssu.eatssu.domain.user.repository.UserRepository;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static ssu.eatssu.global.handler.response.BaseResponseStatus.DISCONTINUED_MENU;
@@ -60,19 +62,22 @@ public class MenuFavoriteService {
             return List.of();
         }
 
-        List<Long> menuIds = candidates.stream().map(candidate -> candidate.menu().getId()).toList();
-        Set<Long> favoriteMenuIds = menuFavoriteRepository.findFavoriteMenuIds(user.getId(), menuIds);
+        Set<MenuGroup> favoriteGroups = favoriteGroupsOf(user.getId());
         return candidates.stream()
                          .map(candidate -> MenuSearchResponse.of(candidate.menu(), candidate.displayName(),
-                                                                 favoriteMenuIds.contains(candidate.menu().getId())))
+                                                                 favoriteGroups.contains(candidate.group())))
                          .toList();
     }
 
     public List<FavoriteMenuResponse> getFavoriteMenus(CustomUserDetails userDetails) {
         User user = findUser(userDetails);
-        return menuFavoriteRepository.findAllWithMenuByUserId(user.getId()).stream()
-                                     .map(favorite -> FavoriteMenuResponse.of(favorite.getMenu(), user.getLanguage()))
-                                     .toList();
+        Map<MenuGroup, Menu> uniqueMenus = new LinkedHashMap<>();
+        menuFavoriteRepository.findAllWithMenuByUserId(user.getId())
+                              .forEach(favorite -> uniqueMenus.putIfAbsent(MenuGroup.of(favorite.getMenu()),
+                                                                           favorite.getMenu()));
+        return uniqueMenus.values().stream()
+                          .map(menu -> FavoriteMenuResponse.of(menu, user.getLanguage()))
+                          .toList();
     }
 
     @Transactional
@@ -80,7 +85,7 @@ public class MenuFavoriteService {
         User user = findUser(userDetails);
         Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new BaseException(NOT_FOUND_MENU));
 
-        if (menuFavoriteRepository.existsByUserIdAndMenuId(user.getId(), menu.getId())) {
+        if (favoriteGroupsOf(user.getId()).contains(MenuGroup.of(menu))) {
             return;
         }
         if (menu.isDiscontinued()) {
@@ -91,7 +96,24 @@ public class MenuFavoriteService {
 
     @Transactional
     public void removeFavorite(CustomUserDetails userDetails, Long menuId) {
-        menuFavoriteRepository.deleteByUserIdAndMenuId(userDetails.getId(), menuId);
+        Long userId = userDetails.getId();
+        Menu menu = menuRepository.findById(menuId).orElse(null);
+        if (menu == null) {
+            menuFavoriteRepository.deleteByUserIdAndMenuId(userId, menuId);
+            return;
+        }
+        MenuGroup group = MenuGroup.of(menu);
+        List<MenuFavorite> sameGroupFavorites = menuFavoriteRepository.findAllWithMenuByUserId(userId).stream()
+                                                                      .filter(favorite -> MenuGroup.of(
+                                                                              favorite.getMenu()).equals(group))
+                                                                      .toList();
+        menuFavoriteRepository.deleteAll(sameGroupFavorites);
+    }
+
+    private Set<MenuGroup> favoriteGroupsOf(Long userId) {
+        return menuFavoriteRepository.findAllWithMenuByUserId(userId).stream()
+                                     .map(favorite -> MenuGroup.of(favorite.getMenu()))
+                                     .collect(Collectors.toSet());
     }
 
     private String normalizeKeyword(String keyword) {
@@ -111,7 +133,8 @@ public class MenuFavoriteService {
                           menu.getId(), menu.getName(), sanitized.excludeReason());
                 continue;
             }
-            candidates.add(new SearchCandidate(menu, sanitized.name(), displayName(menu, language, sanitized.name())));
+            candidates.add(new SearchCandidate(menu, MenuGroup.of(menu), sanitized.name(),
+                                               displayName(menu, language, sanitized.name())));
         }
         return candidates;
     }
@@ -123,14 +146,13 @@ public class MenuFavoriteService {
 
     private List<SearchCandidate> sortAndDeduplicate(List<SearchCandidate> candidates, String keyword) {
         String lowerKeyword = keyword.toLowerCase(Locale.ROOT);
-        Map<String, SearchCandidate> uniqueCandidates = new LinkedHashMap<>();
+        Map<MenuGroup, SearchCandidate> uniqueCandidates = new LinkedHashMap<>();
 
         candidates.stream()
                   .sorted(Comparator.comparingInt((SearchCandidate candidate) -> matchRank(candidate, lowerKeyword))
                                     .thenComparing(SearchCandidate::displayName)
                                     .thenComparing(candidate -> candidate.menu().getId()))
-                  .forEach(candidate -> uniqueCandidates.putIfAbsent(
-                          candidate.name() + "|" + candidate.menu().getRestaurant(), candidate));
+                  .forEach(candidate -> uniqueCandidates.putIfAbsent(candidate.group(), candidate));
 
         return List.copyOf(uniqueCandidates.values());
     }
@@ -156,6 +178,13 @@ public class MenuFavoriteService {
         return userRepository.findById(userDetails.getId()).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
     }
 
-    private record SearchCandidate(Menu menu, String name, String displayName) {
+    private record SearchCandidate(Menu menu, MenuGroup group, String name, String displayName) {
+    }
+
+    private record MenuGroup(String nameKey, Restaurant restaurant) {
+
+        private static MenuGroup of(Menu menu) {
+            return new MenuGroup(MenuNameSanitizer.toKey(menu.getName()), menu.getRestaurant());
+        }
     }
 }
