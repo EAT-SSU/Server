@@ -79,7 +79,20 @@ class MenuNameSanitizerTest {
                 Arguments.of("yukgaejang", MenuNameExcludeReason.NO_HANGUL),
                 Arguments.of("T-bone Steak", MenuNameExcludeReason.NO_HANGUL),
                 Arguments.of("Andong Braised Chicken", MenuNameExcludeReason.NO_HANGUL),
-                Arguments.of("돈까스".repeat(11), MenuNameExcludeReason.TOO_LONG)
+                Arguments.of("돈까스".repeat(11), MenuNameExcludeReason.TOO_LONG),
+                Arguments.of("칠리s", MenuNameExcludeReason.SAUCE_ONLY),
+                Arguments.of("허니s", MenuNameExcludeReason.SAUCE_ONLY),
+                Arguments.of("사우전s", MenuNameExcludeReason.SAUCE_ONLY),
+                Arguments.of("타르S", MenuNameExcludeReason.SAUCE_ONLY),
+                Arguments.of("데미s", MenuNameExcludeReason.SAUCE_ONLY),
+                Arguments.of("후르츠s", MenuNameExcludeReason.SAUCE_ONLY),
+                Arguments.of("무지방오리엔탈D", MenuNameExcludeReason.SAUCE_ONLY),
+                Arguments.of("스리라차s ", MenuNameExcludeReason.SAUCE_ONLY),
+                Arguments.of("소스", MenuNameExcludeReason.SAUCE_ONLY),
+                Arguments.of("칠리소스", MenuNameExcludeReason.SAUCE_ONLY),
+                Arguments.of("짜장소스", MenuNameExcludeReason.SAUCE_ONLY),
+                Arguments.of("오리엔탈드레싱", MenuNameExcludeReason.SAUCE_ONLY),
+                Arguments.of("자몽 드레싱", MenuNameExcludeReason.SAUCE_ONLY)
         );
     }
 
@@ -96,7 +109,12 @@ class MenuNameSanitizerTest {
                 Arguments.of("★미역국 & 뼈없는닭갈비", "미역국 & 뼈없는닭갈비"),
                 Arguments.of("　쌀밥 ", "쌀밥"),
                 Arguments.of("\t· 김치찌개", "김치찌개"),
-                Arguments.of("* 돈까스...", "돈까스")
+                Arguments.of("* 돈까스...", "돈까스"),
+                Arguments.of("시원한~물냉면", "시원한물냉면"),
+                Arguments.of("멸치~잔치국수", "멸치잔치국수"),
+                Arguments.of("떡~만두국(大)", "떡만두국(大)"),
+                Arguments.of("멸치 ~ 잔치국수(大)", "멸치잔치국수(大)"),
+                Arguments.of("김치말이～냉국수", "김치말이냉국수")
         );
     }
 
@@ -105,9 +123,6 @@ class MenuNameSanitizerTest {
                 "잔치국수(大)",
                 "잔치국수(대)",
                 "물냉면",
-                "떡~만두국(大)",
-                "멸치~잔치국수(大)",
-                "시원한~물냉면",
                 "치킨마요",
                 "참치마요덮밥",
                 "크림소다",
@@ -124,6 +139,16 @@ class MenuNameSanitizerTest {
                 "콘크림함박스테이크 & 베이컨마늘쫑필라프",
                 "토스트 & 딸기쨈, 버터",
                 "삶은 만두 네 개",
+                "오징어까스&칠리s",
+                "멘치까스&사우전s",
+                "떡갈비스테이크&소스",
+                "연두부오리엔탈D",
+                "후르츠s치킨너겟",
+                "허니s치킨까스샐러드",
+                "칠리소스닭강정",
+                "데미소스함박스테이크",
+                "블랙돈카츠쫄면SET",
+                "고깃집st볶음밥",
                 "한가위 특식",
                 "추석특선 갈비찜",
                 "감자샐러드"
@@ -141,19 +166,72 @@ class MenuNameSanitizerTest {
         assertThat(result.name()).isEqualTo(raw);
     }
 
+    @ParameterizedTest
+    @MethodSource("sameMenuVariants")
+    void toKeyGivesSameKeyToNotationVariantsOfTheSameMenu(String first, String second) {
+        // given & when
+        String firstKey = MenuNameSanitizer.toKey(first);
+        String secondKey = MenuNameSanitizer.toKey(second);
+
+        // then
+        assertThat(firstKey).isEqualTo(secondKey);
+    }
+
+    @ParameterizedTest
+    @MethodSource("differentMenus")
+    void toKeyKeepsDifferentMenusApart(String first, String second) {
+        // given & when
+        String firstKey = MenuNameSanitizer.toKey(first);
+        String secondKey = MenuNameSanitizer.toKey(second);
+
+        // then
+        assertThat(firstKey).isNotEqualTo(secondKey);
+    }
+
+    @ParameterizedTest
+    @MethodSource("namesWithoutMenuText")
+    void toKeyReturnsNullWhenNothingRemainsAfterNormalization(String raw) {
+        // given & when
+        String key = MenuNameSanitizer.toKey(raw);
+
+        // then
+        assertThat(key).isNull();
+    }
+
+    private static Stream<String> namesWithoutMenuText() {
+        return Stream.of("★", "-", ".", "..", "", "   ", "~", null);
+    }
+
+    private static Stream<Arguments> sameMenuVariants() {
+        return Stream.of(
+                Arguments.of("웨지감자튀김*케찹", "웨지감자튀김&케찹"),
+                Arguments.of("웨지감자튀김&케찹", "웨지감자튀김+케찹"),
+                Arguments.of("수육*새우젓", "수육+새우젓"),
+                Arguments.of("잔치국수(대)", "잔치국수(大)"),
+                Arguments.of("잔치국수(大)", "잔치국수(大)  "),
+                Arguments.of("꼬막 비빔밥 & 계란후라이", "꼬막비빔밥 & 계란후라이"),
+                Arguments.of("시원한~물냉면", "시원한물냉면"),
+                Arguments.of("멸치~잔치국수", "멸치 잔치국수"),
+                Arguments.of("떡~만두국(大)", "떡만두국(대)"),
+                Arguments.of(".콩나물국", "콩나물국"),
+                Arguments.of("수육＆새우젓", "수육&새우젓"),
+                Arguments.of("Pork Cutlet", "porkcutlet")
+        );
+    }
+
+    private static Stream<Arguments> differentMenus() {
+        return Stream.of(
+                Arguments.of("잔치국수", "잔치국수(대)"),
+                Arguments.of("물냉면", "시원한~물냉면"),
+                Arguments.of("오징어가스", "오징어가스/사우전"),
+                Arguments.of("(쌀밥데이)콩나물국", "콩나물국"),
+                Arguments.of("수육", "수육&새우젓")
+        );
+    }
+
     private static Stream<String> outOfScopeMenuNames() {
         return Stream.of(
-                "칠리s",
-                "허니s",
-                "사우전s",
-                "타르s",
-                "데미s",
-                "후르츠s",
-                "무지방오리엔탈D",
                 "오징어가스/사우전",
-                "시원한~물냉면",
-                "멸치~잔치국수",
-                "떡~만두국(大)",
                 "웨지감자튀김*케찹",
                 "웨지감자튀김&케찹",
                 "웨지감자튀김+케찹",

@@ -16,6 +16,7 @@ import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ssu.eatssu.domain.menu.util.MenuNameSanitizer;
 import ssu.eatssu.domain.restaurant.entity.Restaurant;
 import ssu.eatssu.domain.review.entity.Review;
 import ssu.eatssu.domain.review.entity.Reviews;
@@ -42,6 +43,8 @@ public class Menu implements Localizable {
     @Column(name = "menu_id")
     private Long id;
     private String name;
+    @Column(name = "name_key")
+    private String nameKey;
     @Column(name = "name_en")
     private String nameEn;
     @Column(name = "name_ja")
@@ -60,6 +63,7 @@ public class Menu implements Localizable {
 
     private Menu(String name, Restaurant restaurant, Integer price, MenuCategory category) {
         this.name = name;
+        this.nameKey = MenuNameSanitizer.toKey(name);
         this.restaurant = restaurant;
         this.price = price;
         this.category = category;
@@ -89,6 +93,7 @@ public class Menu implements Localizable {
 
     public void update(String name, Integer price) {
         this.name = name;
+        this.nameKey = MenuNameSanitizer.toKey(name);
         this.price = price;
     }
 

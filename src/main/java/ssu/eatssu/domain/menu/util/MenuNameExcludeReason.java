@@ -9,5 +9,6 @@ public enum MenuNameExcludeReason {
     SENTENCE,
     TAG_ONLY,
     ORIGIN_ONLY,
+    SAUCE_ONLY,
     TOO_LONG
 }
